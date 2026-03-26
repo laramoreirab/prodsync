@@ -15,7 +15,7 @@ const CollaborateButton = ({
 }) => (
   <Button
     className={cn(
-      "relative text-sm font-medium rounded-full h-10 p-1 ps-4 pe-12 group transition-all duration-500 hover:ps-12 hover:pe-4 w-fit overflow-hidden",
+      "relative text-lg font-medium rounded-full h-12 p-1 ps-4 pe-12 group transition-all duration-500 hover:ps-12 hover:pe-4 w-fit overflow-hidden",
       className,
       "cursor-pointer"
     )}>
@@ -23,7 +23,7 @@ const CollaborateButton = ({
       Cadastre-se
     </span>
     <span
-      className="absolute right-1 w-8 h-8 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
+      className="absolute right-1 w-10 h-10 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-42px)] group-hover:rotate-45">
       <ArrowUpRight size={16} />
     </span>
   </Button>
@@ -71,6 +71,7 @@ const Header = ({
             ? "p-2.5 bg-background/60 backdrop-blur-lg border border-border/40 shadow-2xl shadow-primary/5 rounded-full"
             : "bg-transparent border-transparent"
         )}>
+          
         {/* Logo */}
         <div>
           <a href="#">
@@ -87,7 +88,7 @@ const Header = ({
                   <NavigationMenuLink
                     href={navItem.href}
                     className={cn(
-                      "px-2 lg:px-4 py-2 text-sm font-medium rounded-full text-muted-foreground hover:text-foreground hover:bg-background outline outline-transparent hover:outline-border hover:shadow-xs transition tracking-normal",
+                      "px-2 lg:px-4 py-2 text-lg font-semibold rounded-full h-12 text-muted-foreground hover:text-foreground hover:bg-background outline outline-transparent hover:outline-border hover:shadow-xs transition tracking-normal",
                       navItem.isActive ? "bg-background text-foreground" : ""
                     )}>
                     {navItem.title}

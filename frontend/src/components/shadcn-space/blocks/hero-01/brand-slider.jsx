@@ -13,7 +13,7 @@ function BrandSlider({
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.6, ease: "easeInOut" }}
+            transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
             className="flex flex-col gap-3">
             <div className="flex justify-center text-center py-3 md:py-4 relative">
               <div className="flex items-center justify-center gap-4">

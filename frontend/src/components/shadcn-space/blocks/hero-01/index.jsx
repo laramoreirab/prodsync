@@ -1,6 +1,5 @@
 import HeroSection from "@/components/shadcn-space/blocks/hero-01/hero";
 import Header from "@/components/shadcn-space/blocks/hero-01/header";
-import BrandSlider from "@/components/shadcn-space/blocks/hero-01/brand-slider";
 
 export default function AgencyHeroSection() {
   const avatarList = [
@@ -21,7 +20,7 @@ export default function AgencyHeroSection() {
   const navigationData = [
     {
       title: "Home",
-      href: "#",
+      href: "/",
       isActive: true,
     },
     {
@@ -71,7 +70,7 @@ export default function AgencyHeroSection() {
       <Header navigationData={navigationData} />
       <main>
         <HeroSection avatarList={avatarList} />
-        {/* <BrandSlider brandList={brandList} /> */}
+        
       </main>
     </div>
   );
