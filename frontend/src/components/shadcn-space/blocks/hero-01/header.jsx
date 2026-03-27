@@ -15,7 +15,7 @@ const CollaborateButton = ({
 }) => (
   <Button
     className={cn(
-      "relative text-lg font-medium rounded-full h-12 p-1 ps-4 pe-12 group transition-all duration-500 hover:ps-12 hover:pe-4 w-fit overflow-hidden",
+      "relative text-md font-medium rounded-full h-10 p-1 ps-4 pe-12 group transition-all duration-500 hover:ps-12 hover:pe-4 w-fit overflow-hidden",
       className,
       "cursor-pointer"
     )}>
@@ -23,7 +23,7 @@ const CollaborateButton = ({
       Cadastre-se
     </span>
     <span
-      className="absolute right-1 w-10 h-10 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-42px)] group-hover:rotate-45">
+      className="absolute right-1 w-8 h-8 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
       <ArrowUpRight size={16} />
     </span>
   </Button>
@@ -68,8 +68,9 @@ const Header = ({
         className={cn(
           "w-full max-w-6xl flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500",
           sticky
-            ? "p-2.5 bg-background/60 backdrop-blur-lg border border-border/40 shadow-2xl shadow-primary/5 rounded-full"
-            : "bg-transparent border-transparent"
+          /* bg-background/60 */
+            ? "p-2.5 bg-red-600 backdrop-blur-lg border border-border/40 shadow-2xl shadow-primary/5 rounded-full h-20 mt-2"
+            : "border-transparent h-20"
         )}>
           
         {/* Logo */}
@@ -81,7 +82,7 @@ const Header = ({
 
         {/* Desktop Navigation */}
         <div>
-          <NavigationMenu className="max-lg:hidden bg-muted p-0.5 rounded-full">
+          <NavigationMenu className="max-lg:hidden bg-muted p-0.5 rounded-full h-12">
             <NavigationMenuList className="flex gap-0">
               {navigationData.map((navItem) => (
                 <NavigationMenuItem key={navItem.title}>

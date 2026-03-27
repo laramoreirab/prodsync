@@ -3,7 +3,8 @@ import { Instrument_Serif } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
-import BrandSlider from "@/components/shadcn-space/blocks/hero-01/brand-slider";
+import { Marquee } from "@/components/shadcn-space/animations/marquee";
+import { CardForm } from "@/components/shadcn-space/blocks/forms-01/login-form";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -14,39 +15,39 @@ const instrumentSerif = Instrument_Serif({
 const virtual = 2; /* fazer dowloand da fonte correta */
 
 const brandList = [
-    {
-      image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-1.svg",
-      lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-1.svg",
-      name: "Brand 1",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-2.svg",
-      lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-2.svg",
-      name: "Brand 2",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-3.svg",
-      lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-3.svg",
-      name: "Brand 3",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-4.svg",
-      lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-4.svg",
-      name: "Brand 4",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-5.svg",
-      lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-5.svg",
-      name: "Brand 5",
-    },
-  ];
+  {
+    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-1.svg",
+    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-1.svg",
+    name: "Brand 1",
+  },
+  {
+    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-2.svg",
+    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-2.svg",
+    name: "Brand 2",
+  },
+  {
+    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-3.svg",
+    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-3.svg",
+    name: "Brand 3",
+  },
+  {
+    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-4.svg",
+    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-4.svg",
+    name: "Brand 4",
+  },
+  {
+    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-5.svg",
+    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-5.svg",
+    name: "Brand 5",
+  },
+];
 
 function HeroSection({
   avatarList
 }) {
   return (
     <section>
-      <div className="w-full h-full relative pt-60">
+      <div className="w-full h-[calc(100vh-80px)] relative bg-green-600 flex">
         <div
           /* degrade 
           before:bg-linear-to-r 
@@ -65,7 +66,7 @@ function HeroSection({
           className="relative pt-0 md:pt-20 pb-6 md:pb-10 
           before:absolute 
           before:w-full 
-          before:h-full
+          h-full
           w-1/2
           ">
           <div className="container mx-auto relative z-10">
@@ -76,7 +77,7 @@ function HeroSection({
                   initial={{ opacity: 0, y: 32 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className="lg:text-9xl md:text-7xl text-5xl font-medium leading-20 md:leading-15 lg:leading-20">
+                  className="lg:text-8xl md:text-7xl text-5xl font-medium leading-20 md:leading-15 lg:leading-20">
                   <span className={`${instrumentSerif.className} tracking-tight block text-primary`}>
                     Produtividade
                   </span>
@@ -110,10 +111,10 @@ function HeroSection({
 
               <div className="relative flex flex-col text-center items-center w-full">
                 <motion.div
-                initial={{ opacity: 0, y: 32 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
-                className="relative flex items-center justify-center w-full before:content-[''] before:absolute before:w-full before:h-px before:bg-gray-300">
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
+                  className="relative flex items-center justify-center w-full before:content-[''] before:absolute before:w-full before:h-px before:bg-gray-300">
 
                   <p className="relative z-10 bg-white px-4 text-base font-semibold text-cinza-escuro">
                     Utilizado por mais de 100 grandes empresas ao redor do mundo
@@ -121,14 +122,71 @@ function HeroSection({
                 </motion.div>
               </div>
 
-              <div className="relative flex flex-col text-center items-center w-full">
-                <BrandSlider brandList={brandList} />
-              </div>
+              <section>
+                {/* <div className="py-6 md:py-10 bg-amber-500 mb-0"> */}
+                <div className="mx-auto max-w-6xl">
+                  <motion.div
+                    initial={{ opacity: 0, y: 32 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
+                    className="flex flex-col gap-3">
+                    <div className="flex justify-center text-center py-3 md:py-4 relative">
+                      <div className="flex items-center justify-center gap-4">
+                        <div
+                          className="hidden md:block h-0.5 w-40 bg-linear-to-l from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
+                        <p
+                          className="text-sm font-normal sm:px-2 px-10 text-muted-foreground text-center">
+                          Loved by 1000+ big and small brands around the worlds
+                        </p>
+                        <div
+                          className="hidden md:block h-0.5 w-40 bg-linear-to-r from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
+                      </div>
+                    </div>
+                    {brandList && brandList.length > 0 && (
+                      <div className="py-4">
+                        <Marquee pauseOnHover className="[--duration:20s] p-0">
+                          {brandList.map((brand, index) => (
+                            <div key={index}>
+                              <img
+                                src={brand.image}
+                                alt={brand.name}
+                                className="w-36 h-8 mr-6 lg:mr-20 dark:hidden" />
+                              <img
+                                src={brand.lightimg}
+                                alt={brand.name}
+                                className="hidden dark:block w-36 h-8 mr-12 lg:mr-20" />
+                            </div>
+                          ))}
+                        </Marquee>
+                      </div>
+                    )}
+                  </motion.div>
+                </div>
+                {/* </div> */}
+              </section>
 
             </div>
 
           </div>
         </div>
+
+
+        <section className="py-8 sm:py-16 lg:py-20 w-1/2 bg-amber-900">
+          <div className="max-w-7xl xl:px-16 lg:px-8 px-4 mx-auto bg-pink-500">
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }} >
+              <div className="flex flex-col gap-8 items-center w-full bg-green-300">
+                <CardForm></CardForm>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+
 
       </div>
     </section>
