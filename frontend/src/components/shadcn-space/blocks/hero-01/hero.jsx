@@ -16,30 +16,20 @@ const virtual = 2; /* fazer dowloand da fonte correta */
 
 const brandList = [
   {
-    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-1.svg",
+    image: "https://reparaassistenciatecnica.com.br/wp-content/uploads/2021/11/bosch-logo-png-transparent.png",
     lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-1.svg",
-    name: "Brand 1",
+    name: "Bosch",
   },
   {
-    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-2.svg",
+    image: "https://images.tcdn.com.br/img/img_prod/673340/12516cp_lampada_painel_12v_1_2w_standard_convencional_philips_117609_2_9c7ea389b96258aba34fcc24cdf7aeb7.png",
     lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-2.svg",
     name: "Brand 2",
   },
   {
-    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-3.svg",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhmtGah-kRzZoGIhuGdltJJjVhvSF5t202T7MXPh8QEscij-691H4xV0X8wTx0pJ5lSlW0Uyq5QeNdXqCnpt1dcWfORoc0Bq41Ovj4YG4hcL_fUKf_xIZiKGhsZ8GGVW91AxYoyyA/s1600/cofap+logo.jpg",
     lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-3.svg",
     name: "Brand 3",
-  },
-  {
-    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-4.svg",
-    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-4.svg",
-    name: "Brand 4",
-  },
-  {
-    image: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-5.svg",
-    lightimg: "https://images.shadcnspace.com/assets/brand-logo/logoipsum-light-5.svg",
-    name: "Brand 5",
-  },
+  }
 ];
 
 function HeroSection({
@@ -47,7 +37,7 @@ function HeroSection({
 }) {
   return (
     <section>
-      <div className="w-full h-[calc(100vh-80px)] relative bg-green-600 flex">
+      <div className="w-full h-[calc(100vh-80px)] relative flex items-center">
         <div
           /* degrade 
           before:bg-linear-to-r 
@@ -68,6 +58,8 @@ function HeroSection({
           before:w-full 
           h-full
           w-1/2
+          flex
+          items-center
           ">
           <div className="container mx-auto relative z-10">
             <div className="flex flex-col max-w-5xl mx-auto gap-8">
@@ -77,7 +69,7 @@ function HeroSection({
                   initial={{ opacity: 0, y: 32 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className="lg:text-8xl md:text-7xl text-5xl font-medium leading-20 md:leading-15 lg:leading-20">
+                  className="lg:text-9xl md:text-7xl text-5xl font-medium leading-20 md:leading-15 lg:leading-20">
                   <span className={`${instrumentSerif.className} tracking-tight block text-primary`}>
                     Produtividade
                   </span>
@@ -112,13 +104,21 @@ function HeroSection({
               <div className="relative flex flex-col text-center items-center w-full">
                 <motion.div
                   initial={{ opacity: 0, y: 32 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
-                  className="relative flex items-center justify-center w-full before:content-[''] before:absolute before:w-full before:h-px before:bg-gray-300">
-
-                  <p className="relative z-10 bg-white px-4 text-base font-semibold text-cinza-escuro">
-                    Utilizado por mais de 100 grandes empresas ao redor do mundo
-                  </p>
+                  className="flex flex-col gap-3">
+                  <div className="flex justify-center text-center py-3 md:py-4 relative">
+                    <div className="flex items-center justify-center gap-4">
+                      <div
+                        className="hidden md:block h-0.5 w-40 bg-linear-to-l from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
+                      <p className="relative z-10 bg-white px-4 text-base font-semibold text-cinza-escuro">
+                        Utilizado por mais de 100 grandes empresas ao redor do mundo
+                      </p>
+                      <div
+                        className="hidden md:block h-0.5 w-40 bg-linear-to-r from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
+                    </div>
+                  </div>
                 </motion.div>
               </div>
 
@@ -131,18 +131,6 @@ function HeroSection({
                     viewport={{ once: true }}
                     transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
                     className="flex flex-col gap-3">
-                    <div className="flex justify-center text-center py-3 md:py-4 relative">
-                      <div className="flex items-center justify-center gap-4">
-                        <div
-                          className="hidden md:block h-0.5 w-40 bg-linear-to-l from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
-                        <p
-                          className="text-sm font-normal sm:px-2 px-10 text-muted-foreground text-center">
-                          Loved by 1000+ big and small brands around the worlds
-                        </p>
-                        <div
-                          className="hidden md:block h-0.5 w-40 bg-linear-to-r from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
-                      </div>
-                    </div>
                     {brandList && brandList.length > 0 && (
                       <div className="py-4">
                         <Marquee pauseOnHover className="[--duration:20s] p-0">
@@ -172,22 +160,19 @@ function HeroSection({
         </div>
 
 
-        <section className="py-8 sm:py-16 lg:py-20 w-1/2 bg-amber-900">
-          <div className="max-w-7xl xl:px-16 lg:px-8 px-4 mx-auto bg-pink-500">
+        <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative">
+          <div className="max-w-9xl xl:px-16 lg:px-8 px-4 mx-auto justify-center">
             <motion.div
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }} >
-              <div className="flex flex-col gap-8 items-center w-full bg-green-300">
-                <CardForm></CardForm>
-              </div>
+              {/* <div className="flex flex-col gap-8 items-center w-full bg-green-300"> */}
+              <CardForm></CardForm>
+              {/* </div> */}
             </motion.div>
           </div>
         </section>
-
-
-
       </div>
     </section>
   );

@@ -151,20 +151,21 @@ import { Label } from "@/components/ui/label"
 
 export function CardForm() {
   return (
-    <Card className="p-0 max-w-3xl w-full gap-0">
-      <CardHeader className="gap-6 px-6 pt-4 pb-4">
-        <CardTitle className="text-lg font-semibold text-card-foreground">Bem-vindo de volta!</CardTitle>
-        <CardDescription>
+    <Card className="p-0 max-w-2xl w-150 gap-0 border-2 bg-transparent">
+      <CardHeader className="gap-4 px-6 pt-10 pb-4">
+        <CardTitle className="text-3xl font-semibold text-card-foreground">Bem-vindo de volta!</CardTitle>
+        <CardDescription className="text-[20px]">
           Faça seu login
         </CardDescription>
       </CardHeader>
 
       <CardContent className="py-4 px-6">
         <form>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
             <div className="grid gap-2">
-              <Label htmlFor="email">Identificador</Label>
+              <Label htmlFor="number" className="text-[17px] font-medium">Identificador</Label>
               <Input
+              className="h-12"
                 id="id"
                 type="number"
                 placeholder="11.111-11"
@@ -174,22 +175,23 @@ export function CardForm() {
 
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
+                <Label htmlFor="password" className="text-[17px] font-medium">Senha</Label>
+                
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" className="h-12" required />
+              <a
+                  href="#"
+                  className="ml-auto inline-block underline-offset-4 hover:underline font-semibold text-sm"
+                >
+                  Esqueceu sua senha?
+                </a>
             </div>
           </div>
         </form>
       </CardContent>
 
       <CardFooter className="flex-col gap-2 border-0 bg-transparent">
-        <Button type="submit" className="rounded-lg cursor-pointer h-9 hover:bg-primary/80 w-full">
+        <Button type="submit" className="rounded-lg cursor-pointer h-12 hover:bg-primary/80 w-full text-[18px] mt-3 mb-10">
           Login
         </Button>
         
