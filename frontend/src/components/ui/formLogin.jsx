@@ -12,14 +12,14 @@ export default function LoginForm() {
 
     return (
         <>
-            <div className="w-110 max-w-2xl space-y-4 gap-0 border-2 py-10 px-5 rounded-lg">
+            <div className="w-130 max-w-2xl space-y-4 gap-0 border-2 pt-15 pb-10 px-10 rounded-[36px]">
 
                 {/* TITULO */}
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">
+                    <h1 className="text-3xl font-semibold tracking-tight">
                         Bem-vindo ao ProdSync
                     </h1>
-                    <p className="text-sm text-muted-foreground font-medium">
+                    <p className="text-md text-muted-foreground font-medium">
                         Faça seu login
                     </p>
                 </div>
@@ -27,19 +27,19 @@ export default function LoginForm() {
                 {/* FORM */}
                 <form>
                     <div className="flex flex-col gap-8 mt-5">
-                        <div className="grid gap-2">
-                            <Label className="font-medium text-muted-foreground">Identificador</Label>
+                        <div className="grid gap-3">
+                            <Label className="font-medium text-muted-foreground mt-5">Identificador</Label>
                             <Input className="h-9" placeholder="Ex: 11.111.-11" />
                         </div>
 
-                        <div className="grid gap-2">
+                        <div className="grid gap-3">
                             <div className="flex items-center">
                                 <Label className="font-medium text-muted-foreground">Senha</Label>
                             </div>
                             <Input className="h-9" type="password" placeholder="••••••••" />
 
                         </div>
-                        <div className="flex items-center justify-between mt-1">
+                        <div className="flex items-center justify-between mt-2">
                             <Label className="flex items-center gap-2 cursor-pointer group">
                                 <Input
                                     type="checkbox"
@@ -59,7 +59,7 @@ export default function LoginForm() {
                         </div>
                     </div>
                     {/* BUTTON LOGIN */}
-                    <Button onClick={() => setOpen(true)} className="w-full mt-4 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
+                    <Button onClick={() => setOpen(true)} className="w-full mt-8 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
                         Login
                     </Button>
                 </form>

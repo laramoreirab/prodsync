@@ -32,32 +32,19 @@ const brandList = [
   }
 ];
 
-function HeroSection({
-  avatarList
-}) {
+function HeroSection() {
   return (
     <section>
       <div className="w-full h-[calc(100vh-80px)] relative flex items-center">
         <div
-          /* degrade 
-          before:bg-linear-to-r 
-            before:from-sky-100 
-            before:via-white before:to-amber-100 
-            before:rounded-full 
-            before:top-24 
-            before:blur-3xl 
-            before:-z-10 
-            dark:before:from-slate-800 
-            dark:before:via-black 
-            dark:before:to-stone-700 
-            dark:before:rounded-full 
-            dark:before:blur-3xl 
-            dark:before:-z-10 */
           className="relative pt-0 md:pt-20 pb-6 md:pb-10 
           before:absolute 
           before:w-full 
           h-full
           w-1/2
+          flex
+          items-center
+          ml-50
           ">
           <div className="container mx-auto relative z-10">
             <div className="flex flex-col max-w-5xl mx-auto gap-8">
@@ -79,7 +66,9 @@ function HeroSection({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.1, ease: "easeInOut" }}
                   className="text-lg font-semibold max-w-5xl text-muted-foreground">
-                  Sua fábrica sincronizada em tempo real e sob controle.
+                  Sua fábrica sincronizada em tempo
+                  {/* <br /> */}
+                  real e sob controle.
                 </motion.p>
               </div>
               <motion.div
@@ -109,12 +98,14 @@ function HeroSection({
                   <div className="flex justify-center text-center py-3 md:py-4 relative">
                     <div className="flex items-center justify-center gap-4">
                       <div
-                        className="hidden md:block h-0.5 w-40 bg-linear-to-l from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
-                      <p className="relative z-10 bg-white px-4 text-base font-semibold text-cinza-escuro">
-                        Utilizado por mais de 100 grandes empresas ao redor do mundo
+                        className="hidden md:block h-0.5 w-40 bg-cinza-escuro opacity-20" />
+                      <p className="relative z-10 bg-white px-4 text-base font-semibold text-cinza-escuro tracking-tight">
+                        Utilizado por mais de 100 grandes 
+                        <br />
+                        empresas ao redor do mundo
                       </p>
                       <div
-                        className="hidden md:block h-0.5 w-40 bg-linear-to-r from-muted-foreground to-white dark:from-muted-foreground dark:to-transparent opacity-20" />
+                        className="hidden md:block h-0.5 w-40 bg-cinza-escuro opacity-20" />
                     </div>
                   </div>
                 </motion.div>
@@ -122,7 +113,7 @@ function HeroSection({
 
               <section>
                 {/* <div className="py-6 md:py-10 bg-amber-500 mb-0"> */}
-                <div className="mx-auto max-w-170">
+                <div className="mx-auto max-w-165">
                   <motion.div
                     initial={{ opacity: 0, y: 32 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -157,8 +148,8 @@ function HeroSection({
           </div>
         </div>
 
-        <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative">
-          <div className="flex items-center justify-center p-8 md:p-16">
+        <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative mr-50">
+          <div className="flex items-start justify-center p-8 md:p-16">
             <motion.div
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
