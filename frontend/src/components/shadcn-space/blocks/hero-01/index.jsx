@@ -69,8 +69,7 @@ export default function AgencyHeroSection() {
     <div className="relative">
       <Header navigationData={navigationData} />
       <main>
-        <HeroSection avatarList={avatarList} />
-        
+        <HeroSection avatarList={avatarList} />       
       </main>
     </div>
   );

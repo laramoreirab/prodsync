@@ -11,16 +11,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-  weight: ["400", "500", "700"], 
-});
-
 export const metadata = {
   title: "ProdSync",
   description: "Controle de produção",
 };
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+})
 
 export default function RootLayout({ children }) {
   return (

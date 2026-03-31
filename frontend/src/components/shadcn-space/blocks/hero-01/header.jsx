@@ -61,7 +61,7 @@ const Header = ({
       viewport={{ once: true }}
       transition={{ duration: 0.7, ease: "easeInOut" }}
       className={cn(
-        "inset-x-0 z-50 px-4 flex items-center justify-center sticky top-0 h-20",
+        "inset-x-0 z-50 flex items-center justify-center sticky top-0 h-20",
         className
       )}>
       <div
@@ -69,8 +69,8 @@ const Header = ({
           "w-full flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500",
           sticky
           /* bg-background/60 */
-            ? "p-2.5 px-0 bg-white border border-border/40 shadow-2xl shadow-primary/5 h-20"
-            : "border-transparent h-20"
+            ? "p-2.5 px-4 bg-white m-0 border border-border/40 shadow-2xl shadow-primary/5 h-20"
+            : "border-transparent h-20 px-4"
         )}>
           
         {/* Logo */}

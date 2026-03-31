@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { Marquee } from "@/components/shadcn-space/animations/marquee";
-import { CardForm } from "@/components/shadcn-space/blocks/forms-01/login-form";
+import LoginForm from "@/components/ui/formLogin";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -58,8 +58,6 @@ function HeroSection({
           before:w-full 
           h-full
           w-1/2
-          flex
-          items-center
           ">
           <div className="container mx-auto relative z-10">
             <div className="flex flex-col max-w-5xl mx-auto gap-8">
@@ -124,7 +122,7 @@ function HeroSection({
 
               <section>
                 {/* <div className="py-6 md:py-10 bg-amber-500 mb-0"> */}
-                <div className="mx-auto max-w-6xl">
+                <div className="mx-auto max-w-170">
                   <motion.div
                     initial={{ opacity: 0, y: 32 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -159,7 +157,19 @@ function HeroSection({
           </div>
         </div>
 
+        <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative">
+          <div className="flex items-center justify-center p-8 md:p-16">
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }} >
+              <LoginForm />
+            </motion.div>
+          </div>
+        </section>
 
+        {/* 
         <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative">
           <div className="max-w-9xl xl:px-16 lg:px-8 px-4 mx-auto justify-center">
             <motion.div
@@ -167,12 +177,14 @@ function HeroSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }} >
-              {/* <div className="flex flex-col gap-8 items-center w-full bg-green-300"> */}
+              // <div className="flex flex-col gap-8 items-center w-full bg-green-300">
               <CardForm></CardForm>
-              {/* </div> */}
+              // </div>
             </motion.div>
           </div>
         </section>
+        */}
+
       </div>
     </section>
   );
