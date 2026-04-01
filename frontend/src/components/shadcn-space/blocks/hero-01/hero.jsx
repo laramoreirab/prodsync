@@ -35,8 +35,8 @@ const brandList = [
 
 function HeroSection() {
   return (
-    <section> {/* h-[calc(100vh-80px)] */}
-      <div className="w-full h-full relative flex flex-col lg:flex-row items-center overflow-hidden">
+    <section>
+      <div className="w-full lg:h-[calc(100vh-80px)] md:h-full relative flex flex-col lg:flex-row items-center overflow-hidden">
         <div
           className="relative pt-10 lg:pt-20 pb-6 lg:pb-10 
           h-auto
@@ -108,7 +108,7 @@ function HeroSection() {
               </div>
 
               <section>
-                <div className="py-2 md:py-10 mb-0">
+                <div className=" mb-0">
                   <div className="mx-auto max-w-165">
                   <motion.div
                     initial={{ opacity: 0, y: 32 }}

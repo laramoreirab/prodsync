@@ -2,20 +2,6 @@ import HeroSection from "@/components/shadcn-space/blocks/hero-01/hero";
 import Header from "@/components/shadcn-space/blocks/hero-01/header";
 
 export default function AgencyHeroSection() {
-  const avatarList = [
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-1.jpg",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-2.jpg",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-3.jpg",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-5.jpg",
-    },
-  ];
 
   const navigationData = [
     {
@@ -69,7 +55,7 @@ export default function AgencyHeroSection() {
     <div className="relative">
       <Header navigationData={navigationData} />
       <main>
-        <HeroSection avatarList={avatarList} />       
+        <HeroSection />       
       </main>
     </div>
   );

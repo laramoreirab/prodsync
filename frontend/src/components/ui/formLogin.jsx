@@ -12,7 +12,7 @@ export default function LoginForm() {
 
     return (
         <>
-            <div className="lg:max-w-130 max-w-2xl space-y-4 gap-0 border-2 lg:pt-15 lg:pb-10 lg:px-10 rounded-[36px] pt-10 pb-8 px-8">
+            <div className="lg:max-w-130 space-y-4 gap-0 border-2 lg:pt-15 lg:pb-10 lg:px-10 rounded-[36px] pt-10 pb-8 px-8">
 
                 {/* TITULO */}
                 <div className="space-y-1">
@@ -43,7 +43,7 @@ export default function LoginForm() {
                             <label className="flex items-center gap-2 cursor-pointer group">
                                 <input
                                     type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary cursor-pointer"
                                 />
                                 <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                                     Lembrar de mim
@@ -58,7 +58,7 @@ export default function LoginForm() {
                         </div>
                     </div>
                     {/* BUTTON LOGIN */}
-                    <Button onClick={() => setOpen(true)} className="w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
+                    <Button id="btn_login" onClick={() => setOpen(true)} className="w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
                         Login
                     </Button>
                 </form>
