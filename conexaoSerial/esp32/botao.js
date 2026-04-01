@@ -1,4 +1,4 @@
-// PROJETO TCC - Módulo ESP32 (Lado Dispositivo)
+// PROJETO TCC - Módulo ESP32 (Lado Dispositivo - Versão Serial / Plano B)
 
 const BOTOES = [D12, D13, D14]; // Array de Botões, posteriorente utilizado no "BOTOES.forEach"
 let isLocked = false; // Mutex do código, serve para garantir que o pressionamento de múltiplos botões não seja reconhecido, apenas um funciona
@@ -17,7 +17,7 @@ function dispararEvento(id) {
     // 2. Montando o payload de uma vez só (usando const, pois não vamos reatribuir)
     const payload = {
         status: STATUS_MAQUINA[id], // Ele pega o texto automático baseado no ID!
-        button_id: id,
+        maquina_id: 1,
         /* timestamp: Date.now() Retirei o timestamp pois o ESP32 precisa se conectar a internet para
         saber a hora, por isso, a data está sendo adicionada no próprio BackEnd */
     };

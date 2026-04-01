@@ -1,6 +1,6 @@
 // SERVIDOR PARA TESTES
 
-// Importa o Express (A nossa "Agência dos Correios")
+// Importa o Express
 const express = require('express');
 const app = express();
 
