@@ -1,27 +1,7 @@
 import HeroSection from "@/components/shadcn-space/blocks/hero-01/hero";
-import Header from "@/components/shadcn-space/blocks/hero-01/header";
+import Header from "@/components/ui/headerHome";
 
 export default function AgencyHeroSection() {
-
-  const navigationData = [
-    {
-      title: "Home",
-      href: "/",
-      isActive: true,
-    },
-    {
-      title: "Sobre nós",
-      href: "#",
-    },
-    {
-      title: "Serviços",
-      href: "#",
-    },    
-    {
-      title: "FAQs",
-      href: "#",
-    }
-  ];
 
   const brandList = [
     {
@@ -53,7 +33,6 @@ export default function AgencyHeroSection() {
 
   return (
     <div className="relative">
-      <Header navigationData={navigationData} />
       <main>
         <HeroSection />       
       </main>

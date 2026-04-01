@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { Marquee } from "@/components/shadcn-space/animations/marquee";
 import LoginForm from "@/components/ui/formLogin";
-import BrandSlider from "./brand-slider";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],

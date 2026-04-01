@@ -90,7 +90,7 @@ const Header = ({
                     href={navItem.href}
                     className={cn(
                       "px-2 lg:px-4 py-2 text-lg font-semibold rounded-full h-12 text-muted-foreground hover:text-foreground hover:bg-background outline outline-transparent hover:outline-border hover:shadow-xs transition tracking-normal",
-                      navItem.isActive ? "bg-background text-foreground" : ""
+                      navItem.isActive ? "text-bold" : ""
                     )}>
                     {navItem.title}
                   </NavigationMenuLink>
