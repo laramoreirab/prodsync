@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { Marquee } from "@/components/shadcn-space/animations/marquee";
 import LoginForm from "@/components/ui/formLogin";
+import BrandSlider from "./brand-slider";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -34,27 +35,24 @@ const brandList = [
 
 function HeroSection() {
   return (
-    <section>
-      <div className="w-full h-[calc(100vh-80px)] relative flex items-center">
+    <section> {/* h-[calc(100vh-80px)] */}
+      <div className="w-full h-full relative flex flex-col lg:flex-row items-center overflow-hidden">
         <div
-          className="relative pt-0 md:pt-20 pb-6 md:pb-10 
-          before:absolute 
-          before:w-full 
-          h-full
-          w-1/2
+          className="relative pt-10 lg:pt-20 pb-6 lg:pb-10 
+          h-auto
+          w-full lg:w-1/2 
           flex
           items-center
-          ml-50
           ">
-          <div className="container mx-auto relative z-10">
-            <div className="flex flex-col max-w-5xl mx-auto gap-8">
+          <div className="container mx-auto relative z-10 lg:ml-20 lg:mx-0">
+            <div className="flex flex-col max-w-5xl mx-auto lg:mx-0 gap-8">
               <div
                 className="relative flex flex-col text-center items-center sm:gap-6 gap-4">
                 <motion.h1
                   initial={{ opacity: 0, y: 32 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className="lg:text-9xl md:text-7xl text-5xl font-medium leading-20 md:leading-15 lg:leading-20">
+                  className="lg:text-9xl md:text-8xl text-6xl font-medium leading-15 md:leading-15 lg:leading-20">
                   <span className={`${instrumentSerif.className} tracking-tight block text-primary`}>
                     Produtividade
                   </span>
@@ -66,9 +64,7 @@ function HeroSection() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.1, ease: "easeInOut" }}
                   className="text-lg font-semibold max-w-5xl text-muted-foreground">
-                  Sua fábrica sincronizada em tempo
-                  {/* <br /> */}
-                  real e sob controle.
+                  Sua fábrica sincronizada em tempo real e sob controle.
                 </motion.p>
               </div>
               <motion.div
@@ -100,7 +96,7 @@ function HeroSection() {
                       <div
                         className="hidden md:block h-0.5 w-40 bg-cinza-escuro opacity-20" />
                       <p className="relative z-10 bg-white px-4 text-base font-semibold text-cinza-escuro tracking-tight">
-                        Utilizado por mais de 100 grandes 
+                        Utilizado por mais de 100 grandes
                         <br />
                         empresas ao redor do mundo
                       </p>
@@ -112,8 +108,8 @@ function HeroSection() {
               </div>
 
               <section>
-                {/* <div className="py-6 md:py-10 bg-amber-500 mb-0"> */}
-                <div className="mx-auto max-w-165">
+                <div className="py-2 md:py-10 mb-0">
+                  <div className="mx-auto max-w-165">
                   <motion.div
                     initial={{ opacity: 0, y: 32 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -121,7 +117,7 @@ function HeroSection() {
                     transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
                     className="flex flex-col gap-3">
                     {brandList && brandList.length > 0 && (
-                      <div className="py-4">
+                      <div className="py-2">
                         <Marquee pauseOnHover className="[--duration:20s] p-0">
                           {brandList.map((brand, index) => (
                             <div key={index}>
@@ -140,7 +136,7 @@ function HeroSection() {
                     )}
                   </motion.div>
                 </div>
-                {/* </div> */}
+                </div>
               </section>
 
             </div>
@@ -148,8 +144,8 @@ function HeroSection() {
           </div>
         </div>
 
-        <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative mr-50">
-          <div className="flex items-start justify-center p-8 md:p-16">
+        <section className="py-8 sm:py-16 lg:py-20 w-full lg:w-1/2 relative flex justify-center items-center">
+          <div className="flex justify-center w-full px-4 lg:p-0 lg:mr-20">
             <motion.div
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -159,22 +155,6 @@ function HeroSection() {
             </motion.div>
           </div>
         </section>
-
-        {/* 
-        <section className="py-8 sm:py-16 lg:py-20 w-1/2 relative">
-          <div className="max-w-9xl xl:px-16 lg:px-8 px-4 mx-auto justify-center">
-            <motion.div
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }} >
-              // <div className="flex flex-col gap-8 items-center w-full bg-green-300">
-              <CardForm></CardForm>
-              // </div>
-            </motion.div>
-          </div>
-        </section>
-        */}
 
       </div>
     </section>

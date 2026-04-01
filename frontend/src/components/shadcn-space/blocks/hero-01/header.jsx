@@ -180,7 +180,7 @@ const Header = ({
                     </div>
 
                     <p className="text-sm text-muted-foreground">
-                      © 2026 Shadcn Space
+                      © 2026 ProdSync
                     </p>
                   </div>
                 </div>
