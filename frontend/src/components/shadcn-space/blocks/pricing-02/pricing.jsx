@@ -1,6 +1,5 @@
 "use client";;
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -81,15 +80,11 @@ const Pricing = () => {
           {/* Heading */}
           <div className="flex flex-col gap-4 justify-center items-center">
 
-
-
-            <h2
+           <h2
               className="text-2xl sm:text-2x1 lg:text-3xl text-primary text-center tracking-tight font-semibold">
               Funções sob medida para cada perfil, cada usuário com as ferramentas
               certas para garantir o controle da produção de sua empresa
             </h2>
-
-
 
           </div>
           {/*  */}

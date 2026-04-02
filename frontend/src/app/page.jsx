@@ -3,6 +3,8 @@ import AboutAndStats01 from "@/components/shadcn-space/blocks/about-us-01";
 import Pricing from "@/components/shadcn-space/blocks/pricing-02/pricing";
 import Testimonial01 from "@/components/shadcn-space/blocks/testimonial-02";
 import Header from "@/components/ui/headerHome";
+import Footer from "@/components/shadcn-space/blocks/footer-01/footer";
+import Faq from "@/components/shadcn-space/blocks/faq-01/faq";
 
 export default function Home() {
 
@@ -33,6 +35,8 @@ export default function Home() {
       <AboutAndStats01 />
       <Pricing />
       <Testimonial01 />
+      <Faq />
+      <Footer />
     </>
   );
 }

@@ -41,7 +41,7 @@ export default function Testimonial01({
                         <h2 className="sm:text-5xl text-xl leading-none font-medium tracking">
                             Histórias de Sucesso com <img src={Logo} />
                         </h2>
-                       
+
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
@@ -57,9 +57,10 @@ export default function Testimonial01({
                                                 className="lg:col-span-8 col-span-12 flex sm:flex-row flex-col sm:gap-10 gap-6 lg:pe-12">
                                                 <div className="shrink-0 flex items-start">
                                                     <img
-                                                        src="quote.png"
+                                                        src="/quote.png"
                                                         alt="muted quote"
-                                                        className="dark:hidden" />
+                                                        className="opacity-20 w-15"
+                                                    />
                                                 </div>
                                                 <div className="flex flex-col gap-12">
                                                     <p className="sm:text-3xl text-xl">

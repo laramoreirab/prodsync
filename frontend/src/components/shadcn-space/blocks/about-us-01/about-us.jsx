@@ -53,10 +53,9 @@ const AboutUs = ({
             }}
             className="flex flex-col items-center justify-center gap-4">
             <h2
-              className="text-3xl sm:text-3xl lg:text-4xl text-primary text-center tracking-tight font-bold">
+              className="text-3xl sm:text-3xl lg:text-4xl text-primary text-center tracking-tight font-bold max-w-6xl">
               Elabore estratégias excepcionais, baseadas em experiência e 
-              tecnologia, para gerar resultados impactantes para sua <br />
-              fábrica com
+              tecnologia, para gerar resultados impactantes para sua fábrica com
             </h2>
             <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-4">
               {aboutusData.map((item, index) => (
