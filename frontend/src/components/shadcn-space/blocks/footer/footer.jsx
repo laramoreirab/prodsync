@@ -63,7 +63,7 @@ const Footer = () => {
                 className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-100 ease-in-out fill-mode-both">
                 {/* Logo */}
                 <a className="" href="#">
-                  <Logo />
+                  <img src="/logo.png" alt="Logo - ProdSync" className="h-10" />
                 </a>
 
                 <p className="text-base font-normal text-muted-foreground">

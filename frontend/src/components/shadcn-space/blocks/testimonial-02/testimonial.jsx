@@ -39,7 +39,7 @@ export default function Testimonial01({
                             Depoimentos
                         </Badge>
                         <h2 className="sm:text-5xl text-xl leading-none font-medium tracking">
-                            Histórias de Sucesso com <img src={Logo} />
+                            Histórias de Sucesso com {/* <img src="/logo.png" /> */}
                         </h2>
 
                     </motion.div>

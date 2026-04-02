@@ -12,7 +12,7 @@ const FAQ_DATA = [
   {
     question: "Como o sistema sabe quando a máquina está parada?",
     answer:
-      "We offer a wide range of services including web development, app development, and digital marketing.",
+      "",
   },
   {
     question: "Preciso estar no computador para usar o sistema?",
@@ -22,12 +22,12 @@ const FAQ_DATA = [
   {
     question: "O que acontece se o operador esquecer de registrar a produção?",
     answer:
-      "Pricing is based on the complexity of the project and the scope of the work.",
+      "",
   },
   {
     question: "Como esses dados ajudam a melhorar a produção?",
     answer:
-      "Absolutely! We offer comprehensive post-launch support to ensure a seamless implementation and provide ongoing maintenance packages tailored to clients who need regular updates or technical assistance. Our commitment doesn’t end at launch — we’re here to help you every step of the way.",
+      "",
   },
   {
     question: "Como posso tirar minhas dúvidas sobre o sistema?",
@@ -48,7 +48,7 @@ export default function Faq() {
             className="text-sm h-auto py-1 px-3 border-0 outline outline-border bg-secondary-foreground text-white font-medium font-sans">
             FAQs
           </Badge>
-          <h2 className="text-5xl font-bold text-center text-primary">
+          <h2 className="text-4xl sm:text-5xl font-bold text-center text-primary">
             Tem dúvidas? Nós estamos prontos para respondê-las!
           </h2>
         </div>

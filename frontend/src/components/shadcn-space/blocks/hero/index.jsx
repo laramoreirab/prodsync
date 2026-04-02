@@ -1,5 +1,4 @@
-import HeroSection from "@/components/shadcn-space/blocks/hero-01/hero";
-import Header from "@/components/ui/headerHome";
+import HeroSection from "@/components/shadcn-space/blocks/hero/hero";
 
 export default function AgencyHeroSection() {
 

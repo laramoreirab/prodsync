@@ -12,7 +12,7 @@ export default function LoginForm() {
 
     return (
         <>
-            <div className="lg:max-w-130 space-y-4 gap-0 border-2 lg:pt-15 lg:pb-10 lg:px-10 rounded-[36px] pt-10 pb-8 px-8">
+            <div className="lg:min-w-120 w-95 space-y-4 gap-0 border-2 lg:pt-15 lg:pb-10 lg:px-10 rounded-[36px] pt-10 pb-8 px-8">
 
                 {/* TITULO */}
                 <div className="space-y-1">

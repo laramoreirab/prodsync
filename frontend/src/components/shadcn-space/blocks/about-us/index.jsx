@@ -1,5 +1,5 @@
 "use client";
-import AboutUs from "@/components/shadcn-space/blocks/about-us-01/about-us";
+import AboutUs from "@/components/shadcn-space/blocks/about-us/about-us";
 import { Target, Sparkles, ChartNoAxesCombined } from "lucide-react";
 
 const aboutusData = [

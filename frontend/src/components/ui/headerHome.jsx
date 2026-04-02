@@ -66,11 +66,10 @@ const Header = ({
       )}>
       <div
         className={cn(
-          "w-full flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500",
+          "w-full px-4 flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500",
           sticky
-          /* bg-background/60 */
-            ? "p-2.5 px-4 bg-white m-0 border border-border/40 shadow-2xl shadow-primary/5 h-20"
-            : "border-transparent h-20 px-4"
+            ? "py-2.5 bg-white m-0 border border-border/40 shadow-2xl shadow-primary/5 h-20"
+            : "border-transparent h-20"
         )}>
           
         {/* Logo */}

@@ -69,7 +69,7 @@ const Pricing = () => {
     <section className="bg-background py-10 lg:py-0">
       
       <div className="w-full mx-auto text-center">
-        <h2 className="text-4xl sm:text-5xl font-bold text-primary">
+        <h2 className="text-3xl sm:text-5xl font-bold text-primary">
           Descubra como cada papel transforma sua gestão
         </h2>
       </div>
