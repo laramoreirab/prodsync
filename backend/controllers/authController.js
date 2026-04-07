@@ -264,6 +264,24 @@ class AuthController {
 
         }
     }
+
+    //POST api/auth/primeiroAcesso - verificar pelo id do usuário se esse é seu primeiro acesso e se ja possui senha
+    static async primeiroAcesso(req, res){
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+    //POST api/auth/registroSenha - registrar a senha de primeiro acesso do usuário
+    static async registroSenha(req, res){
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
 }
 
 export default AuthController;
