@@ -3,34 +3,21 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
     Bar,
     BarChart,
     CartesianGrid,
-    Cell,
-    LabelList,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
     XAxis,
     YAxis,
   } from "recharts";
   
   import {
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 2C — BAR CHART VERTICAL SIMPLES (Motivos de Parada)
+// ============================================================
+//  BAR CHART VERTICAL SIMPLES (Motivos de Parada)
 // ============================================================
 // Quando usar: comparação direta de poucos itens com label no eixo X.
 

@@ -3,20 +3,9 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
-    Bar,
-    BarChart,
     CartesianGrid,
-    Cell,
-    LabelList,
     Line,
     LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
     XAxis,
     YAxis,
   } from "recharts";
@@ -29,10 +18,9 @@ import {
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 4D — LINE CHART COM MÚLTIPLAS SÉRIES (Rotatividade)
 // ============================================================
-// Quando usar: comparar evolução de duas métricas ao longo do tempo.
+// LINE CHART COM MÚLTIPLAS SÉRIES (Rotatividade)
+// ============================================================
 
 const rotatividadeData = [
   { mes: "Abr", novos: 18, desligados: 15 },

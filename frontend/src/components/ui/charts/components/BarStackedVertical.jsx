@@ -3,20 +3,9 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
     Bar,
     BarChart,
-    CartesianGrid,
-    Cell,
     LabelList,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
     XAxis,
     YAxis,
   } from "recharts";
@@ -29,10 +18,9 @@ import {
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 3B — BAR CHART STACKED VERTICAL COM % (Status por Turno)
 // ============================================================
-// Quando usar: comparação de composição entre grupos (turnos, períodos).
+//  BAR CHART STACKED VERTICAL COM % (Status por Turno)
+// ============================================================
 // LabelList dentro de Bar mostra o valor dentro da barra.
 
 const statusTurnoData = [

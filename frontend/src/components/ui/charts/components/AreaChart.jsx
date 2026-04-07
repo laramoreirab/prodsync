@@ -5,34 +5,20 @@ import { useState } from "react";
 import {
     Area,
     AreaChart,
-    Bar,
-    BarChart,
     CartesianGrid,
-    Cell,
-    LabelList,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
     XAxis,
     YAxis,
   } from "recharts";
   
   import {
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// BÔNUS — AREA CHART (variação do LineChart com área preenchida)
 // ============================================================
-// Quando usar: enfatizar volume/magnitude ao longo do tempo.
+// AREA CHART (variação do LineChart com área preenchida)
+// ============================================================
 
 const areaData = [
   { dia: "Seg", refugo: 200 },

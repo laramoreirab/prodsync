@@ -3,36 +3,20 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
-    Bar,
-    BarChart,
-    CartesianGrid,
     Cell,
-    LabelList,
-    Line,
-    LineChart,
     Pie,
     PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
-    XAxis,
-    YAxis,
   } from "recharts";
   
   import {
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 2B — PIE CHART (Status das Máquinas)
 // ============================================================
-// Quando usar: proporção entre partes de um todo (não use com muitas fatias).
+// PIE CHART 
+// ============================================================
 
 const statusMaquinasData = [
   { name: "Produzindo", value: 75 },

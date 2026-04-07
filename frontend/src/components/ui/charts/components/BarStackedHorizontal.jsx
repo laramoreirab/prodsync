@@ -3,20 +3,8 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
     Bar,
     BarChart,
-    CartesianGrid,
-    Cell,
-    LabelList,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
     XAxis,
     YAxis,
   } from "recharts";
@@ -29,10 +17,9 @@ import {
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 3A — BAR CHART STACKED HORIZONTAL (Defeitos por Setor)
 // ============================================================
-// Quando usar: composição de partes dentro de um total, por categoria.
+//  BAR CHART STACKED HORIZONTAL (Defeitos por Setor)
+// ============================================================
 // stackId="a" agrupa as barras em pilha.
 
 const defeitosData = [

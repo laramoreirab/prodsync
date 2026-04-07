@@ -3,22 +3,9 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
-    Bar,
-    BarChart,
-    CartesianGrid,
     Cell,
-    LabelList,
-    Line,
-    LineChart,
     Pie,
     PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
-    XAxis,
-    YAxis,
   } from "recharts";
   
   import {
@@ -29,10 +16,9 @@ import {
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 4A — DONUT CHART (Quantidade de Usuários)
 // ============================================================
-// Quando usar: proporção com buraco no meio (innerRadius).
+// DONUT CHART 
+// ============================================================
 
 const usuariosData = [
   { perfil: "Operadores", qtd: 91.7 },

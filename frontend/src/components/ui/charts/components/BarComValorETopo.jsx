@@ -3,36 +3,23 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
     Bar,
     BarChart,
-    CartesianGrid,
     Cell,
     LabelList,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
-    ReferenceLine,
     XAxis,
     YAxis,
   } from "recharts";
   
   import {
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
 // ============================================================
-// EXEMPLO 4C — BAR COM VALOR NO TOPO + CORES MISTAS (Produção média)
+//  BAR COM VALOR NO TOPO + CORES MISTAS (Produção média)
 // ============================================================
-// Quando usar: quando o valor exato é importante e os grupos têm cores distintas.
 
 const producaoMediaData = [
   { setor: "Engrenagens", media: 56 },

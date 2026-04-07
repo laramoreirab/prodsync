@@ -3,19 +3,9 @@
 import { useState } from "react";
 
 import {
-    Area,
-    AreaChart,
     Bar,
     BarChart,
     CartesianGrid,
-    Cell,
-    LabelList,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    RadialBar,
-    RadialBarChart,
     ReferenceLine,
     XAxis,
     YAxis,
@@ -23,16 +13,13 @@ import {
   
   import {
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
-  // ============================================================
-// EXEMPLO 4B — BAR COM LINHA DE REFERÊNCIA (Sobrecarga de Máquina)
 // ============================================================
-// Quando usar: quando há um limite/meta que precisa ser visualizado.
+//  BAR COM LINHA DE REFERÊNCIA (Sobrecarga de Máquina)
+// ============================================================
 
 const sobrecargaData = [
   { setor: "Engrenagens", carga: 85 },
