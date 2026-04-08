@@ -299,14 +299,33 @@ class AuthController {
                 })
             };
 
+            if(id<2){
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Identificador inválido',
+                    mensagem: 'Identificador inválido'
+                })
+            }
 
+            const usuario = await UsuarioModel.verificarId(id)
+            if(!usuario){
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Identificador não encontrado',
+                    mensagem: 'Identificador não encontrado'
+                })
+            }
+            res.status(201).json({
+                sucesso: true,
+                mensagem: 'Identificador encontrado!'
+            })   
 
         } catch (error) {
             console.error('Erro ao verificar identificador:', error);
             res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível obter o perfil'
+                mensagem: 'Não foi possível verificar identificador'
             });
         }
     }
@@ -314,9 +333,57 @@ class AuthController {
     //POST api/auth/registroSenha - registrar a senha de primeiro acesso do usuário
     static async registroSenha(req, res) {
         try {
+            const { senha, senhaConfirmada } = req.body;
+
+            if(!senha || senha.trim() === ''){
+                res.status(400).json({
+                sucesso: false,
+                erro: 'Senha obrigatória',
+                mensagem: 'Senha é obrigatória'
+                })
+            };
+            
+            if(!senhaConfirmada || senhaConfirmada.trim() === ''){
+                res.status(400).json({
+                sucesso: false,
+                erro: 'Senha confirmada obrigatória',
+                mensagem: 'Senha confirmada é obrigatória'
+                })
+            };
+
+            const comparacao = await UsuarioModel.comparacaoDeSenhas(senha, senhaConfirmada);
+
+            if(comparacao === false){
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Senhas não confirmadas',
+                    mensagem: 'Senhas não confirmadas, digite senhas iguais!'
+                })
+            };
+
+            //registrar senha do usuário no banco
+            const usuarioId = await UsuarioModel.criar(senha)
+            if(!registrarSenha){
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Senha não registrada',
+                    mensagem: 'Senha não registrada!'
+                })
+            };
+
+            res.status(201).json({
+                sucesso: true,
+                mensagem: 'Senha cadastrada com sucesso!'
+            });
+
 
         } catch (error) {
-
+            console.error('Erro ao registrar senha', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível registrar senha'
+            });
         }
     }
 }

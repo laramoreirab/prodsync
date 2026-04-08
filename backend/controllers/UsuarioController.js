@@ -8,6 +8,7 @@ class UsuarioController{
  static async listarUsuarios(req, res){
     try {
         
+        
     } catch (error) {
         
     }
