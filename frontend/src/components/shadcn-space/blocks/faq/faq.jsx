@@ -38,7 +38,7 @@ const FAQ_DATA = [
 
 export default function Faq() {
   return (
-    <section>
+    <section id="faqs">
       <div
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:py-24 py-8 flex flex-col gap-16">
         <div

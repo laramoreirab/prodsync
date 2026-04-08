@@ -66,7 +66,7 @@ const Pricing = () => {
   };
 
   return (
-    <section className="bg-background py-10 lg:py-0">
+    <section id="servicos" className="bg-background py-10 lg:py-0">
       
       <div className="w-full mx-auto text-center">
         <h2 className="text-3xl sm:text-5xl font-bold text-primary">

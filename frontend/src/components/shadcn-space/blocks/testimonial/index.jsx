@@ -1,4 +1,4 @@
-import Testimonial01Inner from "@/components/shadcn-space/blocks/testimonial-02/testimonial";
+import Testimonial01Inner from "@/components/shadcn-space/blocks/testimonial/testimonial";
 
 const defaultTestimonials = [
     {

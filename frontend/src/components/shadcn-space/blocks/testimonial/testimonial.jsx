@@ -2,24 +2,8 @@
 import { useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
-import Logo from "@/assets/logo/logo";
 import { motion, useInView } from "motion/react";
 
-/* const defaultTestimonials = [
-    {
-        quote: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. ",
-        author: "Nome diferente",
-        role: "CEO",
-        image: "https://images.shadcnspace.com/assets/profiles/testimonial-user.png",
-    },
-    {
-        quote: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. ",
-        author: "Outro Nome",
-        role: "CEO",
-        image: "https://images.shadcnspace.com/assets/profiles/testimonial-user-2.png",
-    },
-];
- */
 export default function Testimonial01({
     testimonials = defaultTestimonials
 }) {
@@ -57,9 +41,9 @@ export default function Testimonial01({
                                                 className="lg:col-span-8 col-span-12 flex sm:flex-row flex-col sm:gap-10 gap-6 lg:pe-12">
                                                 <div className="shrink-0 flex items-start">
                                                     <img
-                                                        src="/quote.png"
+                                                        src="/quote.svg"
                                                         alt="muted quote"
-                                                        className="opacity-20 w-15"
+                                                        className="w-15"
                                                     />
                                                 </div>
                                                 <div className="flex flex-col gap-12">

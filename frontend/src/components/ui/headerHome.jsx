@@ -9,23 +9,28 @@ import Logo from "@/assets/logo/logo";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 const CollaborateButton = ({
-  className
+  className,
+  href = "/cadastro"
 }) => (
   <Button
+    asChild
     className={cn(
       "relative text-md font-medium rounded-full h-10 p-1 ps-4 pe-12 group transition-all duration-500 hover:ps-12 hover:pe-4 w-fit overflow-hidden",
       className,
       "cursor-pointer"
     )}>
-    <span className="relative z-10 transition-all duration-500">
-      Cadastre-se
-    </span>
-    <span
-      className="absolute right-1 w-8 h-8 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
-      <ArrowUpRight size={16} />
-    </span>
+    <Link href={href}>
+      <span className="relative z-10 transition-all duration-500">
+        Cadastre-se
+      </span>
+      <span
+        className="absolute right-1 w-8 h-8 bg-background text-foreground rounded-full flex items-center justify-center transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
+        <ArrowUpRight size={16} />
+      </span>
+    </Link>
   </Button>
 );
 
@@ -66,10 +71,10 @@ const Header = ({
       )}>
       <div
         className={cn(
-          "w-full px-4 flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500",
+          "w-full px-4 flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500 bg-transparent",
           sticky
             ? "py-2.5 bg-white m-0 border border-border/40 shadow-2xl shadow-primary/5 h-20"
-            : "border-transparent h-20"
+            : "border-transparent h-20 bg-transparent"
         )}>
           
         {/* Logo */}

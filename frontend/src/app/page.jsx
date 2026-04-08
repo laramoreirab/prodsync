@@ -1,7 +1,7 @@
 import AgencyHeroSection from "@/components/shadcn-space/blocks/hero";
 import AboutAndStats01 from "@/components/shadcn-space/blocks/about-us";
-import Pricing from "@/components/shadcn-space/blocks/pricing-02/pricing";
-import Testimonial01 from "@/components/shadcn-space/blocks/testimonial-02";
+import Pricing from "@/components/shadcn-space/blocks/pricing/pricing";
+import Testimonial01 from "@/components/shadcn-space/blocks/testimonial";
 import Header from "@/components/ui/headerHome";
 import Footer from "@/components/shadcn-space/blocks/footer/footer";
 import Faq from "@/components/shadcn-space/blocks/faq/faq";
@@ -16,15 +16,15 @@ export default function Home() {
     },
     {
       title: "Sobre nós",
-      href: "#",
+      href: "/",
     },
     {
       title: "Serviços",
-      href: "#",
+      href: "/",
     },    
     {
       title: "FAQs",
-      href: "#",
+      href: "/",
     }
   ];
 

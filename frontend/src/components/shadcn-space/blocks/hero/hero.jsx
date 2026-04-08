@@ -54,7 +54,8 @@ function HeroSection() {
                 transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
                 className="flex items-center flex-col md:flex-row justify-center gap-8">
                 <Button
-                  className="relative text-lg font-medium rounded-full h-12 p-1 ps-6 pe-14 group transition-all duration-500 hover:ps-14 hover:pe-6 w-fit overflow-hidden cursor-pointer">
+                  className="relative text-lg font-medium rounded-full h-12 p-1 ps-6 pe-14 group transition-all duration-500 hover:ps-14 hover:pe-6 w-fit overflow-hidden cursor-pointer"
+                  href="/cadastro">
                   <span className="relative z-10 transition-all duration-500">
                     Cadastre-se
                   </span>
