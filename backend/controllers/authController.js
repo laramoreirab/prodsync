@@ -70,68 +70,68 @@ class AuthController {
     //POST api/auth/cadastrar - Registar nova empresa no sistema
     static async cadastrar(req, res) {
         try {
-        const { nome_empresa, cnpj, telefone, email, endereco, nome_representante, cpf, senha } = req.body;
+            const { nome_empresa, cnpj, telefone, email, endereco, nome_representante, cpf, senha } = req.body;
 
-        //validações básicas
-        if(!nome_empresa || nome_empresa.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'Nome da empresa é obrigatório',
-                mensagem: 'O nome da empresa é obrigatório!'
-            })
-        };
-        if(!cnpj || cnpj.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'CNPJ é obrigatório',
-                mensagem: 'O CNPJ da empresa é obrigatório!'
-            })
-        };
-        if(!email|| email.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'Email da empresa é obrigatório',
-                mensagem: 'O email da empresa é obrigatório!'
-            })
-        };
-        if(!telefone|| telefone.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'Telefone da empresa é obrigatório',
-                mensagem: 'O telefone da empresa é obrigatório!'
-            })
-        };
-        if(!endereco|| endereco.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'Endereço é obrigatório',
-                mensagem: 'O endereço da empresa é obrigatório!'
-            })
-        };
-        if(!nome_representante || nome_representante.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'Nome do representante é obrigatório',
-                mensagem: 'O nome do representante é obrigatório!'
-            })
-        };
-        if(!cpf || cpf.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'CPF do representante é obrigatório',
-                mensagem: 'O CPF do representante é obrigatório!'
-            })
-        };
-        if(!senha || senha.trim()==''){
-            res.status(400).json({
-                sucesso: false,
-                erro: 'Senha é obrigatório',
-                mensagem: ' A senha é obrigatória para realizar cadastro!'
-            })
-        };
+            //validações básicas
+            if (!nome_empresa || nome_empresa.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Nome da empresa é obrigatório',
+                    mensagem: 'O nome da empresa é obrigatório!'
+                })
+            };
+            if (!cnpj || cnpj.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'CNPJ é obrigatório',
+                    mensagem: 'O CNPJ da empresa é obrigatório!'
+                })
+            };
+            if (!email || email.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Email da empresa é obrigatório',
+                    mensagem: 'O email da empresa é obrigatório!'
+                })
+            };
+            if (!telefone || telefone.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Telefone da empresa é obrigatório',
+                    mensagem: 'O telefone da empresa é obrigatório!'
+                })
+            };
+            if (!endereco || endereco.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Endereço é obrigatório',
+                    mensagem: 'O endereço da empresa é obrigatório!'
+                })
+            };
+            if (!nome_representante || nome_representante.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Nome do representante é obrigatório',
+                    mensagem: 'O nome do representante é obrigatório!'
+                })
+            };
+            if (!cpf || cpf.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'CPF do representante é obrigatório',
+                    mensagem: 'O CPF do representante é obrigatório!'
+                })
+            };
+            if (!senha || senha.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Senha é obrigatório',
+                    mensagem: ' A senha é obrigatória para realizar cadastro!'
+                })
+            };
 
-        //validações de formato
-        if (nome_empresa.length < 2) {
+            //validações de formato
+            if (nome_empresa.length < 2) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Nome da empresa muito curto',
@@ -200,7 +200,7 @@ class AuthController {
 
             //verificar se o cnpj da empresa já esta cadastrado no sistema 
             const empresaexistente = await UsuarioModel.buscarPorCnpj(cnpj);
-            if(empresaexistente){
+            if (empresaexistente) {
                 res.status(409).json({
                     sucesso: false,
                     erro: 'Empresa já cadastrada',
@@ -226,7 +226,7 @@ class AuthController {
             //Preparar dados do representante para adicionar na tabela Usuario como adm
             const dadosUsuario = {
                 id_empresa: empresaId,
-                nome:nome_representante,
+                nome: nome_representante,
                 tipo: 'Adm',
                 cpf: cpf,
                 email: email.trim().toLowercase()
@@ -259,27 +259,64 @@ class AuthController {
     //GET api/auth/perfil - Obter perfil do usuário logado
     static async obterPerfil(req, res) {
         try {
+            const usuario = await UsuarioModel.buscarPorId(req.usuario.id);
+
+            if (!usuario) {
+                return res.status(404).json({
+                    sucesso: false,
+                    erro: 'Usuário não encontrado',
+                    mensagem: 'Usuário não foi encontrado'
+                });
+            }
+            // Remover senha dos dados retornados
+            const { senha, ...usuarioSemSenha } = usuario;
+
+            res.status(200).json({
+                sucesso: true,
+                dados: usuarioSemSenha
+            });
 
         } catch (error) {
-
+            console.error('Erro ao obter perfil:', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível obter o perfil'
+            });
         }
     }
 
     //POST api/auth/primeiroAcesso - verificar pelo id do usuário se esse é seu primeiro acesso e se ja possui senha
-    static async primeiroAcesso(req, res){
+    static async primeiroAcesso(req, res) {
         try {
-            
+            const { id } = req.body;
+
+            if(!id || id.trim() === ''){
+                res.status(400).json({
+                sucesso: false,
+                erro: 'Identificador obrigatório',
+                mensagem: 'Identificador é obrigatório'
+                })
+            };
+
+
+
         } catch (error) {
-            
+            console.error('Erro ao verificar identificador:', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível obter o perfil'
+            });
         }
     }
 
     //POST api/auth/registroSenha - registrar a senha de primeiro acesso do usuário
-    static async registroSenha(req, res){
+    static async registroSenha(req, res) {
         try {
-            
+
         } catch (error) {
-            
+
         }
     }
 }
