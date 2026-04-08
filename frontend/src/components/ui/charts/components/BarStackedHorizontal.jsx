@@ -22,17 +22,7 @@ import {
 // ============================================================
 // stackId="a" agrupa as barras em pilha.
 
-const defeitosData = [
-  { setor: "Engrenagens", produzidas: 60, defeito: 40 },
-  { setor: "Turbinas", produzidas: 65, defeito: 35 },
-  { setor: "Válvulas", produzidas: 70, defeito: 30 },
-  { setor: "Compressores", produzidas: 55, defeito: 45 },
-];
 
-const defeitosConfig = {
-  produzidas: { label: "Produzidas", color: "hsl(var(--chart-1))" },
-  defeito: { label: "Com Defeito", color: "hsl(var(--chart-3))" },
-};
 
 export function Ex3A_BarStackedHorizontal() {
   return (

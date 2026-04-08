@@ -21,12 +21,6 @@ import {
 //  BAR COM VALOR NO TOPO + CORES MISTAS (Produção média)
 // ============================================================
 
-const producaoMediaData = [
-  { setor: "Engrenagens", media: 56 },
-  { setor: "Turbinas", media: 48 },
-  { setor: "Válvulas", media: 35 },
-  { setor: "Compressores", media: 29 },
-];
 
 const CORES_BARRA = [
   "hsl(var(--chart-1))",
@@ -35,9 +29,7 @@ const CORES_BARRA = [
   "hsl(var(--chart-4))",
 ];
 
-const producaoMediaConfig = {
-  media: { label: "Média/dia", color: "hsl(var(--chart-1))" },
-};
+
 
 export function Ex4C_BarComValorETopo() {
   return (

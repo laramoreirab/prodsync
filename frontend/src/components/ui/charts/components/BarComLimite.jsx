@@ -21,16 +21,6 @@ import {
 //  BAR COM LINHA DE REFERÊNCIA (Sobrecarga de Máquina)
 // ============================================================
 
-const sobrecargaData = [
-  { setor: "Engrenagens", carga: 85 },
-  { setor: "Turbinas", carga: 67 },
-  { setor: "Válvulas", carga: 50 },
-  { setor: "Compressores", carga: 42 },
-];
-
-const sobrecargaConfig = {
-  carga: { label: "Carga (%)", color: "hsl(var(--chart-1))" },
-};
 
 export function Ex4B_BarComLimite() {
   return (

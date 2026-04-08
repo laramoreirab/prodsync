@@ -22,19 +22,9 @@ import {
 // LINE CHART COM MÚLTIPLAS SÉRIES (Rotatividade)
 // ============================================================
 
-const rotatividadeData = [
-  { mes: "Abr", novos: 18, desligados: 15 },
-  { mes: "Mai", novos: 20, desligados: 13 },
-  { mes: "Jun", novos: 17, desligados: 16 },
-  { mes: "Jul", novos: 22, desligados: 14 },
-  { mes: "Ago", novos: 19, desligados: 17 },
-  { mes: "Set", novos: 25, desligados: 15 },
-];
 
-const rotatividadeConfig = {
-  novos: { label: "Novos", color: "hsl(var(--chart-1))" },
-  desligados: { label: "Desligados", color: "hsl(var(--chart-2))" },
-};
+
+
 
 export function Ex4D_LineMultiplasSeries() {
   return (

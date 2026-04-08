@@ -21,15 +21,7 @@ import {
 // ============================================================
 // Quando usar: comparação direta de poucos itens com label no eixo X.
 
-const motivosParadaData = [
-  { motivo: "Manutenção", ocorr: 45 },
-  { motivo: "Falta Material", ocorr: 32 },
-  { motivo: "Limpeza", ocorr: 28 },
-];
 
-const motivosParadaConfig = {
-  ocorr: { label: "Ocorrências", color: "hsl(var(--chart-1))" },
-};
 
 export function Ex2C_BarVertical() {
   return (

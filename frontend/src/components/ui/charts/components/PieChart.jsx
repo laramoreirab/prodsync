@@ -18,17 +18,8 @@ import {
 // PIE CHART 
 // ============================================================
 
-const statusMaquinasData = [
-  { name: "Produzindo", value: 75 },
-  { name: "Paradas", value: 10 },
-  { name: "Setup", value: 15 },
-];
 
-const statusMaquinasConfig = {
-  Produzindo: { label: "Produzindo", color: "hsl(var(--chart-1))" },
-  Paradas: { label: "Paradas", color: "hsl(var(--chart-2))" },
-  Setup: { label: "Setup", color: "hsl(var(--chart-3))" },
-};
+
 
 export function Ex2B_PieChart() {
   return (

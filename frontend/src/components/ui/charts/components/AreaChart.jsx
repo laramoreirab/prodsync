@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import {
     Area,
     AreaChart,
@@ -16,50 +14,70 @@ import {
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
+  function useChart(config, key) {
+    const item = config?.[key];
+  
+    return {
+      color: item?.color || "var(--primary)",
+    };
+  }
+
 // ============================================================
 // AREA CHART (variação do LineChart com área preenchida)
 // ============================================================
 
-const areaData = [
-  { dia: "Seg", refugo: 200 },
-  { dia: "Ter", refugo: 350 },
-  { dia: "Qua", refugo: 420 },
-  { dia: "Qui", refugo: 380 },
-  { dia: "Sex", refugo: 550 },
-  { dia: "Sab", refugo: 480 },
-  { dia: "Dom", refugo: 420 },
-];
+export function AreaChartBase({
+  title,
+  description,
+  data,
+  xKey,
+  yKey,
+  config,
+}) {
+  const { color } = useChart(config, yKey);
+  const gradientId = `grad-${yKey}`;
 
-const areaConfig = {
-  refugo: { label: "Refugo", color: "hsl(var(--chart-1))" },
-};
-
-export function Bonus_AreaChart() {
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Tendência de Refugo</h3>
-      <ChartContainer config={areaConfig} className="h-[200px] w-full">
-        <AreaChart data={areaData}>
+      <h3 className="text-sm font-medium mb-1">{title}</h3>
+
+      {description && (
+        <p className="text-xs text-muted-foreground mb-3">
+          {description}
+        </p>
+      )}
+
+      <ChartContainer config={config} className="h-[200px] w-full">
+        <AreaChart data={data}>
           <defs>
-            <linearGradient id="gradRefugo" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--color-refugo)" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="var(--color-refugo)" stopOpacity={0} />
+            <linearGradient id={gradientId}>
+              <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+              <stop offset="95%" stopColor={color} stopOpacity={0} />
             </linearGradient>
           </defs>
+
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="dia" tickLine={false} axisLine={false} />
-          <YAxis tickLine={false} axisLine={false} />
+          <XAxis dataKey={xKey} />
+          <YAxis hide />
+
           <ChartTooltip content={<ChartTooltipContent />} />
+
           <Area
             type="monotone"
-            dataKey="refugo"
-            stroke="var(--color-refugo)"
-            strokeWidth={2}
-            fill="url(#gradRefugo)"
-            fillOpacity={1}
+            dataKey={yKey}
+            stroke={color}
+            fill={`url(#${gradientId})`}
           />
         </AreaChart>
       </ChartContainer>
     </div>
   );
 }
+
+// <AreaChartBase
+//       title="Tendência de Refugo"
+//       data={data}
+//       xKey="dia"
+//       yKey="refugo"
+//       config={refugoConfig}
+//     />

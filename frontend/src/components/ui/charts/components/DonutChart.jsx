@@ -20,15 +20,6 @@ import {
 // DONUT CHART 
 // ============================================================
 
-const usuariosData = [
-  { perfil: "Operadores", qtd: 91.7 },
-  { perfil: "Gestores", qtd: 8.3 },
-];
-
-const usuariosConfig = {
-  Operadores: { label: "Operadores", color: "hsl(var(--chart-1))" },
-  Gestores: { label: "Gestores", color: "hsl(var(--chart-2))" },
-};
 
 export function Ex4A_DonutChart() {
   return (
