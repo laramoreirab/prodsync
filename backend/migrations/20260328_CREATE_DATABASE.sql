@@ -10,6 +10,7 @@ CREATE TABLE Empresas (
     email VARCHAR(255),
     telefone VARCHAR(20),
     endereco VARCHAR(255),
+    nome_representante VARCHAR(255),
     cpf_representante VARCHAR(14)
 );
 
