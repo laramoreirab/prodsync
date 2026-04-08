@@ -1,10 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 // --- ENUMS ---
@@ -43,7 +43,7 @@ model Empresas {
   id_empresa        Int       @id @default(autoincrement())
   nome_empresa      String    @db.VarChar(255)
   cnpj              String    @unique @db.VarChar(18)
-  data_cadastro     DateTime? @default(now()) @db.DateTime(0)
+  data_cadastro     DateTime? @default(now())
   email             String?   @db.VarChar(255)
   telefone          String?   @db.VarChar(20)
   endereco          String?   @db.VarChar(255)
@@ -167,8 +167,8 @@ model OrdemProducao {
   id_maquina     Int
   codigo_lote    String    @db.VarChar(100)
   produto        String    @db.VarChar(150)
-  data_inicio    DateTime? @db.DateTime(0)
-  data_fim       DateTime? @db.DateTime(0)
+  data_inicio    DateTime? 
+  data_fim       DateTime? 
   qtd_planejada  Int
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
@@ -185,8 +185,8 @@ model Historico_Eventos {
   id_turno         Int
   id_motivo_parada Int?
   status_atual     StatusMaquina
-  inicio           DateTime      @db.DateTime(0)
-  termino          DateTime?     @db.DateTime(0)
+  inicio           DateTime      
+  termino          DateTime?     
   duracao          Int?          // Duração em minutos
 
   empresa        Empresas        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
@@ -205,8 +205,8 @@ model Apontamento {
   id_turno         Int
   qtd_boa          Int      @default(0)
   qtd_refugo       Int      @default(0)
-  data_hora_inicio DateTime @db.DateTime(0)
-  data_hora_fim    DateTime @db.DateTime(0)
+  data_hora_inicio DateTime
+  data_hora_fim    DateTime 
   observacao       String?  @db.Text
 
   empresa        Empresas      @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
