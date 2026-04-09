@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import CriarSenha from "@/components/ui/cardCriarSenha";
 import Header from "@/components/ui/headerHome";
 
 export default function Home() {
@@ -26,7 +26,7 @@ export default function Home() {
   return (
     <>
     <Header navigationData={navigationData} />
-    
+      <CriarSenha />
     </>
   );
 }
