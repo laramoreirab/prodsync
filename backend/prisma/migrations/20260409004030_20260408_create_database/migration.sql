@@ -15,10 +15,11 @@ CREATE TABLE "Empresas" (
     "id_empresa" SERIAL NOT NULL,
     "nome_empresa" VARCHAR(255) NOT NULL,
     "cnpj" VARCHAR(18) NOT NULL,
-    "data_cadastro" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "data_cadastro" TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     "email" VARCHAR(255),
     "telefone" VARCHAR(20),
     "endereco" VARCHAR(255),
+    "nome_representante" VARCHAR(255),
     "cpf_representante" VARCHAR(14),
 
     CONSTRAINT "Empresas_pkey" PRIMARY KEY ("id_empresa")
@@ -116,8 +117,8 @@ CREATE TABLE "OrdemProducao" (
     "id_maquina" INTEGER NOT NULL,
     "codigo_lote" VARCHAR(100) NOT NULL,
     "produto" VARCHAR(150) NOT NULL,
-    "data_inicio" TIMESTAMP(3),
-    "data_fim" TIMESTAMP(3),
+    "data_inicio" TIMESTAMP(0),
+    "data_fim" TIMESTAMP(0),
     "qtd_planejada" INTEGER NOT NULL,
 
     CONSTRAINT "OrdemProducao_pkey" PRIMARY KEY ("id_ordem")
@@ -132,8 +133,8 @@ CREATE TABLE "Historico_Eventos" (
     "id_turno" INTEGER NOT NULL,
     "id_motivo_parada" INTEGER,
     "status_atual" "StatusMaquina" NOT NULL,
-    "inicio" TIMESTAMP(3) NOT NULL,
-    "termino" TIMESTAMP(3),
+    "inicio" TIMESTAMP(0) NOT NULL,
+    "termino" TIMESTAMP(0),
     "duracao" INTEGER,
 
     CONSTRAINT "Historico_Eventos_pkey" PRIMARY KEY ("id_evento")
@@ -149,8 +150,8 @@ CREATE TABLE "Apontamento" (
     "id_turno" INTEGER NOT NULL,
     "qtd_boa" INTEGER NOT NULL DEFAULT 0,
     "qtd_refugo" INTEGER NOT NULL DEFAULT 0,
-    "data_hora_inicio" TIMESTAMP(3) NOT NULL,
-    "data_hora_fim" TIMESTAMP(3) NOT NULL,
+    "data_hora_inicio" TIMESTAMP(0) NOT NULL,
+    "data_hora_fim" TIMESTAMP(0) NOT NULL,
     "observacao" TEXT,
 
     CONSTRAINT "Apontamento_pkey" PRIMARY KEY ("id_apontamento")

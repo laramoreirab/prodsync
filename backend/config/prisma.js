@@ -1,7 +1,9 @@
-import { PrismaClient } from '@prisma/client'
+import 'dotenv/config'
+import { PrismaClient } from './generated/prisma'
+import { PrismaNeon } from '@prisma/adapter-neon'
 
-const prisma = new PrismaClient();
+const adapter = new PrismaNeon({
+    connectionString: process.env.DATABASE_URL,
+})
 
-//esse arquivo exporta os módulos como: read, create, findMany etc...
-
-export default prisma;
+export const prisma = new PrismaClient({ adapter })
