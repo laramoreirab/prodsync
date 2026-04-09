@@ -64,10 +64,7 @@ class UsuarioModel {
     static async criarEmpresa(dados) {
         try {
             const senhaHash = await bcrypt.hash(dados.senha, 10);
-            if (!senhaHash) {
-                console.error('Erro ao gerar hash da senha:', error);
-            }
-
+            
             const novaEmpresa = await prisma.empresas.create({
                 data: {
                     ...dados,
@@ -86,9 +83,7 @@ class UsuarioModel {
         if (dados.tipo === 'Adm') {
             try {
                 const senhaHash = await bcrypt.hash(dados.senha, 10);
-                if (!senhaHash) {
-                    console.error('Erro ao gerar hash da senha:', error);
-                }
+            
                 const novoUsuario = await prisma.usuarios.create({
                     data: {
                         ...dados,
@@ -108,6 +103,7 @@ class UsuarioModel {
                         ...dados
                     }
                 });
+                return novoUsuario || null;
             } catch (error) {
                 console.error('Erro ao registrar novo usuário', error);
                 throw error;
