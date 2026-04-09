@@ -221,7 +221,7 @@ class AuthController {
             }
 
             //cadastrar a empresa no banco 
-            const empresaId = await UsuarioModel.criar(dadosEmpresa);
+            const empresaId = await UsuarioModel.criarEmpresa(dadosEmpresa);
 
             //Preparar dados do representante para adicionar na tabela Usuario como adm
             const dadosUsuario = {
@@ -229,11 +229,12 @@ class AuthController {
                 nome: nome_representante,
                 tipo: 'Adm',
                 cpf: cpf,
-                email: email.trim().toLowercase()
+                email: email.trim().toLowercase(),
+                senha: senha.trim()
             }
 
             //cadastrando o representante como ADM no banco na tabela Usuarios
-            const registroAdm = await UsuarioModel.criar(dadosUsuario)
+            const registroAdm = await UsuarioModel.criarUsuario(dadosUsuario)
 
             res.status(201).json({
                 sucesso: true,
@@ -307,7 +308,7 @@ class AuthController {
                 })
             }
 
-            const usuario = await UsuarioModel.verificarId(id)
+            const usuario = await UsuarioModel.buscarPorId(id)
             if(!usuario){
                 res.status(400).json({
                     sucesso: false,
@@ -315,10 +316,20 @@ class AuthController {
                     mensagem: 'Identificador não encontrado'
                 })
             }
+            //verificar se o id ainda não possui senha cadastrada
+            const verificacaoSenha = await UsuarioModel.verificaSenhaUsuario(id);
+            if(verificacao === true){
+                res.status(400).json({
+                    sucesso: false,
+                    erro:'Senha já criada para o identificador',
+                    mensagem:'Senha já criada para o identificado'
+                })
+            };
+
             res.status(201).json({
                 sucesso: true,
                 mensagem: 'Identificador encontrado!'
-            })   
+            });   
 
         } catch (error) {
             console.error('Erro ao verificar identificador:', error);
@@ -330,9 +341,10 @@ class AuthController {
         }
     }
 
-    //POST api/auth/registroSenha - registrar a senha de primeiro acesso do usuário
+    //POST api/auth/registroSenha/:id - registrar a senha de primeiro acesso do usuário
     static async registroSenha(req, res) {
         try {
+            const { id } = req.params;
             const { senha, senhaConfirmada } = req.body;
 
             if(!senha || senha.trim() === ''){
@@ -362,7 +374,7 @@ class AuthController {
             };
 
             //registrar senha do usuário no banco
-            const usuarioId = await UsuarioModel.criar(senha)
+            const registrarSenha = await UsuarioModel.atualizar(id, senha)
             if(!registrarSenha){
                 res.status(400).json({
                     sucesso: false,
