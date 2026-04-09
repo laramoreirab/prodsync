@@ -212,7 +212,7 @@ class AuthController {
             const dadosEmpresa = {
                 nome_empresa: nome_empresa,
                 cnpj: cnpj.trim(),
-                email: email.trim().toLowercase(),
+                email: email.trim().toLowerCase(),
                 telefone: telefone.trim(),
                 endereco: endereco,
                 nome_representante: nome_representante,
@@ -229,7 +229,7 @@ class AuthController {
                 nome: nome_representante,
                 tipo: 'Adm',
                 cpf: cpf,
-                email: email.trim().toLowercase(),
+                email: email.trim().toLowerCase(),
                 senha: senha.trim()
             }
 
@@ -238,9 +238,10 @@ class AuthController {
 
             res.status(201).json({
                 sucesso: true,
-                mensagem: 'Empresa cadastrada com sucesso',
+                mensagem: 'Empresa e administrador criados com sucesso!',
                 dados: {
                     id_empresa: empresaId,
+                    id_usuario: registroAdm.id_usuario,
                     nome_empresa: nome_empresa,
                     cnpj: cnpj.trim(),
                     tipo: 'Adm'
