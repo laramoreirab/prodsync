@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import UsuarioModel from '../models/UsuarioModel'
+import EmpresaModel from '../models/EmpresaModel';
 import { JWT_CONFIG } from '../config/jwt'
 
 class AuthController {
@@ -221,7 +222,7 @@ class AuthController {
             }
 
             //cadastrar a empresa no banco 
-            const empresaId = await UsuarioModel.criarEmpresa(dadosEmpresa);
+            const empresaId = await EmpresaModel.criarEmpresa(dadosEmpresa);
 
             //Preparar dados do representante para adicionar na tabela Usuario como adm
             const dadosUsuario = {

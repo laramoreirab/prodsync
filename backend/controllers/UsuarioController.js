@@ -171,13 +171,49 @@ class UsuarioController {
                 })
             };
             //validação funcao
-
+            if (!funcao || funcao.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Turno é obrigatório',
+                    mensagem: 'O turno é obrigatório!'
+                })
+            };
             //validação maquina
+            if (!maquina || maquina.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Turno é obrigatório',
+                    mensagem: 'O turno é obrigatório!'
+                })
+            };
 
             //preparar dados do usuario para tabela usuarios
+            const dadosUsuario = {
+                nome: nome,
+                cpf: cpf.trim(),
+                email: email
+            }
 
-            //prepara dados de maquina para tabela maquinas
+            // Adicionar imagem se foi enviada
+            if (req.file) {
+                dadosUsuario.imagem = req.file.filename;
+            }
 
+            //Registrar usuário na tabela Usuarios
+            const usuarioId = await UsuarioModel.criarUsuario(dadosUsuario);
+            if(!usuarioId){
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Id do usuário não retornado',
+                    mensagem: 'Id do usuário não retornado!'
+                })
+            }
+            //prepara dados de maquina,turno e operados para adicionar na tabela turno
+            const dadosMaquina = {
+                nome_maquina: maquina,
+            }
+
+            //tabela de 
             //preparar dados de escala de trabalho para tabela escalaTrabalho
 
 
