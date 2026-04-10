@@ -41,7 +41,7 @@ export default function RegisterForm() {
         </div>
 
         {/* BUTTON CRIAR CONTA */}
-        <Button onClick={() => setOpen(true)} className="w-full h-9 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg">
+        <Button onClick={() => setOpen(true)} className="w-full h-9 bg-[#212e4b] hover:bg-[#1a253c] hover:bg-slate-800 text-white text-sm font-medium rounded-lg">
           Criar conta
         </Button>
 
@@ -71,7 +71,7 @@ export default function RegisterForm() {
 function FormField({ label, placeholder }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">
+      <Label className="text-xs font-medium text-slate-900">
         {label}
       </Label>
       <Input className="h-9" placeholder={placeholder} />

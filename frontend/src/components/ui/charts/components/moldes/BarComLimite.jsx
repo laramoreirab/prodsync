@@ -1,21 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    ReferenceLine,
-    XAxis,
-    YAxis,
-  } from "recharts";
-  
-  import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-  } from "@/components/ui/chart";
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+import { barHorizontalConfig } from "../config/barHorizontalConfig"; // <= import da config
+import { useBarHorizontal } from "../hooks/useBarHorizontal";     // <= import do hook
+
 
 // ============================================================
 //  BAR COM LINHA DE REFERÊNCIA (Sobrecarga de Máquina)
@@ -23,6 +25,11 @@ import {
 
 
 export function Ex4B_BarComLimite() {
+  const { data, loading, error } = useBarHorizontal();
+ 
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
+ 
   return (
     <div>
       <h3 className="text-sm font-medium mb-3">Indicador de Sobrecarga por Setor</h3>
@@ -32,7 +39,7 @@ export function Ex4B_BarComLimite() {
           <XAxis dataKey="setor" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
           <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="carga" fill="var(--color-carga)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey={data} fill="var(--color-carga)" radius={[4, 4, 0, 0]} />
           <ReferenceLine
             y={60}
             stroke="red"

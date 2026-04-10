@@ -21,7 +21,7 @@ export function useChartData(fetcher) {
       }
     }
     load();
-  }, [fetcher]); 
+  }, []); 
 
   return { data, loading, error };
 }
