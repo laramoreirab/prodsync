@@ -1,7 +1,12 @@
 // PROJETO TCC - Módulo ESP32 (Lado Dispositivo - Versão Serial / Plano B)
 
-const BOTOES = [D12, D13, D14]; // Array de Botões, posteriorente utilizado no "BOTOES.forEach"
+// Limpa todos os watches e intervalos anteriores para evitar o erro "Unable to set watch"
+clearWatch();
+clearInterval();
+
+const BOTOES = [D25, D26, D27]; // Array de Botões, posteriorente utilizado no "BOTOES.forEach"
 let isLocked = false; // Mutex do código, serve para garantir que o pressionamento de múltiplos botões não seja reconhecido, apenas um funciona
+let alarmeSeguranca; // Variável para guardar o nosso timer
 
 // Envia o payload via Serial e aguarda confirmação
 
@@ -9,6 +14,15 @@ function dispararEvento(id) {
     if (isLocked) return; // Se houver processo em curso, ignora
 
     isLocked = true;
+
+    // --- NOVA TRAVA DE SEGURANÇA (TIMEOUT DE 5 SEGUNDOS) ---
+    alarmeSeguranca = setTimeout(() => {
+        if (isLocked) {
+            isLocked = false;
+            print("LOG: ⚠️ TIMEOUT! O PC nao respondeu. Mutex liberado por segurança.");
+        }
+    }, 5000); // 5000 milissegundos = 5 segundos
+    // -------------------------------------------------------
 
     // 1. Criando uma lista (Array) onde a posição reflete o ID do botão
     // ID 0 = PRODUZINDO, ID 1 = SETUP/AJUSTE, ID 2 = PARADA
@@ -36,13 +50,29 @@ BOTOES.forEach((pin, index) => {
     }, pin, { repeat: true, edge: "falling", debounce: 50 });
 });
 
-/* Escuta a Serial: Quando o PC terminar o POST,
-   ele deve enviar "OK" para liberar o próximo clique. */
-USB.on('data', function (data) {
-    if (data.includes("RELEASE_MUTEX")) {
-        isLocked = false;
-        print("LOG: Mutex liberado pelo PC.");
+function liberarMutex() {
+    isLocked = false;
+    
+    // Desarma o alarme se ele existir
+    if (alarmeSeguranca) {
+        clearTimeout(alarmeSeguranca);
     }
-});
+    
+    print("LOG: ✅ Mutex liberado pelo PC (Via Comando).");
+}
+
+// /* Escuta a Serial: Quando o PC terminar o POST,
+//    ele deve enviar "OK" para liberar o próximo clique. */
+// Serial.on('data', function (data) {
+//     if (data.includes("RELEASE_MUTEX")) {
+//         isLocked = false;
+
+//         if (alarmeSeguranca) {
+//             clearTimeout(alarmeSeguranca);
+//         }
+
+//         print("LOG: Mutex liberado pelo PC.");
+//     }
+// });
 
 print("LOG: ESP32 iniciado e aguardando cliques.");

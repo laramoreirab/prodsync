@@ -18,17 +18,18 @@ Ele pega aquela String JSON que chegou pelo cabo USB e faz a entrega oficial par
 */
 
 // 1. Configurar a porta correta (Ex: COM3 no Windows ou /dev/ttyUSB0 no Linux)
-const port = new SerialPort({ path: 'COM3', baudRate: 115200 });
-const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+const port = new SerialPort({ path: 'COM7', baudRate: 115200 });
+const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
 const BACKEND_URL = "http://localhost:3000/api/status"; // O backend local **Apenas exemplo**
 
 console.log("Aguardando dados do ESP32...");
 
 parser.on('data', async (line) => {
+    const linhaLimpa = line.trim();
     // Verifica se a linha recebida é um dado válido
-    if (line.startsWith("DATA:")) {
-        const jsonRaw = line.replace("DATA:", "");
+    if (linhaLimpa.startsWith("DATA:")) {
+        const jsonRaw = linhaLimpa.replace("DATA:", "");
 
         try {
             const payload = JSON.parse(jsonRaw);
@@ -43,12 +44,13 @@ parser.on('data', async (line) => {
             console.log("Resposta do Backend:", response.status);
 
             // 3. Avisa o ESP32 que ele pode liberar os botões novamente
-            port.write("RELEASE_MUTEX\n");
+            port.write("liberarMutex();\n");
 
         } catch (err) {
             console.error("Erro ao processar ou enviar dado:", err.message);
-            // Libera mesmo em caso de erro para não travar o hardware
-            port.write("RELEASE_MUTEX\n");
+            port.write("liberarMutex();\n");
+            // // Libera mesmo em caso de erro para não travar o hardware
+            // port.write("RELEASE_MUTEX\n");
         }
     } else {
         // Apenas exibe logs comuns vindos do ESP32

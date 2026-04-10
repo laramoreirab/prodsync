@@ -20,7 +20,9 @@ app.post('/api/status', (req, res) => {
 
   console.log("====================================");
   console.log("CHEGOU UMA REQUISIÇÃO NO BACKEND!");
-  console.log(`Botão Pressionado: ${dadosRecebidos.button_id}`);
+  // Onde estava: console.log(`Botão Pressionado: ${dadosRecebidos.button_id}`);
+  // Mude para:
+  console.log(`ID da Máquina: ${dadosRecebidos.maquina_id}`);
   console.log(`Status: ${dadosRecebidos.status}`);
   console.log(`Horário do clique: ${new Date(dadosRecebidos.timestamp).toLocaleString()}`);
   console.log("====================================\n");
