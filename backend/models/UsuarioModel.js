@@ -1,4 +1,5 @@
 import prisma from '../config/prisma.js';
+import bcrypt from 'bcrypt'
 
 class UsuarioModel {
     //Listar todos os usuários com paginacção
@@ -60,24 +61,6 @@ class UsuarioModel {
         }
     };
 
-    //Registrar nova empresa
-    static async criarEmpresa(dados) {
-        try {
-            const senhaHash = await bcrypt.hash(dados.senha, 10);
-            
-            const novaEmpresa = await prisma.empresas.create({
-                data: {
-                    ...dados,
-                    senha: senhaHash
-                },
-            });
-            return novaEmpresa.id_empresa;
-        } catch (error) {
-            console.error('Erro ao registrar empresa', error);
-            throw error;
-        };
-    };
-
     //Registrar usuarios na tabela usuários
     static async criarUsuario(dados) {
         if (dados.tipo === 'Adm') {
@@ -101,7 +84,8 @@ class UsuarioModel {
                 const novoUsuario = await prisma.usuarios.create({
                     data: {
                         ...dados
-                    }
+                    },
+                    select:{ id_usuario : true } //vai retornar o Id do novo usuário
                 });
                 return novoUsuario || null;
             } catch (error) {
@@ -139,7 +123,7 @@ class UsuarioModel {
                 where: { id_usuario: id },
                 select: { senha: true }
             });
-            if (usuarioSenha !== null) {
+            if (usuarioSenha && usuarioSenha.senha !== null) {
                 return true
             } else {
                 return false
