@@ -50,17 +50,17 @@ class UsuarioController {
             });
 
         } catch (error) {
-             console.error('Erro ao listar usuários:', error);
+            console.error('Erro ao listar usuários:', error);
             res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível listar os produtos'
             });
         }
-        }
+    }
 
     //GET api/usuarios/:id - busca de usuário por id 
-    static async buscarPorId(req, res){
+    static async buscarPorId(req, res) {
         try {
             const { id } = req.params;
             // Validação básica do ID
@@ -74,7 +74,7 @@ class UsuarioController {
 
             const usuario = await UsuarioModel.buscarPorId(id);
 
-            if(!usuario){
+            if (!usuario) {
                 res.status(404).json({
                     sucesso: false,
                     erro: 'Usuário não encontrado',
@@ -100,9 +100,98 @@ class UsuarioController {
     static async criarUsuario(req, res) {
         try {
             const { nome, cpf, email, setor, funcao, turno, maquina } = req.body;
-            
-        } catch (error) {
 
+            // Validar nome
+            if (!nome || nome.trim() === '') {
+                erros.push({
+                    campo: 'nome',
+                    mensagem: 'Nome é obrigatório'
+                });
+            } else {
+                if (nome.trim().length < 3) {
+                    erros.push({
+                        campo: 'nome',
+                        mensagem: 'O nome deve ter pelo menos 3 caracteres'
+                    });
+                }
+
+                if (nome.trim().length > 255) {
+                    erros.push({
+                        campo: 'nome',
+                        mensagem: 'O nome deve ter no máximo 255 caracteres'
+                    });
+                }
+            }
+            // Validar cpf
+            if (!cpf || cpf.trim() === '') {
+                erros.push({
+                    campo: 'CPF',
+                    mensagem: 'CPF é obrigatório'
+                });
+            }
+            if (cpf.trim().length < 11) {
+                erros.push({
+                    campo: 'CPF',
+                    mensagem: 'O CPF deve ter pelo menos 11 caracteres'
+                });
+            }
+
+            //validar email 
+            if (!email || email.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Email da empresa é obrigatório',
+                    mensagem: 'O email da empresa é obrigatório!'
+                })
+            };
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Email inválido',
+                    mensagem: 'Formato de email inválido'
+                });
+            };
+
+            //validação do setor
+            if (!setor || setor.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Setor é obrigatório',
+                    mensagem: 'O setor é obrigatório!'
+                })
+            };
+
+            //validação do turno
+            if (!turno || turno.trim() == '') {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Turno é obrigatório',
+                    mensagem: 'O turno é obrigatório!'
+                })
+            };
+            //validação funcao
+
+            //validação maquina
+
+            //preparar dados do usuario para tabela usuarios
+
+            //prepara dados de maquina para tabela maquinas
+
+            //preparar dados de escala de trabalho para tabela escalaTrabalho
+
+
+            res.status(201).json({
+                sucesso: true,
+                mensagem: 'Usuário criado com sucesso!',
+            })
+        } catch (error) {
+            console.error('Erro ao criar usuário:', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível criar o usuário'
+            });
         }
     }
 
