@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken'
 import UsuarioModel from '../models/UsuarioModel.js'
+import TurnoModel from '../models/TurnoModel.js'
+import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
+import SetorModel from '../models/SetorModel.js'
+import MaquinaModel from '../models/MaquinaModel.js'
 import { JWT_CONFIG } from '../config/jwt.js'
+import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 
 class UsuarioController {
 
@@ -34,9 +39,7 @@ class UsuarioController {
                 });
             }
 
-            const skip = (pagina - 1) * limite;
-
-            const resultado = await UsuarioModel.listarTodos(limite, skip)
+            const resultado = await UsuarioModel.listarTodos(pagina, limite);
 
             res.status(200).json({
                 sucesso: true,
@@ -101,6 +104,7 @@ class UsuarioController {
         try {
             const { nome, cpf, email, setor, funcao, turno, maquina } = req.body;
 
+            const erros = [];
             // Validar nome
             if (!nome || nome.trim() === '') {
                 erros.push({
@@ -190,6 +194,7 @@ class UsuarioController {
             //preparar dados do usuario para tabela usuarios
             const dadosUsuario = {
                 nome: nome,
+                tipo: funcao,
                 cpf: cpf.trim(),
                 email: email
             }
@@ -201,21 +206,46 @@ class UsuarioController {
 
             //Registrar usuário na tabela Usuarios
             const usuarioId = await UsuarioModel.criarUsuario(dadosUsuario);
-            if(!usuarioId){
+            if (!usuarioId || isNaN(usuarioId)) {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Id do usuário não retornado',
                     mensagem: 'Id do usuário não retornado!'
                 })
             }
+            //buscar turno, maquina e setor ID 
+            const turnoId = await TurnoModel.buscarIdTurno(turno)
+            const setorId = await SetorModel.buscarIdSetor(setor)
+            const maquinaId = await TurnoModel.buscarIdMaquina(maquina)
             //prepara dados de maquina,turno e operados para adicionar na tabela turno
-            const dadosMaquina = {
-                nome_maquina: maquina,
+            const dadosTurno = {
+                id_maquina: maquinaId,
+                id_usuario: usuarioId,
+                id_turno: turnoId
             }
-
-            //tabela de 
+            //Registrar na tabela turno 
+            const registrarTurno = await TurnoModel.criar(dadosTurno)
+            if (!registrarTurno) {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Não foi possível registrar turno',
+                    mensagem: 'Não foi possível registrar turno!'
+                })
+            }
             //preparar dados de escala de trabalho para tabela escalaTrabalho
-
+            const dadosEscala = {
+                id_operador: usuarioId,
+                id_turno: turnoId,
+                id_setor: setorId
+            }
+            const registrarEscala = await EscalaTrabalhoModel.criar(dadosEscala)
+            if (!registrarEscala) {
+                res.status(400).json({
+                    sucesso: false,
+                    erro: 'Não foi possível registrar escala',
+                    mensagem: 'Não foi possível registrar escala!'
+                })
+            }
 
             res.status(201).json({
                 sucesso: true,
@@ -234,18 +264,206 @@ class UsuarioController {
     //PUT api/usuarios/:idf
     static async atualizarUsuario(req, res) {
         try {
+            const { id } = req.params;
+            const { nome, cpf, email, setor, funcao, turno, maquina } = req.body;
+
+            // Validação do ID
+            if (!id || isNaN(id)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID inválido',
+                    mensagem: 'O ID deve ser um número válido'
+                });
+            }
+
+            //verificar se usuário existe
+            const usuarioExistente = await UsuarioModel.buscarPorId(id);
+            if (!usuarioExistente) {
+                return res.status(404).json({
+                    sucesso: false,
+                    erro: 'Usuário não encontrado',
+                    mensagem: `Usuário com ID ${id} não foi encontrado`
+                });
+            }
+
+            // Preparar dados para atualização
+            const dadosUpdateUsuario = {};
+            const dadosUpdateEscala = {};
+            const dadosUpdateTurno = {};
+
+            if (nome !== undefined) { dadosUpdateUsuario.nome = nome }
+            if (email !== undefined) { dadosUpdateUsuario.email = email }
+            if (funcao !== undefined) { dadosUpdateUsuario.tipo = funcao }
+            if (cpf !== undefined) { dadosUpdateUsuario.cpf = cpf }
+
+            // Adicionar nova imagem se foi enviada
+            if (req.file) {
+                // Remover imagem antiga se existir
+                if (usuarioExistente.imagem) {
+                    await removerArquivoAntigo(usuarioExistente.imagem, 'imagem');
+                }
+                dadosUpdateUsuario.imagem = req.file.filename;
+            }
+
+            if (setor !== undefined) {
+            const setorId = await SetorModel.buscarIdSetor(setor)
+            dadosUpdateEscala.id_setor = setorId;
+        }
+        if (turno !== undefined) {
+            const turnoId = await TurnoModel.buscarIdTurno(turno)
+            dadosUpdateEscala.id_turno = turnoId;
+            dadosUpdateTurno.id_turno = turnoId; // ← resolve o turnoId duplicado também
+        }
+        if (maquina !== undefined) {
+            const maquinaId = await MaquinaModel.buscarIdMaquina(maquina)
+            dadosUpdateTurno.id_maquina = maquinaId;
+        }
+
+        // UMA única verificação geral no lugar das três individuais
+        if (
+            Object.keys(dadosUpdateUsuario).length === 0 &&
+            Object.keys(dadosUpdateEscala).length === 0 &&
+            Object.keys(dadosUpdateTurno).length === 0
+        ) {
+            return res.status(400).json({
+                sucesso: false,
+                erro: 'Nenhum dado para atualizar',
+                mensagem: 'Forneça pelo menos um campo para atualizar'
+            });
+        }
+
+        // Cada atualização só executa se tiver dados
+        let updateUsuario = null;
+        let updateEscala = null;
+        let updateTurno = null;
+
+        if (Object.keys(dadosUpdateUsuario).length > 0) {
+            updateUsuario = await UsuarioModel.atualizar(id, dadosUpdateUsuario)
+        }
+        if (Object.keys(dadosUpdateEscala).length > 0) {
+            updateEscala = await EscalaTrabalhoModel.atualizar(id, dadosUpdateEscala)
+        }
+        if (Object.keys(dadosUpdateTurno).length > 0) {
+            updateTurno = await TurnoModel.atualizar(id, dadosUpdateTurno)
+        }
+
+            res.status(200).json({
+                sucesso: true,
+                mensagem: 'Usuario atualizado com sucesso',
+                dados: {
+                    ...updateUsuario,
+                    ...updateEscala,
+                    ...updateTurno
+
+                }
+            });
 
         } catch (error) {
-
+            console.error('Erro ao atualizar usuário:', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível atualizar o usuário!'
+            });
         }
     }
 
     //DELETE api/usuarios/:idf - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
+            const { id } = req.params;
+
+            // Validação do ID
+            if (!id || isNaN(id)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID inválido',
+                    mensagem: 'O ID deve ser um número válido'
+                });
+            }
+
+            //verificar se usuário existe
+            const usuarioExistente = await UsuarioModel.buscarPorId(id);
+            if (!usuarioExistente) {
+                return res.status(404).json({
+                    sucesso: false,
+                    erro: 'Usuário não encontrado',
+                    mensagem: `Usuário com ID ${id} não foi encontrado`
+                });
+            }
+
+            // Remover imagem do produto se existir
+            if (usuarioExistente.imagem) {
+                await removerArquivoAntigo(usuarioExistente.imagem, 'imagem');
+            }
+
+            const resultado = await UsuarioModel.deletar(id);
+
+            res.status(200).json({
+                sucesso: true,
+                mensagem: 'Usuário excluído com sucesso',
+                dados: {
+                    linhasAfetadas: resultado || 1
+                }
+            });
 
         } catch (error) {
+            console.error('Erro ao excluir usuário:', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível usuário o produto'
+            });
+        }
+    }
 
+    // POST /usuario/upload - Upload de imagem para usuarios
+    static async uploadImagem(req, res) {
+        try {
+            const { id } = req.body;
+
+            // Validação do ID
+            if (!id || isNaN(id)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID inválido',
+                    mensagem: 'O ID deve ser um número válido'
+                });
+            }
+
+            //verificar se usuário existe
+            const usuarioExistente = await UsuarioModel.buscarPorId(id);
+            if (!usuarioExistente) {
+                return res.status(404).json({
+                    sucesso: false,
+                    erro: 'Usuário não encontrado',
+                    mensagem: `Usuário com ID ${id} não foi encontrado`
+                });
+            }
+
+            // Remover imagem antiga se existir
+            if (usuarioExistente.imagem) {
+                await removerArquivoAntigo(usuarioExistente.imagem, 'imagem');
+            }
+
+            // Atualizar produto com a nova imagem
+            await UsuarioModel.atualizar(id, { imagem: req.file.filename });
+
+            res.status(200).json({
+                sucesso: true,
+                mensagem: 'Imagem enviada com sucesso',
+                dados: {
+                    nomeArquivo: req.file.filename,
+                    caminho: `/uploads/imagens/${req.file.filename}`
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao fazer upload de imagem:', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível fazer upload da imagem'
+            });
         }
     }
 }
