@@ -116,6 +116,7 @@ model Maquinas {
   ordens_producao   OrdemProducao[]
   historico_eventos Historico_Eventos[]
   apontamentos      Apontamento[]
+  escala_trabalho   EscalaTrabalho[]
 }
 
 model Setor_Gestor {
@@ -148,10 +149,12 @@ model EscalaTrabalho {
   id_turno    Int
   dia_semana  DiaSemana
   id_setor Int
+  id_maquina Int?
   
   setor    Setores @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
   operador Usuarios @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
   turno    Turno    @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
+  maquina  Maquinas? @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
 
   @@id([id_operador, id_turno, dia_semana])
 }
