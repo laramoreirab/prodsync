@@ -1,76 +1,168 @@
-import db from "../config/database";
+import prisma from '../config/prisma.js';
+import bcrypt from 'bcrypt'
 
-const Usuario = {
-    async getByID(id_usuario) {
-        const [rows] = await db.query(
-            "SELECT id_usuario, id_empresa, nome, identificador, tipo, cpf, email FROM Usuarios WHERE id_usuario = ?",
-            [id_usuario]
-        );
-        return rows[0];
-    },
+class UsuarioModel {
+    //Listar todos os usuários com paginacção
+    static async listarTodos(pagina = 1, limite = 10) {
+        try {
+            const skip = (pagina - 1) * limite;
 
-    async getByEmail(email) {
-        const [rows] = await db.query(
-            "SELECT id_usuario, id_empresa, nome, identificador, tipo, cpf, email FROM Usuarios WHERE email = ?",
-            [email]
-        );
-        return rows[0];
-    },
+            const [usuarios, totalUsuarios] = await Promise.all([
+                prisma.usuarios.findMany({
+                    skip: skip,
+                    take: limite,
+                    orderBy: { nome: 'asc' }
+                }),
+                prisma.usuarios.count(),
+            ]);
 
-    async getByCPF(cpf) {
-        const [rows] = await db.query(
-            "SELECT id_usuario, id_empresa, nome, identificador, tipo, cpf, email FROM Usuarios WHERE cpf = ?",
-            [cpf]
-        );
-        return rows[0];
-    },
+            const totalPaginas = Math.ceil(totalUsuarios / limite);
 
-    async getByIdentificador(identificador) {
-        const [rows] = await db.query(
-            "SELECT id_usuario, id_empresa, nome, identificador, tipo, cpf, email FROM Usuarios WHERE identificador = ?",
-            [identificador]
-        );
-        return rows[0];
-    },
+            return {
+                data: usuarios,
+                meta: {
+                    totalUsuarios,
+                    totalPaginas,
+                    currentPages: pagina,
+                    pageSize: limite,
+                },
+            };
 
-    async getByEmpresa(id_empresa) {
-        const [rows] = await db.query(
-            "SELECT id_usuario, id_empresa, nome, identificador, tipo, cpf, email FROM Usuarios WHERE id_empresa = ?",
-            [id_empresa]
-        );
-        return rows;
-    },
+        } catch (error) {
+            console.error('Erro ao listar usuários:', error);
+            throw error;
+        }
+    };
 
-    async create(usuarioData) {
-        const { id_empresa, nome, identificador, tipo, cpf, email } = usuarioData;
-        const [result] = await db.query(
-            "INSERT INTO Usuarios (id_empresa, nome, identificador, tipo, cpf, email) VALUES (?, ?, ?, ?, ?, ?)",
-            [id_empresa, nome, identificador, tipo, cpf, email]
-        );
-        return result.insertId;
-    },
+    //buscar usuario por id
+    static async buscarPorId(id) {
+        try {
+            const row = await prisma.usuarios.findUnique({
+                where: { id_usuario: parseInt(id) },
+            });
+            return row || null;
+        } catch (error) {
+            console.error('Erro ao buscar usuário por ID:', error);
+            throw error;
+        }
 
-    async update(id_usuario, usuarioData) {
-        const { nome, tipo, email } = usuarioData;
-        await db.query(
-            "UPDATE Usuarios SET nome = ?, tipo = ?, email = ? WHERE id_usuario = ?",
-            [nome, tipo, email, id_usuario]
-        );
-        return true;
-    },
+    };
 
-    async delete(id_usuario) {
-        await db.query("DELETE FROM Usuarios WHERE id_usuario = ?", [id_usuario]);
-        return true;
-    },
+    //Registrar usuarios na tabela usuários
+    static async criarUsuario(dados) {
+        if (dados.tipo === 'Adm') {
+            try {
+                const senhaHash = await bcrypt.hash(dados.senha, 10);
 
-    async getGestorSetores(id_usuario) {
-        const [rows] = await db.query(
-            "SELECT s.id_setor, s.nome_setor FROM Setor_Gestor sg JOIN Setores s ON sg.id_setor = s.id_setor WHERE sg.id_gestor = ?",
-            [id_usuario]
-        );
-        return rows;
+                const novoUsuario = await prisma.usuarios.create({
+                    data: {
+                        ...dados,
+                        senha: senhaHash
+                    }
+                });
+                return novoUsuario || null;
+
+            } catch (error) {
+                console.error('Erro ao registrar administrador da empresa', error);
+                throw error;
+            }
+        } else {
+            try {
+                const novoUsuario = await prisma.usuarios.create({
+                    data: {
+                        ...dados
+                    },
+                    select: { id_usuario: true } //vai retornar o Id do novo usuário
+                });
+                return novoUsuario || null;
+            } catch (error) {
+                console.error('Erro ao registrar novo usuário', error);
+                throw error;
+            }
+        }
     }
-};
 
-export default Usuario;
+
+    //verificar credenciais do login 
+    static async verificarCredenciais(id, senha) {
+        try {
+            const usuario = await this.buscarPorId(id);
+            if (!usuario) {
+                return null
+            };
+            const senhaValida = await bcrypt.compare(senha, usuario.senha);
+            if (!senhaValida) {
+                return null
+            }
+            // Retornar usuário sem a senha
+            const { senha: _, ...usuarioSemSenha } = usuario;
+            return usuarioSemSenha;
+        } catch (error) {
+            console.error('Erro ao verificar credenciais:', error);
+            throw error;
+        }
+    }
+
+    //verificar se o id ainda não possui senha cadastrada
+    static async verificaSenhaUsuario(id) {
+        try {
+            const usuarioSenha = await prisma.usuarios.findUnique({
+                where: { id_usuario: id },
+                select: { senha: true }
+            });
+            if (usuarioSenha && usuarioSenha.senha !== null) {
+                return true
+            } else {
+                return false
+            }
+        } catch (error) {
+            console.error('Erro ao verificar se o ID possui senha cadastrada:', error);
+            throw error;
+        }
+    };
+
+    //Verificar se as senhas cadastradas no primeiro acesso estão iguais
+    static async comparacaoDeSenhas(senha, senhaConfirmada) {
+        try {
+            if (senha === senhaConfirmada) {
+                return true
+            } else {
+                return false
+            };
+        } catch (error) {
+            console.error('Erro ao comparar as senhas:', error);
+            throw error;
+        }
+    }
+
+    //atualizar dados dos usuários
+    static async atualizar(id, dados) {
+        try {
+            if (dados.senha) {
+                dados.senha = await bcrypt.hash(dados.senha, 10)
+            }
+            const row = await prisma.usuarios.update({
+                where: { id_usuario: id },
+                data: { ...dados }
+            })
+            return row || null
+        } catch (error) {
+            console.error('Erro ao atualizar usuário:', error);
+            throw error;
+        }
+    }
+
+    //Deletar dados dos usuários
+    static async deletar(id) {
+        try {
+            const deletarUser = await prisma.usuarios.delete({
+                where: { id_usuario: id },
+            });
+            return deletarUser
+        } catch (error) {
+            console.error('Erro ao deletar usuário:', error);
+            throw error;
+        }
+    }
+}
+export default UsuarioModel

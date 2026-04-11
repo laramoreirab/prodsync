@@ -1,5 +1,0 @@
-Depois que o banco de dados estiver pronto e conectado ao aiven damos os seguintes comandos 
-para o prisma  gerar o schema automaticamente e gerar o client
-
-npx prisma db pull     # lê as tabelas do Aiven e gera o schema
-npx prisma generate    # gera o client
