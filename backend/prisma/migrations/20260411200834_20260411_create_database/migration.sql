@@ -15,7 +15,7 @@ CREATE TABLE "Empresas" (
     "id_empresa" SERIAL NOT NULL,
     "nome_empresa" VARCHAR(255) NOT NULL,
     "cnpj" VARCHAR(18) NOT NULL,
-    "data_cadastro" TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    "data_cadastro" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "email" VARCHAR(255),
     "telefone" VARCHAR(20),
     "endereco" VARCHAR(255),
@@ -33,7 +33,9 @@ CREATE TABLE "Usuarios" (
     "identificador" VARCHAR(50) NOT NULL,
     "tipo" "TipoUsuario" NOT NULL,
     "cpf" VARCHAR(14) NOT NULL,
-    "email" VARCHAR(255),
+    "email" VARCHAR(255) NOT NULL,
+    "senha" VARCHAR(255) NOT NULL,
+    "imagem_perfil" VARCHAR(255),
 
     CONSTRAINT "Usuarios_pkey" PRIMARY KEY ("id_usuario")
 );
@@ -96,6 +98,8 @@ CREATE TABLE "EscalaTrabalho" (
     "id_operador" INTEGER NOT NULL,
     "id_turno" INTEGER NOT NULL,
     "dia_semana" "DiaSemana" NOT NULL,
+    "id_setor" INTEGER NOT NULL,
+    "id_maquina" INTEGER,
 
     CONSTRAINT "EscalaTrabalho_pkey" PRIMARY KEY ("id_operador","id_turno","dia_semana")
 );
@@ -117,8 +121,8 @@ CREATE TABLE "OrdemProducao" (
     "id_maquina" INTEGER NOT NULL,
     "codigo_lote" VARCHAR(100) NOT NULL,
     "produto" VARCHAR(150) NOT NULL,
-    "data_inicio" TIMESTAMP(0),
-    "data_fim" TIMESTAMP(0),
+    "data_inicio" TIMESTAMP(3),
+    "data_fim" TIMESTAMP(3),
     "qtd_planejada" INTEGER NOT NULL,
 
     CONSTRAINT "OrdemProducao_pkey" PRIMARY KEY ("id_ordem")
@@ -133,8 +137,8 @@ CREATE TABLE "Historico_Eventos" (
     "id_turno" INTEGER NOT NULL,
     "id_motivo_parada" INTEGER,
     "status_atual" "StatusMaquina" NOT NULL,
-    "inicio" TIMESTAMP(0) NOT NULL,
-    "termino" TIMESTAMP(0),
+    "inicio" TIMESTAMP(3) NOT NULL,
+    "termino" TIMESTAMP(3),
     "duracao" INTEGER,
 
     CONSTRAINT "Historico_Eventos_pkey" PRIMARY KEY ("id_evento")
@@ -150,8 +154,8 @@ CREATE TABLE "Apontamento" (
     "id_turno" INTEGER NOT NULL,
     "qtd_boa" INTEGER NOT NULL DEFAULT 0,
     "qtd_refugo" INTEGER NOT NULL DEFAULT 0,
-    "data_hora_inicio" TIMESTAMP(0) NOT NULL,
-    "data_hora_fim" TIMESTAMP(0) NOT NULL,
+    "data_hora_inicio" TIMESTAMP(3) NOT NULL,
+    "data_hora_fim" TIMESTAMP(3) NOT NULL,
     "observacao" TEXT,
 
     CONSTRAINT "Apontamento_pkey" PRIMARY KEY ("id_apontamento")
@@ -165,6 +169,9 @@ CREATE UNIQUE INDEX "Usuarios_identificador_key" ON "Usuarios"("identificador");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuarios_cpf_key" ON "Usuarios"("cpf");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Usuarios_email_key" ON "Usuarios"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Maquinas_serie_key" ON "Maquinas"("serie");
@@ -200,10 +207,16 @@ ALTER TABLE "Setor_Gestor" ADD CONSTRAINT "Setor_Gestor_id_empresa_fkey" FOREIGN
 ALTER TABLE "Turno" ADD CONSTRAINT "Turno_id_empresa_fkey" FOREIGN KEY ("id_empresa") REFERENCES "Empresas"("id_empresa") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "EscalaTrabalho" ADD CONSTRAINT "EscalaTrabalho_id_setor_fkey" FOREIGN KEY ("id_setor") REFERENCES "Setores"("id_setor") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "EscalaTrabalho" ADD CONSTRAINT "EscalaTrabalho_id_operador_fkey" FOREIGN KEY ("id_operador") REFERENCES "Usuarios"("id_usuario") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EscalaTrabalho" ADD CONSTRAINT "EscalaTrabalho_id_turno_fkey" FOREIGN KEY ("id_turno") REFERENCES "Turno"("id_turno") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EscalaTrabalho" ADD CONSTRAINT "EscalaTrabalho_id_maquina_fkey" FOREIGN KEY ("id_maquina") REFERENCES "Maquinas"("id_maquina") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Motivos_Parada" ADD CONSTRAINT "Motivos_Parada_id_empresa_fkey" FOREIGN KEY ("id_empresa") REFERENCES "Empresas"("id_empresa") ON DELETE CASCADE ON UPDATE CASCADE;
