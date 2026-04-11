@@ -18,6 +18,18 @@ class EmpresaModel{
                 throw error;
             };
         };
+        //buscar por cnpj
+            static async buscarPorCnpj(cnpj) {
+                try {
+                    const row = await prisma.empresas.findUnique({
+                        where: { cnpj: cnpj }
+                    });
+                    return row || null;
+                } catch (error) {
+                    console.error('Erro ao buscar usuário por CNPJ:', error);
+                    throw error;
+                }
+            };
 }
 
 export default EmpresaModel

@@ -200,7 +200,7 @@ class AuthController {
             }
 
             //verificar se o cnpj da empresa já esta cadastrado no sistema 
-            const empresaexistente = await UsuarioModel.buscarPorCnpj(cnpj);
+            const empresaexistente = await EmpresaModel.buscarPorCnpj(cnpj);
             if (empresaexistente) {
                 res.status(409).json({
                     sucesso: false,
