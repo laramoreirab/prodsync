@@ -26,7 +26,6 @@ class EscalaTrabalhoModel {
                 data: {
                     id_turno: dados.id_turno,
                     id_operador: dados.id_operador,
-                    dia_semana: dados.dia_semana,
                     id_setor: dados.id_setor,
                     id_maquina: dados.id_maquina || null
                 }
