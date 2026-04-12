@@ -13,3 +13,16 @@ export const mockProducaoPorHora = [
   { hora: "14h", pcs: 95 },
   { hora: "16h", pcs: 83 },
 ];
+
+export const mockOEE = {
+  disponibilidade: 87,
+  performance: 76,
+  qualidade: 94,
+  oee: Math.round((87 * 76 * 94) / 10000), 
+};
+
+export const mockMaquinaStatus = [
+  { name: "ativa",      value: 62 },
+  { name: "parada",     value: 23 },
+  { name: "setup", value: 15 },
+];

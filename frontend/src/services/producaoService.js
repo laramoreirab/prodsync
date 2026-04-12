@@ -17,12 +17,18 @@
 //     return ProducaoPorSetorArraySchema.parse(data);
 //   },
 // };
-
+//   async getOEE() {
+//     const data = await apiFetch("/producao/OEE");
+//     return OEESchema.parse(data);
+//   },
+// };
 
 
 //Mock para desenvolvimento sem backend
 import { apiFetch } from "./api";
+import { mockOEE } from "./mockData";
 import {
+  OEESchema,
   ProducaoPorHoraArraySchema,
   ProducaoPorSetorArraySchema,
 } from "@features/producao/schemas/producaoSchema";
@@ -40,5 +46,10 @@ export const producaoService = {
     if (USE_MOCK) return ProducaoPorSetorArraySchema.parse(mockProducaoPorSetor);
     const data = await apiFetch("/producao/por_setor");
     return ProducaoPorSetorArraySchema.parse(data);
+  },
+   async getOEE() {
+    if (USE_MOCK) return OEESchema.parse(mockOEE);
+    const data = await apiFetch("/producao/oee");
+    return OEESchema.parse(data);
   },
 };

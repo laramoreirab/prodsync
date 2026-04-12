@@ -1,6 +1,6 @@
 "use client";
 
-import { RadialBar, RadialBarChart } from "recharts";
+import { RadialBar, RadialBarChart, PolarAngleAxis } from "recharts";
 
 import { ChartContainer } from "@/components/ui/chart";
 
@@ -24,7 +24,14 @@ export function GaugeSemicircular({ data, config, title }) {
           outerRadius={60}
           barSize={16}
         >
-          <RadialBar dataKey="value" background={false} cornerRadius={4} />
+          <PolarAngleAxis
+            type="number"
+            domain={[0, 100]}
+            tick={false}
+          />
+
+          //tentei mudar a cor do gráfico, mas não consegui, então deixei a cor padrão do gráfico, que é um cinza.
+          <RadialBar dataKey="value" background={{fill: "#7D95C6"}} cornerRadius={4} />
         </RadialBarChart>
       </ChartContainer>
 
