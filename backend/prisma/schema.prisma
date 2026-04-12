@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -70,7 +69,9 @@ model Usuarios {
   identificador String      @unique @db.VarChar(50)
   tipo          TipoUsuario
   cpf           String      @unique @db.VarChar(14)
-  email         String?     @db.VarChar(255)
+  email         String      @unique @db.VarChar(255)
+  senha         String      @db.VarChar(255)
+  imagem_perfil String?     @db.VarChar(255)
 
   empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   setores_geridos Setor_Gestor[]
@@ -86,6 +87,7 @@ model Setores {
   empresa  Empresas       @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquinas Maquinas[]
   gestores Setor_Gestor[]
+  escalas  EscalaTrabalho[]
 }
 
 model Categoria_Maquina {
@@ -114,6 +116,7 @@ model Maquinas {
   ordens_producao   OrdemProducao[]
   historico_eventos Historico_Eventos[]
   apontamentos      Apontamento[]
+  escala_trabalho   EscalaTrabalho[]
 }
 
 model Setor_Gestor {
@@ -145,9 +148,13 @@ model EscalaTrabalho {
   id_operador Int
   id_turno    Int
   dia_semana  DiaSemana
-
+  id_setor Int
+  id_maquina Int?
+  
+  setor    Setores @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
   operador Usuarios @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
   turno    Turno    @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
+  maquina  Maquinas? @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
 
   @@id([id_operador, id_turno, dia_semana])
 }
