@@ -5,6 +5,7 @@ export default function DashboardPage() {
   return (
     <main className="p-8 grid grid-cols-2 gap-6">
       <ProducaoSetorWidget />
+      <ProducaoDiaWidget />
     </main>
   );
 }

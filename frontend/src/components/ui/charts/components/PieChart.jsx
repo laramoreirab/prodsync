@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
 import {
     Cell,
     Pie,
-    PieChart,
+    PieChart as RechartsPieChart,
   } from "recharts";
   
   import {
@@ -18,7 +16,7 @@ import {
 // PIE CHART 
 // ============================================================
 
-export function PieChart({ data, config, title }) {
+export function CustomPieChart({ data, config, title }) {
     if (!data?.length) return null;
 
   const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
@@ -26,11 +24,11 @@ export function PieChart({ data, config, title }) {
     <div>
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
       <ChartContainer config={config} className="h-[200px] w-full">
-        <PieChart>
+        <RechartsPieChart>
           <ChartTooltip content={<ChartTooltipContent hideLabel />} />
           <Pie
             data={data}
-            dataKey="value"
+            dataKey={dataKey}
             nameKey="name"
             cx="50%"
             cy="50%"
@@ -42,7 +40,7 @@ export function PieChart({ data, config, title }) {
               <Cell key={entry.name} fill={`var(--color-${entry.name})`} />
             ))}
           </Pie>
-        </PieChart>
+        </RechartsPieChart>
       </ChartContainer>
     </div>
   );
