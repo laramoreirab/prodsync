@@ -35,10 +35,12 @@ class UsuarioModel {
     };
 
     //buscar usuario por id
-    static async buscarPorId(id) {
+    static async buscarPorId(id, id_empresa) {
         try {
-            const row = await prisma.usuarios.findUnique({
-                where: { id_usuario: parseInt(id) },
+            const row = await prisma.usuarios.findFirt({
+                where:{ 
+                    id_usuario: parseInt(id), 
+                    id_empresa: parseInt(id_empresa)}
             });
             return row || null;
         } catch (error) {
@@ -86,7 +88,11 @@ class UsuarioModel {
     //verificar credenciais do login 
     static async verificarCredenciais(id, senha) {
         try {
-            const usuario = await this.buscarPorId(id);
+            const usuario = await prisma.usuario.findUnique({
+                where: {
+                    id_usuario: id
+                }
+            });
             if (!usuario) {
                 return null
             };
@@ -136,13 +142,15 @@ class UsuarioModel {
     }
 
     //atualizar dados dos usuários
-    static async atualizar(id, dados) {
+    static async atualizar(id, id_empresa, dados) {
         try {
             if (dados.senha) {
                 dados.senha = await bcrypt.hash(dados.senha, 10)
             }
             const row = await prisma.usuarios.update({
-                where: { id_usuario: id },
+                where: { id_usuario: id ,
+                    id_empresa: id_empresa
+                },
                 data: { ...dados }
             })
             return row || null
@@ -153,10 +161,12 @@ class UsuarioModel {
     }
 
     //Deletar dados dos usuários
-    static async deletar(id) {
+    static async deletar(id, id_empresa) {
         try {
             const deletarUser = await prisma.usuarios.delete({
-                where: { id_usuario: id },
+                where: { id_usuario: id,
+                    id_empresa: id_empresa
+                 },
             });
             return deletarUser
         } catch (error) {

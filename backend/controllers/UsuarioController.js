@@ -1,9 +1,6 @@
 import jwt from 'jsonwebtoken'
 import UsuarioModel from '../models/UsuarioModel.js'
-import TurnoModel from '../models/TurnoModel.js'
 import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
-import SetorModel from '../models/SetorModel.js'
-import MaquinaModel from '../models/MaquinaModel.js'
 import { JWT_CONFIG } from '../config/jwt.js'
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 
@@ -12,32 +9,8 @@ class UsuarioController {
     //GET api/usuarios - Listar todos os funcionários (apenas admin)
     static async listarUsuarios(req, res) {
         try {
-            let pagina = parseInt(req.query.pagina) || 1;
-            let limite = parseInt(req.query.limite) || 10;
-
-            if (pagina <= 0) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'Página inválida',
-                    mensagem: 'A página deve ser um número maior que zero'
-                });
-            }
-            if (limite <= 0) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'Limite inválido',
-                    mensagem: 'O limite deve ser um número maior que zero'
-                });
-            }
-
-            const limiteMaximo = parseInt(process.env.PAGINACAO_LIMITE_MAXIMO) || 100;
-            if (limite > limiteMaximo) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'Limite inválido',
-                    mensagem: `O limite deve ser um número entre 1 e ${limiteMaximo}`
-                });
-            }
+            
+            const { pagina, limite} = req.paginacao
 
             const resultado = await UsuarioModel.listarTodos(pagina, limite);
 
@@ -57,7 +30,7 @@ class UsuarioController {
             res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível listar os produtos'
+                mensagem: 'Não foi possível listar os usuário'
             });
         }
     }
@@ -66,16 +39,17 @@ class UsuarioController {
     static async buscarPorId(req, res) {
         try {
             const { id } = req.params;
+            const { id_empresa } = req.body
             // Validação básica do ID
             if (!id || isNaN(id)) {
                 return res.status(400).json({
                     sucesso: false,
-                    erro: 'ID inválido',
-                    mensagem: 'O ID deve ser um número válido'
+                    erro: 'ID de usuário inválido',
+                    mensagem: 'O ID do usuário deve ser um número válido'
                 });
             }
 
-            const usuario = await UsuarioModel.buscarPorId(id);
+            const usuario = await UsuarioModel.buscarPorId(id, id_empresa);
 
             if (!usuario) {
                 res.status(404).json({
@@ -102,7 +76,7 @@ class UsuarioController {
     //POST api/usuarios - Criar novo usuário (apenas dmin)
     static async criarUsuario(req, res) {
         try {
-            const { nome, cpf, email, setor, funcao, turno, maquina } = req.body;
+            const { id_empresa, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             const erros = [];
             // Validar nome
@@ -158,7 +132,7 @@ class UsuarioController {
             };
 
             //validação do setor
-            if (!setor || setor.trim() == '') {
+            if (!id_setor || id_setor.trim() == '') {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Setor é obrigatório',
@@ -167,7 +141,7 @@ class UsuarioController {
             };
 
             //validação do turno
-            if (!turno || turno.trim() == '') {
+            if (!id_turno || id_turno.trim() == '') {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
@@ -183,7 +157,7 @@ class UsuarioController {
                 })
             };
             //validação maquina
-            if (!maquina || maquina.trim() == '') {
+            if (!id_maquina || id_maquina.trim() == '') {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
@@ -193,6 +167,7 @@ class UsuarioController {
 
             //preparar dados do usuario para tabela usuarios
             const dadosUsuario = {
+                id_empresa: Number(id_empresa),
                 nome: nome,
                 tipo: funcao,
                 cpf: cpf.trim(),
@@ -201,7 +176,7 @@ class UsuarioController {
 
             // Adicionar imagem se foi enviada
             if (req.file) {
-                dadosUsuario.imagem = req.file.filename;
+                dadosUsuario.imagem_perfil = req.file.filename;
             }
 
             //Registrar usuário na tabela Usuarios
@@ -213,30 +188,14 @@ class UsuarioController {
                     mensagem: 'Id do usuário não retornado!'
                 })
             }
-            //buscar turno, maquina e setor ID 
-            const turnoId = await TurnoModel.buscarIdTurno(turno)
-            const setorId = await SetorModel.buscarIdSetor(setor)
-            const maquinaId = await TurnoModel.buscarIdMaquina(maquina)
-            //prepara dados de maquina,turno e operados para adicionar na tabela turno
-            const dadosTurno = {
-                id_maquina: maquinaId,
-                id_usuario: usuarioId,
-                id_turno: turnoId
-            }
-            //Registrar na tabela turno 
-            const registrarTurno = await TurnoModel.criar(dadosTurno)
-            if (!registrarTurno) {
-                res.status(400).json({
-                    sucesso: false,
-                    erro: 'Não foi possível registrar turno',
-                    mensagem: 'Não foi possível registrar turno!'
-                })
-            }
+        
             //preparar dados de escala de trabalho para tabela escalaTrabalho
             const dadosEscala = {
+                id_empresa: Number(id_empresa),
                 id_operador: usuarioId,
-                id_turno: turnoId,
-                id_setor: setorId
+                id_turno: Number(id_turno),
+                id_setor: Number(id_setor),
+                id_maquina: Number(id_maquina),
             }
             const registrarEscala = await EscalaTrabalhoModel.criar(dadosEscala)
             if (!registrarEscala) {
@@ -265,7 +224,7 @@ class UsuarioController {
     static async atualizarUsuario(req, res) {
         try {
             const { id } = req.params;
-            const { nome, cpf, email, setor, funcao, turno, maquina } = req.body;
+            const { id_empresa, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             // Validação do ID
             if (!id || isNaN(id)) {
@@ -289,7 +248,6 @@ class UsuarioController {
             // Preparar dados para atualização
             const dadosUpdateUsuario = {};
             const dadosUpdateEscala = {};
-            const dadosUpdateTurno = {};
 
             if (nome !== undefined) { dadosUpdateUsuario.nome = nome }
             if (email !== undefined) { dadosUpdateUsuario.email = email }
@@ -299,31 +257,26 @@ class UsuarioController {
             // Adicionar nova imagem se foi enviada
             if (req.file) {
                 // Remover imagem antiga se existir
-                if (usuarioExistente.imagem) {
-                    await removerArquivoAntigo(usuarioExistente.imagem, 'imagem');
+                if (usuarioExistente.imagem_perfil) {
+                    await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
                 }
-                dadosUpdateUsuario.imagem = req.file.filename;
+                dadosUpdateUsuario.imagem_perfil = req.file.filename;
             }
 
-            if (setor !== undefined) {
-            const setorId = await SetorModel.buscarIdSetor(setor)
-            dadosUpdateEscala.id_setor = setorId;
+        if (id_setor !== undefined) {
+            dadosUpdateEscala.id_setor = id_setor;
         }
-        if (turno !== undefined) {
-            const turnoId = await TurnoModel.buscarIdTurno(turno)
-            dadosUpdateEscala.id_turno = turnoId;
-            dadosUpdateTurno.id_turno = turnoId; // ← resolve o turnoId duplicado também
+        if (id_turno !== undefined) {
+            dadosUpdateEscala.id_turno = id_turno;
         }
-        if (maquina !== undefined) {
-            const maquinaId = await MaquinaModel.buscarIdMaquina(maquina)
-            dadosUpdateTurno.id_maquina = maquinaId;
+        if (id_maquina !== undefined) {
+            dadosUpdateEscala.id_maquina = id_maquina;
         }
 
         // UMA única verificação geral no lugar das três individuais
         if (
             Object.keys(dadosUpdateUsuario).length === 0 &&
-            Object.keys(dadosUpdateEscala).length === 0 &&
-            Object.keys(dadosUpdateTurno).length === 0
+            Object.keys(dadosUpdateEscala).length === 0
         ) {
             return res.status(400).json({
                 sucesso: false,
@@ -335,16 +288,12 @@ class UsuarioController {
         // Cada atualização só executa se tiver dados
         let updateUsuario = null;
         let updateEscala = null;
-        let updateTurno = null;
 
         if (Object.keys(dadosUpdateUsuario).length > 0) {
-            updateUsuario = await UsuarioModel.atualizar(id, dadosUpdateUsuario)
+            updateUsuario = await UsuarioModel.atualizar(id, id_empresa, dadosUpdateUsuario)
         }
         if (Object.keys(dadosUpdateEscala).length > 0) {
-            updateEscala = await EscalaTrabalhoModel.atualizar(id, dadosUpdateEscala)
-        }
-        if (Object.keys(dadosUpdateTurno).length > 0) {
-            updateTurno = await TurnoModel.atualizar(id, dadosUpdateTurno)
+            updateEscala = await EscalaTrabalhoModel.atualizar(id, id_empresa, dadosUpdateEscala)
         }
 
             res.status(200).json({
@@ -352,9 +301,7 @@ class UsuarioController {
                 mensagem: 'Usuario atualizado com sucesso',
                 dados: {
                     ...updateUsuario,
-                    ...updateEscala,
-                    ...updateTurno
-
+                    ...updateEscala
                 }
             });
 
@@ -372,6 +319,7 @@ class UsuarioController {
     static async deletarUsuario(req, res) {
         try {
             const { id } = req.params;
+            const { id_empresa } = req.body
 
             // Validação do ID
             if (!id || isNaN(id)) {
@@ -393,11 +341,11 @@ class UsuarioController {
             }
 
             // Remover imagem do produto se existir
-            if (usuarioExistente.imagem) {
-                await removerArquivoAntigo(usuarioExistente.imagem, 'imagem');
+            if (usuarioExistente.imagem_perfil) {
+                await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
             }
 
-            const resultado = await UsuarioModel.deletar(id);
+            const resultado = await UsuarioModel.deletar(id, id_empresa);
 
             res.status(200).json({
                 sucesso: true,
@@ -420,7 +368,7 @@ class UsuarioController {
     // POST /usuario/upload - Upload de imagem para usuarios
     static async uploadImagem(req, res) {
         try {
-            const { id } = req.body;
+            const { id_empresa, id } = req.body;
 
             // Validação do ID
             if (!id || isNaN(id)) {
@@ -432,7 +380,7 @@ class UsuarioController {
             }
 
             //verificar se usuário existe
-            const usuarioExistente = await UsuarioModel.buscarPorId(id);
+            const usuarioExistente = await UsuarioModel.buscarPorId(id, id_empresa);
             if (!usuarioExistente) {
                 return res.status(404).json({
                     sucesso: false,
@@ -442,12 +390,12 @@ class UsuarioController {
             }
 
             // Remover imagem antiga se existir
-            if (usuarioExistente.imagem) {
-                await removerArquivoAntigo(usuarioExistente.imagem, 'imagem');
+            if (usuarioExistente.imagem_perfil) {
+                await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
             }
 
             // Atualizar produto com a nova imagem
-            await UsuarioModel.atualizar(id, { imagem: req.file.filename });
+            await UsuarioModel.atualizar(id, { imagem_perfil: req.file.filename });
 
             res.status(200).json({
                 sucesso: true,
@@ -466,6 +414,8 @@ class UsuarioController {
             });
         }
     }
+
+    // --------------------------------------------dashboards---------------------------------------------------
 }
 
 export default UsuarioController
