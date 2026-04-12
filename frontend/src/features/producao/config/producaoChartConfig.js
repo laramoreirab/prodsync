@@ -3,13 +3,13 @@
 export const producaoSetorConfig = {
   qtd: {
     label: "Peças produzidas",
-    color: "hsl(var(--chart-1))",
+    color: "#7d95c6",
   },
 };
 
 export const producaoDiaConfig = {
   pcs: {
     label: "Peças/hora",
-    color: "hsl(var(--chart-2))",
+    color: "#00357a",
   },
 };

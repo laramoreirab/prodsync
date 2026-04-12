@@ -50,7 +50,7 @@ export function LineChartBase({
               key={key}
               type="monotone"
               dataKey={key}
-              stroke={`var(--color-${key})`}
+              stroke={config[key]?.color ?? "#3b82f6"}
               strokeWidth={2}
               dot={{ r: 3 }}
             />
