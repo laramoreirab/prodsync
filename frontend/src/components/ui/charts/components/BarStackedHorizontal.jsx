@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import {
     Bar,
     BarChart,
@@ -24,12 +22,12 @@ import {
 
 
 
-export function Ex3A_BarStackedHorizontal() {
+export function BarStackedHorizontal({ data, config, title }) {
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Produção de Peças com Defeitos por Setor</h3>
-      <ChartContainer config={defeitosConfig} className="h-[220px] w-full">
-        <BarChart data={defeitosData} layout="vertical">
+      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <ChartContainer config={config} className="h-[220px] w-full">
+        <BarChart data={data} layout="vertical">
           <YAxis
             dataKey="setor"
             type="category"

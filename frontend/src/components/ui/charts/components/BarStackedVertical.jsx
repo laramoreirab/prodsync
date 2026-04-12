@@ -23,24 +23,12 @@ import {
 // ============================================================
 // LabelList dentro de Bar mostra o valor dentro da barra.
 
-const statusTurnoData = [
-  { turno: "Manhã", ativas: 80, paradas: 12, manutencao: 8 },
-  { turno: "Tarde", ativas: 72, paradas: 18, manutencao: 10 },
-  { turno: "Noite", ativas: 65, paradas: 20, manutencao: 15 },
-];
-
-const statusTurnoConfig = {
-  ativas: { label: "Ativas", color: "hsl(var(--chart-1))" },
-  paradas: { label: "Paradas", color: "hsl(var(--chart-2))" },
-  manutencao: { label: "Em Manutenção", color: "hsl(var(--chart-3))" },
-};
-
-export function Ex3B_BarStackedVertical() {
+export function BarStackedVertical({ data, config, title }) {
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Status das Máquinas por Turno</h3>
-      <ChartContainer config={statusTurnoConfig} className="h-[250px] w-full">
-        <BarChart data={statusTurnoData} margin={{ top: 10 }}>
+      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <ChartContainer config={config} className="h-[250px] w-full">
+        <BarChart data={data} margin={{ top: 10 }}>
           <XAxis dataKey="turno" tickLine={false} axisLine={false} />
           <YAxis tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} />
           <ChartTooltip content={<ChartTooltipContent />} />

@@ -15,31 +15,26 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-import { barHorizontalConfig } from "../config/barHorizontalConfig"; // <= import da config
-import { useBarHorizontal } from "../hooks/useBarHorizontal";     // <= import do hook
-
-
 // ============================================================
-//  BAR COM LINHA DE REFERÊNCIA (Sobrecarga de Máquina)
+//  BAR COM LINHA DE REFERÊNCIA 
 // ============================================================
 
 
-export function Ex4B_BarComLimite() {
-  const { data, loading, error } = useBarHorizontal();
- 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
+export function BarComLimite(data, config, title) {
+  if (!data?.length) return null;
+
+  const dataKey = Object.keys(config)[0];
  
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Indicador de Sobrecarga por Setor</h3>
-      <ChartContainer config={sobrecargaConfig} className="h-[220px] w-full">
-        <BarChart data={sobrecargaData} margin={{ top: 10 }}>
+      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <ChartContainer config={config} className="h-[220px] w-full">
+        <BarChart data={data} margin={{ top: 10 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="setor" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
           <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey={data} fill="var(--color-carga)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey={dataKey} fill="var(--color-${dataKey})" radius={[4, 4, 0, 0]} />
           <ReferenceLine
             y={60}
             stroke="red"

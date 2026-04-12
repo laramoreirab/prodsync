@@ -1,36 +1,29 @@
+// src/components/ui/charts/BarHorizontal.jsx
+//Componente burro/visual, só recebe os dados e o config formatados e monta o gráfico. Ele é genérico, pode ser usado para qualquer gráfico de barras horizontal, desde que os dados estejam no formato esperado e o config tenha a chave correta.
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  XAxis,
-  YAxis,
-} from "recharts";
-
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-import { barHorizontalConfig } from "../config/barHorizontalConfig"; // <= import da config
-import { useBarHorizontal } from "../hooks/useBarHorizontal";     // <= import do hook
-
 // ============================================================
 // BAR CHART HORIZONTAL
 // ============================================================
 // layout="vertical" inverte os eixos => barra fica horizontal.
 
-export function BarHorizontal() {
-  const { data, loading, error } = useBarHorizontal();
- 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
- 
+// Componente genérico 
+export function BarHorizontal({ data, config, title }) {
+  if (!data?.length) return null;
+
+  const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
+
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Produção por Setor</h3>
-      <ChartContainer config={barHorizontalConfig} className="h-[200px] w-full">
+      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <ChartContainer config={config} className="h-[200px] w-full">
         <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
           <YAxis
             dataKey="setor"
@@ -42,7 +35,7 @@ export function BarHorizontal() {
           />
           <XAxis type="number" hide />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="qtd" fill="var(--color-qtd)" radius={[0, 4, 4, 0]} />
+          <Bar dataKey={dataKey} fill={`var(--color-${dataKey})`} radius={[0, 4, 4, 0]} />
         </BarChart>
       </ChartContainer>
     </div>

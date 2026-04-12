@@ -10,36 +10,36 @@ import {
   
   import {
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
 
 // ============================================================
-// DONUT CHART 
+// PIE CHART 
 // ============================================================
 
+export function PieChart({ data, config, title }) {
+    if (!data?.length) return null;
 
-export function Ex4A_DonutChart() {
+  const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Quantidade de Usuários</h3>
-      <ChartContainer config={usuariosConfig} className="h-[180px] w-full">
+      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <ChartContainer config={config} className="h-[200px] w-full">
         <PieChart>
           <ChartTooltip content={<ChartTooltipContent hideLabel />} />
           <Pie
-            data={usuariosData}
-            dataKey="qtd"
-            nameKey="perfil"
+            data={data}
+            dataKey="value"
+            nameKey="name"
             cx="50%"
             cy="50%"
-            innerRadius={45}
-            outerRadius={70}
-            label={({ perfil, qtd }) => `${perfil} ${qtd}%`}
+            outerRadius={80}
+            label={({ name, value }) => `${name} ${value}%`}
+            labelLine={true}
           >
-            {usuariosData.map((entry) => (
-              <Cell key={entry.perfil} fill={`var(--color-${entry.perfil})`} />
+            {data.map((entry) => (
+              <Cell key={entry.name} fill={`var(--color-${entry.name})`} />
             ))}
           </Pie>
         </PieChart>

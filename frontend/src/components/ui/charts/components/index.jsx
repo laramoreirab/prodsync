@@ -1,0 +1,12 @@
+export * from "./AreaChart";
+export * from "../components copy/moldes/LineChart";
+export * from "../components copy/moldes/GaugeSemicircular";
+export * from "../components copy/moldes/BarHorizontal";
+export * from "../components copy/moldes/PieChart";
+export * from "../components copy/moldes/BarVertical";
+export * from "../components copy/moldes/BarStackedHorizontal";
+export * from "../components copy/moldes/BarStackedVertical";
+export * from "../components copy/moldes/DonutChart";
+export * from "./BarComLimite";
+export * from "../components copy/moldes/BarComValorETopo";
+export * from "./LineMultiplasSeries";

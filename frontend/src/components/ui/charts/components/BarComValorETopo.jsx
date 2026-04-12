@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import {
     Bar,
     BarChart,
@@ -31,12 +29,12 @@ const CORES_BARRA = [
 
 
 
-export function Ex4C_BarComValorETopo() {
+export function BarComValorETopo({ data, config, title }) {
   return (
     <div>
-      <h3 className="text-sm font-medium mb-3">Produção Média de Usuário por Dia</h3>
-      <ChartContainer config={producaoMediaConfig} className="h-[220px] w-full">
-        <BarChart data={producaoMediaData} margin={{ top: 20 }}>
+      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <ChartContainer config={config} className="h-[220px] w-full">
+        <BarChart data={data} margin={{ top: 20 }}>
           <XAxis dataKey="setor" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
           <YAxis tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} />
           <ChartTooltip content={<ChartTooltipContent />} />
@@ -46,7 +44,7 @@ export function Ex4C_BarComValorETopo() {
               position="top"
               style={{ fontSize: 12, fontWeight: 700 }}
             />
-            {producaoMediaData.map((_, index) => (
+            {data.map((_, index) => (
               <Cell key={index} fill={CORES_BARRA[index % CORES_BARRA.length]} />
             ))}
           </Bar>
