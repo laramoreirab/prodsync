@@ -109,6 +109,7 @@ model Maquinas {
   id_setor      Int
   id_categoria  Int
   data_ativacao DateTime?     @db.Date
+  ativo         Boolean       @default(true)
 
   empresa           Empresas          @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   setor             Setores           @relation(fields: [id_setor], references: [id_setor])
@@ -137,6 +138,7 @@ model Turno {
   nome_turno  String   @db.VarChar(50)
   hora_inicio DateTime @db.Time
   hora_fim    DateTime @db.Time
+  dia_semana  DiaSemana
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   escalas           EscalaTrabalho[]
@@ -147,16 +149,15 @@ model Turno {
 model EscalaTrabalho {
   id_operador Int
   id_turno    Int
-  dia_semana  DiaSemana
-  id_setor Int
-  id_maquina Int?
+  id_setor    Int
+  id_maquina  Int?
   
   setor    Setores @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
   operador Usuarios @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
   turno    Turno    @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
   maquina  Maquinas? @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
 
-  @@id([id_operador, id_turno, dia_semana])
+  @@id([id_operador, id_turno])
 }
 
 model Motivos_Parada {
