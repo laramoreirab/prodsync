@@ -1,32 +1,43 @@
 import prisma from '../config/prisma.js';
+import { paginarPrisma } from '../utils/paginacaoUtil.js';
 import bcrypt from 'bcrypt'
 
 class UsuarioModel {
     //Listar todos os usuários com paginacção
-    static async listarTodos(pagina = 1, limite = 10) {
+    static async listarTodos(id_empresa, paginacao) {
         try {
-            const skip = (pagina - 1) * limite;
 
-            const [usuarios, totalUsuarios] = await Promise.all([
-                prisma.usuarios.findMany({
-                    skip: skip,
-                    take: limite,
-                    orderBy: { nome: 'asc' }
-                }),
-                prisma.usuarios.count(),
-            ]);
-
-            const totalPaginas = Math.ceil(totalUsuarios / limite);
-
-            return {
-                data: usuarios,
-                meta: {
-                    totalUsuarios,
-                    totalPaginas,
-                    currentPages: pagina,
-                    pageSize: limite,
+            const regrasDaBusca = {
+                where: {
+                    usuario: {
+                        id_empresa: id_empresa// Substitua pelo ID da empresa ou o campo correto
+                    }
                 },
-            };
+                include: {
+                    usuario: true, // Traz os dados do operador
+                    turno: {
+                        select: {
+                            nome: true, // Traz apenas o nome do turno
+                        },
+                    },
+                    setor: {
+                        select: {
+                            nome: true, // Traz apenas o nome do setor
+                        },
+                    },
+                },
+                orderBy: {
+                    id_usuario: 'asc' // Mantém a lista organizada
+                },
+            }
+
+            const resultadoPaginado = await paginarPrisma(
+                prisma.escalatrabalho,
+                regrasDaBusca,
+                paginacao
+            );
+
+            return resultadoPaginado;
 
         } catch (error) {
             console.error('Erro ao listar usuários:', error);
@@ -38,9 +49,10 @@ class UsuarioModel {
     static async buscarPorId(id, id_empresa) {
         try {
             const row = await prisma.usuarios.findFirt({
-                where:{ 
-                    id_usuario: parseInt(id), 
-                    id_empresa: parseInt(id_empresa)}
+                where: {
+                    id_usuario: parseInt(id),
+                    id_empresa: parseInt(id_empresa)
+                }
             });
             return row || null;
         } catch (error) {
@@ -148,7 +160,8 @@ class UsuarioModel {
                 dados.senha = await bcrypt.hash(dados.senha, 10)
             }
             const row = await prisma.usuarios.update({
-                where: { id_usuario: id ,
+                where: {
+                    id_usuario: id,
                     id_empresa: id_empresa
                 },
                 data: { ...dados }
@@ -164,9 +177,10 @@ class UsuarioModel {
     static async deletar(id, id_empresa) {
         try {
             const deletarUser = await prisma.usuarios.delete({
-                where: { id_usuario: id,
+                where: {
+                    id_usuario: id,
                     id_empresa: id_empresa
-                 },
+                },
             });
             return deletarUser
         } catch (error) {
