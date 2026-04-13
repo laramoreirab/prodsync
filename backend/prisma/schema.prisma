@@ -39,15 +39,15 @@ enum TipoMotivoParada {
 // --- MODELS ---
 
 model Empresas {
-  id_empresa        Int       @id @default(autoincrement())
-  nome_empresa      String    @db.VarChar(255)
-  cnpj              String    @unique @db.VarChar(18)
-  data_cadastro     DateTime? @default(now())
-  email             String?   @db.VarChar(255)
-  telefone          String?   @db.VarChar(20)
-  endereco          String?   @db.VarChar(255)
-  nome_representante          String?   @db.VarChar(255)
-  cpf_representante String?   @db.VarChar(14)
+  id_empresa         Int       @id @default(autoincrement())
+  nome_empresa       String    @db.VarChar(255)
+  cnpj               String    @unique @db.VarChar(18)
+  data_cadastro      DateTime? @default(now())
+  email              String?   @db.VarChar(255)
+  telefone           String?   @db.VarChar(20)
+  endereco           String?   @db.VarChar(255)
+  nome_representante String?   @db.VarChar(255)
+  cpf_representante  String?   @db.VarChar(14)
 
   // Relações
   usuarios           Usuarios[]
@@ -60,6 +60,7 @@ model Empresas {
   ordens_producao    OrdemProducao[]
   historico_eventos  Historico_Eventos[]
   apontamentos       Apontamento[]
+  escalas_trabalho   EscalaTrabalho[]
 }
 
 model Usuarios {
@@ -84,7 +85,7 @@ model Setores {
   id_empresa Int
   nome_setor String @db.VarChar(100)
 
-  empresa  Empresas       @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  empresa  Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquinas Maquinas[]
   gestores Setor_Gestor[]
   escalas  EscalaTrabalho[]
@@ -111,9 +112,9 @@ model Maquinas {
   data_ativacao DateTime?     @db.Date
   ativo         Boolean       @default(true)
 
-  empresa           Empresas          @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  setor             Setores           @relation(fields: [id_setor], references: [id_setor])
-  categoria         Categoria_Maquina @relation(fields: [id_categoria], references: [id_categoria])
+  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  setor             Setores             @relation(fields: [id_setor], references: [id_setor])
+  categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
   ordens_producao   OrdemProducao[]
   historico_eventos Historico_Eventos[]
   apontamentos      Apontamento[]
@@ -133,11 +134,11 @@ model Setor_Gestor {
 }
 
 model Turno {
-  id_turno    Int      @id @default(autoincrement())
+  id_turno    Int       @id @default(autoincrement())
   id_empresa  Int
-  nome_turno  String   @db.VarChar(50)
-  hora_inicio DateTime @db.Time
-  hora_fim    DateTime @db.Time
+  nome_turno  String    @db.VarChar(50)
+  hora_inicio DateTime  @db.Time
+  hora_fim    DateTime  @db.Time
   dia_semana  DiaSemana
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
@@ -151,11 +152,13 @@ model EscalaTrabalho {
   id_turno    Int
   id_setor    Int
   id_maquina  Int?
-  
-  setor    Setores @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
-  operador Usuarios @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
-  turno    Turno    @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
+  id_empresa  Int
+
+  setor    Setores   @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
+  operador Usuarios  @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
+  turno    Turno     @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
   maquina  Maquinas? @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
+  empresa  Empresas  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
 
   @@id([id_operador, id_turno])
 }
@@ -171,14 +174,14 @@ model Motivos_Parada {
 }
 
 model OrdemProducao {
-  id_ordem       Int       @id @default(autoincrement())
-  id_empresa     Int
-  id_maquina     Int
-  codigo_lote    String    @db.VarChar(100)
-  produto        String    @db.VarChar(150)
-  data_inicio    DateTime? 
-  data_fim       DateTime? 
-  qtd_planejada  Int
+  id_ordem      Int       @id @default(autoincrement())
+  id_empresa    Int
+  id_maquina    Int
+  codigo_lote   String    @db.VarChar(100)
+  produto       String    @db.VarChar(150)
+  data_inicio   DateTime?
+  data_fim      DateTime?
+  qtd_planejada Int
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquina           Maquinas            @relation(fields: [id_maquina], references: [id_maquina])
@@ -194,15 +197,17 @@ model Historico_Eventos {
   id_turno         Int
   id_motivo_parada Int?
   status_atual     StatusMaquina
-  inicio           DateTime      
-  termino          DateTime?     
-  duracao          Int?          // Duração em minutos
+  inicio           DateTime
+  termino          DateTime?
+  duracao          Int? // Duração em minutos
 
   empresa        Empresas        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquina        Maquinas        @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
   ordem_producao OrdemProducao?  @relation(fields: [id_ordemProducao], references: [id_ordem])
   turno          Turno           @relation(fields: [id_turno], references: [id_turno])
   motivo_parada  Motivos_Parada? @relation(fields: [id_motivo_parada], references: [id_motivo])
+
+  @@index([id_empresa])
 }
 
 model Apontamento {
@@ -215,7 +220,7 @@ model Apontamento {
   qtd_boa          Int      @default(0)
   qtd_refugo       Int      @default(0)
   data_hora_inicio DateTime
-  data_hora_fim    DateTime 
+  data_hora_fim    DateTime
   observacao       String?  @db.Text
 
   empresa        Empresas      @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
@@ -223,4 +228,6 @@ model Apontamento {
   maquina        Maquinas      @relation(fields: [id_maquina], references: [id_maquina])
   operador       Usuarios      @relation(fields: [id_operador], references: [id_usuario])
   turno          Turno         @relation(fields: [id_turno], references: [id_turno])
+
+  @@index([id_empresa])
 }
