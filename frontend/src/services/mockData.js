@@ -26,3 +26,19 @@ export const mockMaquinaStatus = [
   { name: "parada",     value: 23 },
   { name: "setup", value: 15 },
 ];
+
+export const mockMotivosFrequentesParadas = [
+  { motivo : "Manutenção", qtd: 76},
+  { motivo : "Falta de Materiais", qtd: 60},
+  { motivo : "Limpeza", qtd: 45}
+]
+
+
+export const mockTendenciaRefugo = [
+{ dia: "Dia 1", qtd: 45 },
+  { dia: "Dia 2", qtd: 72 },
+  { dia: "Dia 3", qtd: 88 },
+  { dia: "Dia 4", qtd: 61 },
+  { dia: "Dia 5", qtd: 95 },
+  { dia: "Dia 6", qtd: 83 },
+];

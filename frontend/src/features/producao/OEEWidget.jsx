@@ -15,15 +15,21 @@ export function OEEWidget() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
       {oeeMetricasConfig.map(({ key, label, color }) => (
-        <div key={key} className="w-full flex justify-center">
+        <div key={key} className="w-full flex justify-evenly">
           <div className="w-[140px] flex flex-col items-center">
             <GaugeSemicircular
               title={label}
               data={[{ value: data[key], fill: color }]}
               config={{
-                value: { label, color },
+                value: { 
+                  label, 
+                  color,
+                  // Ajusta a label/porcentagem interna
+                  className: "-translate-y-12 font-bold" 
+                },
                 title: {
-                  className: "text-base font-semibold text-gray-900",
+                  // Ajusta o título (label) para subir também, se necessário
+                  className: "text-base font-semibold text-gray-900 -translate-y-2",
                 },
               }}
             />

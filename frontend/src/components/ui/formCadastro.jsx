@@ -48,15 +48,15 @@ export default function RegisterForm() {
 
   return (
     <>
-      <div className="w-full max-w-sm space-y-4">
+      <div className="w-full max-w-[600px] space-y-5 ml-0 md:ml-4 pt-16">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Bem-vindo ao ProdSync</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Bem-vindo ao ProdSync</h1>
           <p className="text-sm text-muted-foreground">
             Crie sua conta para acompanhar a produção em tempo real.
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <FormField label="Nome da Empresa" campo="nomeEmpresa"   placeholder="Ex: Tech Ltda"         value={form.nomeEmpresa}   erro={erros.nomeEmpresa}   onChange={handleChange} />
           <FormField label="CNPJ da Empresa" campo="cnpj"          placeholder="00.000.000/0000-00"     value={form.cnpj}          erro={erros.cnpj}          onChange={handleChange} mascara={mascaraCNPJ} />
           <FormField label="Telefone"        campo="telefone"      placeholder="(11) 99999-9999"        value={form.telefone}      erro={erros.telefone}      onChange={handleChange} mascara={mascaraTelefone} />
@@ -74,7 +74,7 @@ export default function RegisterForm() {
         <Button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full h-9 bg-[#212e4b] hover:bg-slate-800 text-white text-sm font-medium rounded-lg"
+          className="w-full h-11 bg-[#212e4b] hover:bg-slate-800 text-white text-sm font-medium rounded-lg"
         >
           {loading ? "Criando conta..." : "Criar conta"}
         </Button>

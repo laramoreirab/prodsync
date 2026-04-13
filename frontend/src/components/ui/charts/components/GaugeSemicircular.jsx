@@ -1,42 +1,49 @@
 "use client";
 
 import { RadialBar, RadialBarChart, PolarAngleAxis } from "recharts";
-
 import { ChartContainer } from "@/components/ui/chart";
-
-// ============================================================
-// RADIAL BAR (Gauge semicircular)
-// ============================================================
 
 export function GaugeSemicircular({ data, config, title }) {
   if (!data?.length) return null;
 
-  const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
+  const dataKey = Object.keys(config)[0]; 
 
   return (
     <div className="flex flex-col items-center">
-      <ChartContainer config={config} className="h-[120px] w-[120px]">
+      {/* 1. Aumentado de 120px para 180px */}
+      <ChartContainer config={config} className="h-[180px] w-[180px]">
         <RadialBarChart
           data={data}
           startAngle={180}
           endAngle={0}
-          innerRadius={40}
-          outerRadius={60}
-          barSize={16}
+          // 2. Aumentado os raios para preencher o novo espaço
+          innerRadius={60}
+          outerRadius={85}
+          barSize={20}
         >
           <PolarAngleAxis
             type="number"
             domain={[0, 100]}
+            angleAxisId={0}
             tick={false}
           />
-
-          //tentei mudar a cor do gráfico, mas não consegui, então deixei a cor padrão do gráfico, que é um cinza.
-          <RadialBar dataKey="value" background={{fill: "#7D95C6"}} cornerRadius={4} />
+          <RadialBar
+            dataKey="value"
+            background={{ fill: "#7D95C6" }} 
+            cornerRadius={6}
+          />
         </RadialBarChart>
       </ChartContainer>
 
-      <span className="text-2xl font-bold -mt-6">{data[0][dataKey]}%</span>
-      <span className="text-xs text-muted-foreground mt-1">{config[dataKey]?.label || "Gauge"}</span>
+      {/* 3. Ajustado a margem negativa para o novo centro do gráfico maior */}
+      <div className="flex flex-col items-center -mt-30">
+        <span className="text-3xl font-bold leading-none">
+          {data[0].value}%
+        </span>
+        <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium mt-1">
+          {config[dataKey]?.label || "Gauge"}
+        </span>
+      </div>
     </div>
   );
 }
