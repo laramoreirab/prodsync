@@ -10,6 +10,7 @@ class TurnoModel {
                     nome_turno: dados.nome_turno,
                     hora_inicio: dados.hora_inicio,
                     hora_fim: dados.hora_fim,
+                    dia_semana: dados.dia_semana,
                     id_empresa: dados.id_empresa
                 }
             });
@@ -67,12 +68,15 @@ class TurnoModel {
     //Deleta um turno específico por ID e ID da empresa
     static async deletarTurno(id_turno, id_empresa) {
         try {
-            await prisma.turno.deleteMany({
+            const result = await prisma.turno.deleteMany({
                 where: {
                     id_turno,
                     id_empresa: id_empresa
                 }
             });
+            if (result.count === 0) {
+                throw new Error('Turno não encontrado ou não pertence à empresa');
+            }
         } catch (error) {
             console.error('Erro ao deletar turno:', error);
             throw error;
@@ -80,11 +84,12 @@ class TurnoModel {
     }
 
     //Obtém o turno atual com base na hora atual e ID da empresa
-    static async obterTurnoAtual(id_empresa, hora_atual) {
+    static async obterTurnoAtual(id_empresa, hora_atual, dia_semana) {
         try {
             const turnoAtual = await prisma.turno.findFirst({
                 where: {
                     id_empresa: id_empresa,
+                    dia_semana: dia_semana,
                     hora_inicio: {
                         lte: hora_atual
                     },

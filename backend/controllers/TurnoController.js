@@ -6,14 +6,31 @@ class TurnoController {
     static async criarTurno(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
+            const { nome_turno, hora_inicio, hora_fim, dia_semana } = req.body;
 
-            const dadosTurno = { ...req.body, id_empresa };
+            if (!nome_turno || !hora_inicio || !hora_fim || !dia_semana) {
+                return res.status(400).json({ sucesso: false, erro: 'Preencha todos os campos obrigatórios.' });
+            }
+
+            if (isNaN(new Date(hora_inicio).getTime()) || isNaN(new Date(hora_fim).getTime())) {
+                return res.status(400).json({ sucesso: false, erro: 'Formato de hora inválido.' });
+            }
+
+            const dadosTurno = {
+                nome_turno,
+                hora_inicio: new Date(hora_inicio),
+                hora_fim: new Date(hora_fim),
+                dia_semana,
+                id_empresa
+            };
 
             const turno = await TurnoModel.criarTurno(dadosTurno);
-            res.status(201).json({ sucesso: true, dados: turno });
+
+            return res.status(201).json({ sucesso: true, dados: turno });
+
         } catch (error) {
             console.error('Erro ao criar turno:', error);
-            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
 
@@ -105,14 +122,15 @@ class TurnoController {
     static async obterTurnoAtual(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const hora_atual = req.query.hora_atual;
+            const { hora_atual, dia_semana } = req.query;
 
             if (!hora_atual) return res.status(400).json({ sucesso: false, erro: 'A hora atual é obrigatória' });
+            if (!dia_semana) return res.status(400).json({ sucesso: false, erro: 'O dia da semana é obrigatório' });
 
-            const turnoAtual = await TurnoModel.obterTurnoAtual(id_empresa, hora_atual);
+            const turnoAtual = await TurnoModel.obterTurnoAtual(id_empresa, hora_atual, dia_semana);
 
             if (!turnoAtual) {
-                return res.status(404).json({ sucesso: false, erro: 'Nenhum turno em andamento neste horário' });
+                return res.status(404).json({ sucesso: false, erro: 'Nenhum turno em andamento neste horário e dia' });
             }
 
             res.status(200).json({ sucesso: true, dados: turnoAtual });
