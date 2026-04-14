@@ -56,7 +56,6 @@ const InputSenha = () => {
             className="bg-transparent"
             id="password-realtime"
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
             type={showPassword ? "text" : "password"}
             value={password} />
           <Button
