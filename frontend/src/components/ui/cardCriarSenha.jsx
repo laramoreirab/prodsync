@@ -77,62 +77,53 @@ export default function CriarSenha() {
                     <CardContent className="p-0">
                         <form>
                             <FieldGroup className="gap-6">
-                                
+
+                                <Field className="gap-0 mt-0">
+                                    <div className="space-y-2">
+                                        <FieldLabel htmlFor="password-realtime">Senha</FieldLabel>
+                                        <div className="relative">
+                                            <Input
+                                                className="bg-transparent"
+                                                id="password-realtime"
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                type={showPassword ? "text" : "password"}
+                                                value={password} />
+                                            <Button
+                                                className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                size="icon"
+                                                type="button"
+                                                variant="ghost">
+                                                {showPassword ? (
+                                                    <Eye className="h-4 w-4 text-muted-foreground" />
+                                                ) : (
+                                                    <EyeClosed className="h-4 w-4 text-muted-foreground" />
+                                                )}
+                                            </Button>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="password-realtime">Confirmar Senha</Label>
-                                    <div className="relative">
-                                        <Input
-                                            className="bg-transparent"
-                                            id="password-realtime"
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            type={showPassword ? "text" : "password"}
-                                            value={password} />
-                                        <Button
-                                            className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            size="icon"
-                                            type="button"
-                                            variant="ghost">
-                                            {showPassword ? (
-                                                <Eye className="h-4 w-4 text-muted-foreground" />
-                                            ) : (
-                                                <EyeClosed className="h-4 w-4 text-muted-foreground" />
-                                            )}
-                                        </Button>
-                                    </div>
-                                </div>
-                                
-                                <div className="space-y-1.5 pt-1">
-                                    {validations.map((validation, index) => (
-                                        <div
-                                            className={`flex items-center gap-2 text-sm transition-colors duration-200 ${validation.valid
-                                                ? "text-green-500"
-                                                : "text-muted-foreground"
-                                                }`}
-                                            key={index}>
-                                            {validation.valid ? (
-                                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                            ) : (
-                                                <X className="h-3.5 w-3.5" />
-                                            )}
-                                            <span className="text-[13px]">{validation.text}</span>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+
+
+                                    <div className="space-y-1.5 pt-1">
+                                        {validations.map((validation, index) => (
+                                            <div
+                                                className={`flex items-center gap-2 text-sm transition-colors duration-200 ${validation.valid
+                                                    ? "text-green-500"
+                                                    : "text-muted-foreground"
+                                                    }`}
+                                                key={index}>
+                                                {validation.valid ? (
+                                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                                ) : (
+                                                    <X className="h-3.5 w-3.5" />
+                                                )}
+                                                <span className="text-[13px]">{validation.text}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Field>
 
                                 <div className="flex flex-col gap-4">
 
@@ -141,7 +132,7 @@ export default function CriarSenha() {
 
                                     </Field>
                                 </div>
-                                
+
 
                                 <Field className="gap-4">
                                     <Button

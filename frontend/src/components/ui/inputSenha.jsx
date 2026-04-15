@@ -50,7 +50,7 @@ const InputSenha = () => {
 
       
       <div className="space-y-2">
-        <Label htmlFor="password-realtime">Senha</Label>
+        <Label htmlFor="password-realtime">Confirmar Senha</Label>
         <div className="relative">
           <Input
             className="bg-transparent"
@@ -71,9 +71,7 @@ const InputSenha = () => {
             )}
           </Button>
         </div>
-{/* 
-
-      <div className="space-y-2">
+{/*  <div className="space-y-2">
         <div className="flex items-center justify-between text-xs font-medium">
           <span className={getStrengthTextColor(strength)}>
             {getStrengthText(strength)}
