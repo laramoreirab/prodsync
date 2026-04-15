@@ -53,7 +53,7 @@ const InputSenha = () => {
         <Label htmlFor="password-realtime">Confirmar Senha</Label>
         <div className="relative">
           <Input
-            className="bg-transparent"
+            className="bg-transparent [&::-ms-reveal]:hidden h-10"
             id="password-realtime"
             onChange={(e) => setPassword(e.target.value)}
             type={showPassword ? "text" : "password"}
@@ -71,6 +71,8 @@ const InputSenha = () => {
             )}
           </Button>
         </div>
+
+         
 {/*  <div className="space-y-2">
         <div className="flex items-center justify-between text-xs font-medium">
           <span className={getStrengthTextColor(strength)}>

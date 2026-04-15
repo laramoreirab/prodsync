@@ -58,7 +58,7 @@ export default function LoginForm() {
                         </div>
                     </div>
                     {/* BUTTON LOGIN */}
-                    <Button id="btn_login" onClick={() => setOpen(true)} className="w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
+                    <Button id="btn_login" onClick={() => setOpen(true)} className="cursor-pointer w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
                         Login
                     </Button>
                 </form>
