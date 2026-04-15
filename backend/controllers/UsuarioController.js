@@ -1,7 +1,5 @@
-import jwt from 'jsonwebtoken'
 import UsuarioModel from '../models/UsuarioModel.js'
 import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
-import { JWT_CONFIG } from '../config/jwt.js'
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 
 class UsuarioController {
@@ -10,19 +8,14 @@ class UsuarioController {
     static async listarUsuarios(req, res) {
         try {
             
-            const { pagina, limite} = req.paginacao
+            const id_empresa = req.user.id_empresa;
+            const paginacao = req.paginacao;
 
-            const resultado = await UsuarioModel.listarTodos(pagina, limite);
+            const resultado = await UsuarioModel.listarTodos(id_empresa, paginacao);
 
             res.status(200).json({
                 sucesso: true,
-                dados: resultado.data, // Acessa o array dentro da chave 'data'
-                paginacao: {
-                    totalUsuarios: resultado.meta.totalUsuarios,
-                    totalPaginas: resultado.meta.totalPaginas,
-                    currentPage: resultado.meta.currentPages,
-                    pageSize: resultado.meta.pageSize
-                }
+                ...resultado
             });
 
         } catch (error) {
@@ -35,11 +28,11 @@ class UsuarioController {
         }
     }
 
-    //GET api/usuarios/:id - busca de usuário por id 
+    //GET api/usuarios - busca de usuário por id 
     static async buscarPorId(req, res) {
         try {
-            const { id } = req.params;
-            const { id_empresa } = req.body
+            const  id_usuario  = req.user.id_usuario;
+            const  id_empresa  = req.user.id_empresa;
             // Validação básica do ID
             if (!id || isNaN(id)) {
                 return res.status(400).json({
@@ -49,7 +42,7 @@ class UsuarioController {
                 });
             }
 
-            const usuario = await UsuarioModel.buscarPorId(id, id_empresa);
+            const usuario = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
 
             if (!usuario) {
                 res.status(404).json({
@@ -76,7 +69,8 @@ class UsuarioController {
     //POST api/usuarios - Criar novo usuário (apenas dmin)
     static async criarUsuario(req, res) {
         try {
-            const { id_empresa, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const  id_empresa  = req.user.id_empresa;
+            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             const erros = [];
             // Validar nome
@@ -220,14 +214,14 @@ class UsuarioController {
         }
     }
 
-    //PUT api/usuarios/:idf
+    //PUT api/usuarios
     static async atualizarUsuario(req, res) {
         try {
-            const { id } = req.params;
-            const { id_empresa, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const id_empresa = req.user.id_empresa;
+            const { id_usuario, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             // Validação do ID
-            if (!id || isNaN(id)) {
+            if (!id_usuario || isNaN(id_usuario)) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'ID inválido',
@@ -236,12 +230,12 @@ class UsuarioController {
             }
 
             //verificar se usuário existe
-            const usuarioExistente = await UsuarioModel.buscarPorId(id);
+            const usuarioExistente = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
             if (!usuarioExistente) {
                 return res.status(404).json({
                     sucesso: false,
                     erro: 'Usuário não encontrado',
-                    mensagem: `Usuário com ID ${id} não foi encontrado`
+                    mensagem: `Usuário com ID ${id_usuario} não foi encontrado`
                 });
             }
 
@@ -290,10 +284,10 @@ class UsuarioController {
         let updateEscala = null;
 
         if (Object.keys(dadosUpdateUsuario).length > 0) {
-            updateUsuario = await UsuarioModel.atualizar(id, id_empresa, dadosUpdateUsuario)
+            updateUsuario = await UsuarioModel.atualizar(id_usuario, id_empresa, dadosUpdateUsuario)
         }
         if (Object.keys(dadosUpdateEscala).length > 0) {
-            updateEscala = await EscalaTrabalhoModel.atualizar(id, id_empresa, dadosUpdateEscala)
+            updateEscala = await EscalaTrabalhoModel.atualizar(id_usuario, id_empresa, dadosUpdateEscala)
         }
 
             res.status(200).json({
@@ -315,14 +309,14 @@ class UsuarioController {
         }
     }
 
-    //DELETE api/usuarios/:idf - Excluir funcionario 
+    //DELETE api/usuarios - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
-            const { id } = req.params;
-            const { id_empresa } = req.body
+            const id_usuario = req.body
+            const  id_empresa  = req.user.id_empresa;
 
             // Validação do ID
-            if (!id || isNaN(id)) {
+            if (!id_usuario || isNaN(id_usuario)) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'ID inválido',
@@ -331,12 +325,12 @@ class UsuarioController {
             }
 
             //verificar se usuário existe
-            const usuarioExistente = await UsuarioModel.buscarPorId(id);
+            const usuarioExistente = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
             if (!usuarioExistente) {
                 return res.status(404).json({
                     sucesso: false,
                     erro: 'Usuário não encontrado',
-                    mensagem: `Usuário com ID ${id} não foi encontrado`
+                    mensagem: `Usuário com ID ${id_usuario} não foi encontrado`
                 });
             }
 
@@ -345,7 +339,7 @@ class UsuarioController {
                 await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
             }
 
-            const resultado = await UsuarioModel.deletar(id, id_empresa);
+            const resultado = await UsuarioModel.deletar(id_usuario, id_empresa);
 
             res.status(200).json({
                 sucesso: true,
@@ -368,7 +362,8 @@ class UsuarioController {
     // POST /usuario/upload - Upload de imagem para usuarios
     static async uploadImagem(req, res) {
         try {
-            const { id_empresa, id } = req.body;
+            const id_empresa = req.user.id_empresa;
+            const id  = req.body;
 
             // Validação do ID
             if (!id || isNaN(id)) {
