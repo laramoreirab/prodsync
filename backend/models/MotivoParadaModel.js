@@ -4,18 +4,21 @@ const TIPOS_VALIDOS = ['Programada', 'Nao_Programada'];
 
 class MotivoParadaModel {
 
+    // Valida se o ID é um número inteiro positivo
     static validarId(id, nome = 'ID') {
         if (!Number.isInteger(id) || id <= 0) {
             throw new Error(`${nome} inválido`);
         }
     }
 
+    // Valida se o ID da empresa é um número inteiro positivo ou undefined (para casos onde não é obrigatório)
     static validarEmpresa(id_empresa) {
         if (id_empresa !== undefined && (!Number.isInteger(id_empresa) || id_empresa <= 0)) {
             throw new Error('ID de empresa inválido');
         }
     }
 
+    // Valida os dados de entrada para criação ou atualização de motivo de parada
     static validarDados(dados) {
         if (!dados || typeof dados !== 'object') {
             throw new Error('Dados inválidos');
@@ -58,6 +61,7 @@ class MotivoParadaModel {
                 id_empresa: id_empresa ?? dados.id_empresa
             };
 
+            // Garantir que o ID da empresa seja fornecido, seja pelo parâmetro ou pelos dados
             if (!data.id_empresa || !Number.isInteger(data.id_empresa) || data.id_empresa <= 0) {
                 throw new Error('ID de empresa obrigatório para criar motivo de parada');
             }
@@ -120,6 +124,7 @@ class MotivoParadaModel {
                     : { id_motivo: id }
             });
 
+            // Verifica se o motivo de parada existe antes de tentar atualizar
             if (!motivoExistente) {
                 throw new Error('Motivo de parada não encontrado');
             }
@@ -141,10 +146,13 @@ class MotivoParadaModel {
             this.validarId(id, 'ID do motivo');
             this.validarEmpresa(id_empresa);
 
+            // Se o ID da empresa for fornecido, tenta excluir apenas o motivo de parada que pertence a essa empresa
             if (id_empresa) {
                 const result = await prisma.motivos_Parada.deleteMany({
                     where: { id_motivo: id, id_empresa }
                 });
+
+                // Se nenhum registro foi deletado, significa que o motivo de parada não existe ou não pertence à empresa
                 if (result.count === 0) {
                     throw new Error('Motivo de parada não encontrado ou não pertence à empresa');
                 }
