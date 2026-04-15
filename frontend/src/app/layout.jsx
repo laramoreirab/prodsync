@@ -11,12 +11,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-  weight: ["400", "500", "700"], 
-});
-
 export const metadata = {
   title: "ProdSync",
   description: "Controle de produção",
