@@ -15,7 +15,7 @@ export function MotivosFrequentesWidget(){
           title="Motivos mais frequentes de paradas"
           data={data}
           xKey="motivo"
-          yKeys={"qtd"}
+          yKeys="qtd"
           config={paradasChartConfig}
         />
       );

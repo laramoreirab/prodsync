@@ -25,6 +25,7 @@ export default function PageLayout() {
             <OEEWidget />
           </div>
         </section>
+        
 
         {/* SEÇÃO 3 */}
         <section className="bg-white p-6 rounded-2xl shadow-sm">

@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-export const TendenciaRefugoSchema = z.object({
-  hora: z.string(),    // "08h", "10h", ...
-  pcs:  z.number(),    // peças produzidas
-});
+export const TendenciaRefugoSchema = z.object({ dia: z.string(), qtd: z.number() });
 
-export const TendenciaRefugoArraySchema  = z.array(TendenciaRefugoSchema);
+export const TendenciaRefugoArraySchema = z.array(TendenciaRefugoSchema);

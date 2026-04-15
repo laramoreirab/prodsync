@@ -23,8 +23,8 @@ import { mockTendenciaRefugo } from "./mockData";
 
 const USE_MOCK = true; 
 export const refugoService = {
-  async getPorHora() {
-    if (USE_MOCK) return TendenciaRefugoArraySchemaArraySchema.parse(mockTendenciaRefugo);
+  async getTendenciaRefugo() {
+    if (USE_MOCK) return TendenciaRefugoArraySchema.parse(mockTendenciaRefugo);
     const data = await apiFetch("/refugo/tendencias");
     return TendenciaRefugoArraySchema.parse(data);
   },
