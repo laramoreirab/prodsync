@@ -8,12 +8,46 @@ class SetorModel {
             const setor = await prisma.setores.create({
                 data: {
                     nome_setor: dados.nome_setor,
+                    localizacao: dados.localizacao,
                     id_empresa: dados.id_empresa
                 }
             });
             return setor;
         } catch (error) {
             console.error('Erro ao criar setor:', error);
+            throw error;
+        }
+    }
+
+    // Associa máquinas a um setor
+    static async associarMaquinas(id_setor, id_empresa, ids_maquinas) {
+        try {
+            const resultado = await prisma.maquinas.updateMany({
+                where: {
+                    id_maquina: { in: ids_maquinas },
+                    id_empresa: id_empresa
+                },
+                data: {
+                    id_setor: id_setor
+                }
+            });
+            return resultado;
+        } catch (error) {
+            console.error('Erro ao associar máquinas ao setor:', error);
+            throw error;
+        }
+    }
+
+    // Remove máquinas de um setor
+    static async removerMaquinas(id_setor, id_empresa, ids_maquinas) {
+        try {
+            const resultado = await prisma.maquinas.updateMany({
+                where: { id_maquina: { in: ids_maquinas }, id_setor: id_setor, id_empresa: id_empresa },
+                data: { id_setor: null }
+            });
+            return resultado;
+        } catch (error) {
+            console.error('Erro ao remover máquinas do setor:', error);
             throw error;
         }
     }
@@ -117,6 +151,29 @@ class SetorModel {
     // Associa um gestor a um setor
     static async associarGestor(id_setor, id_gestor, id_empresa) {
         try {
+            const setor = await prisma.setores.findFirst({
+                where: {
+                    id_setor: id_setor,
+                    id_empresa: id_empresa
+                }
+            });
+
+            if (!setor) {
+                throw new Error('Setor não encontrado ou não pertence à empresa');
+            }
+
+            const gestor = await prisma.usuarios.findFirst({
+                where: {
+                    id_usuario: id_gestor,
+                    id_empresa: id_empresa,
+                    tipo: 'Gestor'
+                }
+            });
+
+            if (!gestor) {
+                throw new Error('Usuário não encontrado, não pertence à empresa ou não é gestor');
+            }
+
             const associacao = await prisma.setor_Gestor.create({
                 data: {
                     id_setor: id_setor,

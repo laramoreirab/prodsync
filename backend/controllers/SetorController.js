@@ -6,7 +6,7 @@ class SetorController {
     static async criarSetor(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { nome_setor } = req.body;
+            const { nome_setor, localizacao } = req.body;
 
             if (!nome_setor || nome_setor.trim().length < 2) {
                 return res.status(400).json({ sucesso: false, erro: 'Nome do setor deve ter pelo menos 2 caracteres.' });
@@ -14,7 +14,8 @@ class SetorController {
 
             const dadosSetor = {
                 nome_setor: nome_setor.trim(),
-                id_empresa
+                id_empresa,
+                localizacao: localizacao ? localizacao.trim() : null
             };
 
             const setor = await SetorModel.criarSetor(dadosSetor);
@@ -24,6 +25,40 @@ class SetorController {
         } catch (error) {
             console.error('Erro ao criar setor:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // Associar máquinas ao setor
+    static async associarMaquinas(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const { ids_maquinas } = req.body; // Espera um array: [1, 2, 5]
+            const id_empresa = req.user.id_empresa;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor inválido' });
+            if (!Array.isArray(ids_maquinas) || ids_maquinas.length === 0) {
+                return res.status(400).json({ sucesso: false, erro: 'Forneça um array com os IDs das máquinas' });
+            }
+
+            await SetorModel.associarMaquinas(id_setor, id_empresa, ids_maquinas);
+            res.status(200).json({ sucesso: true, mensagem: 'Máquinas associadas com sucesso' });
+        } catch (error) {
+            console.error('Erro ao associar máquinas:', error);
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // Listar setores específicos de um gestor logado
+    static async listarMeusSetores(req, res) {
+        try {
+            const id_gestor = req.user.id_usuario;
+            const id_empresa = req.user.id_empresa;
+
+            const setores = await SetorModel.listarSetoresDoGestor(id_gestor, id_empresa);
+            res.status(200).json({ sucesso: true, dados: setores });
+        } catch (error) {
+            console.error('Erro ao listar setores do gestor:', error);
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
 
@@ -118,6 +153,9 @@ class SetorController {
             res.status(201).json({ sucesso: true, dados: associacao });
         } catch (error) {
             console.error('Erro ao associar gestor:', error);
+            if (error.message && (error.message.includes('não encontrado') || error.message.includes('não é gestor'))) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
