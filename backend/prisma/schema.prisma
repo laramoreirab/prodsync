@@ -81,9 +81,10 @@ model Usuarios {
 }
 
 model Setores {
-  id_setor   Int    @id @default(autoincrement())
-  id_empresa Int
-  nome_setor String @db.VarChar(100)
+  id_setor    Int     @id @default(autoincrement())
+  id_empresa  Int
+  nome_setor  String  @db.VarChar(100)
+  localizacao String? @db.VarChar(255)
 
   empresa  Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquinas Maquinas[]
@@ -107,13 +108,13 @@ model Maquinas {
   nome          String        @db.VarChar(100)
   serie         String?       @unique @db.VarChar(50)
   status_atual  StatusMaquina @default(Parada)
-  id_setor      Int
+  id_setor      Int?
   id_categoria  Int
   data_ativacao DateTime?     @db.Date
   ativo         Boolean       @default(true)
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  setor             Setores             @relation(fields: [id_setor], references: [id_setor])
+  setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
   categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
   ordens_producao   OrdemProducao[]
   historico_eventos Historico_Eventos[]
