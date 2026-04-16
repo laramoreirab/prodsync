@@ -45,7 +45,36 @@ class EventoController{
         }
     }
 
-    static async atualizar(req, res){
+    static async justificarEvento(req, res){
 
+        try {
+        const id_empresa = req.user;
+        const { id_evento, id_motivo_parada } = req.body;
+
+        //verificar se já não há uma justificativa cadastrada no evento
+        const verificacao = await EventoModel.verificaJustificativa(id_empresa, id_evento);
+        if(verificacao===true){
+            res.status(400).json({
+                sucesso: false,
+                erro: 'O evento já possui justificativa',
+                mensagem: 'O evento já possui justificatva de parada!'
+            })
+        }
+        const registrarJustificativa = await EventoModel.justificar(id_empresa, id_evento, id_motivo_parada);
+        res.status(201).json({
+            sucesso: true,
+            mensagem: 'Justificativa registrada com sucesso! A máquina já pode ser religada!'
+        }) 
+        } catch (error) {
+            res.status(500).json({
+                 sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível registrar a justificativa do evento!'
+            })
+           
+        }
+
+        
+    
     }
 }
