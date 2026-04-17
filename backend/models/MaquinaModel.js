@@ -81,7 +81,10 @@ class MaquinaModel {
                     nome,
                     serie
                 }
-            })
+            });
+            if (atualizarMaquina.count === 0) {
+                throw new Error('Máquina não encontrada ou não pertence à empresa');
+            }
             return atualizarMaquina;
         } catch (error) {
             console.error('Erro ao atualizar informações da máquina:', error)
@@ -101,6 +104,9 @@ class MaquinaModel {
                     ativo: false
                 }
             });
+            if (deletarMaquina.count === 0) {
+                throw new Error('Máquina não encontrada ou não pertence à empresa');
+            }
             return deletarMaquina;
         } catch (error) {
             console.error('Erro ao deletar máquina:', error);
@@ -121,7 +127,10 @@ class MaquinaModel {
                     status_atual: status_atual
                 }
             });
-            return atualizarStatus
+            if (atualizarStatus.count === 0) {
+                throw new Error('Máquina não encontrada ou não pertence à empresa');
+            }
+            return atualizarStatus;
         } catch (error) {
             console.error('Erro ao atualizar status da máquina:', error);
             throw error;
