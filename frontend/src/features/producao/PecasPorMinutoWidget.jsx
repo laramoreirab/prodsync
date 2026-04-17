@@ -1,0 +1,18 @@
+"use client"
+import { KPI } from "@/components/ui/charts/components";
+import { usePecasPorMinuto } from "./hooks/usePecasPorMinuto";
+
+
+export function PecasPorMinutoWidget(){
+    const { data, loading, error } = usePecasPorMinuto();
+    
+      if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+      if (error)   return <p className="text-sm text-destructive">Erro ao carregar produção.</p>;
+    
+      return (
+        <KPI
+          title={data?.titulo}
+          value={data?.valor}
+        />
+      );
+}

@@ -8,4 +8,9 @@ export const MotivosFrequentesSchema = z.object({
   qtd:  z.number(),    // peças produzidas
 });
 
+export const MediaParadasDiaArraychema = z.object({
+  titulo: z.string(),
+  valor: z.string(), //1h, 45 min, etc
+})
+
 export const MotivosFrequentesArraySchema  = z.array(MotivosFrequentesSchema);

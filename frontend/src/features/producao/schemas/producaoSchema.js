@@ -20,6 +20,16 @@ export const OEESchema = z.object({
   oee:             z.number().min(0).max(100),
 });
 
+export const PecasPorMinutoSchema = z.object({
+  titulo: z.string(),
+  valor: z.coerce.string(), //30, 12 etc
+})
+
+export const ProducaoPorTurnoLotesSchema = z.object({
+  titulo: z.string(),
+  valor: z.string(), 
+})
+
 export const ProducaoPorHoraArraySchema  = z.array(ProducaoPorHoraSchema);
 export const ProducaoPorSetorArraySchema = z.array(ProducaoPorSetorSchema);
 export const OEESchemaArraySchema = z.array(OEESchema);

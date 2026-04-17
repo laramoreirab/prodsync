@@ -42,3 +42,23 @@ export const mockTendenciaRefugo = [
   { dia: "Dia 5", qtd: 95 },
   { dia: "Dia 6", qtd: 83 },
 ];
+
+export const mockMediaParadasDia = {
+  titulo: "Média de Paradas por Dia",
+  valor: "1h"
+};
+
+export const mockPecasPorMinuto = {
+  titulo: "Peças por MInuto",
+  valor: "30"
+};
+
+export const mockMaquinaAtivaPorTurno = {
+  titulo: "Maquina Ativa Por Turno",
+  valor: "12"
+};
+
+export const mockProducaoPorTurnoLotes = {
+  titulo: "Producao Por Turno por Lote",
+  valor: "25"
+};

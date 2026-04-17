@@ -26,13 +26,14 @@
 
 //Mock para desenvolvimento sem backend
 import { apiFetch } from "./api";
-import { mockOEE } from "./mockData";
 import {
   OEESchema,
   ProducaoPorHoraArraySchema,
   ProducaoPorSetorArraySchema,
+  PecasPorMinutoSchema,
+  ProducaoPorTurnoLotesSchema
 } from "@features/producao/schemas/producaoSchema";
-import { mockProducaoPorSetor, mockProducaoPorHora } from "./mockData";
+import { mockProducaoPorSetor, mockProducaoPorHora, mockOEE, mockPecasPorMinuto } from "./mockData";
 
 const USE_MOCK = true; 
 export const producaoService = {
@@ -52,4 +53,21 @@ export const producaoService = {
     const data = await apiFetch("/producao/oee");
     return OEESchema.parse(data);
   },
+  
+};
+
+export const pecasPorMinutosService = {
+  async getPecasPorMinuto(){
+    if (USE_MOCK) return PecasPorMinutoSchema.parse(mockPecasPorMinuto);
+    const data = await apiFetch("/producao/pecas_por_minuto");
+    return PecasPorMinutoSchema.parse(data);
+  }
+};
+
+export const producaoPorTurnoLotesService = {
+  async getProducaoPorTurnoLotes(){
+    if (USE_MOCK) return ProducaoPorTurnoLotesSchema.parse(mockProducaoPorTurnoLotes);
+    const data = await apiFetch("/producao/producao_por_turno_lote");
+    return ProducaoPorTurnoLotesSchema.parse(data);
+  }
 };

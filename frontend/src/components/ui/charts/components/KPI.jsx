@@ -1,10 +1,16 @@
-export function CardNumero({ title, value }) {
-  return (
-    <div className="bg-white p-4 rounded-xl shadow">
-      <p className="text-sm text-muted-foreground">{title}</p>
-      <h2 className="text-2xl font-bold">{value}</h2>
-    </div>
-  );
-} 
+"use client";
 
-//Demonstrarção de KPI, um componente genérico  que mostra um numero
+export function KPI({ title, value }) {
+  return (
+    <>
+      <p className="text-sm font-semibold">{title}</p>
+      <div className="flex flex-col items-center justify-center w-full">
+
+        <h2 className="text-5xl font-medium p-8">{value}</h2>
+      </div>
+      </>
+
+  );
+}
+
+// Demonstração de KPI, um componente genérico que mostra um número

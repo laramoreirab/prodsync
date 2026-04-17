@@ -10,3 +10,4 @@ export * from "./DonutChart";
 export * from "./BarComLimite";
 export * from "./BarComValorETopo";
 export * from "./LineMultiplasSeries";
+export * from "./KPI";

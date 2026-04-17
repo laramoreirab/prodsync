@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@iconify/react": "^6.0.2",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@radix-ui/react-separator": "^1.1.8",
     "class-variance-authority": "^0.7.1",
@@ -15,7 +16,6 @@
     "lottie-colorify": "^0.8.0",
     "lottie-react": "^2.4.1",
     "lucide-react": "^1.7.0",
-    "@iconify/react": "^6.0.2",
     "motion": "^12.38.0",
     "next": "16.2.0",
     "radix-ui": "^1.4.3",

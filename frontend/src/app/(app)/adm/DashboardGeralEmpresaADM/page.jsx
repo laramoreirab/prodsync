@@ -3,9 +3,12 @@ import { ProducaoSetorWidget } from "@features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@features/producao/OEEWidget";
 import { MaquinaStatusWidget } from "@/features/maquinas/MaquinaStatusWidget";
-// import { MotivosFrequentesWidget } from "@/features/paradas/schemas/paradasSchema";
 import { MotivosFrequentesWidget } from "@/features/paradas/MotivosFrequentesParadas";
 import { TendendiaRefugoWidget } from "@/features/refugo/TendenciaRefugoWidget";
+import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget";
+import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
+// import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/maquinaAtivaPorTurnoWidget";
+import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 
 export default function PageLayout() {
   return (
@@ -54,10 +57,10 @@ export default function PageLayout() {
         {/* SEÇÃO 5 */}
         <section className="bg-white p-6 rounded-2xl shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white border rounded-xl p-4">1</div>
-            <div className="bg-white border rounded-xl p-4">2</div>
-            <div className="bg-white border rounded-xl p-4">3</div>
-            <div className="bg-white border rounded-xl p-4">4</div>
+            <div className="bg-white border rounded-xl p-4"><MediaParadasDiaWidget/></div>
+            <div className="bg-white border rounded-xl p-4"><PecasPorMinutoWidget/></div>
+            <div className="bg-white border rounded-xl p-4"><MaquinaAtivaPorTurnoWidget/></div>
+            <div className="bg-white border rounded-xl p-4"><ProducaoPorTurnoLotesWidget/></div>
           </div>
         </section>
       </div>
