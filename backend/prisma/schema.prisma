@@ -197,9 +197,11 @@ model Historico_Eventos {
   id_turno         Int
   id_motivo_parada Int?
   status_atual     StatusMaquina
+  setor_afetado    Int
   inicio           DateTime
   termino          DateTime?
   duracao          Int? // Duração em minutos
+  observacao       String    @db.VarChar(450)
 
   empresa        Empresas        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquina        Maquinas        @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
