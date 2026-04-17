@@ -1,41 +1,6 @@
-import HeroSection from "@/components/shadcn-space/blocks/hero-01/hero";
-import Header from "@/components/shadcn-space/blocks/hero-01/header";
+import HeroSection from "@/components/shadcn-space/blocks/hero/hero";
 
 export default function AgencyHeroSection() {
-  const avatarList = [
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-1.jpg",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-2.jpg",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-3.jpg",
-    },
-    {
-      image: "https://images.shadcnspace.com/assets/profiles/user-5.jpg",
-    },
-  ];
-
-  const navigationData = [
-    {
-      title: "Home",
-      href: "/",
-      isActive: true,
-    },
-    {
-      title: "Sobre nós",
-      href: "#",
-    },
-    {
-      title: "Serviços",
-      href: "#",
-    },    
-    {
-      title: "FAQs",
-      href: "#",
-    }
-  ];
 
   const brandList = [
     {
@@ -67,9 +32,8 @@ export default function AgencyHeroSection() {
 
   return (
     <div className="relative">
-      <Header navigationData={navigationData} />
       <main>
-        <HeroSection avatarList={avatarList} />       
+        <HeroSection />       
       </main>
     </div>
   );
