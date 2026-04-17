@@ -42,14 +42,7 @@ const ProfileDropdown = ({
           {/* User Info */}
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
             <div className="relative">
-              <Avatar className="size-10">
-                <AvatarImage
-                  src=""
-                  alt="Foto de perfil - {usuário}" />
-                <AvatarFallback>
-                  <User />
-                </AvatarFallback>
-              </Avatar>
+              <img src="/userdefault.svg" className="w-10"/>
               <span
                 className="ring-card absolute right-0 bottom-0 size-2 rounded-full bg-green-600 ring-2" />
             </div>
