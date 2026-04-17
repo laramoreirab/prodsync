@@ -28,6 +28,54 @@ class EventoModel {
         }
     }
 
+    //listar paradas não justificadas
+    static async listarNaoJustificadas(id_empresa, paginacao){
+        try {
+
+            const regrasDaBusca = {
+                where: {
+                    id_empresa : id_empresa,
+                    id_motivo_parada : {
+                         equals: null
+                    },
+                }
+            }
+             const resultadoPaginado = await paginarPrisma(
+                prisma.historico_eventos,
+                regrasDaBusca,
+                paginacao
+             );
+             return resultadoPaginado
+        } catch (error) {
+            console.error('Erro ao listar eventos não justificadas:', error);
+            throw error;
+        }
+    }
+
+    //listar tabelas justificadas
+    static async listarJustificadas(id_empresa, paginacao){
+        try {
+            const regrasDaBusca = {
+                where: {
+                    id_empresa : id_empresa,
+                    id_motivo_parada : {
+                         not: null
+                    },
+                }
+            }
+             const resultadoPaginado = await paginarPrisma(
+                prisma.historico_eventos,
+                regrasDaBusca,
+                paginacao
+             );
+             return resultadoPaginado
+            
+        } catch (error) {
+            console.error('Erro ao listar eventos justificados:', error);
+            throw error;
+        }
+    }
+
     static async converterTimestamp(timestamp) {
         const ms = String(timestamp).length === 10
             ? timestamp * 1000   // veio em segundos → converte
@@ -67,7 +115,7 @@ class EventoModel {
             const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio);
 
             //achar setor pelo Id da máquina
-            const setor = await prisma.escalatrabalho.read({
+            const setor = await prisma.escalatrabalho.findFirst({
                 where: {
                     id_empresa: id_empresa,
                     id_maquina: id_maquina
@@ -103,56 +151,59 @@ class EventoModel {
     }
 
     static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, id_maquina, inicio, fim, id_motivo_parada, observacao = null) {
-        try {
+       try {
+            const duracao = await this.calcularDuracao(inicio, fim);
+            const inicio_convertido = await this.converterTimestamp(inicio);
+            const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio_convertido);
 
-            //calcular duracao
-            const duracao = await this.calcularDuracao(inicio, fim)
+            // Mapeia todas as máquinas para criar os objetos de inserção
+            const eventosData = await Promise.all(maquinas.map(async (id_maquina) => {
+                
+                const ordem = await prisma.ordemProducao.findFirst({
+                    where: {
+                        id_empresa: id_empresa,
+                        id_maquina: id_maquina,
+                        data_inicio: { lte: inicio_convertido } // Sugestão: OP iniciada antes ou igual a parada
+                    },
+                    orderBy: { data_inicio: 'desc' }, // Pega a mais recente
+                    select: { id_ordem: true }
+                });
 
-            // busca o turno ativo pelo horário do início da parada
-            const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio);
-
-            const inicio_convertido = this.converterTimestamp(inicio)
-            const fim_convertido = this.converterTimestamp(fim)
-
-            //fazer pesquisa de ordem de produção associada ao inicio do evento e id da máquina
-            const IdordemProducao = await prisma.ordemProducao.read({
-                where: {
+                return {
                     id_empresa: id_empresa,
                     id_maquina: id_maquina,
-                    data_inicio: inicio_convertido
-                },
-                select: { id_ordem: true }
-            })
-
-            //calcular duracao
-            const duracao = await this.calcularDuracao(inicio, fim)
-
-            const resultado = await prisma.historico_eventos.create({
-                data: {
-                    id_empresa: id_empresa,
-                    id_maquina: id_maquina,
-                    id_ordemProducao: IdordemProducao || null,
-                    id_turno: turno.id_turno,
+                    id_ordemProducao: ordem?.id_ordem || null,
+                    id_turno: turno?.id_turno || null,
                     status_atual: status_maquina,
                     setor_afetado: setor_afetado,
-                    inicio: inicio,
-                    termino: fim,
+                    inicio: inicio_convertido,
+                    termino: await this.converterTimestamp(fim),
                     duracao: duracao,
+                    id_motivo_parada: id_motivo_parada,
                     observacao: observacao
-                },
-            })
-            return this.formatarParada(resultado);
+                };
+            }));
+
+            // Cria todos os registros de uma vez no banco
+            const resultados = await prisma.historico_eventos.createMany({
+                data: eventosData
+            });
+
+            return resultados; // Retorna { count: X }
+        } catch (error) {
+            console.error('Erro registrar evento no banco de dados:', error);
+            throw error;
+        }
 
         } catch (error) {
             console.error('Erro registrar evento no banco de dados:', error);
             throw error;
         }
-    };
 
     static async verificaJustificativa(id_empresa, id_evento) {
         //verificar se o evento não há justificativas registradas
         try {
-            const verificacao = await prisma.historico_eventos.findFirst({
+            const evento  = await prisma.historico_eventos.findFirst({
                 where: {
                     id_empresa: id_empresa,
                     id_evento: id_evento,
@@ -161,11 +212,11 @@ class EventoModel {
                     id_motivo_parada: true
                 }
             });
-            if (verificacao !== null || verificacao !== '') {
-                return true
+            if (evento && evento.id_motivo_parada !== null) {
+                return true;
             } else {
-                return false
-            };
+                return false;
+            }
         } catch (error) {
             console.error('Erro verificar justificativa no banco de dados:', error);
             throw error;
@@ -175,21 +226,30 @@ class EventoModel {
 
     static async calcularDuracao(inicio, fim) {
         //partindo do principio que inicio e fim viram em timestamp
-        const diferencaMs = msFim - msInicio        // diferença em milissegundos
+        const diferencaMs = fim - inicio        // diferença em milissegundos
         const diferencaMinutos = diferencaMs / 1000 / 60 // converte para minutos
 
         return Math.round(diferencaMinutos) // arredonda para inteiro — ex: 35
 
     }
 
-    static async justificativa(id_empresa, id_evento, id_motivo_parada,) {
+    static async justificar(id_empresa, id_evento, id_motivo_parada, observacao = null) {
         try {
-
+            return await prisma.historico_eventos.update({
+                where: { 
+                    id_empresa: id_empresa,
+                    id_evento: id_evento 
+                },
+                data: {
+                    id_motivo_parada: id_motivo_parada,
+                    observacao: observacao
+                },
+            });
         } catch (error) {
-
+            console.error('Erro salvar justificativa:', error);
+            throw error;
         }
     }
-
 }
 
 export default EventoModel;
