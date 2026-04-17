@@ -33,7 +33,7 @@ import {
   PecasPorMinutoSchema,
   ProducaoPorTurnoLotesSchema
 } from "@features/producao/schemas/producaoSchema";
-import { mockProducaoPorSetor, mockProducaoPorHora, mockOEE, mockPecasPorMinuto } from "./mockData";
+import { mockProducaoPorSetor, mockProducaoPorHora, mockOEE, mockPecasPorMinuto, mockProducaoPorTurnoLotes } from "./mockData";
 
 const USE_MOCK = true; 
 export const producaoService = {

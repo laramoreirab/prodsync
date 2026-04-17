@@ -1,14 +1,3 @@
-// import { apiFetch } from "./api";
-// import {
-//MaquinaStatusSchema
-// } from "@features/maquinas/schemas/maquinaSchema";
-
-// export const maquinaService = {
-//   async getStatus() {
-//     const data = await apiFetch("/maquinas/status");
-//     return MaquinaStatusSchema.parse(data); 
-//   },
-
 import { apiFetch } from "./api";
 import { MaquinaStatusArraySchema } from "@features/maquinas/schemas/maquinaStatusSchema";
 import { MaquinaAtivaPorTurnoSchema } from "@features/maquinas/schemas/maquinaStatusSchema";

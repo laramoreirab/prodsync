@@ -1,18 +1,18 @@
 // src/app/DashboardGeralEmpresaADM/page.jsx
-import { ProducaoSetorWidget } from "@features/producao/ProducaoSetorWidget";
-import { ProducaoDiaWidget } from "@features/producao/ProducaoDiaWidget";
-import { OEEWidget } from "@features/producao/OEEWidget";
+import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
+import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
+import { OEEWidget } from "@/features/producao/OEEWidget";
 import { MaquinaStatusWidget } from "@/features/maquinas/MaquinaStatusWidget";
 import { MotivosFrequentesWidget } from "@/features/paradas/MotivosFrequentesParadas";
 import { TendendiaRefugoWidget } from "@/features/refugo/TendenciaRefugoWidget";
 import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget";
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
-// import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/maquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
+import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
 export default function PageLayout() {
   return (
-    <div className="min-h-screen bg-[#f8f8f8] flex justify-center py-10 px-4">
+    <div className="min-h-screen  flex justify-center py-10 px-4">
       {/* Container centralizado */}
       <div className="w-full max-w-6xl space-y-6">
         {/* SEÇÃO 1 */}
@@ -23,7 +23,7 @@ export default function PageLayout() {
 
         </section>
         {/* SEÇÃO 2 */}
-        <section className="bg-white p-6 rounded-2xl shadow-sm">
+        <section className="bg-white p-4 rounded-2xl shadow-sm">
           <div className="w-full flex justify-evenly">
             <OEEWidget />
           </div>
@@ -55,8 +55,8 @@ export default function PageLayout() {
         </section>
 
         {/* SEÇÃO 5 */}
-        <section className="bg-white p-6 rounded-2xl shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="p-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
             <div className="bg-white border rounded-xl p-4"><MediaParadasDiaWidget/></div>
             <div className="bg-white border rounded-xl p-4"><PecasPorMinutoWidget/></div>
             <div className="bg-white border rounded-xl p-4"><MaquinaAtivaPorTurnoWidget/></div>

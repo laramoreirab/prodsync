@@ -1,6 +1,7 @@
 "use client"
 import { KPI } from "@/components/ui/charts/components";
-import { useMaquinaAtivaPorTurno} from ".usemaquinaAtivaPorTurno"
+import { useMaquinaAtivaPorTurno } from "./hooks/usemaquinaAtivaPorTurno";
+
 
 export function MaquinaAtivaPorTurnoWidget(){
     const { data, loading, error } = useMaquinaAtivaPorTurno();

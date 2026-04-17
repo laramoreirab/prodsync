@@ -49,7 +49,7 @@ export const mockMediaParadasDia = {
 };
 
 export const mockPecasPorMinuto = {
-  titulo: "Peças por MInuto",
+  titulo: "Peças por Minuto",
   valor: "30"
 };
 
