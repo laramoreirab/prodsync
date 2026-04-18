@@ -24,7 +24,7 @@ export default function SuccessCard({ onClose, onContinue }) {
         <h2 className="text-lg font-semibold">
           Conta criada com sucesso!
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground font-medium">
           Tudo pronto para acompanhar sua produção em tempo real.
         </p>
       </div>
