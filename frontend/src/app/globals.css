@@ -32,6 +32,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-cinza-escuro: var(--cinza-escuro);
+  --color-vermelho-vivido: var(--vermelho-vivido);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -83,7 +84,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --cinza-escuro: #545454;
-  --bg_app: url('/bg_app.svg')
+  --bg_app: url('/bg_app.svg');
+  --vermelho-vivido: #b30000;
 }
 
 .dark {

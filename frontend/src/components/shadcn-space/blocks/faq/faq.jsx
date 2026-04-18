@@ -27,7 +27,7 @@ const FAQ_DATA = [
   {
     question: "Como esses dados ajudam a melhorar a produção?",
     answer:
-      "",
+      "Passo 1: Analisar dados. \nPasso 2: Identificar gargalos.\nPasso 3: Agir.",
   },
   {
     question: "Como posso tirar minhas dúvidas sobre o sistema?",
