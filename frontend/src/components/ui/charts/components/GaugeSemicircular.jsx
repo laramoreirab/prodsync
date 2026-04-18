@@ -23,7 +23,7 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
       innerRadius: 85,
       outerRadius: 115,
       barSize: 26,
-      mt: "-mt-36",
+      mt: "-mt-42",
       valueText: "text-5xl",
     },
   };
