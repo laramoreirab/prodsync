@@ -1,5 +1,7 @@
 import Header from "@/components/ui/topbar";
 
+import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
+
 
 
 export default function PageLayout() {
@@ -35,6 +37,11 @@ export default function PageLayout() {
           </button>
         </div>
         </div>
+
+      <ParadasComparadasWidget />
+
+
+        
     </main>
   );
 }

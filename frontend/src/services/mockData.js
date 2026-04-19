@@ -75,8 +75,6 @@ export const mockSetores = [
   { id: 9, setor: "Montagem",    gestor: "Patrícia Souza",  oeeMedio: 76, qtdMaquinas: 7,  qtdOperadores: 7  },
 ];
 
-// Adicione estes exports ao seu mockData.js existente
-
 export const mockSetorTotalKPI = {
   titulo:    "Número Total de Setores",
   subtitulo: "Atualizado em tempo real",
@@ -109,3 +107,9 @@ export const mockOEECritico = {
   setor: "Injeção",
   oee:   35,
 };
+
+
+export const mockParadasComparadas = [
+  { name: "justificada",      value: 62 },
+  { name: "naoJustificada",     value: 23 },
+];
