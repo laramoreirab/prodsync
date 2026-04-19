@@ -13,6 +13,16 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
+//Widget imports - Dashboard
+import { MaquinaStatusDonutWidget } from "@/features/maquinas/MaquinaStatusDonutWidget";
+import { MaquinasPorSetorWidget } from "@/features/maquinas/MaquinasPorSetorWidget";
+import { TempoMedioParadaWidget } from "@/features/maquinas/TempoMedioParadaWidget";
+import { ProducaoDefeitosWidget } from "@/features/maquinas/ProducaoDefeitosWidget";
+import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidget";
+import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
+
+//
+
 const maquinasFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
   { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
@@ -53,14 +63,14 @@ export default function Maquinas() {
 
     //filtro por setor
     if (filtrosSelecionados.status && filtrosSelecionados.status.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq => 
+      dadosFiltrados = dadosFiltrados.filter(maq =>
         filtrosSelecionados.status.includes(maq.status)
       );
     }
 
     //filtro por setor
     if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq => 
+      dadosFiltrados = dadosFiltrados.filter(maq =>
         filtrosSelecionados.setor.includes(maq.setor)
       );
     }
@@ -68,12 +78,12 @@ export default function Maquinas() {
     //filtro por data
     if (filtrosSelecionados.data) {
       if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(maq => 
+        dadosFiltrados = dadosFiltrados.filter(maq =>
           new Date(maq.data) >= new Date(filtrosSelecionados.data.start)
         );
       }
       if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(maq => 
+        dadosFiltrados = dadosFiltrados.filter(maq =>
           new Date(maq.data) <= new Date(filtrosSelecionados.data.end)
         );
       }
@@ -117,6 +127,63 @@ export default function Maquinas() {
           </Dialog>
         </div>
       </section>
+      {/* SEÇÃO 1: Graphs */}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* Status Operacional */}
+          <div className=" bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
+            <p className="text-sm font-semibold text-black self-start">
+              Status Operacional das Máquinas
+            </p>
+            <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">
+              *Atualizado em tempo real
+            </p>
+
+            <div className="w-full">
+              <MaquinaStatusDonutWidget />
+            </div>
+          </div>
+
+          {/* Quantidade por Setor */}
+          <div className=" bg-white border rounded-xl p-4">
+
+            <MaquinasPorSetorWidget />
+          </div>
+
+          {/* Tempo Médio de Parada */}
+          <div className="border bg-white rounded-xl p-4">
+            <TempoMedioParadaWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 2: Graphs */}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          {/* Produção vs Defeitos por setor */}
+          <div className="border bg-white rounded-xl p-4">
+            <ProducaoDefeitosWidget />
+          </div>
+
+          {/* Status por Turno */}
+          <div className="border bg-white rounded-xl p-4">
+            <MaquinasPorTurnoWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 3:Graphs*/}
+      <section className="p-6">
+        <div className="border bg-white rounded-xl p-4">
+          <ProducaoTotalWidget />
+        </div>
+      </section>
+      
+ {/* LISTAGEM MAQUINAS      */}
 
       <section id="listagem_maquinas">
         <div className="flex items-center p-8 gap-5">
@@ -140,10 +207,10 @@ export default function Maquinas() {
               options={opcoesOrdenacao}
               onSortChange={handleSort}
             />
-            
-            <FilterDropdown 
-              filtersConfig={maquinasFilter} 
-              onApply={aplicarFiltros} 
+
+            <FilterDropdown
+              filtersConfig={maquinasFilter}
+              onApply={aplicarFiltros}
             />
           </div>
         </div>
@@ -174,7 +241,7 @@ export default function Maquinas() {
             </tbody>
           </table>
         </div>
-      
+
       </section>
     </main>
   );

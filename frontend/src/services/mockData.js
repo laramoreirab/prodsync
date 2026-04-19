@@ -119,3 +119,67 @@ export const mockTopMotivosTempo = [
   { motivo: "Manutenção",        tempo: "1h 10m", minutos: 70  },
   { motivo: "Falta de Material", tempo: "45m",    minutos: 45  },
 ];
+
+
+export const mockQtdMaquinasPorSetor = [
+  { setor: "Engrenagens", qtd: 80 },
+  { setor: "Turbinas",    qtd: 55 },
+  { setor: "Válvulas",    qtd: 35 },
+  { setor: "Compressores",qtd: 20 },
+];
+
+export const mockTempoMedioParada = [
+  { setor: "Compressores", minutos: 46 },
+  { setor: "Turbinas",     minutos: 38 },
+  { setor: "Válvulas",     minutos: 30 },
+  { setor: "Engrenagens",  minutos: 15 },
+];
+
+export const mockProducaoDefeitos = [
+  { setor: "Engrenagens",  produzidas: 85, defeito: 15 },
+  { setor: "Turbinas",     produzidas: 72, defeito: 28 },
+  { setor: "Válvulas",     produzidas: 60, defeito: 40 },
+  { setor: "Compressores", produzidas: 55, defeito: 45 },
+];
+
+export const mockMaquinasPorTurno = [
+  { turno: "Manhã", ativas: 80, paradas: 12, manutencao: 8  },
+  { turno: "Tarde", ativas: 72, paradas: 18, manutencao: 10 },
+  { turno: "Noite", ativas: 65, paradas: 20, manutencao: 15 },
+];
+
+// ProducaoTotal — três datasets para os filtros de período
+export const mockProducaoTotal3Meses = [
+  { data: "Abr 2",  total: 650  },
+  { data: "Abr 9",  total: 720  },
+  { data: "15 Abr", total: 890  },
+  { data: "16 Abr", total: 1200 },
+  { data: "23 Abr", total: 980  },
+  { data: "7 Mai",  total: 750  },
+  { data: "14 Mai", total: 820  },
+  { data: "22 Mai", total: 900  },
+  { data: "6 Jun",  total: 780  },
+  { data: "13 Jun", total: 850  },
+  { data: "20 Jun", total: 770  },
+];
+
+export const mockProducaoTotal30Dias = [
+  { data: "28 Mai", total: 600 },
+  { data: "1 Jun",  total: 720 },
+  { data: "5 Jun",  total: 810 },
+  { data: "10 Jun", total: 750 },
+  { data: "15 Jun", total: 900 },
+  { data: "20 Jun", total: 680 },
+  { data: "25 Jun", total: 790 },
+  { data: "27 Jun", total: 820 },
+];
+
+export const mockProducaoTotal7Dias = [
+  { data: "Seg", total: 750 },
+  { data: "Ter", total: 820 },
+  { data: "Qua", total: 690 },
+  { data: "Qui", total: 910 },
+  { data: "Sex", total: 840 },
+  { data: "Sáb", total: 600 },
+  { data: "Dom", total: 450 },
+];

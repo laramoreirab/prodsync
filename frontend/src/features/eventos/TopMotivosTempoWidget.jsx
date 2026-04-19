@@ -9,12 +9,9 @@ import {
 } from "@/components/ui/chart";
 import { useTopMotivosTempo } from "./hooks/useTopMotivosTempo";
 
-const config = {
-  minutos: {
-    label: "Duração (min)",
-    color: "#7d95c6",
-  },
-};
+import { topMotivosTempoConfig } from "./config/topMotivosTempoConfig";
+
+const config = topMotivosTempoConfig;
 
 export function TopMotivosTempoWidget() {
   const { data, loading, error } = useTopMotivosTempo();
