@@ -1,5 +1,5 @@
 import prisma from '../config/prisma.js';
-import { paginarPrisma } from '../utils/paginacaoUtil.js';
+import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 
 class MaquinaModel {
 
