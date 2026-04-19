@@ -1,8 +1,6 @@
 import Header from "@/components/ui/topbar";
-
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
-
-
+import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
 
 export default function PageLayout() {
   return (
@@ -21,7 +19,8 @@ export default function PageLayout() {
       </div>
 
       <div className="w-full max-w-6xl mt-8 pt-0 pb-10 px-4 space-y-4">
-        <div className="flex items-center justify-between">
+        {/* TÍTULO E BOTÃO */}
+        <div className="flex items-center justify-between mb-6">
           <div className="flex justify-start">
             <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
               Histórico de Eventos
@@ -36,12 +35,24 @@ export default function PageLayout() {
             Registrar Eventos
           </button>
         </div>
-        </div>
 
-      <ParadasComparadasWidget />
+        {/* SEÇÃO DOS GRÁFICOS  */}
+        <section className=" p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            {/* Widget 1/3 */}
+            <div className="bg-white border rounded-xl p-4 md:col-span-1">
+              <ParadasComparadasWidget />
+            </div>
 
+            {/* Widget 2/3 */}
+            <div className="bg-white border rounded-xl p-4 md:col-span-2">
+              <TopMotivosTempoWidget />
+            </div>
 
-        
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

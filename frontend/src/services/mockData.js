@@ -113,3 +113,9 @@ export const mockParadasComparadas = [
   { name: "justificada",      value: 62 },
   { name: "naoJustificada",     value: 23 },
 ];
+
+export const mockTopMotivosTempo = [
+  { motivo: "Limpeza",           tempo: "2h 30m", minutos: 150 },
+  { motivo: "Manutenção",        tempo: "1h 10m", minutos: 70  },
+  { motivo: "Falta de Material", tempo: "45m",    minutos: 45  },
+];
