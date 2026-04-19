@@ -267,7 +267,7 @@ class UsuarioController {
             dadosUpdateEscala.id_maquina = id_maquina;
         }
 
-        // UMA única verificação geral no lugar das três individuais
+
         if (
             Object.keys(dadosUpdateUsuario).length === 0 &&
             Object.keys(dadosUpdateEscala).length === 0
