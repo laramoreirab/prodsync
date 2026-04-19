@@ -3,7 +3,9 @@ import Header from "@/components/ui/topbar";
 import { OEEPorSetorWidget } from "@/features/setores/OEEPorSetorWidget";
 import { RefugoPorSetorWidget } from "@/features/setores/RefugoPorSetorWidget";
 import { OEECriticoWidget } from "@/features/setores/OEECriticoWidget";
-import { SetoresListaWidget } from "@/features/setores/SetoresListaWidget";
+import { SetoresListaWidget } from "@/features/setores/SetoreslistaWidget";
+import { SetorTotalWidget } from "@/features/setores/SetorTotalKPIWidget";
+import { OperadoresMediaWidget } from "@/features/setores/OperadoresMediaKPIWidget";
 
 export default function PageLayout() {
   return (
@@ -22,8 +24,6 @@ export default function PageLayout() {
       </div>
 
       <div className="w-full max-w-6xl mt-[-800px] pt-0 pb-10 px-4 space-y-4">
-
-        {/* Div de agrupamento para o título de setores e botão */}
         <div className="flex items-center justify-between">
           <div className="flex justify-start">
             <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
@@ -40,21 +40,41 @@ export default function PageLayout() {
           </button>
         </div>
 
-        {/* SEÇÃO 1 — KPIs Principais */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* <OEEPorSetorWidget /> */}
-        </section>
+        <div className="flex flex-col gap-4 p-4">
 
-        {/* SEÇÃO 2 — Gráficos de Refugo e Alertas */}
-        <section className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4">
-          <RefugoPorSetorWidget />
-          <OEECriticoWidget />
-        </section>
+          {/* SEÇÃO 1 — KPIs de Topo (1/4, 1/4, 1/2) */}
+          <section className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
+              <SetorTotalWidget />
+            </div>
 
-        {/* SEÇÃO 3 — Tabela de Listagem */}
-        <section className="bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-white/20">
-          <SetoresListaWidget />
-        </section>
+            <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
+              <OperadoresMediaWidget />
+            </div>
+
+            <div className="sm:col-span-2 bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
+              <OEEPorSetorWidget />
+            </div>
+          </section>
+
+          {/* SEÇÃO 2 — Gráficos Principais (Refugo e Gauge) */}
+
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2 bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+              <RefugoPorSetorWidget />
+            </div>
+
+            <div className="md:col-span-1 bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
+              <OEECriticoWidget />
+            </div>
+          </section>
+
+          {/* SEÇÃO 3 — Tabela de Listagem Full Width */}
+          <section className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-gray-100">
+            <SetoresListaWidget />
+          </section>
+
+        </div>
       </div>
     </main>
   );

@@ -11,9 +11,9 @@ export function OEEPorSetorWidget() {
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-      <p className="text-sm font-medium text-slate-700">OEE Médio por Setor</p>
-      <p className="text-[11px] text-gray-400 mb-3">Atualizado em tempo real</p>
+    <div className=" p-1">
+      <p className="text-sm font-semibold text-black">OEE Médio por Setor</p>
+      <p className="text-xs font-semibold text-gray-400 mb-3">Atualizado em tempo real</p>
 
       <ChartContainer config={oeeSetorConfig} className="h-[180px] w-full">
         <BarChart data={data} margin={{ top: 8 }}>
@@ -33,11 +33,11 @@ export function OEEPorSetorWidget() {
           />
           <ChartTooltip
             content={<ChartTooltipContent />}
-            formatter={(value) => [`${value}%`, "OEE"]}
+            formatter={(value) => [`${value}%`, " do OEE"]}
           />
           <Bar
             dataKey="oee"
-            fill="#00357a"
+            fill="var(--secondary-foreground)"
             radius={[4, 4, 0, 0]}
           />
         </BarChart>

@@ -8,6 +8,6 @@ export const oeeSetorConfig = {
 export const refugoSetorConfig = {
   refugo: {
     label: "Peças em Refugo",
-    color: "#00357a",
+    color: "#23304c",
   },
 };
