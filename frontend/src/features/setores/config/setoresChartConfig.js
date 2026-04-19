@@ -1,5 +1,6 @@
 export const oeeSetorConfig = {
   oee: {
+    key: "oee",
     label: "OEE Médio",
     color: "#00357a",
   },
