@@ -76,7 +76,7 @@ const Header = ({
             ? "py-2.5 bg-white m-0 border border-border/40 shadow-2xl shadow-primary/5 h-20"
             : "border-transparent h-20 bg-transparent"
         )}>
-          
+
         {/* Logo */}
         <div>
           <a href="/">
@@ -87,15 +87,16 @@ const Header = ({
         {/* Desktop Navigation */}
         <div>
           <NavigationMenu className="max-lg:hidden bg-muted p-0.5 rounded-full h-12">
-            <NavigationMenuList className="flex gap-0">
+            <NavigationMenuList className="bg-muted rounded-full px-4 h-10">
               {navigationData.map((navItem) => (
                 <NavigationMenuItem key={navItem.title}>
                   <NavigationMenuLink
                     href={navItem.href}
                     className={cn(
-                      "px-2 lg:px-4 py-2 text-lg font-semibold rounded-full h-12 text-muted-foreground hover:text-foreground hover:bg-background outline outline-transparent hover:outline-border hover:shadow-xs transition tracking-normal",
+                      "px-4 h-9 flex items-center text-lg font-semibold rounded-full text-muted-foreground hover:text-foreground hover:bg-background outline outline-transparent hover:outline-border hover:shadow-xs transition-all duration-200 tracking-normal",
                       navItem.isActive ? "text-bold" : ""
-                    )}>
+                    )}
+                  >
                     {navItem.title}
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -167,22 +168,6 @@ const Header = ({
                   </div>
 
                   <div className="mt-auto flex flex-col gap-4">
-                    <div className="flex gap-3">
-                      {[
-                        "lucide:dribbble",
-                        "lucide:instagram",
-                        "lucide:twitter",
-                        "lucide:linkedin",
-                      ].map((icon) => (
-                        <a
-                          key={icon}
-                          href="#"
-                          className="flex items-center justify-center rounded-full outline outline-border hover:bg-muted transition p-3 shadow-xs">
-                          <Icon icon={icon} width={16} height={16} />
-                        </a>
-                      ))}
-                    </div>
-
                     <p className="text-sm text-muted-foreground">
                       © 2026 ProdSync
                     </p>

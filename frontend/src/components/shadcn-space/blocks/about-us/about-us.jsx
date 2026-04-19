@@ -57,7 +57,7 @@ const AboutUs = ({
               Elabore estratégias excepcionais, baseadas em experiência e 
               tecnologia, para gerar resultados impactantes para sua fábrica com
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-4">
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
               {aboutusData.map((item, index) => (
                 <div
                   key={index}

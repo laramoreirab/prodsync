@@ -69,22 +69,6 @@ const Footer = () => {
                 <p className="text-base font-normal text-muted-foreground">
                   Sua fábrica sincronizada em tempo real e sob controle.
                 </p>
-
-                {/* social links */}
-                {/* <div className="flex items-center gap-4">
-                  <a href="#" className="text-muted-foreground hover:text-foreground">
-                    <TwitterIcon />
-                  </a>
-                  <a href="#" className="text-muted-foreground hover:text-foreground">
-                    <LinkedinIcon />
-                  </a>
-                  <a href="#" className="text-muted-foreground hover:text-foreground">
-                    <DribbbleIcon />
-                  </a>
-                  <a href="#" className="text-muted-foreground hover:text-foreground">
-                    <InstagramIcon />
-                  </a>
-                </div> */}
               </div>
             </div>
 

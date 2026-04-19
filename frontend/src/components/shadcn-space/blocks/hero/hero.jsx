@@ -33,11 +33,11 @@ function HeroSection() {
                   initial={{ opacity: 0, y: 32 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, ease: "easeInOut" }}
-                  className="lg:text-9xl md:text-8xl text-6xl font-medium leading-15 md:leading-15 lg:leading-20">
-                  <span className={`${instrumentSerif.className} tracking-tight block text-primary`}>
+                  className=" font-medium leading-[0.32]">
+                  <span className="block whitespace-nowrap text-[clamp(5.5rem,14vw,8rem)] text-primary sm:text-[8rem] md:text-[8rem] lg:text-[10rem] xl:text-[12rem] leading-[0.8]" style={{ fontFamily: "var(--font-virtual)"}}>
                     Produtividade
                   </span>
-                  <span className="lg:text-7xl md:text-5xl text-4xl font-semibold">sem pausa</span>
+                  <span className="block lg:text-7xl md:text-5xl text-4xl font-semibold">sem pausa.</span>
                 </motion.h1>
 
                 <motion.p
@@ -45,7 +45,7 @@ function HeroSection() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.1, ease: "easeInOut" }}
                   className="text-lg font-semibold max-w-5xl text-muted-foreground">
-                  Sua fábrica sincronizada em tempo real e sob controle.
+                  Sua fábrica sincronizada em tempo <br/> real e sob controle.
                 </motion.p>
               </div>
               <motion.div
@@ -54,7 +54,7 @@ function HeroSection() {
                 transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
                 className="flex items-center flex-col md:flex-row justify-center gap-8">
                 <Button
-                  className="relative text-lg font-medium rounded-full h-12 p-1 ps-6 pe-14 group transition-all duration-500 hover:ps-14 hover:pe-6 w-fit overflow-hidden cursor-pointer"
+                  className=" bg-secondary-foreground relative text-lg font-semibold rounded-full h-12 p-1 ps-6 pe-14 group transition-all duration-500 hover:ps-14 hover:pe-6 w-fit overflow-hidden cursor-pointer"
                   href="/cadastro">
                   <span className="relative z-10 transition-all duration-500">
                     Cadastre-se
