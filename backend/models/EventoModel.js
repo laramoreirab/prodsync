@@ -126,16 +126,29 @@ class EventoModel {
                 }
             })
             // busca a ordem de produção ativa da máquina
-            const ordemProducao = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
+            const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
+
+            //atualiza status da OP na tabela de Ordem de produção 
+            const atualizaOP = await prisma.ordemProducao.update({
+                where:{
+                    id_ordem: ordemProducaoId,
+                    id_maquina:id_maquina,
+                    id_empresa: id_empresa
+                },
+                data:{
+                    status_op: status_maquina,
+                    prioridade: 'Critica'
+                }
+            })
 
             if (!turno) console.warn(`Nenhum turno ativo encontrado para o horário ${inicio}`)
-            if (!ordemProducao) console.warn(`Nenhuma ordem ativa para a máquina ${id_maquina}`)
+            if (!ordemProducaoId) console.warn(`Nenhuma ordem ativa para a máquina ${id_maquina}`)
 
             const resultado = await prisma.historico_eventos.create({
                 data: {
                     id_empresa: id_empresa,
                     id_maquina: id_maquina,
-                    id_ordemProducao: ordemProducao.id_ordem || null,
+                    id_ordemProducao: ordemProducaoId || null,
                     id_turno: turno.id_turno,
                     status_atual: status_maquina,
                     setor_afetado: setor,

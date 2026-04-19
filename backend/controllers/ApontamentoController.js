@@ -6,7 +6,7 @@ class ApontamentoController {
         try {
             const id_empresa = req.user.id_empresa;
             const id_operador = req.user.id_usuario;
-            const { id_ordemProducao, id_maquina, id_turno, qtd_boa, qtd_refugo, incio, fim, observacao } = req.body;
+            const { id_ordemProducao, id_maquina, id_turno, qtd_boa, qtd_refugo, inicio, fim, observacao } = req.body;
 
             //validações básicas
             if (!id_ordemProducao || id_ordemProducao === '') {
@@ -44,7 +44,7 @@ class ApontamentoController {
                     mensagem: 'Quantidade de refugo é obrigatório!'
                 })
             };
-            if (!incio || incio === '') {
+            if (!inicio || inicio === '') {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Data/hora de início é obrigatória',
@@ -67,7 +67,7 @@ class ApontamentoController {
                 id_turno: id_turno,
                 qtd_boa: qtd_boa,
                 qtd_refugo: qtd_refugo,
-                data_hora_inicio: incio,
+                data_hora_inicio: inicio,
                 data_hora_fim: fim,
                 observacao: observacao || null
             }
@@ -98,7 +98,7 @@ class ApontamentoController {
         try {
             const id_empresa = req.user.id_empresa;
             const id_operador = req.user.id_usuario;
-            const { id_apontamento, id_ordemProducao, id_maquina, id_turno, qtd_boa, qtd_refugo, incio, fim, observacao } = req.body;
+            const { id_apontamento, id_ordemProducao, id_maquina, id_turno, qtd_boa, qtd_refugo, inicio, fim, observacao } = req.body;
 
             //verificar se apontamento existe
             const apontamentoExistente = await ApontamentoModel.buscarApontamentoId(id_empresa, id_apontamento, id_operador)
@@ -118,7 +118,7 @@ class ApontamentoController {
             if (id_turno !== undefined) { dadosUpdateApontamento.id_turno = id_turno }
             if (qtd_boa !== undefined) { dadosUpdateApontamento.qtd_boa = qtd_boa }
             if (qtd_refugo !== undefined) { dadosUpdateApontamento.qtd_refugo = qtd_refugo }
-            if (incio !== undefined) { dadosUpdateApontamento.data_hora_incio = incio }
+            if (inicio !== undefined) { dadosUpdateApontamento.data_hora_inicio = inicio }
             if (fim !== undefined) { dadosUpdateApontamento.data_hora_fim = fim }
             if (observacao !== undefined) { dadosUpdateApontamento.observacao = observacao }
 
