@@ -4,12 +4,17 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useSetores } from "./hooks/useSetores";
 
 const ITEMS_POR_PAGINA = 9;
-
 const OPCOES_ORDEM = [
   { label: "Ordem Alfabética", fn: (a, b) => a.setor.localeCompare(b.setor) },
-  { label: "Maior OEE",        fn: (a, b) => b.oeeMedio - a.oeeMedio },
-  { label: "Menor OEE",        fn: (a, b) => a.oeeMedio - b.oeeMedio },
-  { label: "Mais Máquinas",    fn: (a, b) => b.qtdMaquinas - a.qtdMaquinas },
+  
+  { label: "OEE Crescente",    fn: (a, b) => Number(a.oeeMedio) - Number(b.oeeMedio) },
+  { label: "OEE Decrescente",   fn: (a, b) => Number(b.oeeMedio) - Number(a.oeeMedio) },
+  
+  { label: "Qtd. Máquina Crescente", fn: (a, b) => Number(a.qtdMaquinas) - Number(b.qtdMaquinas) },
+  { label: "Qtd. Máquina Decrescente", fn: (a, b) => Number(b.qtdMaquinas) - Number(a.qtdMaquinas) },
+  
+  { label: "Qtd. Operadores Crescente", fn: (a, b) => Number(a.qtdOperadores) - Number(b.qtdOperadores) },
+  { label: "Qtd. Operadores Decrescente", fn: (a, b) => Number(b.qtdOperadores) - Number(a.qtdOperadores) },
 ];
 
 function badgeOEE(valor) {
@@ -166,24 +171,27 @@ export function SetoresListaWidget() {
     return [...new Set(data.map(s => s.setor))].sort();
   }, [data]);
 
-  const filtrados = useMemo(() => {
-    if (!data?.length) return [];
-    const termo = busca.toLowerCase();
-    const f     = filtrosAtivos;
-    return [...data]
-      .filter(s => {
-        if (termo && !s.setor.toLowerCase().includes(termo) && !s.gestor.toLowerCase().includes(termo)) return false;
-        if (f.setores.length && !f.setores.includes(s.setor)) return false;
-        if (f.oeeMin !== "" && s.oeeMedio      < Number(f.oeeMin)) return false;
-        if (f.oeeMax !== "" && s.oeeMedio      > Number(f.oeeMax)) return false;
-        if (f.maqMin !== "" && s.qtdMaquinas   < Number(f.maqMin)) return false;
-        if (f.maqMax !== "" && s.qtdMaquinas   > Number(f.maqMax)) return false;
-        if (f.opMin  !== "" && s.qtdOperadores < Number(f.opMin))  return false;
-        if (f.opMax  !== "" && s.qtdOperadores > Number(f.opMax))  return false;
-        return true;
-      })
-      .sort(OPCOES_ORDEM[ordemIdx].fn);
-  }, [data, busca, ordemIdx, filtrosAtivos]);
+const filtrados = useMemo(() => {
+  if (!data?.length) return [];
+  
+  const termo = busca.toLowerCase();
+  const f = filtrosAtivos;
+
+  const resultado = data.filter(s => {
+    if (termo && !s.setor.toLowerCase().includes(termo) && !s.gestor.toLowerCase().includes(termo)) return false;
+    if (f.setores.length && !f.setores.includes(s.setor)) return false;
+    if (f.oeeMin !== "" && s.oeeMedio < Number(f.oeeMin)) return false;
+    if (f.oeeMax !== "" && s.oeeMedio > Number(f.oeeMax)) return false;
+    if (f.maqMin !== "" && s.qtdMaquinas < Number(f.maqMin)) return false;
+    if (f.maqMax !== "" && s.qtdMaquinas > Number(f.maqMax)) return false;
+    if (f.opMin !== "" && s.qtdOperadores < Number(f.opMin)) return false;
+    if (f.opMax !== "" && s.qtdOperadores > Number(f.opMax)) return false;
+    return true;
+  });
+
+ return resultado.sort(OPCOES_ORDEM[ordemIdx].fn);
+
+}, [data, busca, ordemIdx, filtrosAtivos]); 
 
   const totalPaginas = Math.ceil(filtrados.length / ITEMS_POR_PAGINA);
   const paginaAtual  = filtrados.slice(
@@ -217,7 +225,7 @@ export function SetoresListaWidget() {
     paginaAtual.length > 0 && paginaAtual.every(s => selecionados.has(s.id));
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-visible relative">
+    <div>
 
       {/* HEADER */}
       <div className="px-6 pt-6 pb-4 border-b border-gray-100">

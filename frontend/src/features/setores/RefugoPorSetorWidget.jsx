@@ -1,8 +1,8 @@
 "use client";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { useRefugoPorSetor } from "../hooks/useRefugoPorSetor";
-import { refugoSetorConfig } from "../config/setoresChartConfig";
+import { useRefugoPorSetor } from "./hooks/useRefugoPorSetor";
+import { refugoSetorConfig } from "./config/setoresChartConfig";
 
 export function RefugoPorSetorWidget() {
   const { data, loading, error } = useRefugoPorSetor();

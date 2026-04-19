@@ -1,6 +1,6 @@
 "use client"
 import { KPI } from "@/components/ui/charts/components";
-import { useMaquinaAtivaPorTurno } from "./hooks/usemaquinaAtivaPorTurno";
+import { useMaquinaAtivaPorTurno } from "./hooks/useMaquinaAtivaPorTurno.js";
 
 
 export function MaquinaAtivaPorTurnoWidget(){
