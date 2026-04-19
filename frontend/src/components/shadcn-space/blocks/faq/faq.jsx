@@ -26,8 +26,19 @@ const FAQ_DATA = [
   },
   {
     question: "Como esses dados ajudam a melhorar a produção?",
-    answer:
-      "",
+      answer: (
+      <div className="flex flex-col ">
+        <p>
+          Com informações confiáveis e em tempo real, a empresa consegue:
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Identificar gargalos e causas de paradas</li>
+          <li>Comparar turnos e operadores com indicadores claros</li>
+          <li>Tomar decisões baseadas em dados, não em achismos</li>
+          <li>Aumentar produtividade e reduzir desperdícios</li>
+        </ul>
+      </div>
+    ),
   },
   {
     question: "Como posso tirar minhas dúvidas sobre o sistema?",

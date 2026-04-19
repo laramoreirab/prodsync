@@ -19,12 +19,21 @@ export default function Testimonial01({
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -40 }}
                         transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
                         className="flex flex-col gap-3">
-                        <Badge className="text-sm h-auto py-1 px-3 border-0 w-fit">
+                        <Badge className="text-sm bg-secondary-foreground h-auto py-1 px-3 border-0 w-fit">
                             Depoimentos
                         </Badge>
-                        <h2 className="sm:text-5xl text-xl leading-none font-medium tracking">
-                            Histórias de Sucesso com {/* <img src="/logo.png" /> */}
-                        </h2>
+                        <div className="flex flex-col md:flex-row gap-3">
+                            <h2 className="sm:text-5xl text-xl leading-none font-medium tracking-tight">
+                                Histórias de Sucesso com
+                            </h2>
+
+                            <img
+                                src="/logo.png"
+                                alt="Logo da Empresa"
+                                className="w-48 shrink-0 object-contain"
+                            />
+                        </div>
+
 
                     </motion.div>
                     <motion.div

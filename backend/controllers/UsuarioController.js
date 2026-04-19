@@ -13,14 +13,14 @@ class UsuarioController {
 
             const resultado = await UsuarioModel.listarTodos(id_empresa, paginacao);
 
-            res.status(200).json({
+            return res.status(200).json({
                 sucesso: true,
                 ...resultado
             });
 
         } catch (error) {
             console.error('Erro ao listar usuários:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível listar os usuário'
@@ -45,20 +45,20 @@ class UsuarioController {
             const usuario = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
 
             if (!usuario) {
-                res.status(404).json({
+                return res.status(404).json({
                     sucesso: false,
                     erro: 'Usuário não encontrado',
 
                 })
             };
-            res.status(200).json({
+            return res.status(200).json({
                 sucesso: true,
                 dados: usuario
             });
 
         } catch (error) {
             console.error('Erro ao buscar usuário:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível buscar o usuário'
@@ -206,7 +206,7 @@ class UsuarioController {
             })
         } catch (error) {
             console.error('Erro ao criar usuário:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível criar o usuário'
@@ -267,7 +267,7 @@ class UsuarioController {
             dadosUpdateEscala.id_maquina = id_maquina;
         }
 
-        // UMA única verificação geral no lugar das três individuais
+
         if (
             Object.keys(dadosUpdateUsuario).length === 0 &&
             Object.keys(dadosUpdateEscala).length === 0
@@ -290,7 +290,7 @@ class UsuarioController {
             updateEscala = await EscalaTrabalhoModel.atualizar(id_usuario, id_empresa, dadosUpdateEscala)
         }
 
-            res.status(200).json({
+            return res.status(200).json({
                 sucesso: true,
                 mensagem: 'Usuario atualizado com sucesso',
                 dados: {
@@ -301,7 +301,7 @@ class UsuarioController {
 
         } catch (error) {
             console.error('Erro ao atualizar usuário:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível atualizar o usuário!'
@@ -341,7 +341,7 @@ class UsuarioController {
 
             const resultado = await UsuarioModel.deletar(id_usuario, id_empresa);
 
-            res.status(200).json({
+            return res.status(200).json({
                 sucesso: true,
                 mensagem: 'Usuário excluído com sucesso',
                 dados: {
@@ -351,7 +351,7 @@ class UsuarioController {
 
         } catch (error) {
             console.error('Erro ao excluir usuário:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível usuário o produto'
@@ -392,7 +392,7 @@ class UsuarioController {
             // Atualizar produto com a nova imagem
             await UsuarioModel.atualizar(id, { imagem_perfil: req.file.filename });
 
-            res.status(200).json({
+            return res.status(200).json({
                 sucesso: true,
                 mensagem: 'Imagem enviada com sucesso',
                 dados: {
@@ -402,7 +402,7 @@ class UsuarioController {
             });
         } catch (error) {
             console.error('Erro ao fazer upload de imagem:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível fazer upload da imagem'

@@ -17,10 +17,10 @@ export default function LoginForm() {
                 {/* TITULO */}
                 <div className="space-y-1">
                     <h1 className="text:2x1 sm:text-3xl font-semibold tracking-tight">
-                        Bem-vindo ao ProdSync
+                        Bem-vindo de volta!
                     </h1>
                     <p className="text-md text-muted-foreground font-medium">
-                        Faça seu login
+                        Faça seu login.
                     </p>
                 </div>
 
@@ -28,13 +28,13 @@ export default function LoginForm() {
                 <form>
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
-                            <Label className="font-medium text-muted-foreground mt-5">Identificador</Label>
+                            <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
                             <Input className="h-9" placeholder="Ex: 11.111.-11" />
                         </div>
 
                         <div className="grid gap-3">
                             <div className="flex items-center">
-                                <Label className="font-medium text-muted-foreground">Senha</Label>
+                                <Label className="font-medium text-[#545454]">Senha</Label>
                             </div>
                             <Input className="h-9" type="password" placeholder="••••••••" />
 
@@ -58,20 +58,20 @@ export default function LoginForm() {
                         </div>
                     </div>
                     {/* BUTTON LOGIN */}
-                    <Button id="btn_login" onClick={() => setOpen(true)} className="cursor-pointer w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-medium rounded-lg">
-                        Login
+                    <Button id="btn_login" onClick={() => setOpen(true)} className="cursor-pointer py-3 w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-semibold rounded-lg">
+                        Entrar
                     </Button>
                 </form>
 
                 {/* AINDA NÃO TEM UMA CONTA */}
-                <p className="text-sm text-center text-muted-foreground">
+                <p className="text-sm text-center font-medium text-[#545454]">
                     Não tem uma conta?{" "}
-                    <span className="font-medium text-foreground cursor-pointer hover:underline">
+                    <span className="font-semibold text-foreground cursor-pointer hover:underline">
                         Cadastre-se
                     </span>
                 </p>
 
-                <p className="text-sm text-center font-medium text-foreground cursor-pointer hover:underline">
+                <p className="text-sm text-center font-semibold text-foreground cursor-pointer hover:underline">
                     É seu primeiro acesso?
                 </p>
             </div>
