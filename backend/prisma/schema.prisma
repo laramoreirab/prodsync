@@ -19,6 +19,7 @@ enum StatusMaquina {
   Parada
   Manutencao
   Setup
+  Aguardando 
 }
 
 enum DiaSemana {
@@ -34,6 +35,13 @@ enum DiaSemana {
 enum TipoMotivoParada {
   Programada
   Nao_Programada @map("Nao Programada")
+}
+
+enum TipoPrioridade{
+  Alta
+  Media
+  Baixa
+  Critica
 }
 
 // --- MODELS ---
@@ -90,6 +98,7 @@ model Setores {
   maquinas Maquinas[]
   gestores Setor_Gestor[]
   escalas  EscalaTrabalho[]
+  ordens_producao    OrdemProducao[]
 }
 
 model Categoria_Maquina {
@@ -178,16 +187,21 @@ model OrdemProducao {
   id_ordem      Int       @id @default(autoincrement())
   id_empresa    Int
   id_maquina    Int
+  id_setor      Int
   codigo_lote   String    @db.VarChar(100)
   produto       String    @db.VarChar(150)
   data_inicio   DateTime?
   data_fim      DateTime?
   qtd_planejada Int
+  status_op     StatusMaquina
+  prioridade    TipoPrioridade
+  observacao_op    String    @db.VarChar(450)
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquina           Maquinas            @relation(fields: [id_maquina], references: [id_maquina])
   historico_eventos Historico_Eventos[]
-  apontamentos      Apontamento[]
+  apontamentos       Apontamento[]
+  setores           Setores[]
 }
 
 model Historico_Eventos {
