@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import UsuarioModel from '../models/UsuarioModel'
-import EmpresaModel from '../models/EmpresaModel';
-import { JWT_CONFIG } from '../config/jwt'
+import UsuarioModel from '../models/UsuarioModel.js'
+import EmpresaModel from '../models/EmpresaModel.js';
+import { JWT_CONFIG } from '../config/jwt.js'
 
 class AuthController {
 

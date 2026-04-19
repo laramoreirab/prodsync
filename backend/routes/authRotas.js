@@ -6,3 +6,4 @@ const router = express.Router()
 
 router.post('/login', authController.login)
 router.post('/cadastrar', authController.cadastrar)
+
