@@ -23,7 +23,7 @@ export default function PageLayout() {
         <Header />
       </div>
 
-      <div className="w-full max-w-6xl mt-[-800px] pt-0 pb-10 px-4 space-y-4">
+      <div className="w-full max-w-6xl mt-8 pt-0 pb-10 px-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex justify-start">
             <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
