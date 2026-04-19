@@ -74,3 +74,38 @@ export const mockSetores = [
   { id: 8, setor: "Soldagem",    gestor: "Ricardo Neves",   oeeMedio: 34, qtdMaquinas: 15, qtdOperadores: 15 },
   { id: 9, setor: "Montagem",    gestor: "Patrícia Souza",  oeeMedio: 76, qtdMaquinas: 7,  qtdOperadores: 7  },
 ];
+
+// Adicione estes exports ao seu mockData.js existente
+
+export const mockSetorTotalKPI = {
+  titulo:    "Número Total de Setores",
+  subtitulo: "Atualizado em tempo real",
+  valor:     "4",
+};
+
+export const mockOperadoresMediaKPI = {
+  titulo:    "Número de operadores por setor (média)",
+  subtitulo: "Atualizado em tempo real",
+  valor:     "12",
+};
+
+export const mockOEEPorSetor = [
+  { setor: "Engrenagens", oee: 90 },
+  { setor: "Roscas",      oee: 80 },
+  { setor: "Embalagens",  oee: 65 },
+  { setor: "Injeção",     oee: 35 },
+  { setor: "Usinagem",    oee: 75 },
+];
+
+export const mockRefugoPorSetor = [
+  { setor: "Engrenagens", refugo: 95 },
+  { setor: "Roscas",      refugo: 85 },
+  { setor: "Embalagens",  refugo: 60 },
+  { setor: "Injeção",     refugo: 30 },
+  { setor: "Usinagem",    refugo: 80 },
+];
+
+export const mockOEECritico = {
+  setor: "Injeção",
+  oee:   35,
+};
