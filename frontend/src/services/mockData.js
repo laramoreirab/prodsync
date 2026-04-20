@@ -183,3 +183,53 @@ export const mockProducaoTotal7Dias = [
   { data: "Sáb", total: 600 },
   { data: "Dom", total: 450 },
 ];
+
+// ─── ADICIONAR em src/services/mockData.js ────────────────────────────────
+
+export const mockQtdUsuariosPorPerfil = [
+  { name: "gestores",   value: 8  },
+  { name: "operadores", value: 92 },
+];
+
+export const mockQtdUsuariosPorSetor = [
+  { setor: "Engrenagens", qtd: 80 },
+  { setor: "Turbinas",    qtd: 55 },
+  { setor: "Válvulas",    qtd: 35 },
+  { setor: "Compressores",qtd: 20 },
+];
+
+// Top 5 operadores — reutiliza shape de BarComValorETopo { setor, media }
+export const mockTopOperadores = [
+  { setor: "Marcos",  media: 40 },
+  { setor: "Victória",media: 42 },
+  { setor: "Joana",   media: 22 },
+  { setor: "Andrew",  media: 18 },
+  { setor: "Mauro",   media: 30 },
+];
+
+export const mockTempoSessaoPerfil = [
+  { perfil: "Gestores",   horas: 1.42, label: "01:25 h" },
+  { perfil: "Operadores", horas: 0.50, label: "00:30 h" },
+];
+
+export const mockRotatividade = [
+  { mes: "Abr", novos: 14, desligados: 6  },
+  { mes: "Mai", novos: 18, desligados: 10 },
+  { mes: "Jun", novos: 25, desligados: 15 },
+];
+
+// Sobrecarga — reutiliza shape de BarComLimite { setor, media }
+export const mockSobrecargaSetor = [
+  { setor: "Engrenagens", media: 95 },
+  { setor: "Turbinas",    media: 70 },
+  { setor: "Válvulas",    media: 55 },
+  { setor: "Compressores",media: 40 },
+];
+
+// Produção média — reutiliza shape de BarComValorETopo { setor, media }
+export const mockProducaoMediaSetor = [
+  { setor: "Engrenagens", media: 56 },
+  { setor: "Turbinas",    media: 48 },
+  { setor: "Válvulas",    media: 35 },
+  { setor: "Compressores",media: 29 },
+];
