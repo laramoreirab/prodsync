@@ -1,8 +1,7 @@
 "use client"
 
 import Header from "@/components/ui/topbar";
-import TableListagens from "@/components/shadcn-studio/table/table";
-import SearchBar from "@/components/ui/searchBar";
+import TableListagens from "@/components/table";
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -12,8 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+
+import FilterDropdown from "@/components/ui/filterDropdown";
+import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 
 const usuariosFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Brocas", "Roscas"] },
@@ -119,7 +119,7 @@ export default function Usuarios() {
 
           {/* Modal de Cadastrar Usuário*/}
           <Dialog>
-            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
               <Plus className="mr-2" />
               Cadastrar
             </DialogTrigger>
@@ -143,6 +143,7 @@ export default function Usuarios() {
           <h1 className="text-4xl w-[500px] font-semibold">Listagem de Usuários</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
+
         {/* Busca */}
         <div className="flex px-8 searchbar">
           <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
@@ -177,8 +178,43 @@ export default function Usuarios() {
 
         <div className="flex flex-col flex-1 items-center w-full mt-4">
           {dadosExibidos.length > 0 ? (
-            /* data={dadosExibidos} ao invés do array fixo */
-            <TableListagens data={dadosExibidos} columns={colunasUsuarios} />
+
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosExibidos} columns={colunasUsuarios}
+
+              // 1. Para a ação "ver detalhes" Url com base na linha clicada
+              viewLink={(row) => `adm/usuarios/${row.id}`}
+
+              // 2.  modais de Editar e Excluir para a tabela renderizar
+              dialogs={{
+                edit: (row) => (
+                  <DialogContent className="rounded-lg">
+                    <DialogTitle>Editar Usuário </DialogTitle> {/* Faz seu nome Gi, não estiizei nada */}
+                    <Separator className="my-2" />
+
+                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
+                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
+
+                  </DialogContent>
+                ),
+                delete: (row) => (
+                  <DialogContent>
+                    <DialogTitle className="text-red-600">Excluir Usuário</DialogTitle>
+
+                      {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
+                      qual está sendo o usuário deletado [mas isso não ta no desing])
+                  
+                      <Button
+                        onClick={() => deletar(row.id)} APENAS EXEMPLO, não existe o onCLick ainda
+                      >
+                        Deletar
+                      </Button> */}
+
+                  </DialogContent>
+                )
+              }}
+            />
           ) : (
             //caso não encontre nada correspondente
             <div className="flex flex-col items-center justify-center p-8 text-gray-500">

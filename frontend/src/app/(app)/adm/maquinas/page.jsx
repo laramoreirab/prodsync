@@ -2,8 +2,8 @@
 
 import Header from "@/components/ui/topbar";
 import { Plus, Search } from "lucide-react";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+import FilterDropdown from "@/components/ui/filterDropdown";
+import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 import React, { useState } from 'react';
 import {
   Dialog,

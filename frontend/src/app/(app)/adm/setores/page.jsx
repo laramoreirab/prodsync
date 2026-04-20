@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+import FilterDropdown from "@/components/ui/filterDropdown";
+import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 
 
 const setoresFilter = [
