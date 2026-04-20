@@ -1,32 +1,31 @@
 "use client";
 
 import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
-import { useRefugoPorSetor } from "./hooks/useRefugoPorSetor";
-import { refugoSetorConfig } from "./config/setoresChartConfig";
+import { useTopMotivosTempo } from "./hooks/useTopMotivosTempo";
+import { topMotivosTempoConfig } from "./config/topMotivosTempoConfig";
 
-export function RefugoPorSetorWidget() {
-  const { data, loading, error } = useRefugoPorSetor();
+export function TopMotivosTempoWidget() {
+  const { data, loading, error } = useTopMotivosTempo();
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar refugo.</p>;
+  if (error)   return <p className="text-sm text-destructive">Erro ao carregar motivos.</p>;
 
   return (
     <div className="p-5 h-full">
-
       <header>
         <p className="text-sm font-semibold text-black">
-          Setores com mais produção de peças em refugo
+          Top 3 Motivos de Parada (Tempo)
         </p>
         <p className="text-xs text-gray-400 font-semibold mt-1">
           *Atualizado em tempo real
         </p>
       </header>
 
-      <div className="mt-4">
+      <div className="mt-2">
         <BarHorizontal
           data={data}
-          config={refugoSetorConfig}
-           />
+          config={topMotivosTempoConfig}
+        />
       </div>
     </div>
   );

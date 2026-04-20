@@ -15,6 +15,16 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
+//Widget imports - Dashboard
+import { MaquinaStatusDonutWidget } from "@/features/maquinas/MaquinaStatusDonutWidget";
+import { MaquinasPorSetorWidget } from "@/features/maquinas/MaquinasPorSetorWidget";
+import { TempoMedioParadaWidget } from "@/features/maquinas/TempoMedioParadaWidget";
+import { ProducaoDefeitosWidget } from "@/features/maquinas/ProducaoDefeitosWidget";
+import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidget";
+import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
+
+//
+
 const maquinasFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
   { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
@@ -60,7 +70,7 @@ export default function Maquinas() {
     //filtra a partir da lista original completa
     let dadosFiltrados = [...dadosOriginais];
 
-    //filtro por setor (Nota: mantive seu comentário, mas a lógica é do status)
+    //filtro por status
     if (filtrosSelecionados.status && filtrosSelecionados.status.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(maq =>
         filtrosSelecionados.status.includes(maq.status)
@@ -364,6 +374,63 @@ export default function Maquinas() {
           </Dialog>
         </div>
       </section>
+      {/* SEÇÃO 1: Graphs */}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* Status Operacional */}
+          <div className=" bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
+            <p className="text-sm font-semibold text-black self-start">
+              Status Operacional das Máquinas
+            </p>
+            <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">
+              *Atualizado em tempo real
+            </p>
+
+            <div className="w-full">
+              <MaquinaStatusDonutWidget />
+            </div>
+          </div>
+
+          {/* Quantidade por Setor */}
+          <div className=" bg-white border rounded-xl p-4">
+
+            <MaquinasPorSetorWidget />
+          </div>
+
+          {/* Tempo Médio de Parada */}
+          <div className="border bg-white rounded-xl p-4">
+            <TempoMedioParadaWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 2: Graphs */}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          {/* Produção vs Defeitos por setor */}
+          <div className="border bg-white rounded-xl p-4">
+            <ProducaoDefeitosWidget />
+          </div>
+
+          {/* Status por Turno */}
+          <div className="border bg-white rounded-xl p-4">
+            <MaquinasPorTurnoWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 3:Graphs*/}
+      <section className="p-6">
+        <div className="border bg-white rounded-xl p-4">
+          <ProducaoTotalWidget />
+        </div>
+      </section>
+      
+ {/* LISTAGEM MAQUINAS      */}
 
       {/* Listagem */}
       <section id="listagem_maquinas">

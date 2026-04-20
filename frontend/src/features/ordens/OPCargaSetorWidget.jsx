@@ -1,23 +1,23 @@
 "use client";
 
 import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
-import { useOEEPorSetor } from "./hooks/ueseOEEPorSetor";
-import { oeeSetorConfig } from "./config/setoresChartConfig";
+import { useOPCargaSetor } from "./hooks/useOPCargaSetor";
+import { opCargaSetorConfig } from "./config/ordensChartConfig";
 
-export function OEEPorSetorWidget() {
-  const { data, loading, error } = useOEEPorSetor();
+export function OPCargaSetorWidget() {
+  const { data, loading, error } = useOPCargaSetor();
 
   return (
     <div className="p-1 h-full">
       <BarVerticalBase
-        title="OEE Médio por Setor"
+        title="Carga de Trabalho por Setor"
         description="*Atualizado em tempo real"
         data={data}
-        config={oeeSetorConfig}
+        config={opCargaSetorConfig}
         loading={loading}
         error={error}
         xKey="setor"
-        yKey="oee"
+        yKey="carga"
       />
     </div>
   );

@@ -33,6 +33,16 @@ const dadosOriginais = [
   { id: 4, nome: 'Bia Gonçalves', setor: 'Brocas', funcao: 'Gestor', turno: 'Tarde' }
 ];
 
+//Widgets dashboard
+import { QtdUsuariosWidget }          from "@/features/usuarios/QtdUsuariosWidget";
+import { QtdUsuariosPorSetorWidget }  from "@/features/usuarios/QtdUsuariosPorSetorWidget";
+import { TopOperadoresWidget }        from "@/features/usuarios/TopOperadoresWidget";
+import { TempoSessaoWidget }          from "@/features/usuarios/TempoSessaoWidget";
+import { RotatividadeWidget }         from "@/features/usuarios/RotatividadeWidget";
+import { SobrecargaSetorWidget }      from "@/features/usuarios/SobrecargaSetorWidget";
+import { ProducaoMediaSetorWidget }   from "@/features/usuarios/ProducaoMediaSetorWidget";
+ 
+
 export default function Usuarios() {
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
@@ -228,6 +238,54 @@ export default function Usuarios() {
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <Header />
+      {/* SEÇÃO 1: CHarts*/}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="border rounded-xl p-4">
+            <QtdUsuariosWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <QtdUsuariosPorSetorWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <TopOperadoresWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 2: Charts */}
+      <section className=" p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="border rounded-xl p-6">
+            <TempoSessaoWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <RotatividadeWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 3: Charts */}
+      <section className=" p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="border rounded-xl p-4">
+            <SobrecargaSetorWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <ProducaoMediaSetorWidget />
+          </div>
+
+        </div>
+      </section>
 
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}

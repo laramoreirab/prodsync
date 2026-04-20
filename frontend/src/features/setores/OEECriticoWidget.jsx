@@ -8,8 +8,8 @@ export function OEECriticoWidget() {
   const { data, loading, error } = useOEECritico();
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE crítico.</p>;
-  if (!data)   return null;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar OEE crítico.</p>;
+  if (!data) return null;
 
   return (
     <div className=" flex flex-col gap-2">
@@ -23,15 +23,14 @@ export function OEECriticoWidget() {
       <div className="flex items-center justify-center py-4">
         <div className="flex flex-col items-center">
           <GaugeSemicircular
-            title={data.setor} 
+            title={data.setor}
             data={[{ value: data.oee, fill: "#00357a" }]}
             size="lg"
-            config={oeeSetorConfig || { oee: {} }} 
+            config={{
+              value: { label: data.setor },
+            }}
           />
-          
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
-            Desempenho Crítico
-          </span>
+
         </div>
       </div>
     </div>
