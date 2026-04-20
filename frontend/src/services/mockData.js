@@ -285,3 +285,50 @@ export const mockOPConcluidasDia = [
   { dia: "Dia 6", total: 82 },
   { dia: "Dia 7", total: 95 },
 ];
+
+
+export const mockOEEOperador = {
+  disponibilidade: 85,
+  performance:     90,
+  qualidade:       90,
+  oee:             Math.round((85 * 90 * 90) / 10000), 
+}
+
+export const mockPecasPorDia = [
+  { dia: "Seg", qtd: 80 },
+  { dia: "Ter", qtd: 65 },
+  { dia: "Qua", qtd: 78 },
+  { dia: "Qui", qtd: 72 },
+  { dia: "Sex", qtd: 60 },
+  { dia: "Sáb", qtd: 55 },
+];
+
+export const mockProducaoPorHoraOperador = [
+  { hora: "0",  qtd: 12 },
+  { hora: "3",  qtd: 18 },
+  { hora: "6",  qtd: 22 },
+  { hora: "9",  qtd: 15 },
+  { hora: "12", qtd: 20 },
+  { hora: "15", qtd: 17 },
+  { hora: "18", qtd: 14 },
+  { hora: "21", qtd: 16 },
+];
+
+export const mockMetaProducao = {
+  completo: 92,
+  restante: 8,
+};
+
+export const mockParadasComparadasOperador = [
+  { dia: "Seg", registradas: 8,  reais: 7  },
+  { dia: "Ter", registradas: 7,  reais: 12 },
+  { dia: "Qua", registradas: 13, reais: 15 },
+  { dia: "Sex", registradas: 9,  reais: 8  },
+];
+
+export const mockEficienciaMaquina = [
+  { maquina: "THA-1", eficiencia: 85 },
+  { maquina: "THA-2", eficiencia: 60 },
+  { maquina: "THA-3", eficiencia: 72 },
+  { maquina: "THA-4", eficiencia: 90 },
+];
