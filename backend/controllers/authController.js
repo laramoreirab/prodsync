@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import UsuarioModel from '../models/UsuarioModel'
-import EmpresaModel from '../models/EmpresaModel';
-import { JWT_CONFIG } from '../config/jwt'
+import UsuarioModel from '../models/UsuarioModel.js'
+import EmpresaModel from '../models/EmpresaModel.js';
+import { JWT_CONFIG } from '../config/jwt.js'
 
 class AuthController {
 
@@ -262,7 +262,7 @@ class AuthController {
     //GET api/auth/perfil - Obter perfil do usuário logado
     static async obterPerfil(req, res) {
         try {
-            const usuario = await UsuarioModel.buscarPorId(req.usuario.id);
+            const usuario = await UsuarioModel.buscarPorId(req.user.id_usuario);
 
             if (!usuario) {
                 return res.status(404).json({
