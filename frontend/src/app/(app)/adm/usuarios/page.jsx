@@ -31,7 +31,7 @@ export default function Usuarios() {
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-center bg-no-repeat">
       <Header />
       {/* SEÇÃO 1: CHarts*/}
-      <section className="bg-white rounded-2xl shadow-sm p-6">
+      <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           <div className="border rounded-xl p-4">
@@ -50,7 +50,7 @@ export default function Usuarios() {
       </section>
 
       {/* SEÇÃO 2: Charts */}
-      <section className="bg-white rounded-2xl shadow-sm p-6">
+      <section className=" p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="border rounded-xl p-6">
@@ -65,7 +65,7 @@ export default function Usuarios() {
       </section>
 
       {/* SEÇÃO 3: Charts */}
-      <section className="bg-white rounded-2xl shadow-sm p-6">
+      <section className=" p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="border rounded-xl p-4">
