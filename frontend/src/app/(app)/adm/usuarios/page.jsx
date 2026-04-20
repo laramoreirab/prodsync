@@ -245,7 +245,7 @@ export default function Usuarios() {
           }}>
             <DialogTrigger
               onClick={() => { limparFormularios(); setIsModalOpen(true); }}
-              className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold"
+              className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
             >
               <Plus className="mr-2" />
               Cadastrar
