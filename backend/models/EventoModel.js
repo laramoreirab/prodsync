@@ -1,7 +1,7 @@
 import prisma from '../config/prisma.js';
 import TurnoModel from './TurnoModel.js';
 import OrdemProducaoModel from '../models/OrdemProducaoModel.js'
-import { paginarPrisma } from '../utils/paginacaoUtil.js';
+import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 
 class EventoModel {
     static async listarTodos(id_empresa, paginacao) {

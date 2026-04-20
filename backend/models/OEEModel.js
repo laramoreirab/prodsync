@@ -125,14 +125,17 @@ class OEEModel {
             where: { id_empresa: id_empresa }
         })
 
-        // calcula OEE de todos os setores em paralelo
         const resultados = await Promise.all(
-            setores.map(async (setor) => ({
-                id_setor: setor.id_setor,
-                nome_setor: setor.nome_setor,
-                ...(await calcularOEESetor(setor.id_setor, id_empresa))
-            }))
+            setores.map(async (setor) => {
+                const oee = await calcularOEESetor(setor.id_setor, id_empresa)
+
+                return {
+                    setor: setor.nome_setor,  // eixo X
+                    oee: oee.oee            //  eixo Y
+                }
+            })
         )
+
         return resultados
     }
 
@@ -157,44 +160,44 @@ class OEEModel {
             ...oee
         }
     }
-    static async maquinaPorOP(id_maquina, id_ordem, id_empresa){
+    static async maquinaPorOP(id_maquina, id_ordem, id_empresa) {
         const [apontamentos, ordem, paradas, tempoDisponivel] = await Promise.all([
-    prisma.apontamento.aggregate({
-      where: {
-        id_maquina:      id_maquina,
-        id_ordemProducao: id_ordem,
-        id_empresa:      id_empresa
-      },
-      _sum: { qtd_boa: true, qtd_refugo: true }
-    }),
-    prisma.ordemproducao.findUnique({
-      where: { id_ordem: id_ordem }
-    }),
-    prisma.historico_eventos.aggregate({
-      where: {
-        id_maquina:      id_maquina,
-        id_ordemProducao: id_ordem,
-        id_empresa:      id_empresa,
-        duracao:         { not: null }
-      },
-      _sum: { duracao: true }
-    }),
-    buscarTempoDisponivel(id_empresa)
-  ])
+            prisma.apontamento.aggregate({
+                where: {
+                    id_maquina: id_maquina,
+                    id_ordemProducao: id_ordem,
+                    id_empresa: id_empresa
+                },
+                _sum: { qtd_boa: true, qtd_refugo: true }
+            }),
+            prisma.ordemproducao.findUnique({
+                where: { id_ordem: id_ordem }
+            }),
+            prisma.historico_eventos.aggregate({
+                where: {
+                    id_maquina: id_maquina,
+                    id_ordemProducao: id_ordem,
+                    id_empresa: id_empresa,
+                    duracao: { not: null }
+                },
+                _sum: { duracao: true }
+            }),
+            buscarTempoDisponivel(id_empresa)
+        ])
 
-  return {
-    id_maquina: id_maquina,
-    id_ordem:   id_ordem,
-    produto:    ordem.produto,
-    ...calcularOEE({
-      tempo_disponivel,
-      tempo_parado:  paradas._sum.duracao        ?? 0,
-      qtd_planejada: ordem.qtd_planejada         ?? 0,
-      qtd_boa:       apontamentos._sum.qtd_boa   ?? 0,
-      qtd_refugo:    apontamentos._sum.qtd_refugo ?? 0
-    })
+        return {
+            id_maquina: id_maquina,
+            id_ordem: id_ordem,
+            produto: ordem.produto,
+            ...calcularOEE({
+                tempo_disponivel,
+                tempo_parado: paradas._sum.duracao ?? 0,
+                qtd_planejada: ordem.qtd_planejada ?? 0,
+                qtd_boa: apontamentos._sum.qtd_boa ?? 0,
+                qtd_refugo: apontamentos._sum.qtd_refugo ?? 0
+            })
+        }
     }
-}
 }
 
 export default OEEModel

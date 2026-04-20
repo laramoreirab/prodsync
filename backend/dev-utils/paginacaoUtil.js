@@ -1,6 +1,6 @@
 // utils/paginacaoUtil.js
 
-import { prisma } from '../config/prisma.js'; // Ajuste o caminho se necessário
+import  prisma  from '../config/prisma.js'; // Ajuste o caminho se necessário
 
 /**
  * Função genérica para paginar qualquer tabela do Prisma
