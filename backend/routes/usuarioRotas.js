@@ -4,3 +4,4 @@ import UsuarioController from '../controllers/UsuarioController.js'
 
 const router = Router()
 
+export default router
