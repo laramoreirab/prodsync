@@ -1,8 +1,10 @@
 "use client"
 
+import { useState, useEffect } from 'react';
+
 import Header from "@/components/ui/topbar";
 import TableListagens from "@/components/table";
-import React, { useState } from 'react';
+
 import {
   Dialog,
   DialogTrigger,
@@ -30,8 +32,66 @@ const dadosOriginais = [
 ];
 
 export default function Usuarios() {
-  const [dados, setDados] = useState(dadosOriginais);
+  const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+
+  /* API para teste da tabela */
+  useEffect(() => {
+    async function buscarUsuariosFalsos() {
+      try {
+        // 1. Puxando os dados da API de teste
+        const res = await fetch('https://dummyjson.com/users');
+
+        if (!res.ok) throw new Error('Falha ao buscar usuários');
+
+        const json = await res.json();
+
+        // 2. A DummyJSON devolve os usuários dentro de uma propriedade chamada "users"
+        const dadosDaApi = json.users;
+
+        // 3. Vamos "traduzir" os dados em inglês para o formato da sua tabela
+        const usuariosFormatados = dadosDaApi.map((user) => ({
+          id: user.id,
+          nome: `${user.firstName} ${user.lastName}`, // Junta nome e sobrenome
+          setor: user.company.department,             // Usa o departamento da API como "Setor"
+          funcao: user.company.title,                 // Usa o cargo da API como "Função"
+
+          // Como a API não tem "turno", vamos inventar um de forma aleatória só para testar
+          turno: ['Manhã', 'Tarde', 'Noite'][Math.floor(Math.random() * 3)]
+        }));
+
+        // 4. Salva no estado! A tabela vai renderizar 30 usuários reais imediatamente.
+        setDados(usuariosFormatados);
+
+      } catch (error) {
+        console.error("Erro na integração:", error);
+      }
+    }
+
+    buscarUsuariosFalsos();
+  }, []);
+
+
+  /* Fetch da listagem de usuarios OFICIAL
+    useEffect(() => {
+      async function buscarUsuarios() {
+        try {
+          const res = await fetch('https://jsonplaceholder.typicode.com/users'); // Endpoint de usuários
+  
+          if (!res.ok) throw new Error('Falha ao buscar usuários');
+  
+          const json = await res.json();
+  
+          // Lista de Usuarios
+          setDados(json);
+        } catch (error) {
+          console.error("Erro:", error);
+        }
+      }
+  
+      buscarUsuarios();
+    }, []); */
+
 
   //lógica de ordenação
   const handleSort = (criterio) => {
@@ -88,11 +148,11 @@ export default function Usuarios() {
   ];
 
   const colunasUsuarios = [
-    { key: 'nome', label: 'Nome' },
-    { key: 'id', label: 'ID', className: 'w-20' },
-    { key: 'setor', label: 'Setor' },
-    { key: 'funcao', label: 'Função' },
-    { key: 'turno', label: 'Turno' },
+    { id: 'nome', key: 'nome', label: 'Nome' },
+    { id: 'id', key: 'id', label: 'ID', className: 'w-20' },
+    { id: 'setor', key: 'setor', label: 'Setor' },
+    { id: 'funcao', key: 'funcao', label: 'Função' },
+    { id: 'turno', key: 'turno', label: 'Turno' },
   ];
 
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
@@ -140,7 +200,7 @@ export default function Usuarios() {
       {/* Listagem */}
       <section id="listagem_usuarios">
         <div className="flex items-center p-8 gap-5">
-          <h1 className="text-4xl w-[500px] font-semibold">Listagem de Usuários</h1>
+          <h1 className="text-4xl w-[450px] font-semibold">Listagem de Usuários</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
 
@@ -202,7 +262,7 @@ export default function Usuarios() {
                   <DialogContent>
                     <DialogTitle className="text-red-600">Excluir Usuário</DialogTitle>
 
-                      {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
+                    {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
                       qual está sendo o usuário deletado [mas isso não ta no desing])
                   
                       <Button

@@ -64,7 +64,7 @@ function PaginationPrevious({
 }) {
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      aria-label="Ir para página anterior"
       size="default"
       className={cn("pl-1.5!", className)}
       {...props}>
@@ -81,7 +81,7 @@ function PaginationNext({
 }) {
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      aria-label="Vá para próxima página"
       size="default"
       className={cn("pr-1.5!", className)}
       {...props}>
