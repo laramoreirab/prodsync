@@ -160,11 +160,17 @@ export default function PageLayout() {
 
               <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
                 <div className="flex items-center">
-                  <Plus className="mr-2" />
-                  <DialogTitle className="text-2xl">Criar Setor</DialogTitle>
+                  <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
+                    <Plus className="mr-2 text-3xl text-white" />
+x                    <DialogTitle className="text-3xl text-white">Criar Setor</DialogTitle>
+                  </div>
                 </div>
                 <Separator className="m-2 bg-[#a6a6a6]" />
               </DialogContent>
+
+              <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+
+              </form>
 
             </Dialog>
           </div>
@@ -204,7 +210,7 @@ export default function PageLayout() {
 
       <section className="listagem_setores">
         <div className="flex items-center p-8 gap-5">
-          <h1 className="text-4xl w-[500px] font-semibold">Listagem de Usuários</h1>
+          <h1 className="text-4xl w-[125] font-semibold">Listagem de Usuários</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
         {/* Busca */}
