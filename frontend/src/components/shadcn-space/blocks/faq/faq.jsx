@@ -70,7 +70,7 @@ export default function Faq() {
                 key={`item-${index}`}
                 value={`item-${index}`}
                 className={cn(
-                  "p-6 border border-border font-medium rounded-2xl flex flex-col gap-3 group/item data-[open]:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both",
+                  "p-6 border border-border font-medium rounded-2xl flex flex-col gap-3 group/item data-open:bg-accent transition-colors animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both",
                   index === 0 && "delay-100",
                   index === 1 && "delay-200",
                   index === 2 && "delay-300",

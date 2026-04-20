@@ -1,4 +1,3 @@
-// src/services/api.js
 //aqui se faz o fetch para TUDO. Ele montta a url variável de ambiente, e tem um tratamento de erro genérico(lança erro se a resposta não for OK).
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
