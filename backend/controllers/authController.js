@@ -318,6 +318,16 @@ class AuthController {
                     mensagem: 'Identificador não encontrado'
                 })
             }
+            //gerar token
+            const token = jwt.sign({
+                id_empresa: usuario.id_empresa,
+                id_usuario: usuario.id_usuario,
+                tipo: usuario.tipo
+            },
+                JWT_CONFIG.secret,
+                { expiresIn: JWT_CONFIG.expiresIn }
+            );
+
             //verificar se o id ainda não possui senha cadastrada
             const verificacaoSenha = await UsuarioModel.verificaSenhaUsuario(id);
             if(verificacao === true){
@@ -330,7 +340,14 @@ class AuthController {
 
             return res.status(201).json({
                 sucesso: true,
-                mensagem: 'Identificador encontrado!'
+                mensagem: 'Identificador encontrado!',
+                dados: {
+                    token,
+                    id_empresa: usuario.id_empresa,
+                    nome: usuario.nome,
+                    id_usuario: usuario.id_usuario,
+                    tipo: usuario.tipo
+                }
             });   
 
         } catch (error) {
@@ -343,10 +360,10 @@ class AuthController {
         }
     }
 
-    //POST api/auth/registroSenha/:id - registrar a senha de primeiro acesso do usuário
+    //POST api/auth/registroSenha- registrar a senha de primeiro acesso do usuário
     static async registroSenha(req, res) {
         try {
-            const { id } = req.params;
+            const { id } = req.user.id_usuario;
             const { senha, senhaConfirmada } = req.body;
 
             if(!senha || senha.trim() === ''){
