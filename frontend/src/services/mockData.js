@@ -184,7 +184,6 @@ export const mockProducaoTotal7Dias = [
   { data: "Dom", total: 450 },
 ];
 
-// ─── ADICIONAR em src/services/mockData.js ────────────────────────────────
 
 export const mockQtdUsuariosPorPerfil = [
   { name: "gestores",   value: 8  },
@@ -198,7 +197,7 @@ export const mockQtdUsuariosPorSetor = [
   { setor: "Compressores",qtd: 20 },
 ];
 
-// Top 5 operadores — reutiliza shape de BarComValorETopo { setor, media }
+// Top 5 operadores 
 export const mockTopOperadores = [
   { setor: "Marcos",  media: 40 },
   { setor: "Victória",media: 42 },
@@ -218,7 +217,7 @@ export const mockRotatividade = [
   { mes: "Jun", novos: 25, desligados: 15 },
 ];
 
-// Sobrecarga — reutiliza shape de BarComLimite { setor, media }
+// Sobrecarga 
 export const mockSobrecargaSetor = [
   { setor: "Engrenagens", media: 95 },
   { setor: "Turbinas",    media: 70 },
@@ -226,10 +225,63 @@ export const mockSobrecargaSetor = [
   { setor: "Compressores",media: 40 },
 ];
 
-// Produção média — reutiliza shape de BarComValorETopo { setor, media }
+// Produção média 
 export const mockProducaoMediaSetor = [
   { setor: "Engrenagens", media: 56 },
   { setor: "Turbinas",    media: 48 },
   { setor: "Válvulas",    media: 35 },
   { setor: "Compressores",media: 29 },
+];
+
+export const mockOPAtivasKPI = {
+  titulo: "Número Total de OPs Ativas",
+  valor:  "4",
+};
+
+export const mockOPAtrasadasKPI = {
+  titulo: "Número Total de OPs Atrasadas",
+  valor:  "2",
+};
+
+export const mockOPPecasBoas = {
+  titulo: "Peças boas",
+  valor:  "12.340",
+};
+
+export const mockOPRefugoKPI = {
+  titulo: "Refugo",
+  valor:  "312",
+};
+
+export const mockOPEficiencia = {
+  eficiencia: 67,
+};
+
+export const mockOPTopRefugo = [
+  { op: "#4491 (Elc)", refugo: 48 },
+  { op: "#4480 (Pino)", refugo: 29 },
+  { op: "#4490 (Eng)", refugo: 14 },
+];
+
+export const mockOPCargaSetor = [
+  { setor: "Usinagem", carga: 8 },
+  { setor: "Injeção",  carga: 4 },
+  { setor: "Montagem", carga: 2 },
+];
+
+export const mockOPStatus = [
+  { name: "emProducao",       value: 35 },
+  { name: "pausadasSetup",    value: 25 },
+  { name: "atrasadas",        value: 13 },
+  { name: "aguardandoInicio", value: 27 },
+];
+
+export const mockOPConcluidasDia = [
+  { dia: "Dia 1", total: 55 },
+  { dia: "Dia 2", total: 68 },
+  { dia: "Dia 3", total: 80 },
+  { dia: "Dia 4", total: 73 },
+  { dia: "Dia 5", total: 85 },
+  { dia: "Dia 6", total: 82 },
+  { dia: "Dia 7", total: 95 },
 ];
