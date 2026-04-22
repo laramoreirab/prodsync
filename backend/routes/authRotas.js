@@ -4,7 +4,7 @@ import AuthController from '../controllers/AuthController.js'
 
 const router = Router()
 
-router.post('/login', authController.login)
-router.post('/cadastrar', authController.cadastrar)
+router.post('/login', AuthController.login)
+router.post('/cadastrar', AuthController.cadastrar)
 
 export default router

@@ -72,10 +72,9 @@ model Empresas {
 }
 
 model Usuarios {
-  id_usuario    Int         @id @default(autoincrement())
+  id_usuario    Int         @id
   id_empresa    Int
   nome          String      @db.VarChar(255)
-  identificador String      @unique @db.VarChar(50)
   tipo          TipoUsuario
   cpf           String      @unique @db.VarChar(14)
   email         String      @unique @db.VarChar(255)
