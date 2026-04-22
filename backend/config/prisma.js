@@ -1,14 +1,17 @@
-import 'dotenv/config'
+// config/prisma.js
 import { PrismaClient } from '@prisma/client';
-import { Pool } from '@neondatabase/serverless';
-import { PrismaNeon } from '@prisma/adapter-neon'
+import pg from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const pool = new Pool({ 
-    connectionString: process.env.DATABASE_URL 
+// Cria a pool de conexão padrão do Node
+const pool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL
 });
 
-const adapter = new PrismaNeon(pool);
+// Inicializa o adapter
+const adapter = new PrismaPg(pool);
 
+// Passa o adapter para o PrismaClient
 const prisma = new PrismaClient({ adapter });
 
 export default prisma;
