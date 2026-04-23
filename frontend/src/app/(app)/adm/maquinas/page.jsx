@@ -19,9 +19,9 @@ const maquinasFilter = [
 ];
 
 const dadosOriginais = [
-  { id: 10, nome: 'MÃ¡quina A', status: 'Produzindo', setor: 'Engrenagens', data: '2026-04-09T10:00' },
-  { id: 2, nome: 'MÃ¡quina C', status: 'Setup', setor: 'Roscas', data: '2026-04-08T15:30' },
-  { id: 5, nome: 'MÃ¡quina B', status: 'Parada', setor: 'Engrenagens', data: '2026-04-08T16:24' },
+  { id: 10, nome: 'Máquina A', status: 'Produzindo', setor: 'Engrenagens', data: '2026-04-09T10:00' },
+  { id: 2, nome: 'Máquina C', status: 'Setup', setor: 'Roscas', data: '2026-04-08T15:30' },
+  { id: 5, nome: 'Máquina B', status: 'Parada', setor: 'Engrenagens', data: '2026-04-08T16:24' },
 ];
 
 export default function Maquinas() {
@@ -83,7 +83,7 @@ export default function Maquinas() {
       <section className="flex items-center justify-between gap-4 pt-2">
         <div className="title_tela">
           <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-            MÃ¡quinas
+            Máquinas
           </h1>
         </div>
         <Dialog>
@@ -94,7 +94,7 @@ export default function Maquinas() {
           <DialogContent className="top-0 left-0 right-0 max-w-none translate-x-0 translate-y-0 rounded-b-lg">
             <div className="flex items-center">
               <Plus className="mr-2" />
-              <DialogTitle className="text-2xl">Cadastrar MÃ¡quina</DialogTitle>
+              <DialogTitle className="text-2xl">Cadastrar Máquina</DialogTitle>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
           </DialogContent>
@@ -103,7 +103,7 @@ export default function Maquinas() {
 
       <section id="listagem_maquinas" className="flex flex-col gap-5">
         <div className="flex items-center gap-5">
-          <h1 className="w-[500px] text-4xl font-semibold">InventÃ¡rio de MÃ¡quinas</h1>
+          <h1 className="w-[500px] text-4xl font-semibold">Inventário de Máquinas</h1>
           <hr className="h-1 flex-1 bg-black" />
         </div>
 
@@ -115,7 +115,7 @@ export default function Maquinas() {
         </div>
 
         <div className="row_ord_fil_cont mt-1 flex items-center justify-between">
-          <p>{dados.length} mÃ¡quinas encontradas</p>
+          <p>{dados.length} máquinas encontradas</p>
 
           <div className="flex items-center gap-4">
             <OrdenarDropdown
