@@ -24,9 +24,9 @@ function NavMainItem({
         asChild
         tooltip={item.title}
         isActive={isActive}
-        className="h-10 rounded-xl px-3 text-sidebar-foreground/95 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center hover:bg-white/14 data-[active=true]:bg-white/18 data-[active=true]:text-white">
+        className="h-10 rounded-xl px-3 text-sidebar-foreground/95 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center hover:bg-white/14 data-[active=true]:bg-gray/100 data-[active=true]:text-secondary-foreground">
         <Link href={item.url}>
-          <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground [&_svg]:size-[1.1rem]">
+          <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground/500 [&_svg]:size-[1.1rem]">
             {item.icon}
           </div>
           <span className="font-medium">{item.title}</span>
