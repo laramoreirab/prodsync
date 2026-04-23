@@ -68,5 +68,26 @@ const adminMiddleware = (req, res, next) => {
     }
     next();
 };
+// Middleware para verificar se o usuário é gestor
+const gestorMiddleware = (req, res, next) => {
+    if (req.user.tipo !== 'Gestor' ) {
+        return res.status(403).json({ 
+            erro: 'Acesso negado',
+            mensagem: 'Apenas gestores podem acessar este recurso'
+        });
+    }
+    next();
+};
 
-export { authMiddleware, adminMiddleware };
+// Middleware para verificar se o usuário é gestor
+const operadorMiddleware = (req, res, next) => {
+    if (req.user.tipo !== 'Operador' ) {
+        return res.status(403).json({ 
+            erro: 'Acesso negado',
+            mensagem: 'Apenas operadores podem acessar este recurso'
+        });
+    }
+    next();
+};
+
+export { authMiddleware, adminMiddleware, gestorMiddleware, operadorMiddleware };

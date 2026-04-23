@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import UsuarioModel from '../models/UsuarioModel'
-import EmpresaModel from '../models/EmpresaModel';
-import { JWT_CONFIG } from '../config/jwt'
+import UsuarioModel from '../models/UsuarioModel.js'
+import EmpresaModel from '../models/EmpresaModel.js';
+import { JWT_CONFIG } from '../config/jwt.js'
 
 class AuthController {
 
@@ -133,7 +133,7 @@ class AuthController {
 
             //validações de formato
             if (nome_empresa.length < 2) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Nome da empresa muito curto',
                     mensagem: 'O nome da empresa deve ter pelo menos 2 caracteres'
@@ -141,14 +141,14 @@ class AuthController {
             };
 
             if (nome_empresa.length > 255) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Nome da empresa muito longo',
                     mensagem: 'O nome da empresa deve ter no máximo 255 caracteres'
                 });
             };
             if (nome_representante.length < 2) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Nome do representante muito curto',
                     mensagem: 'O nome do representante deve ter pelo menos 2 caracteres'
@@ -156,35 +156,35 @@ class AuthController {
             };
 
             if (nome_representante.length > 255) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Nome do representante muito longo',
                     mensagem: 'O nome do representante deve ter no máximo 255 caracteres'
                 });
             };
             if (telefone.length < 11) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'telefone inválido',
                     mensagem: 'Telefone da empresa inválido'
                 });
             };
             if (cnpj.length < 14) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'CNPJ inválido',
                     mensagem: 'CNPJ da empresa inválido'
                 });
             };
             if (cpf.length < 11) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'CPF inválido',
                     mensagem: 'CPF do representante inválido'
                 });
             };
             if (senha.length < 6) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha muito curta',
                     mensagem: 'A senha deve ter pelo menos 6 caracteres'
@@ -192,7 +192,7 @@ class AuthController {
             };
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                 return res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Email inválido',
                     mensagem: 'Formato de email inválido'
@@ -221,31 +221,23 @@ class AuthController {
                 senha: senha.trim()
             }
 
-            //cadastrar a empresa no banco 
-            const empresaId = await EmpresaModel.criarEmpresa(dadosEmpresa);
+            // 1. Cadastrar a empresa E o representante como ADM juntos no banco 
+            // Obs: A função agora retorna a empresa e um array com os usuários criados nela
+            const novaEmpresa = await EmpresaModel.criarEmpresa(dadosEmpresa);
 
-            //Preparar dados do representante para adicionar na tabela Usuario como adm
-            const dadosUsuario = {
-                id_empresa: empresaId,
-                nome: nome_representante,
-                tipo: 'Adm',
-                cpf: cpf,
-                email: email.trim().toLowerCase(),
-                senha: senha.trim()
-            }
+            // 2. Pegamos o usuário ADM que o Prisma acabou de criar e devolveu junto com a empresa
+            const registroAdm = novaEmpresa.usuarios[0];
 
-            //cadastrando o representante como ADM no banco na tabela Usuarios
-            const registroAdm = await UsuarioModel.criarUsuario(dadosUsuario)
-
+            // 3. Retornamos o sucesso para o frontend
             return res.status(201).json({
                 sucesso: true,
                 mensagem: 'Empresa e administrador criados com sucesso!',
                 dados: {
-                    id_empresa: empresaId,
+                    id_empresa: novaEmpresa.id_empresa,
                     id_usuario: registroAdm.id_usuario,
-                    nome_empresa: nome_empresa,
-                    cnpj: cnpj.trim(),
-                    tipo: 'Adm'
+                    nome_empresa: novaEmpresa.nome_empresa,
+                    cnpj: novaEmpresa.cnpj,
+                    tipo: registroAdm.tipo
                 }
             })
 
@@ -262,7 +254,7 @@ class AuthController {
     //GET api/auth/perfil - Obter perfil do usuário logado
     static async obterPerfil(req, res) {
         try {
-            const usuario = await UsuarioModel.buscarPorId(req.usuario.id);
+            const usuario = await UsuarioModel.buscarPorId(req.user.id_usuario);
 
             if (!usuario) {
                 return res.status(404).json({
@@ -294,15 +286,15 @@ class AuthController {
         try {
             const { id } = req.body;
 
-            if(!id || id.trim() === ''){
+            if (!id || id.trim() === '') {
                 return res.status(400).json({
-                sucesso: false,
-                erro: 'Identificador obrigatório',
-                mensagem: 'Identificador é obrigatório'
+                    sucesso: false,
+                    erro: 'Identificador obrigatório',
+                    mensagem: 'Identificador é obrigatório'
                 })
             };
 
-            if(id<2){
+            if (id < 2) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Identificador inválido',
@@ -311,7 +303,7 @@ class AuthController {
             }
 
             const usuario = await UsuarioModel.buscarPorId(id)
-            if(!usuario){
+            if (!usuario) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Identificador não encontrado',
@@ -320,18 +312,18 @@ class AuthController {
             }
             //verificar se o id ainda não possui senha cadastrada
             const verificacaoSenha = await UsuarioModel.verificaSenhaUsuario(id);
-            if(verificacao === true){
+            if (verificacao === true) {
                 return res.status(400).json({
                     sucesso: false,
-                    erro:'Senha já criada para o identificador',
-                    mensagem:'Senha já criada para o identificado'
+                    erro: 'Senha já criada para o identificador',
+                    mensagem: 'Senha já criada para o identificado'
                 })
             };
 
             return res.status(201).json({
                 sucesso: true,
                 mensagem: 'Identificador encontrado!'
-            });   
+            });
 
         } catch (error) {
             console.error('Erro ao verificar identificador:', error);
@@ -349,25 +341,25 @@ class AuthController {
             const { id } = req.params;
             const { senha, senhaConfirmada } = req.body;
 
-            if(!senha || senha.trim() === ''){
+            if (!senha || senha.trim() === '') {
                 return res.status(400).json({
-                sucesso: false,
-                erro: 'Senha obrigatória',
-                mensagem: 'Senha é obrigatória'
+                    sucesso: false,
+                    erro: 'Senha obrigatória',
+                    mensagem: 'Senha é obrigatória'
                 })
             };
-            
-            if(!senhaConfirmada || senhaConfirmada.trim() === ''){
+
+            if (!senhaConfirmada || senhaConfirmada.trim() === '') {
                 return res.status(400).json({
-                sucesso: false,
-                erro: 'Senha confirmada obrigatória',
-                mensagem: 'Senha confirmada é obrigatória'
+                    sucesso: false,
+                    erro: 'Senha confirmada obrigatória',
+                    mensagem: 'Senha confirmada é obrigatória'
                 })
             };
 
             const comparacao = await UsuarioModel.comparacaoDeSenhas(senha, senhaConfirmada);
 
-            if(comparacao === false){
+            if (comparacao === false) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senhas não confirmadas',
@@ -377,7 +369,7 @@ class AuthController {
 
             //registrar senha do usuário no banco
             const registrarSenha = await UsuarioModel.atualizar(id, senha)
-            if(!registrarSenha){
+            if (!registrarSenha) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha não registrada',

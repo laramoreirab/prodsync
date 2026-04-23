@@ -72,10 +72,9 @@ model Empresas {
 }
 
 model Usuarios {
-  id_usuario    Int         @id @default(autoincrement())
+  id_usuario    Int         @id
   id_empresa    Int
   nome          String      @db.VarChar(255)
-  identificador String      @unique @db.VarChar(50)
   tipo          TipoUsuario
   cpf           String      @unique @db.VarChar(14)
   email         String      @unique @db.VarChar(255)
@@ -86,6 +85,7 @@ model Usuarios {
   setores_geridos Setor_Gestor[]
   escalas         EscalaTrabalho[]
   apontamentos    Apontamento[]
+  logs            Logs[] 
 }
 
 model Setores {
@@ -247,4 +247,25 @@ model Apontamento {
   turno          Turno         @relation(fields: [id_turno], references: [id_turno])
 
   @@index([id_empresa])
+}
+model Logs {
+  id_log              Int      @id @default(autoincrement())
+  usuario_id          Int?     // null quando não autenticado (rotas públicas)
+  rota                String   @db.VarChar(255)
+  metodo              String   @db.VarChar(10)  // GET, POST, PUT, DELETE
+  status_code         Int?     // null até a resposta ser enviada
+  ip_address          String?  @db.VarChar(45)  // suporta IPv6
+  user_agent          String?  @db.VarChar(500)
+  tempo_resposta_ms   Int?     // em milissegundos
+  dados_requisicao    String?  @db.Text         // JSON stringificado
+  dados_resposta      String?  @db.Text         // só preenchido em erros (status >= 400)
+  criado_em           DateTime @default(now())
+
+  // relação com usuário — opcional pois rotas públicas não têm usuário
+  usuario Usuarios? @relation(fields: [usuario_id], references: [id_usuario], onDelete: SetNull)
+
+  @@index([usuario_id])   // facilita buscar logs de um usuário específico
+  @@index([rota])         // facilita buscar logs de uma rota específica
+  @@index([status_code])  // facilita filtrar só erros
+  @@index([criado_em])    // facilita ordenar por data
 }
