@@ -18,9 +18,9 @@ export function OEEWidget() {
       </div>
 
       {/* Gauges */}
-      <div className="flex items-end justify-around gap-4">
+      <div className="flex-col items-end justify-around gap-4">
         {oeeMetricasConfig.map(({ key, label, color }) => (
-          <div key={key} className="flex flex-col items-center">
+          <div key={key} className="flex my-4 flex-col items-center">
             <GaugeSemicircular
               title={label}
               data={[{ value: data[key], fill: color }]}
