@@ -72,7 +72,7 @@ export default function Maquinas() {
   };
 
   const opcoesOrdenacao = [
-    { label: 'Ordem AlfabÃ©tica', value: 'nome' },
+    { label: 'Ordem Alfabética', value: 'nome' },
     { label: 'ID Crescente', value: 'id_asc' },
     { label: 'ID Decrescente', value: 'id_desc' },
     { label: 'Setor', value: 'setor' }
