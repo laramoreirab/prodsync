@@ -34,7 +34,7 @@ export default function ProducaoOperadorPage() {
         {/* TÍTULO */}
         <div className="flex justify-start">
           <h1 className="text-4xl font-semibold text-black pb-0 inline-block">
-            Produção
+            Operador
           </h1>
         </div>
 

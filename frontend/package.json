@@ -17,6 +17,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
+    "express": "^5.2.1",
     "framer-motion": "^11.18.2",
     "lottie-colorify": "^0.8.0",
     "lottie-react": "^2.4.1",

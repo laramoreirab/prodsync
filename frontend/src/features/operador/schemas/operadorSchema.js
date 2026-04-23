@@ -11,6 +11,7 @@ export const OEEOperadorSchema = z.object({
 // Peças produzidas por dia da semana
 export const PecasPorDiaSchema = z.object({
   dia: z.string(),   //Seg, Ter
+  qtd: z.number(),
 });
 export const PecasPorDiaArraySchema = z.array(PecasPorDiaSchema);
 
