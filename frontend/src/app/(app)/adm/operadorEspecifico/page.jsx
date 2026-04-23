@@ -29,7 +29,7 @@ export default function ProducaoOperadorPage() {
         <Header />
       </div>
 
-      <div className="w-full max-w-6xl mt-8 pb-10 px-4 space-y-4">
+      <div className="w-80% max-w-5xl mt-8 pb-10 px-4 space-y-4">
 
         {/* TÍTULO */}
         <div className="flex justify-start">
@@ -39,7 +39,7 @@ export default function ProducaoOperadorPage() {
         </div>
 
         {/* SEÇÃO 1  */}
-        <section className="bg-white border-2 rounded-2xl p-6 shadow-sm">
+        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
           <OEEOperadorWidget operadorId={OPERADOR_ID} />
         </section>
 
