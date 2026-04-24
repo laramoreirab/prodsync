@@ -20,7 +20,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/adm/dashboardGeral",
+      url: "/adm",
       icon: <PieChartIcon />,
     },
     {
