@@ -332,3 +332,37 @@ export const mockEficienciaMaquina = [
   { maquina: "THA-3", eficiencia: 72 },
   { maquina: "THA-4", eficiencia: 90 },
 ];
+
+export const mockMotivoRefugoMaquina = [
+  { name: "Rolhas na Injeção", value: 43 },
+  { name: "Peça Incompleta",   value: 29 },
+  { name: "Rebarba Grossa",    value: 28 },
+];
+
+export const mockMotivoSetupMaquina = [
+  { motivo: "Limpeza",           minutos: 150 },
+  { motivo: "Manutenção",        minutos: 95  },
+  { motivo: "Falta de Material", minutos: 70  },
+];
+
+export const mockOEEMaquina = {
+  disponibilidade: 85,
+  performance:     90,
+  qualidade:       90,
+  oee:             Math.round((85 * 90 * 90) / 10000),
+};
+
+export const mockOEEEvolucaoMaquina = [
+  { dia: "Dia 1", oee: 65 },
+  { dia: "Dia 2", oee: 78 },
+  { dia: "Dia 3", oee: 70 },
+  { dia: "Dia 4", oee: 82 },
+  { dia: "Dia 5", oee: 79 },
+  { dia: "Dia 6", oee: 85 },
+  { dia: "Dia 7", oee: 92 },
+];
+
+export const mockVelocidadeMaquina = [
+  { tipo: "Velocidade Normal", valor: 45 },
+  { tipo: "Velocidade Atual",  valor: 38 },
+];
