@@ -87,7 +87,7 @@ export default function Usuarios() {
     useEffect(() => {
       async function buscarUsuarios() {
         try {
-          const res = await fetch('https://jsonplaceholder.typicode.com/users'); // Endpoint de usuários
+          const res = await fetch(''); // Endpoint de usuários exemplo: 'https://localhost:8080/adm/usuarios'
   
           if (!res.ok) throw new Error('Falha ao buscar usuários');
   
@@ -541,7 +541,7 @@ export default function Usuarios() {
               data={dadosExibidos} columns={colunasUsuarios}
 
               // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `adm/usuarios/${row.id}`}
+              viewLink={(row) => `/usuarios/${row.id}`}
 
               // 2.  modais de Editar e Excluir para a tabela renderizar - falta integrar!!!
               dialogs={{

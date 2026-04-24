@@ -84,7 +84,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
   return (
     <div className='w-full px-8 mb-5'>
       <div className='overflow-hidden rounded-md border bg-white/50 backdrop-blur-sm'>
-        <Table>
+        <Table className="table-fixed">
 
           <TableHeader>
             <TableRow className="font-semibold bg-muted/50">
@@ -106,9 +106,11 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
 
                 {/* Renderiza linhas de dados dinâmicos */}
                 {columns.map((col) => (
-                  <TableCell key={`${index}-${col.key}`} className={col.className}>
-                    {/* original pois apenas row retorna undefined relacionada a paginação */}
-                    {row.original[col.key]}
+                  <TableCell key={`${row.id}-${col.key}`} className={col.className}>
+  
+                    {col.badge
+                      ? col.badge(row.original[col.key], row.original)
+                      : row.original[col.key]}
                   </TableCell>
                 ))}
 
@@ -175,7 +177,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
         </Table>
       </div>
 
-      <div className='flex items-center gap-3 max-sm:flex-col mt-2 justify-center text-center'>
+      <div className='flex items-center max-sm:flex-col mt-3 justify-center text-center'>
 
         <div className='grow items-center'>
           <Pagination>
