@@ -1,13 +1,7 @@
 "use client";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useOEEOperador } from "./hooks/useOEEOperador";
- 
-const metricas = [
-  { key: "disponibilidade", label: "Disponibilidade", color: "#00357a" },
-  { key: "performance",     label: "Performance",     color: "#00357a" },
-  { key: "qualidade",       label: "Qualidade",       color: "#00357a" },
-  { key: "oee",             label: "OEE Geral Consolidado", color: "#00357a" },
-];
+import { metricas } from "@/features/operador/config/operadorConfig"
  
 export function OEEOperadorWidget({ operadorId }) {
   const { data, loading, error } = useOEEOperador(operadorId);

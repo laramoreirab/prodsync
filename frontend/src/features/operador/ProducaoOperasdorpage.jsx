@@ -1,11 +1,11 @@
 "use client";
 import Header from "@/components/ui/topbar";
 
-// Widgets reutilizados de outras features
-import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
-import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
-import { LineChartBase } from "@/components/ui/charts/components/LineChart";
-import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
+// // Widgets reutilizados de outras features
+// import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
+// import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
+// import { LineChartBase } from "@/components/ui/charts/components/LineChart";
+// import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 
 // Widgets novos do operador
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";

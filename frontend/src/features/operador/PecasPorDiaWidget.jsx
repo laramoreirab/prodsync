@@ -2,14 +2,7 @@
 
 import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
 import { usePecasPorDia } from "./hooks/usePecasPorDia";
-
-
-const pecasPorDiaConfig = {
-  qtd: { 
-    label: "Peças", 
-    color: "#00357a" 
-  },
-};
+import { pecasPorDiaConfig } from "@/features/operador/config/operadorConfig"
 
 export function PecasPorDiaWidget({ operadorId }) {
   const { data, loading, error } = usePecasPorDia(operadorId);

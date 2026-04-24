@@ -2,10 +2,7 @@
 
 import { AreaChartBase } from "@/components/ui/charts/components/AreaChart";
 import { useProducaoPorHoraOperador } from "./hooks/useProducaoPorHoraOperador";
-
-const producaoPorHoraConfig = {
-  qtd: { label: "Peças/hora", color: "#00357a" },
-};
+import { producaoPorHoraConfig } from "@/features/operador/config/operadorConfig"
 
 export function ProducaoPorHoraOperadorWidget({ operadorId }) {
   const { data, loading, error } = useProducaoPorHoraOperador(operadorId);

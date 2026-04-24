@@ -2,11 +2,7 @@
 
 import { useParadasOperador } from "./hooks/useParadasOperador";
 import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
-
-const paradasConfig = {
-  registradas: { label: "Paradas Registradas", color: "#7d95c6" },
-  reais:       { label: "Paradas Reais",        color: "#212e4b" },
-};
+import { paradasConfig } from "@/features/operador/config/operadorConfig"
 
 export function ParadasComparadasOperadorWidget({ operadorId }) {
   const { data, loading, error } = useParadasOperador(operadorId);

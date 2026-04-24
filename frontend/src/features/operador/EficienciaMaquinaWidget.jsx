@@ -2,10 +2,8 @@
 
 import { useEficienciaMaquina } from "./hooks/useEficienciaMaquina";
 import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
+import { eficienciaConfig } from "@/features/operador/config/operadorConfig"
 
-const eficienciaConfig = {
-  eficiencia: { label: "Eficiência %", color: "#00357a" },
-};
 
 export function EficienciaMaquinaWidget({ operadorId }) {
   const { data, loading, error } = useEficienciaMaquina(operadorId);

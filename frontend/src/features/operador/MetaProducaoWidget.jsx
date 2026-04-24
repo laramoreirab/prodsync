@@ -2,11 +2,8 @@
 
 import { useMetaProducao } from "./hooks/useMetaProducao";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
+import { metaConfig } from "@/features/operador/config/operadorConfig"
 
-const metaConfig = {
-  completo: { label: "Completo", color: "#00357a" },
-  restante: { label: "Restante", color: "#e2e8f0" },
-};
 
 export function MetaProducaoWidget({ operadorId }) {
   const { data, loading, error } = useMetaProducao(operadorId);
