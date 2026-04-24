@@ -1,14 +1,54 @@
 "use client";
 
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import SuccessCard from "@/components/ui/modalCadastro";
 
+
 export default function LoginForm() {
+    const router = useRouter()
+
     const [open, setOpen] = useState(false);
+    const [identificador, setIdentificador] = useState("");
+    const [senha, setSenha] = useState("");
+    const [carregando, setCarregando] = useState(false)
+    const [erro, setErro] = useState("")
+
+    async function handleLogin() {
+        setCarregando(true)
+        setErro("")
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ identificador, senha })
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                setErro(data.mensagem)
+                return
+            }
+
+            //guarda o token no localstorage e o middleware le o header Autorization
+            localStorage.setItem("token", data.token)
+
+            //redireciona pelo tipo que vem no token
+            if (data.tipo === "Adm") router.push("/adm/DashboardGeral")
+            if (data.tipo === "Gestor") router.push("/gestor/DashboardGeral")
+            if (data.tipo === "Operario") router.push("/operador/DashboardGeral")
+
+        } catch (error) {
+            setErro("Erro de conexão com o servidor")
+        } finally {
+            setCarregando(false)
+        }
+    }
 
     return (
         <>
@@ -29,14 +69,16 @@ export default function LoginForm() {
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
                             <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
-                            <Input className="h-9" placeholder="Ex: 11.111.-11" />
+                            <Input className="h-9" placeholder="Ex: 11.111.-11"
+                                value={identificador} onChange={(e) => setIdentificador(e.target.value)} />
                         </div>
 
                         <div className="grid gap-3">
                             <div className="flex items-center">
                                 <Label className="font-medium text-[#545454]">Senha</Label>
                             </div>
-                            <Input className="h-9" type="password" placeholder="••••••••" />
+                            <Input className="h-9" type="password" placeholder="••••••••"
+                                value={senha} onChange={(e) => setSenha(e.target.value)} />
 
                         </div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mt-2">
@@ -57,9 +99,16 @@ export default function LoginForm() {
                             </a>
                         </div>
                     </div>
+
+                    {/* erro vindo do backend */}
+                    {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
+
                     {/* BUTTON LOGIN */}
-                    <Button id="btn_login" onClick={() => setOpen(true)} className="cursor-pointer py-3 w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-semibold rounded-lg">
-                        Entrar
+                    <Button id="btn_login"
+                        onClick={handleLogin}
+                        disabled={carregando}
+                        className="cursor-pointer py-3 w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-semibold rounded-lg">
+                        {carregando ? "Entrando..." : "Entrar"}
                     </Button>
                 </form>
 
