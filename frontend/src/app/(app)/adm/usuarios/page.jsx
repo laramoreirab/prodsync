@@ -1,5 +1,4 @@
-import Header from "@/components/ui/topbar";
-import TableListagens from "@/components/shadcn-studio/table/table";
+import TableListagens from "@/components/shadcn-studio/data-table/data-table-11";
 import SearchBar from "@/components/ui/searchBar";
 
 export default function Usuarios() {
@@ -19,8 +18,6 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-center bg-no-repeat">
-      <Header />
-
 
       <div className="flex flex-col flex-1 items-center">
         <SearchBar />

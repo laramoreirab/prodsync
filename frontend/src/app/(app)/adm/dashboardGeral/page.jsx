@@ -1,3 +1,4 @@
+// src/app/DashboardGeralEmpresaADM/page.jsx
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";
@@ -21,10 +22,7 @@ export default function PageLayout() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="w-full">
-        <Header />
-      </div>
-
+      
       <div className="w-full max-w-6xl mt-8 pt-0 pb-10 px-4 space-y-4">
         <div className="flex justify-start mb-6">
           <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
@@ -32,56 +30,62 @@ export default function PageLayout() {
           </h1>
         </div>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="rounded-xl border bg-white p-4">
-          <ProducaoDiaWidget />
-        </div>
-      </section>
+        {/* SEÇÃO 1 */}
+        <section className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="bg-white border rounded-xl p-4">
+            <ProducaoDiaWidget />
+          </div>
+        </section>
 
-      <section className="rounded-2xl bg-white p-4 shadow-sm">
-        <div className="flex w-full justify-evenly">
-          <OEEWidget />
-        </div>
-      </section>
+        {/* SEÇÃO 2 */}
+        <section className="bg-white p-4 rounded-2xl shadow-sm">
+          <div className="w-full flex justify-evenly">
+            <OEEWidget />
+          </div>
+        </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-xl border bg-white p-4 md:col-span-2">
-            <ProducaoSetorWidget />
+        {/* SEÇÃO 3 */}
+        <section className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white border rounded-xl p-4 md:col-span-2">
+              <ProducaoSetorWidget />
+            </div>
+            <div className="bg-white border rounded-xl p-4 md:col-span-1">
+              <MaquinaStatusWidget />
+            </div>
           </div>
-          <div className="rounded-xl border bg-white p-4 md:col-span-1">
-            <MaquinaStatusWidget />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
-          <div className="h-[260px] rounded-xl border bg-white p-4 md:col-span-2">
-            <MotivosFrequentesWidget />
+        {/* SEÇÃO 4 */}
+        <section className="bg-white p-6 rounded-2xl shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div className="bg-white border rounded-xl p-4 md:col-span-2 h-[260px]">
+              <MotivosFrequentesWidget />
+            </div>
+            <div className="bg-white border rounded-xl p-4 md:col-span-4">
+              <TendendiaRefugoWidget />
+            </div>
           </div>
-          <div className="rounded-xl border bg-white p-4 md:col-span-4">
-            <TendendiaRefugoWidget />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section>
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
-          <div className="rounded-xl border bg-white p-4">
-            <MediaParadasDiaWidget />
+        {/* SEÇÃO 5 */}
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+            <div className="bg-white border rounded-xl p-4">
+              <MediaParadasDiaWidget />
+            </div>
+            <div className="bg-white border rounded-xl p-4">
+              <PecasPorMinutoWidget />
+            </div>
+            <div className="bg-white border rounded-xl p-4">
+              <MaquinaAtivaPorTurnoWidget />
+            </div>
+            <div className="bg-white border rounded-xl p-4">
+              <ProducaoPorTurnoLotesWidget />
+            </div>
           </div>
-          <div className="rounded-xl border bg-white p-4">
-            <PecasPorMinutoWidget />
-          </div>
-          <div className="rounded-xl border bg-white p-4">
-            <MaquinaAtivaPorTurnoWidget />
-          </div>
-          <div className="rounded-xl border bg-white p-4">
-            <ProducaoPorTurnoLotesWidget />
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </main>
   );
 }

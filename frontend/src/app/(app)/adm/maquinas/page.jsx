@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/ui/topbar";
 import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react"; // Adicionei Pencil e Trash2
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
@@ -190,7 +189,6 @@ export default function Maquinas() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
 
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro de máquina */}
