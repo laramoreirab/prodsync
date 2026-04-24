@@ -50,8 +50,8 @@ export default function RegisterForm() {
     <>
       <div className="w-full max-w-[600px] space-y-5 ml-0 md:ml-4 pt-16">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">Bem-vindo ao ProdSync</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight">Bem-vindo ao ProdSync!</h1>
+          <p className="text-md text-muted-foreground">
             Crie sua conta para acompanhar a produção em tempo real.
           </p>
         </div>

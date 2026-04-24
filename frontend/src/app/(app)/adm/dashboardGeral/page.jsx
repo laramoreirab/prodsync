@@ -11,12 +11,26 @@ import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorT
 
 export default function PageLayout() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">
-      <div className="mb-2 flex justify-start">
-        <h1 className="inline-block border-b-4 border-[var(--secondary-foreground)] pb-0 text-4xl font-semibold text-black">
-          Dashboard Geral da Empresa
-        </h1>
+    <main
+      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
+      style={{
+        backgroundImage: "url('/bg_app.svg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="w-full">
+        <Header />
       </div>
+
+      <div className="w-full max-w-6xl mt-8 pt-0 pb-10 px-4 space-y-4">
+        <div className="flex justify-start mb-6">
+          <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
+            Dashboard Geral da Empresa
+          </h1>
+        </div>
 
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="rounded-xl border bg-white p-4">
