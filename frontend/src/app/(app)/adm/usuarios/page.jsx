@@ -13,7 +13,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Search, Info, File, Upload, ChevronDown } from "lucide-react";
+import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 import FilterDropdown from "@/components/ui/filterDropdown";
@@ -34,14 +34,14 @@ const dadosOriginais = [
 ];
 
 //Widgets dashboard
-import { QtdUsuariosWidget }          from "@/features/usuarios/QtdUsuariosWidget";
-import { QtdUsuariosPorSetorWidget }  from "@/features/usuarios/QtdUsuariosPorSetorWidget";
-import { TopOperadoresWidget }        from "@/features/usuarios/TopOperadoresWidget";
-import { TempoSessaoWidget }          from "@/features/usuarios/TempoSessaoWidget";
-import { RotatividadeWidget }         from "@/features/usuarios/RotatividadeWidget";
-import { SobrecargaSetorWidget }      from "@/features/usuarios/SobrecargaSetorWidget";
-import { ProducaoMediaSetorWidget }   from "@/features/usuarios/ProducaoMediaSetorWidget";
- 
+import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
+import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSetorWidget";
+import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
+import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
+import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
+import { SobrecargaSetorWidget } from "@/features/usuarios/SobrecargaSetorWidget";
+import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
+
 
 export default function Usuarios() {
   const [dados, setDados] = useState([]);
@@ -238,55 +238,6 @@ export default function Usuarios() {
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <Header />
-      {/* SEÇÃO 1: CHarts*/}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          <div className="border rounded-xl p-4">
-            <QtdUsuariosWidget />
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <QtdUsuariosPorSetorWidget />
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <TopOperadoresWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: Charts */}
-      <section className=" p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className="border rounded-xl p-6">
-            <TempoSessaoWidget />
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <RotatividadeWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 3: Charts */}
-      <section className=" p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className="border rounded-xl p-4">
-            <SobrecargaSetorWidget />
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <ProducaoMediaSetorWidget />
-          </div>
-
-        </div>
-      </section>
-
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">
@@ -494,6 +445,56 @@ export default function Usuarios() {
 
         </div>
       </section>
+      {/* SEÇÃO 1: CHarts*/}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="border rounded-xl p-4">
+            <QtdUsuariosWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <QtdUsuariosPorSetorWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <TopOperadoresWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 2: Charts */}
+      <section className=" p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="border rounded-xl p-6">
+            <TempoSessaoWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <RotatividadeWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 3: Charts */}
+      <section className=" p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="border rounded-xl p-4">
+            <SobrecargaSetorWidget />
+          </div>
+
+          <div className="border rounded-xl p-4">
+            <ProducaoMediaSetorWidget />
+          </div>
+
+        </div>
+      </section>
+
+
 
       {/* Listagem */}
       <section id="listagem_usuarios">
@@ -544,12 +545,127 @@ export default function Usuarios() {
               // 1. Para a ação "ver detalhes" Url com base na linha clicada
               viewLink={(row) => `adm/usuarios/${row.id}`}
 
-              // 2.  modais de Editar e Excluir para a tabela renderizar
+              // 2.  modais de Editar e Excluir para a tabela renderizar - falta integrar!!!
               dialogs={{
                 edit: (row) => (
                   <DialogContent className="rounded-lg">
-                    <DialogTitle>Editar Usuário </DialogTitle> {/* Faz seu nome Gi, não estiizei nada */}
+                    <div className="title_modal flex items-center">
+                      <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
+                        <Plus className="mr-2 text-3xl text-white" />
+                        <DialogTitle className="text-3xl text-white">
+                          Editar Usuário
+                        </DialogTitle>
+                      </div>
+                    </div>
                     <Separator className="my-2" />
+                    <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+                      <input
+                        type="file"
+                        ref={fileInputFotoRef}
+                        onChange={handleFotoChange}
+                        accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
+                        className="hidden"
+                      />
+
+                      {/* div do upload clicavel */}
+                      <div
+                        onClick={() => fileInputFotoRef.current?.click()}
+                        className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
+                      >
+                        {!fotoPerfil ? (
+                          <div className="flex flex-col items-center text-gray-500">
+                            <Upload className="w-12 h-12 mb-2 text-gray-400" />
+                            <span className="text-md font-medium">Clique aqui para fazer upload da imagem.</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center w-full">
+                            {/*pré-visualização da imagem */}
+                            <img
+                              src={fotoPerfil.preview}
+                              alt="Preview"
+                              className="w-32 h-32 object-cover rounded-lg mb-2 border"
+                            />
+                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
+                              <File className="w-4 h-4 mr-2 shrink-0" />
+                              <span className="text-sm truncate">{fotoPerfil.nome}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-5">
+                        <div>
+                          <label className={labelStyle}>Nome</label>
+                          <input id="nomeUser" value={formData.nomeUser} onChange={handleInputChange} type="text" className={inputStyle} required />
+                        </div>
+                        <div>
+                          <label className={labelStyle}>CPF</label>
+                          <input id="cpfUser" value={formData.cpfUser} onChange={handleInputChange} type="text" className={inputStyle} required />
+                        </div>
+                        <div>
+                          <label className={labelStyle}>E-mail</label>
+                          <input id="emailUser" value={formData.emailUser} onChange={handleInputChange} type="email" className={inputStyle} required />
+                        </div>
+
+                        {/* Select personalizado com ícone */}
+                        <div className="relative">
+                          <label className={labelStyle}>Setor</label>
+                          <select id="setorUser" value={formData.setorUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
+                            <option value="">Selecione...</option>
+                            <option value="Roscas">Roscas</option>
+                            <option value="Brocas">Brocas</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-5">
+                        <div className="relative">
+                          <label className={labelStyle}>Função</label>
+                          <select
+                            id="funcaoUser"
+                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            value={formData.funcaoUser}
+                            onChange={handleInputChange}
+                            required
+                          >
+                            <option value="">Selecione...</option>
+                            <option value="Operador">Operador</option>
+                            <option value="Gestor">Gestor</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
+                        <div className="relative">
+                          <label className={labelStyle}>Turno</label>
+                          <select id="turnoUser" value={formData.turnoUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
+                            <option value="">Selecione...</option>
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noite">Noite</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      {/* Máquina a Gerenciar só aparece se função = operador */}
+                      {formData.funcaoUser === "Operador" && (
+                        <div className="relative pt-1">
+                          <label className={labelStyle}>Máquina a Gerenciar</label>
+                          <select id="maquinaUser" value={formData.maquinaUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
+                            <option value="">Selecione...</option>
+                            <option value="M1">Máquina 1</option>
+                            <option value="M2">Máquina 2</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
+                      )}
+
+                      <div className="flex justify-center mt-4">
+                        <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                          Editar
+                        </button>
+                      </div>
+                    </form>
 
                     {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
                     {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
@@ -558,7 +674,22 @@ export default function Usuarios() {
                 ),
                 delete: (row) => (
                   <DialogContent>
-                    <DialogTitle className="text-red-600">Excluir Usuário</DialogTitle>
+                    <div className="title_modal flex items-center">
+                      <div className="bg-red-900 flex items-center px-4 py-2 rounded-md">
+                        <Trash2 className="mr-2 text-4xl text-white" />
+                        <DialogTitle className="text-3xl text-white">
+                          Excluir Usuário
+                        </DialogTitle>
+                      </div>
+                    </div>
+                    <Separator className="my-2" />
+                    <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+                      <div className='w-full flex flex-col items-center justify-center'>
+                        <TriangleAlert className='text-[#00357a] text-4xl' />
+                        <h2>Você tem certeza que deseja excluir o usuário?</h2>
+                        <p>As informações serão excluídas PERMANENTEMENTE e não poderão ser restauradas após excluí-las!</p>
+                      </div>
+                    </form>
 
                     {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
                       qual está sendo o usuário deletado [mas isso não ta no desing])
