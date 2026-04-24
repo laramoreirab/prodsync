@@ -221,7 +221,7 @@ class MaquinaModel {
                     escala_trabalho: {
                         include: {
                             operador: {
-                                select: { nome: true, identificador: true }
+                                select: { nome: true, id_usuario: true }
                             }
                         }
                     },

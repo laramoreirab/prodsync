@@ -19,6 +19,7 @@ enum StatusMaquina {
   Parada
   Manutencao
   Setup
+  Aguardando 
 }
 
 enum DiaSemana {
@@ -34,6 +35,13 @@ enum DiaSemana {
 enum TipoMotivoParada {
   Programada
   Nao_Programada @map("Nao Programada")
+}
+
+enum TipoPrioridade{
+  Alta
+  Media
+  Baixa
+  Critica
 }
 
 // --- MODELS ---
@@ -64,10 +72,9 @@ model Empresas {
 }
 
 model Usuarios {
-  id_usuario    Int         @id @default(autoincrement())
+  id_usuario    Int         @id
   id_empresa    Int
   nome          String      @db.VarChar(255)
-  identificador String      @unique @db.VarChar(50)
   tipo          TipoUsuario
   cpf           String      @unique @db.VarChar(14)
   email         String      @unique @db.VarChar(255)
@@ -78,6 +85,7 @@ model Usuarios {
   setores_geridos Setor_Gestor[]
   escalas         EscalaTrabalho[]
   apontamentos    Apontamento[]
+  logs            Logs[] 
 }
 
 model Setores {
@@ -90,6 +98,7 @@ model Setores {
   maquinas Maquinas[]
   gestores Setor_Gestor[]
   escalas  EscalaTrabalho[]
+  ordens_producao    OrdemProducao[]
 }
 
 model Categoria_Maquina {
@@ -178,16 +187,21 @@ model OrdemProducao {
   id_ordem      Int       @id @default(autoincrement())
   id_empresa    Int
   id_maquina    Int
+  id_setor      Int
   codigo_lote   String    @db.VarChar(100)
   produto       String    @db.VarChar(150)
   data_inicio   DateTime?
   data_fim      DateTime?
   qtd_planejada Int
+  status_op     StatusMaquina
+  prioridade    TipoPrioridade
+  observacao_op    String    @db.VarChar(450)
 
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   maquina           Maquinas            @relation(fields: [id_maquina], references: [id_maquina])
   historico_eventos Historico_Eventos[]
-  apontamentos      Apontamento[]
+  apontamentos       Apontamento[]
+  setores           Setores[]
 }
 
 model Historico_Eventos {
@@ -233,4 +247,25 @@ model Apontamento {
   turno          Turno         @relation(fields: [id_turno], references: [id_turno])
 
   @@index([id_empresa])
+}
+model Logs {
+  id_log              Int      @id @default(autoincrement())
+  usuario_id          Int?     // null quando não autenticado (rotas públicas)
+  rota                String   @db.VarChar(255)
+  metodo              String   @db.VarChar(10)  // GET, POST, PUT, DELETE
+  status_code         Int?     // null até a resposta ser enviada
+  ip_address          String?  @db.VarChar(45)  // suporta IPv6
+  user_agent          String?  @db.VarChar(500)
+  tempo_resposta_ms   Int?     // em milissegundos
+  dados_requisicao    String?  @db.Text         // JSON stringificado
+  dados_resposta      String?  @db.Text         // só preenchido em erros (status >= 400)
+  criado_em           DateTime @default(now())
+
+  // relação com usuário — opcional pois rotas públicas não têm usuário
+  usuario Usuarios? @relation(fields: [usuario_id], references: [id_usuario], onDelete: SetNull)
+
+  @@index([usuario_id])   // facilita buscar logs de um usuário específico
+  @@index([rota])         // facilita buscar logs de uma rota específica
+  @@index([status_code])  // facilita filtrar só erros
+  @@index([criado_em])    // facilita ordenar por data
 }
