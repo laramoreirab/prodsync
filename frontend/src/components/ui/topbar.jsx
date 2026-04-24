@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <div className="flex w-full">
       <div className="flex flex-1 flex-col">
-        <header className="bg-card sticky  py-3 top-0 z-50 border-b fixed">
+        <header className="bg-card sticky  py-3 top-0 z-50 border-b">
           <div className="mx-auto flex items-center justify-between gap-6 px-4 py-2 sm:px-6">
             <div className="flex items-center gap-4">
               <a href="#">
