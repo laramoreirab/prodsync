@@ -1,4 +1,3 @@
-import Header from "@/components/ui/topbar";
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
 
@@ -14,9 +13,6 @@ export default function PageLayout() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="w-full">
-        <Header />
-      </div>
 
       <div className="w-full max-w-6xl mt-8 pt-0 pb-10 px-4 space-y-4">
         {/* TÍTULO E BOTÃO */}

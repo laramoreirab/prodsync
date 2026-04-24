@@ -10,7 +10,7 @@ const footerSections = [
         href: "#",
       },
       {
-        title: "Sobre mós",
+        title: "Sobre nós",
         href: "#",
       },
       {
@@ -54,7 +54,7 @@ const Footer = () => {
   return (
     <footer className="py-10">
       <Separator orientation="horizontal" />
-      <div className="max-w-7xl xl:px-16 lg:px-8 px-4 mx-auto">
+      <div className="xl:px-16 lg:px-8 px-4 mx-auto">
         <div className="flex flex-col gap-6 sm:gap-12">
           <div
             className="py-12 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-12 gap-x-8 gap-y-10 px-6 xl:px-0">

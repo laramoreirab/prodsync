@@ -1,5 +1,4 @@
 // src/app/DashboardGeralEmpresaADM/page.jsx
-import Header from "@/components/ui/topbar";
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";
@@ -23,10 +22,7 @@ export default function PageLayout() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="w-full">
-        <Header />
-      </div>
-
+      
       <div className="w-full max-w-6xl mt-8 pt-0 pb-10 px-4 space-y-4">
         <div className="flex justify-start mb-6">
           <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">

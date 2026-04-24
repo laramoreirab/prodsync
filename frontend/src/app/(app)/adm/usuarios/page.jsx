@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-import Header from "@/components/ui/topbar";
 import TableListagens from "@/components/table";
 
 import { useUsuarios } from "@/hooks/useUsuarios";
@@ -88,7 +87,7 @@ export default function Usuarios() {
     useEffect(() => {
       async function buscarUsuarios() {
         try {
-          const res = await fetch('https://jsonplaceholder.typicode.com/users'); // Endpoint de usuários
+          const res = await fetch(''); // Endpoint de usuários exemplo: 'https://localhost:8080/adm/usuarios'
   
           if (!res.ok) throw new Error('Falha ao buscar usuários');
   
@@ -237,7 +236,6 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">
@@ -543,7 +541,7 @@ export default function Usuarios() {
               data={dadosExibidos} columns={colunasUsuarios}
 
               // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `adm/usuarios/${row.id}`}
+              viewLink={(row) => `/usuarios/${row.id}`}
 
               // 2.  modais de Editar e Excluir para a tabela renderizar - falta integrar!!!
               dialogs={{
@@ -684,11 +682,13 @@ export default function Usuarios() {
                     </div>
                     <Separator className="my-2" />
                     <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+
                       <div className='w-full flex flex-col items-center justify-center'>
                         <TriangleAlert className='text-[#00357a] text-4xl' />
-                        <h2>Você tem certeza que deseja excluir o usuário?</h2>
+                        <h2 className='text-bold'>Você tem certeza que deseja excluir o usuário?</h2>
                         <p>As informações serão excluídas PERMANENTEMENTE e não poderão ser restauradas após excluí-las!</p>
                       </div>
+
                     </form>
 
                     {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
