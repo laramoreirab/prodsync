@@ -1,6 +1,3 @@
-// src/app/(app)/adm/usuarios/[id]/page.jsx
-// Remover "use client" — page pode ser Server Component no App Router
-
 import Header from "@/components/ui/topbar";
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
 import { ParadasComparadasOperadorWidget } from "@/features/operador/ParadasComparadasOperadorWidget";
@@ -9,10 +6,10 @@ import { PecasPorDiaWidget } from "@/features/operador/PecasPorDiaWidget";
 import { ProducaoPorHoraOperadorWidget } from "@/features/operador/ProducaoPorHoraOperadorWidget";
 import { EficienciaMaquinaWidget } from "@/features/operador/EficienciaMaquinaWidget";
 
-// Next.js App Router injeta params automaticamente
+
 export default async function ProducaoOperadorPage({ params }) {
-  const { id } = await params;          // ← vem da pasta [id]
-  const operadorId = Number(id);        // converte string → número
+  const { id } = await params;         
+  const operadorId = Number(id);       
 
   return (
     <main
