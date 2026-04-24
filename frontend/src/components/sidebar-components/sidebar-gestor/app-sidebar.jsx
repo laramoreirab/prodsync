@@ -20,17 +20,17 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/adm/DashboardGeralEmpresaADM",
+      url: "/gestor",
       icon: <PieChartIcon />,
     },
     {
       title: "Maquinas",
-      url: "/adm/maquinas",
+      url: "#",
       icon: <Wrench />,
     },
     {
       title: "Usuarios",
-      url: "/adm/usuarios",
+      url: "#",
       icon: <Users />,
     },
     {
