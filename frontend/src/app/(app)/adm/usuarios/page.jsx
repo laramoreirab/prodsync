@@ -684,11 +684,13 @@ export default function Usuarios() {
                     </div>
                     <Separator className="my-2" />
                     <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+
                       <div className='w-full flex flex-col items-center justify-center'>
                         <TriangleAlert className='text-[#00357a] text-4xl' />
-                        <h2>Você tem certeza que deseja excluir o usuário?</h2>
+                        <h2 className='text-bold'>Você tem certeza que deseja excluir o usuário?</h2>
                         <p>As informações serão excluídas PERMANENTEMENTE e não poderão ser restauradas após excluí-las!</p>
                       </div>
+
                     </form>
 
                     {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
