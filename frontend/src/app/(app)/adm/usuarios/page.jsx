@@ -236,7 +236,6 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-<<<<<<< HEAD
       <Header />
       {/* SEÇÃO 1: CHarts*/}
       <section className="p-6">
@@ -287,8 +286,6 @@ export default function Usuarios() {
         </div>
       </section>
 
-=======
->>>>>>> a2ad22bb227dad1ee5d4d491f433af19b45ecc29
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">
@@ -770,8 +767,4 @@ export default function Usuarios() {
       </section>
     </main >
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> a2ad22bb227dad1ee5d4d491f433af19b45ecc29

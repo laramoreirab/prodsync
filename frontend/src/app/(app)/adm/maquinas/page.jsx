@@ -539,33 +539,6 @@ export default function Maquinas() {
               <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
               <p>Não encontramos nenhum resultado para "{busca}".</p>
             </div>
-<<<<<<< HEAD
-          ) : (
-            // A tabela inteira (com thead e tbody) só aparece se houver dados
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b text-left">
-                  <th className="p-2">ID</th>
-                  <th className="p-2">Nome</th>
-                  <th className="p-2">Status</th>
-                  <th className="p-2">Setor</th>
-                  <th className="p-2">Data Parada</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dadosExibidos.map((item) => (
-                  <tr key={item.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2">{item.id}</td>
-                    <td className="p-2">{item.nome}</td>
-                    <td className="p-2">{item.status}</td>
-                    <td className="p-2">{item.setor}</td>
-                    <td className="p-2">{item.data.replace("T", " ")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-=======
->>>>>>> a2ad22bb227dad1ee5d4d491f433af19b45ecc29
           )}
         </div>
 
