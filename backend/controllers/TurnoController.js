@@ -182,6 +182,229 @@ class TurnoController {
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
+    
+    // ------------- Dashboards -------------- //
+
+    // GET api/turnos/kpis/:idTurno
+    static async obterKpisTurno(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório',
+                    mensagem: 'Forneça o ID do turno para buscar os indicadores.'
+                });
+            }
+
+            // Executa as duas buscas no banco ao mesmo tempo (mais rápido)
+            const [totalLotes, totalMaquinasAtivas] = await Promise.all([
+                TurnoModel.buscarProducaoTurnoLotes(idTurno),
+                TurnoModel.buscarMaquinasAtivasTurno(idTurno)
+            ]);
+
+            // Devolve um objeto simples com os valores absolutos para os cards
+            return res.status(200).json({
+                sucesso: true,
+                dados: {
+                    producaoLotes: Number(totalLotes),
+                    maquinasAtivas: Number(totalMaquinasAtivas)
+                }
+            });
+
+        } catch (error) {
+            console.error('Erro ao obter KPIs do turno:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível carregar os dados do turno.'
+            });
+        }
+    }
+
+    // Gráfico 1: GET api/turnos/:idTurno/producao-timeline
+    static async obterProducaoTimeline(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório'
+                });
+            }
+
+            const timeline = await TurnoModel.obterProducaoTimeline(idTurno);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: timeline
+            });
+        } catch (error) {
+            console.error('Erro ao obter timeline de produção:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar dados de produção'
+            });
+        }
+    }
+
+    // Gráfico 2: GET api/turnos/comparativo/producao
+    static async obterComparativoTurnos(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa;
+
+            const comparativo = await TurnoModel.obterComparativoTurnos(id_empresa);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: comparativo
+            });
+        } catch (error) {
+            console.error('Erro ao obter comparativo de turnos:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar comparativo de turnos'
+            });
+        }
+    }
+
+    // Gráfico 3: GET api/turnos/:idTurno/distribuicao-maquinas
+    static async obterDistribuicaoMaquinas(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório'
+                });
+            }
+
+            const distribuicao = await TurnoModel.obterDistribuicaoMaquinas(idTurno);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: distribuicao
+            });
+        } catch (error) {
+            console.error('Erro ao obter distribuição de máquinas:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar distribuição de máquinas'
+            });
+        }
+    }
+
+    // Gráfico 4: GET api/turnos/:idTurno/tempo-parado
+    static async obterTempoParado(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório'
+                });
+            }
+
+            const tempoParado = await TurnoModel.obterTempoParado(idTurno);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: tempoParado
+            });
+        } catch (error) {
+            console.error('Erro ao obter tempo parado:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar dados de tempo parado'
+            });
+        }
+    }
+
+    // Gráfico 5: GET api/turnos/:idTurno/ocupacao-operadores
+    static async obterOcupacaoOperadores(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório'
+                });
+            }
+
+            const ocupacao = await TurnoModel.obterOcupacaoOperadores(idTurno);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: ocupacao
+            });
+        } catch (error) {
+            console.error('Erro ao obter ocupação de operadores:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar dados de ocupação'
+            });
+        }
+    }
+
+    // Gráfico 6: GET api/turnos/:idTurno/distribuicao-paradas
+    static async obterDistribuicaoParadas(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório'
+                });
+            }
+
+            const distribuicao = await TurnoModel.obterDistribuicaoParadas(idTurno);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: distribuicao
+            });
+        } catch (error) {
+            console.error('Erro ao obter distribuição de paradas:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar distribuição de paradas'
+            });
+        }
+    }
+
+    // Gráfico 7: GET api/turnos/:idTurno/resumo
+    static async obterResumoTurno(req, res) {
+        try {
+            const { idTurno } = req.params;
+
+            if (!idTurno) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do turno é obrigatório'
+                });
+            }
+
+            const resumo = await TurnoModel.obterResumoTurno(idTurno);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: resumo
+            });
+        } catch (error) {
+            console.error('Erro ao obter resumo do turno:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro ao buscar resumo do turno'
+            });
+        }
+    }
+
 }
 
 export default TurnoController;
