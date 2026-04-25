@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/ui/topbar";
 import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react"; // Adicionei Pencil e Trash2
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
@@ -23,7 +22,8 @@ import { ProducaoDefeitosWidget } from "@/features/maquinas/ProducaoDefeitosWidg
 import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidget";
 import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 
-//
+import TableListagens from "@/components/table";
+import { Badge } from "@/components/ui/badge";
 
 const maquinasFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
@@ -31,10 +31,48 @@ const maquinasFilter = [
   { id: "data", label: "Parada", type: "date-range" }
 ];
 
+//guardar os dados originais intactos aqui fora, pois assim,
+//  quando o usuário limpar o filtro, a tabela consegue voltar ao normal.
+
 const dadosOriginais = [
   { id: 10, nome: 'Máquina A', status: 'Produzindo', setor: 'Engrenagens', data: '2026-04-09T10:00' },
   { id: 2, nome: 'Máquina C', status: 'Setup', setor: 'Roscas', data: '2026-04-08T15:30' },
   { id: 5, nome: 'Máquina B', status: 'Parada', setor: 'Engrenagens', data: '2026-04-08T16:24' },
+];
+
+const colunasMaquinas = [
+  { id: 'nome', key: 'nome', label: 'Nome' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20' },
+  { id: 'setor', key: 'setor', label: 'Setor' },
+  { 
+    id: 'status', 
+    key: 'status', 
+    label: 'Status',
+    badge: (valor) => {
+      const config = {
+        "Produzindo": { 
+          variant: "outline", 
+          className: "bg-green-500/15 text-green-600 text-sm font-medium" 
+        },
+        "Setup": { 
+          variant: "secondary", 
+          className: "bg-[#fffbea] text-amarelo font-medium text-sm " 
+        },
+        "Parada": { 
+          variant: "destructive", 
+          className: "font-semibold text-sm border-none"
+        }        
+      };
+
+      const estilo = config[valor] || { variant: "outline", className: "" };
+      return (
+        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+          {valor}
+        </Badge>
+      );
+    }
+  },
+  { id: 'data', key: 'data', label: 'Data' },
 ];
 
 export default function Maquinas() {
@@ -47,6 +85,7 @@ export default function Maquinas() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
 
+  //lógica de ordenação
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
 
@@ -143,7 +182,7 @@ export default function Maquinas() {
 
       console.log("Cadastro realizado com sucesso!", resposta);
       setIsCreateOpen(false);
-      limparFormulario(); 
+      limparFormulario();
 
     } catch (erro) {
       console.error("Erro ao enviar a requisição:", erro);
@@ -189,7 +228,6 @@ export default function Maquinas() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
 
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro de máquina */}
@@ -365,20 +403,8 @@ export default function Maquinas() {
 
           </Dialog>
         </div>
-        <Dialog>
-          <DialogTrigger className="flex items-center rounded-md bg-secondary-foreground px-4 py-1 text-xl font-semibold text-white">
-            <Plus className="mr-2" />Cadastrar
-          </DialogTrigger>
-
-          <DialogContent className="top-0 left-0 right-0 max-w-none translate-x-0 translate-y-0 rounded-b-lg">
-            <div className="flex items-center">
-              <Plus className="mr-2" />
-              <DialogTitle className="text-2xl">Cadastrar Máquina</DialogTitle>
-            </div>
-            <Separator className="m-2 bg-[#a6a6a6]" />
-          </DialogContent>
-        </Dialog>
       </section>
+      
       {/* SEÇÃO 1: Graphs */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -434,8 +460,8 @@ export default function Maquinas() {
           <ProducaoTotalWidget />
         </div>
       </section>
-      
- {/* LISTAGEM MAQUINAS      */}
+
+      {/* LISTAGEM MAQUINAS      */}
 
       {/* Listagem */}
       <section id="listagem_maquinas">
@@ -476,14 +502,44 @@ export default function Maquinas() {
 
 
         {/* tabela temporária, apenas para testes */}
-        <div className="px-8 mt-5 pb-10">
-          {dadosExibidos.length === 0 ? (
-            //mensagem quando não há dados correspondentes
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500 w-full mt-10">
+        <div className="flex flex-col flex-1 items-center w-full mt-4">
+          {dadosExibidos.length > 0 ? (
+
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosExibidos} columns={colunasMaquinas}
+
+              // 1. Para a ação "ver detalhes" Url com base na linha clicada
+              viewLink={(row) => `/maquinas/${row.id}`}
+
+              // 2.  modais de Editar e Excluir para a tabela renderizar
+              dialogs={{
+                edit: (row) => (
+                  <DialogContent className="rounded-lg">
+                    <DialogTitle>Editar Máquina </DialogTitle> {/* Faz seu nome Gi, não estiizei nada */}
+                    <Separator className="my-2" />
+
+                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
+                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
+
+                  </DialogContent>
+                ),
+                delete: (row) => (
+                  <DialogContent>
+                    <DialogTitle className="text-red-600">Excluir Máquina</DialogTitle>
+
+                  </DialogContent>
+                )
+              }}
+            />
+          ) : (
+            //caso não encontre nada correspondente
+            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
               <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
+              <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
               <p>Não encontramos nenhum resultado para "{busca}".</p>
             </div>
+<<<<<<< HEAD
           ) : (
             // A tabela inteira (com thead e tbody) só aparece se houver dados
             <table className="w-full border-collapse">
@@ -508,8 +564,12 @@ export default function Maquinas() {
                 ))}
               </tbody>
             </table>
+=======
+>>>>>>> a2ad22bb227dad1ee5d4d491f433af19b45ecc29
           )}
         </div>
+
+
       </section>
 
     </main>

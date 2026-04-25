@@ -1,6 +1,6 @@
 "use client"
 
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main"
 import {
   Sidebar,
   SidebarContent,
@@ -14,28 +14,19 @@ import {
   Users,
   Wrench,
 } from "lucide-react"
+import { ListBulletsIcon } from "@phosphor-icons/react"
 
 const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/adm/DashboardGeralEmpresaADM",
+      url: "/operador",
       icon: <PieChartIcon />,
     },
     {
       title: "Maquinas",
       url: "/adm/maquinas",
       icon: <Wrench />,
-    },
-    {
-      title: "Usuarios",
-      url: "/adm/usuarios",
-      icon: <Users />,
-    },
-    {
-      title: "Setores",
-      url: "/adm/setores",
-      icon: <Folders />,
     },
     {
       title: "Historico de Eventos",
@@ -45,7 +36,7 @@ const data = {
     {
       title: "Ordem de Producao",
       url: "#",
-      icon: <Logs />,
+      icon: <ListBulletsIcon size={32} />,
     },
     {
       title: "Andon",

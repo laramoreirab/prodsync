@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/sidebar-components/sidebar-adm/app-sidebar"
+import { AppSidebar } from "@/components/sidebar-components/sidebar-gestor/app-sidebar"
 import Header from "@/components/ui/topbar"
 
 export default function AdminLayout({ children }) {

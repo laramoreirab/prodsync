@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/ui/topbar";
 import React, { useState } from 'react';
 import { OEEPorSetorWidget } from "@/features/setores/OEEPorSetorWidget";
 import { RefugoPorSetorWidget } from "@/features/setores/RefugoPorSetorWidget";
@@ -137,9 +136,6 @@ export default function PageLayout() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="w-full">
-        <Header />
-      </div>
 
       <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">
@@ -162,16 +158,14 @@ export default function PageLayout() {
                 <div className="flex items-center">
                   <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
                     <Plus className="mr-2 text-3xl text-white" />
-x                    <DialogTitle className="text-3xl text-white">Criar Setor</DialogTitle>
+                    <DialogTitle className="text-3xl text-white">Criar Setor</DialogTitle>
                   </div>
                 </div>
                 <Separator className="m-2 bg-[#a6a6a6]" />
+                <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+
+                </form>
               </DialogContent>
-
-              <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
-
-              </form>
-
             </Dialog>
           </div>
         </section>
@@ -210,7 +204,7 @@ x                    <DialogTitle className="text-3xl text-white">Criar Setor</D
 
       <section className="listagem_setores">
         <div className="flex items-center p-8 gap-5">
-          <h1 className="text-4xl w-[125] font-semibold">Listagem de Usuários</h1>
+          <h1 className="text-4xl w-[125] font-semibold">Listagem de Setores</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
         {/* Busca */}
