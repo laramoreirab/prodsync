@@ -2,8 +2,8 @@ import React from 'react';
 
 const OrdenarDropdown = ({ options = [], label, onSortChange }) => {
     return (
-        <div className="flex items-center bg-white gap-2">
-            {label && <span className="text-cinza-escuro bg-white text-md font-medium">{label}</span>}
+        <div className="flex items-center gap-2">
+            {label && <span className="text-cinza-escuro text-md font-medium">{label}</span>}
 
             <select
                 defaultValue=""

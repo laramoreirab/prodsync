@@ -215,9 +215,9 @@ export default function Usuarios() {
   ];
 
   const colunasUsuarios = [
-    { id: 'nome', key: 'nome', label: 'Nome' },
-    { id: 'id', key: 'id', label: 'ID', className: 'w-20' },
-    { id: 'setor', key: 'setor', label: 'Setor' },
+    { id: 'nome', key: 'nome', label: 'Nome', className: 'w-1/4' },
+    { id: 'id', key: 'id', label: 'ID', className: 'w-40' },
+    { id: 'setor', key: 'setor', label: 'Setor', className: 'w-2/9' },
     { id: 'funcao', key: 'funcao', label: 'Função' },
     { id: 'turno', key: 'turno', label: 'Turno' },
   ];
@@ -690,7 +690,7 @@ export default function Usuarios() {
                           <label className={labelStyle}>Turno</label>
                           <select id="turnoUser" value={formData.turnoUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
                             <option value="">Selecione...</option>
-                            <option value="Manhã">Manhã</option>
+                            <option value="Manha">Manhã</option>
                             <option value="Tarde">Tarde</option>
                             <option value="Noite">Noite</option>
                           </select>
