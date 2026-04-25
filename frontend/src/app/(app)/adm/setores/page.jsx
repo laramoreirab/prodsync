@@ -17,6 +17,8 @@ import { Separator } from "@/components/ui/separator";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 
+import TableListagens from "@/components/table";
+
 
 const setoresFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },//backend que vai enviar as options posteriormente
@@ -26,9 +28,17 @@ const setoresFilter = [
 ];
 
 const dadosOriginais = [
-  { setor: "roscas", gestor: "Luiz Mariz", OEE_Médio: '76%', QTD_De_Máquinas: 67, QTD_De_Operadores: 60 },
-  { setor: "engrenagens", gestor: "Luiza Mariza", OEE_Médio: '78%', QTD_De_Máquinas: 60, QTD_De_Operadores: 58 },
-  { setor: "brocas", gestor: "Estevão Ferreira", OEE_Médio: '77%', QTD_De_Máquinas: 50, QTD_De_Operadores: 34 },
+  { setor: "roscas", gestor: "Luiz Mariz", oee_medio: '76%', qtd_de_maquinas: 67, qtd_de_operadores: 60 },
+  { setor: "engrenagens", gestor: "Luiza Mariza", oee_medio: '78%', qtd_de_maquinas: 60, qtd_de_operadores: 58 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
+  { setor: "brocas", gestor: "Estevão Ferreira", oee_medio: '77%', qtd_de_maquinas: 50, qtd_de_operadores: 34 },
 ];
 
 export default function PageLayout() {
@@ -114,6 +124,14 @@ export default function PageLayout() {
     { label: 'Qtd. Máquinas Decrescente', value: 'qtdMaquinas_desc' },
     { label: 'Qtd. Operadores Crescente', value: 'qtdOperadores_asc' },
     { label: 'Qtd. Operadores Decrescente', value: 'qtdOperadores_desc' },
+  ];
+
+  const colunasSetores = [
+    { id: 'setor', key: 'setor', label: 'Setor', className: 'w-1/7' },
+    { id: 'gestor', key: 'gestor', label: 'Gestor', className: 'w-1/5' },
+    { id: 'oee_medio', key: 'oee_medio', label: 'OEE Médio', className: 'w-45' },
+    { id: 'qtd_de_maquinas', key: 'qtd_de_maquinas', label: 'Qtd. de Máquinas', className: 'w-1/5' },
+    { id: 'qtd_de_operadores', key: 'qtd_de_operadores', label: 'Qtd. de Operadores' },
   ];
 
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
@@ -241,43 +259,48 @@ export default function PageLayout() {
 
         </div>
 
-        {/* tabela temporária, apenas para testes */}
-        <div className="px-8 mt-5 pb-10 w-full">
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 w-full overflow-x-auto">
+        <div className="flex flex-col flex-1 items-center w-full mt-4">
+          {dadosExibidos.length > 0 ? (
+            /* dados só renderizam a tabela se tiver resultado */
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosExibidos} 
+              columns={colunasSetores}
+              enableSelection={true}
 
-            {dadosExibidos.length > 0 ? (
-              /* dados só renderizam a tabela se tiver resultado */
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 text-left text-gray-600">
-                    <th className="p-3">Setor</th>
-                    <th className="p-3">OEE Médio</th>
-                    <th className="p-3">Qtd. de Máquinas</th>
-                    <th className="p-3">Qtd. de Operadores</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dadosExibidos.map((item, index) => (
-                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="p-3 font-medium capitalize">{item.setor}</td>
-                      <td className="p-3">{item.OEE_Médio}</td>
-                      <td className="p-3">{item.QTD_De_Máquinas}</td>
-                      <td className="p-3">{item.QTD_De_Operadores}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              /* se não tiver correspondência (length === 0), mostra apenas a div */
-              <div className="flex flex-col items-center justify-center p-8 text-gray-500 w-full mt-4">
-                <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum setor encontrado</h2>
-                <p>Não encontramos nenhum resultado para "{busca}".</p>
-              </div>
-            )}
+              // 1. Para a ação "ver detalhes" Url com base na linha clicada
+              viewLink={(row) => `/maquinas/${row.id}`}
 
-          </div>
+              // 2.  modais de Editar e Excluir para a tabela renderizar
+              dialogs={{
+                edit: (row) => (
+                  <DialogContent className="rounded-lg">
+                    <DialogTitle>Editar Máquina </DialogTitle> {/* Faz seu nome Gi, não estiizei nada */}
+                    <Separator className="my-2" />
+
+                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
+                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
+
+                  </DialogContent>
+                ),
+                delete: (row) => (
+                  <DialogContent>
+                    <DialogTitle className="text-red-600">Excluir Máquina</DialogTitle>
+
+                  </DialogContent>
+                )
+              }}
+            />
+          ) : (
+            /* se não tiver correspondência (length === 0), mostra apenas a div */
+            <div className="flex flex-col items-center justify-center p-8 text-gray-500 w-full mt-4">
+              <Search className="w-12 h-12 mb-4 text-gray-300" />
+              <h2 className="text-xl font-semibold">Nenhum setor encontrado</h2>
+              <p>Não encontramos nenhum resultado para "{busca}".</p>
+            </div>
+          )}
         </div>
+
       </section>
 
     </main >

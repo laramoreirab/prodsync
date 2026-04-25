@@ -43,8 +43,9 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination';
 
+import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, viewLink, dialogs }) => {
+const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = false }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
   const [pagination, setPagination] = useState({
@@ -59,6 +60,8 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
     }
   ])
 
+  const [rowSelection, setRowSelection] = useState({});
+
   const table = useReactTable({
     data: data,
     columns,
@@ -70,12 +73,15 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
     onPaginationChange: setPagination,
     state: {
       sorting,
-      pagination
-    }
+      pagination,
+      rowSelection
+    },
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
   })
 
   /* Calculos botões da paginação */
-  const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
+  const { showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage: table.getState().pagination.pageIndex + 1,
     totalPages: table.getPageCount(),
     paginationItemsToDisplay: 5
@@ -84,10 +90,21 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
   return (
     <div className='w-full px-8 mb-5'>
       <div className='overflow-hidden rounded-md border bg-white/50 backdrop-blur-sm'>
-        <Table className="table-fixed">
+        <Table className="overflow-auto">
 
           <TableHeader>
             <TableRow className="font-semibold bg-muted/50">
+
+              {enableSelection && (
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={table.getIsAllPageRowsSelected()}
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Selecionar todos"
+                  />
+                </TableHead>
+              )}
+
               {/* Renderiza as colunas dinâmicas (a coluna vai no page específico [Usuários, Máquinas ou Setores]) */}
               {columns.map((col) => (
                 <TableHead key={col.key} className={col.className}>
@@ -102,15 +119,29 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
 
           <TableBody>
             {table.getRowModel().rows.map((row, index) => (
-              <TableRow key={row.id || index} className='font-medium'>
+              <TableRow 
+              key={row.id || index} 
+              className='font-medium'
+              data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
+
+                {enableSelection && (
+                  <TableCell>
+                    <Checkbox
+                      checked={row.getIsSelected()}
+                      onCheckedChange={(value) => row.toggleSelected(!!value)}
+                      aria-label="Selecionar linha"
+                    />
+                  </TableCell>
+                )}
 
                 {/* Renderiza linhas de dados dinâmicos */}
                 {columns.map((col) => (
                   <TableCell key={`${row.id}-${col.key}`} className={col.className}>
-  
+
                     {col.badge
-                      ? col.badge(row.original[col.key], row.original)
+                      ? col.badge(row.original[col.key], row.original) /* se tiver BADGE (o caso de máquinas) */
                       : row.original[col.key]}
+
                   </TableCell>
                 ))}
 
@@ -177,7 +208,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
         </Table>
       </div>
 
-      <div className='flex items-center max-sm:flex-col mt-3 justify-center text-center'>
+      <div className='flex items-center max-sm:flex-col mt-7 justify-center text-center'>
 
         <div className='grow items-center'>
           <Pagination>
