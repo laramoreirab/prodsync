@@ -35,7 +35,7 @@ function DialogOverlay({ className, ...props }) {
   return (
     <DialogPrimitive.Overlay
       className={cn(
-        "fixed inset-0 z-50 bg-black/10 backdrop-blur-sm",
+        "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm",
         className
       )}
       {...props}
@@ -52,12 +52,11 @@ function DialogContent({
   return (
     <DialogPortal>
       <DialogOverlay />
-
       <DialogPrimitive.Content
-        className="fixed inset-0 z-50"
+        className="fixed inset-0 z-50 overflow-y-auto flex justify-center pt-6 pb-10"
         {...props}
       >
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[90vw] sm:w-[70vw] md:w-[50vw] max-w-[50vw] rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none">
+        <div className="relative h-fit w-[90vw] sm:w-[70vw] md:w-[50vw] max-w-[37vw] rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none shadow-2xl">
           {children}
 
           {showCloseButton && (

@@ -26,7 +26,6 @@ export default function Testimonial01({
                             <h2 className="sm:text-5xl text-xl leading-none font-medium tracking-tight">
                                 Histórias de Sucesso com
                             </h2>
-
                             <img
                                 src="/logo.png"
                                 alt="Logo da Empresa"

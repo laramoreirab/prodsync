@@ -96,7 +96,7 @@ class EscalaTrabalhoModel {
                         select: {
                             id_usuario: true,
                             nome: true,
-                            identificador: true
+                            id_usuario: true
                         }
                     },
                     maquina: {
