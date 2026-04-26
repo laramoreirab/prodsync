@@ -430,3 +430,16 @@ export const mockOPOEEDetalhe = {
   qualidade:       90,
   oee:             72.5,
 };
+
+export const mockAndonStatusMaquinas = {
+  emProducao: 12,
+  emSetup:     3,
+  emParada:    2,
+};
+ 
+export const mockAndonRanking = [
+  { setor: "THAK-9879", produtividade: 95 },
+  { setor: "THAK-9878", produtividade: 80 },
+  { setor: "THAK-9877", produtividade: 70 },
+  { setor: "THAK-9876", produtividade: 55 },
+];
