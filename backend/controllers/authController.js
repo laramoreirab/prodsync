@@ -253,11 +253,11 @@ class AuthController {
             })
 
         } catch (error) {
-            console.error('Erro ao registrar usuário:', error);
+            console.error('Erro ao registrar empresa e usuário:', error);
             return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível registrar o usuário'
+                mensagem: 'Não foi possível registrar empresa ou usuário'
             });
         }
     }
