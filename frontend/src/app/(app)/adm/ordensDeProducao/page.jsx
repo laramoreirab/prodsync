@@ -1,5 +1,4 @@
 // src/app/(app)/adm/ordens/page.jsx
-import Header from "@/components/ui/topbar";
 import { OPAtivasKPIWidget }     from "@/features/ordens/OPAtivasKPIWidget";
 import { OPAtrasadasKPIWidget }  from "@/features/ordens/OPAtrasadasKPIWidget";
 import { OPPecasBoasKPIWidget }  from "@/features/ordens/OPPecasBoasKPIWidget";
@@ -22,7 +21,6 @@ export default function OrdensDeProducaoPage() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="w-full"><Header /></div>
 
       <div className="w-full max-w-6xl mt-8 pb-10 px-4 space-y-4">
 

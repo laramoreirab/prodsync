@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/ui/topbar";
 import React, { useState } from 'react';
 import { OEEPorSetorWidget } from "@/features/setores/OEEPorSetorWidget";
 import { RefugoPorSetorWidget } from "@/features/setores/RefugoPorSetorWidget";
@@ -155,9 +154,6 @@ export default function PageLayout() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="w-full">
-        <Header />
-      </div>
 
       <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">

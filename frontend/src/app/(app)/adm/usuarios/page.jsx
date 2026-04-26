@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-import Header from "@/components/ui/topbar";
 import TableListagens from "@/components/table";
 
 import { useUsuarios } from "@/hooks/useUsuarios";
@@ -237,7 +236,6 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">

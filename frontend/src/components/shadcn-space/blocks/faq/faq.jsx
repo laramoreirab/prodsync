@@ -12,17 +12,17 @@ const FAQ_DATA = [
   {
     question: "Como o sistema sabe quando a máquina está parada?",
     answer:
-      "",
+      "Nosso sistema pode ser integrado diretamente às máquinas (via sensores ou CLPs) ou receber o apontamento do operador. Assim, o status da máquina é atualizado em tempo real e o gestor não precisa esperar horas para descobrir um problema.",
   },
   {
     question: "Preciso estar no computador para usar o sistema?",
     answer:
-      "Não, o sistema pode ser acessado tanto via site quanto pelo nosso aplicativo.",
+      "Não. O sistema é acessível em diferentes dispositivos — pode ser usado em computadores, tablets ou celulares. Isso garante que operadores, gestores e administradores acompanhem a produção de onde estiverem.",
   },
   {
     question: "O que acontece se o operador esquecer de registrar a produção?",
     answer:
-      "",
+      "O sistema mantém o histórico de eventos e permite identificar lacunas. O gestor consegue ver rapidamente se há registros faltando e cobrar ou corrigir. Isso evita que dados importantes se percam e mantém a rastreabilidade.",
   },
   {
     question: "Como esses dados ajudam a melhorar a produção?",
@@ -42,8 +42,14 @@ const FAQ_DATA = [
   },
   {
     question: "Como posso tirar minhas dúvidas sobre o sistema?",
-    answer:
-      "E-mail: prodsync@gmail.com Telefone: 4004-8922",
+    answer:(
+    <div className="flex flex-col ">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>E-mail: prodsync@gmail.com </li>
+          <li>Telefone: 4004-8922</li>
+        </ul>
+      </div>
+      ),
   },
 ];
 

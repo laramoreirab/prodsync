@@ -1,7 +1,6 @@
 "use client"
 
-import Header from "@/components/ui/topbar";
-import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react"; // Adicionei Pencil e Trash2
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 import React, { useState } from 'react';
@@ -77,7 +76,6 @@ const colunasMaquinas = [
 ];
 
 export default function Maquinas() {
-  //estado que vai para a tela (começa com todos os dados)
   const [dados, setDados] = useState(dadosOriginais);
   const [busca, setBusca] = useState("");
 
@@ -101,9 +99,7 @@ export default function Maquinas() {
     setDados(dadosCopiados);
   };
 
-  //recebendo os filtros do dropdown e atualizando a tabela
   const aplicarFiltros = (filtrosSelecionados) => {
-    //filtra a partir da lista original completa
     let dadosFiltrados = [...dadosOriginais];
 
     //filtro por status
@@ -113,7 +109,6 @@ export default function Maquinas() {
       );
     }
 
-    //filtro por setor
     if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(maq =>
         filtrosSelecionados.setor.includes(maq.setor)
@@ -233,7 +228,6 @@ export default function Maquinas() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
 
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro de máquina */}
@@ -492,7 +486,7 @@ export default function Maquinas() {
         <div className="row_ord_fil_cont flex items-center justify-between px-8 mt-3">
           <p>{dadosExibidos.length} máquinas encontradas</p>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             <OrdenarDropdown
               label="Ordenar por"
               options={opcoesOrdenacao}
