@@ -70,3 +70,4 @@ export const SetorProducaoSemanalSchema = z.object({
 });
 
 export const SetorMotivosParadaArraySchema = z.array(SetorMotivosParadaSchema);
+export const SetorProducaoSemanalArraySchema = z.array(SetorProducaoSemanalSchema);

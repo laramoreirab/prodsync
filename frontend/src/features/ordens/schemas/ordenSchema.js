@@ -36,6 +36,30 @@ export const OPConcluidasDiaSchema = z.object({
   total: z.number(),
 });
 
+export const OPDetalheSchema = z.object({
+  id:         z.string(),
+  meta:       z.number(),
+  setor:      z.string(),
+  status:     z.string(),
+  prioridade: z.string(),
+  operador:   z.string(),
+  dataInicio: z.string(),
+  prazoFinal: z.string(),
+  imagem:     z.string().optional(),
+});
+ 
+export const OPProgressoSchema = z.object({
+  produzidos: z.number(),
+  aProduzir:  z.number(),
+});
+ 
+export const OPOEEDetalheSchema = z.object({
+  disponibilidade: z.number().min(0).max(100),
+  performance:     z.number().min(0).max(100),
+  qualidade:       z.number().min(0).max(100),
+  oee:             z.number().min(0).max(100),
+});
+
 // Arrays
 export const OPRefugoArraySchema        = z.array(OPRefugoSchema);
 export const OPCargaSetorArraySchema    = z.array(OPCargaSetorSchema);

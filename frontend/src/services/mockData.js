@@ -89,10 +89,17 @@ export const mockOperadoresMediaKPI = {
 
 export const mockOEEPorSetor = [
   { setor: "Engrenagens", oee: 90 },
-  { setor: "Roscas",      oee: 80 },
+  { setor: "Roscas",      oee: 82 },
+  { setor: "Usinagem",    oee: 78 },
+  { setor: "Fundição",    oee: 72 },
+  { setor: "Montagem",    oee: 68 },
   { setor: "Embalagens",  oee: 65 },
+  { setor: "Pintura",     oee: 58 },
+  { setor: "Soldagem",    oee: 52 },
+  { setor: "Corte CNC",   oee: 45 },
   { setor: "Injeção",     oee: 35 },
-  { setor: "Usinagem",    oee: 75 },
+  { setor: "Acabamento",  oee: 28 },
+  { setor: "Logística",   oee: 88 },
 ];
 
 export const mockRefugoPorSetor = [
@@ -411,3 +418,15 @@ export const mockSetorProducaoSemanal = [
   { dia: "Sábado",  qtd: 90  },
   { dia: "Domingo", qtd: 50  },
 ];
+ 
+export const mockOPProgresso = {
+  produzidos: 82.8,
+  aProduzir:  17.2,
+};
+ 
+export const mockOPOEEDetalhe = {
+  disponibilidade: 85,
+  performance:     90,
+  qualidade:       90,
+  oee:             72.5,
+};

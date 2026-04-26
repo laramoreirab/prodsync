@@ -122,8 +122,7 @@ export const setorMotivosParadaService = {
 
 export const setorProducaoSemanalService = {
   async getProducaoSemanal(setorId) {
-    if (USE_MOCK) return [SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal)]; 
-    const data = await apiFetch(`/setores/${setorId}/producao_semanal`);
+if (USE_MOCK) return SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal);    const data = await apiFetch(`/setores/${setorId}/producao_semanal`);
     return SetorProducaoSemanalArraySchema.parse(data); 
   },
 };
