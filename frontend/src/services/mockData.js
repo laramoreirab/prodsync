@@ -366,3 +366,38 @@ export const mockVelocidadeMaquina = [
   { tipo: "Velocidade Normal", valor: 45 },
   { tipo: "Velocidade Atual",  valor: 38 },
 ];
+
+export const mockSetorMaquinaStatus = {
+  emProducao: 12,
+  emSetup: 3,
+  emParada: 2,
+};
+
+export const mockSetorOEEMedio = {
+  setor: "Engrenagens",
+  oee: 75,
+};
+
+export const mockSetorOEEEvolucao = [
+  { dia: "Dia 1", oee: 65 },
+  { dia: "Dia 2", oee: 80 },
+  { dia: "Dia 3", oee: 75 },
+  { dia: "Dia 4", oee: 78 },
+  { dia: "Dia 5", oee: 85 },
+  { dia: "Dia 6", oee: 83 },
+  { dia: "Dia 7", oee: 90 },
+];
+
+export const mockSetorTopOperadores = [
+  { operador: "Márcio",  qtd: 60 },
+  { operador: "Vinícius", qtd: 45 },
+  { operador: "Josefe",  qtd: 80 },
+  { operador: "Antônio", qtd: 30 },
+  { operador: "Maria",   qtd: 42 },
+];
+
+export const mockSetorMotivosParada = [
+  { motivo: "Manutenção",        qtd: 45 },
+  { motivo: "Falta de Materiais", qtd: 38 },
+  { motivo: "Limpeza",           qtd: 28 },
+];
