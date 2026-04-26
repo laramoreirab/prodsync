@@ -12,8 +12,8 @@ import { useRouter } from "next/navigation";
 import { mascaraCNPJ, mascaraCPF, mascaraTelefone } from "@/utils/mascaras";
 
 const CAMPOS_INICIAIS = {
-  nomeEmpresa: "", cnpj: "", telefone: "", endereco: "",
-  email: "", representante: "", cpf: "", senha: "",
+  nome_empresa: "", cnpj: "", telefone: "", endereco: "",
+  email: "", nome_representante: "", cpf: "", senha: "",
 };
 
 export default function RegisterForm() {
@@ -73,12 +73,12 @@ export default function RegisterForm() {
         </div>
 
         <div className="space-y-4">
-          <FormField label="Nome da Empresa" campo="nomeEmpresa" placeholder="Ex: Tech Ltda" value={form.nomeEmpresa} erro={erros.nomeEmpresa} onChange={handleChange} />
+          <FormField label="Nome da Empresa" campo="nome_empresa" placeholder="Ex: Tech Ltda" value={form.nome_empresa} erro={erros.nome_empresa} onChange={handleChange} />
           <FormField label="CNPJ da Empresa" campo="cnpj" placeholder="00.000.000/0000-00" value={form.cnpj} erro={erros.cnpj} onChange={handleChange} mascara={mascaraCNPJ} />
           <FormField label="Telefone" campo="telefone" placeholder="(11) 99999-9999" value={form.telefone} erro={erros.telefone} onChange={handleChange} mascara={mascaraTelefone} />
-          <FormField label="Endereco" campo="endereco" placeholder="Rua exemplo, 123" value={form.endereco} erro={erros.endereco} onChange={handleChange} />
+          <FormField label="Endereço" campo="endereco" placeholder="Rua exemplo, 123" value={form.endereco} erro={erros.endereco} onChange={handleChange} />
           <FormField label="Email" campo="email" placeholder="empresa@email.com" value={form.email} erro={erros.email} onChange={handleChange} />
-          <FormField label="Representante" campo="representante" placeholder="Seu nome" value={form.representante} erro={erros.representante} onChange={handleChange} />
+          <FormField label="Representante" campo="nome_representante" placeholder="Seu nome" value={form.nome_representante} erro={erros.nome_representante} onChange={handleChange} />
           <FormField label="CPF" campo="cpf" placeholder="000.000.000-00" value={form.cpf} erro={erros.cpf} onChange={handleChange} mascara={mascaraCPF} />
           <FormField label="Senha" campo="senha" placeholder="••••••••" type="password" value={form.senha} erro={erros.senha} onChange={handleChange} />
         </div>
