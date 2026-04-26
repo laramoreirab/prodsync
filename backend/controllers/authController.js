@@ -228,11 +228,22 @@ class AuthController {
             // 2. Pegamos o usuário ADM que o Prisma acabou de criar e devolveu junto com a empresa
             const registroAdm = novaEmpresa.usuarios[0];
 
+            //gerar token
+            const token = jwt.sign({
+                id_empresa: novaEmpresa.id_empresa,
+                id_usuario: registroAdm.id_usuario,
+                tipo: registroAdm.tipo
+            },
+                JWT_CONFIG.secret,
+                { expiresIn: JWT_CONFIG.expiresIn }
+            );
+
             // 3. Retornamos o sucesso para o frontend
             return res.status(201).json({
                 sucesso: true,
                 mensagem: 'Empresa e administrador criados com sucesso!',
                 dados: {
+                    token,
                     id_empresa: novaEmpresa.id_empresa,
                     id_usuario: registroAdm.id_usuario,
                     nome_empresa: novaEmpresa.nome_empresa,
@@ -242,11 +253,11 @@ class AuthController {
             })
 
         } catch (error) {
-            console.error('Erro ao registrar usuário:', error);
+            console.error('Erro ao registrar empresa e usuário:', error);
             return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível registrar o usuário'
+                mensagem: 'Não foi possível registrar empresa ou usuário'
             });
         }
     }
@@ -310,6 +321,16 @@ class AuthController {
                     mensagem: 'Identificador não encontrado'
                 })
             }
+            //gerar token
+            const token = jwt.sign({
+                id_empresa: usuario.id_empresa,
+                id_usuario: usuario.id_usuario,
+                tipo: usuario.tipo
+            },
+                JWT_CONFIG.secret,
+                { expiresIn: JWT_CONFIG.expiresIn }
+            );
+
             //verificar se o id ainda não possui senha cadastrada
             const verificacaoSenha = await UsuarioModel.verificaSenhaUsuario(id);
             if (verificacao === true) {
@@ -322,8 +343,15 @@ class AuthController {
 
             return res.status(201).json({
                 sucesso: true,
-                mensagem: 'Identificador encontrado!'
-            });
+                mensagem: 'Identificador encontrado!',
+                dados: {
+                    token,
+                    id_empresa: usuario.id_empresa,
+                    nome: usuario.nome,
+                    id_usuario: usuario.id_usuario,
+                    tipo: usuario.tipo
+                }
+            });   
 
         } catch (error) {
             console.error('Erro ao verificar identificador:', error);
@@ -335,10 +363,10 @@ class AuthController {
         }
     }
 
-    //POST api/auth/registroSenha/:id - registrar a senha de primeiro acesso do usuário
+    //POST api/auth/registroSenha- registrar a senha de primeiro acesso do usuário
     static async registroSenha(req, res) {
         try {
-            const { id } = req.params;
+            const { id } = req.user.id_usuario;
             const { senha, senhaConfirmada } = req.body;
 
             if (!senha || senha.trim() === '') {
