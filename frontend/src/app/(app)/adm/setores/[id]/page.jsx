@@ -4,6 +4,7 @@ import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
 import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
 import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
 import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
+import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
 
 export default function SetorEspecificoPage({ params }) {
   const { id } = params;
@@ -45,7 +46,7 @@ export default function SetorEspecificoPage({ params }) {
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
-            <SetorOEEEvolucaoWidget setorId={id} />
+            <SetorProducaoSemanalWidget setorId={id} />
           </div>
           <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
             <SetorTopOperadoresWidget setorId={id} />

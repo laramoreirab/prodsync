@@ -12,6 +12,7 @@ import {
     SetorOEEEvolucaoArraySchema,
     SetorTopOperadoresArraySchema,
     SetorMotivosParadaArraySchema,
+    SetorProducaoSemanalArraySchema,
   } from "@features/setores/schemas/setorSchema";
 import {
   mockSetores,
@@ -20,6 +21,7 @@ import {
   mockOEEPorSetor,
   mockRefugoPorSetor,
   mockOEECritico,
+  mockSetorProducaoSemanal
 } from "./mockData";
  import {
     mockSetorMaquinaStatus,
@@ -115,5 +117,13 @@ export const setorMotivosParadaService = {
     if (USE_MOCK) return SetorMotivosParadaArraySchema.parse(mockSetorMotivosParada);
     const data = await apiFetch(`/setores/${setorId}/motivos_parada`);
     return SetorMotivosParadaArraySchema.parse(data);
+  },
+};
+
+export const setorProducaoSemanalService = {
+  async getProducaoSemanal(setorId) {
+    if (USE_MOCK) return [SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal)]; 
+    const data = await apiFetch(`/setores/${setorId}/producao_semanal`);
+    return SetorProducaoSemanalArraySchema.parse(data); 
   },
 };

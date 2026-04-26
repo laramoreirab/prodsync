@@ -33,4 +33,11 @@ export const setorMotivosParadaConfig = {
     color: "#00357a",
   },
 };
+
+export const setorProducaoSemanalConfig = {
+  qtd: {
+    label: "Produção Semanal:",
+    color: "#00357a",
+  },
+};
  

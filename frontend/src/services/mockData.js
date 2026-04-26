@@ -401,3 +401,13 @@ export const mockSetorMotivosParada = [
   { motivo: "Falta de Materiais", qtd: 38 },
   { motivo: "Limpeza",           qtd: 28 },
 ];
+
+export const mockSetorProducaoSemanal = [
+  { dia: "Segunda", qtd: 120 },
+  { dia: "Terça",   qtd: 150 }, 
+  { dia: "Quarta",  qtd: 130 },
+  { dia: "Quinta",  qtd: 170 },
+  { dia: "Sexta",   qtd: 160 },
+  { dia: "Sábado",  qtd: 90  },
+  { dia: "Domingo", qtd: 50  },
+];

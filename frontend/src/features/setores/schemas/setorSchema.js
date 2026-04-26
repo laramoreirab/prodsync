@@ -63,4 +63,10 @@ export const SetorMotivosParadaSchema = z.object({
   motivo: z.string(),
   qtd:    z.number(),
 });
+
+export const SetorProducaoSemanalSchema = z.object({
+  dia: z.string(),
+  qtd: z.number(),
+});
+
 export const SetorMotivosParadaArraySchema = z.array(SetorMotivosParadaSchema);
