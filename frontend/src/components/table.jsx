@@ -25,7 +25,7 @@ import {
 import { EllipsisVertical, EyeIcon, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { usePagination } from '@/hooks/use-pagination';
 
@@ -60,6 +60,26 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
     }
   ])
 
+  const pagesToShow = useMemo(() => {
+    const total = table.getPageCount();
+    const current = table.getState().pagination.pageIndex + 1;
+
+    if (total <= 1) return [1];
+
+    const pages = new Set();
+
+    pages.add(1);
+    if (total >= 2) pages.add(2);
+    pages.add(current);
+    if (total >= 3) pages.add(total - 1);
+    pages.add(total);
+
+    return Array.from(pages).filter(p => p > 0 && p <= total).sort((a, b) => a - b);
+  }, [table.getPageCount(), table.getState().pagination.pageIndex]);
+
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const totalPages = table.getPageCount();
+
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
@@ -67,9 +87,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    enableSortingRemoval: false,
-    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting, getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     state: {
       sorting,
@@ -96,7 +114,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
             <TableRow className="font-semibold bg-muted/50">
 
               {enableSelection && (
-                <TableHead className="w-[50px]">
+                <TableHead className="w-12.5">
                   <Checkbox
                     checked={table.getIsAllPageRowsSelected()}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
@@ -119,10 +137,10 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
 
           <TableBody>
             {table.getRowModel().rows.map((row, index) => (
-              <TableRow 
-              key={row.id || index} 
-              className='font-medium'
-              data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
+              <TableRow
+                key={row.id || index}
+                className='font-medium'
+                data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
 
                 {enableSelection && (
                   <TableCell>
@@ -221,7 +239,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                   aria-label='Página anterior'>
                   <ChevronLeftIcon aria-hidden='true'
                     strokeWidth={3}
-                    className='!w-7 !h-7' />
+                    size={16} />
                 </Button>
               </PaginationItem>
 

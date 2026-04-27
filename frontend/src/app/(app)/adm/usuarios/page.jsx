@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import TableListagens from "@/components/table";
+import DataTableWithPaginationDemo from '@/components/shadcn-studio/data-table/data-table-11';
 
 import { useUsuarios } from "@/hooks/useUsuarios";
 import { usuarioService } from "@/services/usuariosCrudService";
@@ -40,6 +41,7 @@ import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
 import { SobrecargaSetorWidget } from "@/features/usuarios/SobrecargaSetorWidget";
 import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
+
 
 
 export default function Usuarios() {
@@ -713,6 +715,8 @@ export default function Usuarios() {
             </div>
           )}
         </div>
+
+        <DataTableWithPaginationDemo />
 
       </section>
     </main >
