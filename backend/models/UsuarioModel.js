@@ -418,67 +418,27 @@ class UsuarioModel {
             throw error;
         }
     }
-    static async taxaCumprimentoMetaPorSetor(id_empresa) {
 
-        // busca ordens de produção agrupadas por setor com qtd planejada
-        const ordens = await prisma.ordemProducao.findMany({
-            where: { id_empresa },
-            select: {
-                qtd_planejada: true,
-                id_setor: true,
-                setores: { select: { nome_setor: true } }
-            }
-        })
+    // ------------------------------------------------------Dashboard da página específica de usuário-------------------------------------------------------------
 
-        // busca apontamentos com qtd produzida por setor
-        const apontamentos = await prisma.apontamento.findMany({
-            where: { id_empresa },
-            select: {
-                qtd_boa: true,
-                qtd_refugo: true,
-                maquina: {
-                    select: {
-                        setor: { select: { id_setor: true, nome_setor: true } }
-                    }
-                }
-            }
-        })
+    static async metaProducao() {
+        try {
+            const ordensDaMaquina =  await prisma.ordemproducao.findMany(
+                
+            )
+        } catch (error) {
 
-        // agrupa qtd planejada por setor
-        const planejadoPorSetor = {}
-        for (const ordem of ordens) {
-            const setor = ordem.setores?.nome_setor ?? 'Sem setor'
-            if (!planejadoPorSetor[setor]) planejadoPorSetor[setor] = 0
-            planejadoPorSetor[setor] += ordem.qtd_planejada ?? 0
         }
-
-        // agrupa qtd produzida por setor
-        const produzidoPorSetor = {}
-        for (const ap of apontamentos) {
-            const setor = ap.maquina?.setor?.nome_setor ?? 'Sem setor'
-            if (!produzidoPorSetor[setor]) produzidoPorSetor[setor] = 0
-            produzidoPorSetor[setor] += (ap.qtd_boa ?? 0) + (ap.qtd_refugo ?? 0)
-        }
-
-        // calcula a taxa de cumprimento de cada setor
-        const setores = new Set([
-            ...Object.keys(planejadoPorSetor),
-            ...Object.keys(produzidoPorSetor)
-        ])
-
-        return Array.from(setores).map(setor => {
-            const planejado = planejadoPorSetor[setor] ?? 0
-            const produzido = produzidoPorSetor[setor] ?? 0
-
-            const taxa = planejado > 0
-                ? Math.round((produzido / planejado) * 100)
-                : 0
-
-            return {
-                setor,             // eixo X
-                taxa_cumprimento: taxa  // eixo Y — porcentagem
-            }
-        }).sort((a, b) => b.taxa_cumprimento - a.taxa_cumprimento)
     }
+
+    static async paradasJustificadasENaoJustificadasUsuario(){
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+
 }
 export default UsuarioModel

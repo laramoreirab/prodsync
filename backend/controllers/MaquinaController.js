@@ -225,6 +225,18 @@ class MaquinaController {
             });
         }
     }
+
+    // ----------------------------------------------dashboard--------------------------------------------------
+    //dashboard novo da tela de usuário adm 
+     static async taxaCumprimentoMetaPorSetor(req, res) {
+        try {
+            const dados = await UsuarioModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no gráfico Cumprimento de Meta de Produção Por Setor', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
 }
 
 export default MaquinaController;
