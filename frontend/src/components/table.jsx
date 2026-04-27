@@ -119,10 +119,10 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
 
           <TableBody>
             {table.getRowModel().rows.map((row, index) => (
-              <TableRow 
-              key={row.id || index} 
-              className='font-medium'
-              data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
+              <TableRow
+                key={row.id || index}
+                className='font-medium'
+                data-state={row.getIsSelected() ? "selected" : undefined} > {/* linhas selecioanada */}
 
                 {enableSelection && (
                   <TableCell>
@@ -139,8 +139,9 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                   <TableCell key={`${row.id}-${col.key}`} className={col.className}>
 
                     {col.badge
-                      ? col.badge(row.original[col.key], row.original) /* se tiver BADGE (o caso de máquinas) */
-                      : row.original[col.key]}
+                      ? (col.badge(row.original[col.key], row.original) ?? null)
+                      : (row.original?.[col.key] ?? null)
+                    }
 
                   </TableCell>
                 ))}

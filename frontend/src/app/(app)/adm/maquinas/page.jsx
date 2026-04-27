@@ -1,19 +1,21 @@
 "use client"
 
-import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react"; // Adicionei Pencil e Trash2
+import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 import React, { useState } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
-import { maquinaCrudService } from '@/services/maquinaCrudService';
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-
+import FormCadastroMaquina from "@/components/ui/forms/maquinas/formCadastroMaquina";
+import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
+import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
+import { useEffect } from 'react';
+import { Loader2 } from "lucide-react";
 //Widget imports - Dashboard
 import { MaquinaStatusDonutWidget } from "@/features/maquinas/MaquinaStatusDonutWidget";
 import { MaquinasPorSetorWidget } from "@/features/maquinas/MaquinasPorSetorWidget";
@@ -22,8 +24,12 @@ import { ProducaoDefeitosWidget } from "@/features/maquinas/ProducaoDefeitosWidg
 import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidget";
 import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 
+
+//imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
+
+
 
 const maquinasFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
@@ -31,37 +37,28 @@ const maquinasFilter = [
   { id: "data", label: "Parada", type: "date-range" }
 ];
 
-//guardar os dados originais intactos aqui fora, pois assim,
-//  quando o usuário limpar o filtro, a tabela consegue voltar ao normal.
-
-const dadosOriginais = [
-  { id: 10, nome: 'Máquina A', status: 'Produzindo', setor: 'Engrenagens', data: '2026-04-09T10:00' },
-  { id: 2, nome: 'Máquina C', status: 'Setup', setor: 'Roscas', data: '2026-04-08T15:30' },
-  { id: 5, nome: 'Máquina B', status: 'Parada', setor: 'Engrenagens', data: '2026-04-08T16:24' },
-];
-
 const colunasMaquinas = [
   { id: 'nome', key: 'nome', label: 'Nome' },
   { id: 'id', key: 'id', label: 'ID', className: 'w-20' },
-  { id: 'setor', key: 'setor', label: 'Setor' },
-  { 
-    id: 'status', 
-    key: 'status', 
+  { id: 'setor', key: 'id_setor', label: 'Setor' },
+  {
+    id: 'status',
+    key: 'status',
     label: 'Status',
     badge: (valor) => {
       const config = {
-        "Produzindo": { 
-          variant: "outline", 
-          className: "bg-green-500/15 text-green-600 text-sm font-medium" 
+        "Produzindo": {
+          variant: "outline",
+          className: "bg-green-500/15 text-green-600 text-sm font-medium"
         },
-        "Setup": { 
-          variant: "secondary", 
-          className: "bg-[#fffbea] text-amarelo font-medium text-sm " 
+        "Setup": {
+          variant: "secondary",
+          className: "bg-[#fffbea] text-amarelo font-medium text-sm "
         },
-        "Parada": { 
-          variant: "destructive", 
+        "Parada": {
+          variant: "destructive",
           className: "font-semibold text-sm border-none"
-        }        
+        }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -76,23 +73,25 @@ const colunasMaquinas = [
 ];
 
 export default function Maquinas() {
-  const [dados, setDados] = useState(dadosOriginais);
+  const { maquinas, loading, error, refresh, cadastrarMaquina, editarMaquina, excluirMaquina } = useMaquinas();
+  const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
-
-  // estados para contralar os modais
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
+
+  //sincronizar dados da API com estado local
+  useEffect(() => {
+    setDados(maquinas);
+  }, [maquinas]);
 
   //lógica de ordenação
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'nome') return a.nome.localeCompare(b.nome);
+      if (criterio === 'nome') return a.nome.localeCompare(b.nomeMaquina);
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'setor') return a.id_setor.localeCompare(b.id_setor);
       return 0;
     });
 
@@ -100,7 +99,7 @@ export default function Maquinas() {
   };
 
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosOriginais];
+    let dadosFiltrados = [...maquinas];
 
     //filtro por status
     if (filtrosSelecionados.status && filtrosSelecionados.status.length > 0) {
@@ -143,268 +142,55 @@ export default function Maquinas() {
   const dadosExibidos = dados.filter((maq) => {
     const termo = busca.toLowerCase();
     return (
-      maq.nome.toLowerCase().includes(termo) ||
+      maq.nome.toLowerCase().includes(termo) || 
       maq.id.toString().includes(termo)
     );
   });
 
-  const {
-    formData,
-    arquivo,
-    fileInputRef,
-    handleInputChange,
-    handleUploadClick,
-    handleFileChange,
-    preencherParaEdicao, // função do hook
-    limparFormulario
-  } = useMaquinas();
-
-  // função de envio
-  const handleSubmitPreparado = async (e) => {
-    e.preventDefault();
-    const payload = new FormData();
-
-    payload.append("nome", formData.nomeMaquina);
-    payload.append("id_maquina", formData.idMaquina);
-    payload.append("setor", formData.setorMaquina);
-    payload.append("capacidadeNormal", formData.capacidadeNormalMaquina);
-    payload.append("tipoMaquina", formData.tipoMaquina);
-    payload.append("dataAquisicao", formData.dataAquisicaoMaquina);
-    payload.append("operador", formData.operadorMaquina);
-    payload.append("status", formData.statusMaquina);
-
-    if (arquivo && arquivo.raw) {
-      payload.append("imagem", arquivo.raw);
-    }
-
-    try {
-      const resposta = await maquinaCrudService.cadastrar(payload);
-
-      console.log("Cadastro realizado com sucesso!", resposta);
-      setIsCreateOpen(false);
-      limparFormulario();
-
-    } catch (erro) {
-      console.error("Erro ao enviar a requisição:", erro);
-    }
-  };
-
   //ações da tabela
-  const abrirModalEdicao = (maquina) => {
-    preencherParaEdicao(maquina);
-    setMaquinaSelecionada(maquina);
-    setIsEditOpen(true);
-  };
-
   const abrirModalExclusao = (maquina) => {
     setMaquinaSelecionada(maquina);
-    setIsDeleteOpen(true);
   };
 
-  //envios de edição e exclusão
-  const handleEditar = async (e) => {
-    e.preventDefault();
-    const payload = new FormData();
-    payload.append("nome", formData.nomeMaquina);
-    // gi, adicione os outros appends iguais ao de criar ...
-
-    try {
-      await maquinaCrudService.editar(maquinaSelecionada.id, payload);
-      setIsEditOpen(false);
-      limparFormulario();
-    } catch (erro) {
-      console.error(erro);
-    }
-  };
-
-  const handleExcluir = async () => {
-    try {
-      await maquinaCrudService.excluir(maquinaSelecionada.id);
-      setIsDeleteOpen(false);
-    } catch (erro) {
-      console.error(erro);
-    }
-  };
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando máquinas...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
 
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro de máquina */}
-        <div className="flex justify-between p-8">
+        <div className="flex flex-wrap justify-between p-8">
           <div className="title_tela">
             <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
               Máquinas
             </h1>
           </div>
+          {/* Modal de Cadastro */}
+          <div className="modal_cadastro">
+            <Dialog>
+              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+                <Plus className="mr-2" />
+                Cadastrar
+              </DialogTrigger>
 
-          <Dialog open={isCreateOpen} onOpenChange={(open) => {
-            setIsCreateOpen(open);
-            if (!open) limparFormulario();
-          }}>
-
-            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
-              <Plus className="mr-2" />
-              Cadastrar
-            </DialogTrigger>
-
-            <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-              <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                  <Plus className="mr-2 text-3xl text-white" />
-                  <DialogTitle className="text-3xl text-white">Cadastrar Máquina</DialogTitle>
-                </div>
-
-              </div>
-              <Separator className="m-2 bg-[#a6a6a6]" />
-
-              <form onSubmit={handleSubmitPreparado} className="px-8 pb-8 pt-4 flex flex-col gap-6">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
-                  className="hidden"
-                />
-                {/* div do upload clicavel */}
-                <div
-                  onClick={handleUploadClick}
-                  className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  {!arquivo ? (
-                    <div className="flex flex-col items-center text-gray-500">
-                      <Upload className="w-12 h-12 mb-2 text-gray-400" />
-                      <span className="text-md font-medium">Clique aqui para fazer upload da imagem.</span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center w-full">
-                      {/*pré-visualização da Imagem */}
-                      <img
-                        src={arquivo.preview}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg mb-2 border"
-                      />
-                      <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
-                        <File className="w-4 h-4 mr-2 shrink-0" />
-                        <span className="text-sm truncate">{arquivo.nome}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Nome</label>
-                    <input
-                      id="nomeMaquina"
-                      type="text"
-                      placeholder=""
-                      value={formData.nomeMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">ID</label>
-                    <input
-                      id="idMaquina"
-                      type="number"
-                      value={formData.idMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Setor</label>
-                    <select
-                      id="setorMaquina"
-                      value={formData.setorMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none bg-white"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="Engrenagens">Engrenagens</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Capacidade Normal</label>
-                    <input
-                      id="capacidadeNormalMaquina"
-                      type="text"
-                      value={formData.capacidadeNormalMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Tipo de Máquina</label>
-                    <select
-                      id="tipoMaquina"
-                      value={formData.tipoMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none bg-white"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="Tipo A">Tipo A</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Data de Aquisição</label>
-                    <input
-                      id="dataAquisicaoMaquina"
-                      type="date"
-                      value={formData.dataAquisicaoMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Operador</label>
-                    <select
-                      id="operadorMaquina"
-                      value={formData.operadorMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none bg-white"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="João">João</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-md text-cinza-escuro">Status</label>
-                    <select
-                      id="statusMaquina"
-                      value={formData.statusMaquina}
-                      onChange={handleInputChange}
-                      className="border rounded-md p-2.5 outline-none bg-white"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="Parada">Parada</option>
-                      <option value="Produzindo">Produzindo</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex justify-center mt-4">
-                  <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg ">
-                    Cadastrar
-                  </button>
-                </div>
-              </form>
-            </DialogContent>
-
-          </Dialog>
+              <FormCadastroMaquina onCadastroSucesso={refresh} />
+            </Dialog>
+          </div>
         </div>
       </section>
-      
+
+
+      {/* Gráficos */}
       {/* SEÇÃO 1: Graphs */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -461,14 +247,13 @@ export default function Maquinas() {
         </div>
       </section>
 
-      {/* LISTAGEM MAQUINAS      */}
-
-      {/* Listagem */}
+      {/* LISTAGEM MAQUINAS */}
       <section id="listagem_maquinas">
         <div className="flex items-center p-8 gap-5">
           <h1 className="text-4xl w-[125] font-semibold">Inventário de Máquinas</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
+
         {/* Busca */}
         <div className="flex px-8 searchbar">
           <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
@@ -500,7 +285,6 @@ export default function Maquinas() {
           </div>
         </div>
 
-
         {/* tabela temporária, apenas para testes */}
         <div className="flex flex-col flex-1 items-center w-full mt-4">
           {dadosExibidos.length > 0 ? (
@@ -510,24 +294,19 @@ export default function Maquinas() {
               data={dadosExibidos} columns={colunasMaquinas}
 
               // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/maquinas/${row.id}`}
+              viewLink={(row) => `/adm/maquinas/${row.id}`}
 
               // 2.  modais de Editar e Excluir para a tabela renderizar
               dialogs={{
                 edit: (row) => (
-                  <DialogContent className="rounded-lg">
-                    <DialogTitle>Editar Máquina </DialogTitle> {/* Faz seu nome Gi, não estiizei nada */}
-                    <Separator className="my-2" />
-
-                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
+                  <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none">
+                    <FormEdicaoMaquina maquinaId={row.id} onEdicaoSucesso={refresh} />
                     {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
-
                   </DialogContent>
                 ),
                 delete: (row) => (
                   <DialogContent>
-                    <DialogTitle className="text-red-600">Excluir Máquina</DialogTitle>
-
+                    <FormExclusaoMaquina maquinaId={row.id} onExclusaoSucesso={refresh} />
                   </DialogContent>
                 )
               }}
@@ -537,14 +316,12 @@ export default function Maquinas() {
             <div className="flex flex-col items-center justify-center p-8 text-gray-500">
               <Search className="w-12 h-12 mb-4 text-gray-300" />
               <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
-              <p>Não encontramos nenhum resultado para "{busca}".</p>
+              <p>Não encontramos nenhum resultado "{busca}".</p>
             </div>
           )}
         </div>
-
-
       </section>
 
-    </main>
+    </main >
   );
 }

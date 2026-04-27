@@ -1,90 +1,69 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { usuariosCrudService } from '@/services/usuariosCrudService';
 
-export const useUsuarios = () => {
-  const fileInputLoteRef = useRef(null);
-  const fileInputFotoRef = useRef(null);
+export function useUsuarios() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const estadoInicialForm = {
-    nomeUser: "",
-    cpfUser: "",
-    emailUser: "",
-    setorUser: "",
-    funcaoUser: "",
-    turnoUser: "",
-    maquinaUser: ""
-  };
+  // carregar todos os usuários
+  const fetchUsuarios = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await usuariosCrudService.getAll();
+      setUsuarios(data);
+      setError(null);
+    } catch (err) {
+      setError('Falha ao carregar usuários');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const [formData, setFormData] = useState(estadoInicialForm);
-  
-  const [fotoPerfil, setFotoPerfil] = useState(null);
-  const [arquivoLote, setArquivoLote] = useState(null);
-  
-  const [usuarioEditandoId, setUsuarioEditandoId] = useState(null); 
+  useEffect(() => {
+    fetchUsuarios();
+  }, [fetchUsuarios]);
 
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleFotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFotoPerfil({
-        raw: file,
-        preview: URL.createObjectURL(file),
-        nome: file.name
-      });
+  // criar
+  const cadastrarUsuario = async (dados) => {
+    try {
+      const novo = await usuariosCrudService.create(dados);
+      setUsuarios(prev => [...prev, novo]);
+      return novo;
+    } catch (err) {
+      throw err;
     }
   };
 
-  const handleLoteChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.name.endsWith('.csv')) {
-      setArquivoLote({
-        raw: file,
-        nome: file.name
-      });
-    } else {
-      alert("Por favor, selecione um arquivo CSV válido.");
-      if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
+  // editar
+  const editarUsuario = async (id, dados) => {
+    try {
+      const atualizado = await usuariosCrudService.update(id, dados);
+      setUsuarios(prev => prev.map(u => u.id === id ? atualizado : u));
+      return atualizado;
+    } catch (err) {
+      throw err;
     }
   };
 
-  const preencherParaEdicao = (usuario) => {
-    setUsuarioEditandoId(usuario.id); 
-    setFormData({
-      nome: usuario.nome || "",
-      cpf: usuario.cpf || "",
-      email: usuario.email || "",
-      setor: usuario.setor || "",
-      funcao: usuario.funcao || "",
-      turno: usuario.turno || "",
-      maquina_id: usuario.maquina_id || ""
-    });
-  };
-
-  const limparFormularios = () => {
-    setFormData(estadoInicialForm);
-    setFotoPerfil(null);
-    setArquivoLote(null);
-    setUsuarioEditandoId(null); 
-    
-    if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
-    if (fileInputFotoRef.current) fileInputFotoRef.current.value = "";
+  // deletar
+  const excluirUsuario = async (id) => {
+    try {
+      await usuariosCrudService.delete(id);
+      setUsuarios(prev => prev.filter(u => u.id !== id));
+    } catch (err) {
+      throw err;
+    }
   };
 
   return {
-    formData,
-    fotoPerfil,
-    arquivoLote,
-    usuarioEditandoId,
-    fileInputLoteRef,
-    fileInputFotoRef,
-    handleInputChange,
-    handleFotoChange,
-    handleLoteChange,
-    preencherParaEdicao,
-    limparFormularios,
-    setFormData
+    usuarios,
+    loading,
+    error,
+    refresh: fetchUsuarios,
+    cadastrarUsuario,
+    editarUsuario,
+    excluirUsuario,
   };
-};
+}

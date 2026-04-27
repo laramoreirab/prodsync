@@ -18,6 +18,9 @@ import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 
 import TableListagens from "@/components/table";
+import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
+import FormExclusaoSetor from '@/components/ui/forms/setores/formExclusaoSetor';
+import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
 
 
 const setoresFilter = [
@@ -173,16 +176,7 @@ export default function PageLayout() {
               </DialogTrigger>
 
               <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <div className="flex items-center">
-                  <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Criar Setor</DialogTitle>
-                  </div>
-                </div>
-                <Separator className="m-2 bg-[#a6a6a6]" />
-                <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
-
-                </form>
+                <FormCadastroSetor/>
               </DialogContent>
             </Dialog>
           </div>
@@ -275,17 +269,16 @@ export default function PageLayout() {
               dialogs={{
                 edit: (row) => (
                   <DialogContent className="rounded-lg">
-                    <DialogTitle>Editar Máquina </DialogTitle> {/* Faz seu nome Gi, não estiizei nada */}
-                    <Separator className="my-2" />
-
-                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
+                    
+                    <FormEdicaoSetor/>
                     {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
 
                   </DialogContent>
                 ),
                 delete: (row) => (
                   <DialogContent>
-                    <DialogTitle className="text-red-600">Excluir Máquina</DialogTitle>
+
+                    <FormExclusaoSetor/>
 
                   </DialogContent>
                 )
