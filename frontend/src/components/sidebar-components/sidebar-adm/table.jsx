@@ -25,9 +25,9 @@ import {
 import { EllipsisVertical, EyeIcon, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
-import { usePagination } from '@/hooks/use-pagination';
+// import { usePagination } from '@/hooks/use-pagination';
 
 import {
   useReactTable,
@@ -74,12 +74,6 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
     }
   })
 
-  /* Calculos botões da paginação */
-  const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
-    currentPage: table.getState().pagination.pageIndex + 1,
-    totalPages: table.getPageCount(),
-    paginationItemsToDisplay: 5
-  })
 
   return (
     <div className='w-full px-8 mb-5'>
