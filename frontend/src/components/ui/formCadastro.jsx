@@ -59,7 +59,7 @@ export default function RegisterForm() {
   }
   async function handleContinuar() {
     setOpen(false)
-    router.push('/adm/DashboardGeral')
+    router.push('/adm')
   }
 
   return (
