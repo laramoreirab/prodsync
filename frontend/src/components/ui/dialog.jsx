@@ -56,7 +56,7 @@ function DialogContent({
         className="fixed inset-0 z-50 overflow-y-auto flex justify-center pt-6 pb-10"
         {...props}
       >
-        <div className="relative h-fit w-[90vw] sm:w-[70vw] md:w-[50vw] max-w-[37vw] rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none shadow-2xl">
+        <div className="relative h-fit sm:w-[90vw] md:w-[50vw] xl:w-[37vw] rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none shadow-2xl">
           {children}
 
           {showCloseButton && (
