@@ -7,7 +7,7 @@ class UsuarioController {
     //GET api/usuarios - Listar todos os funcionários (apenas admin)
     static async listarUsuarios(req, res) {
         try {
-            
+
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
 
@@ -31,10 +31,10 @@ class UsuarioController {
     //GET api/usuarios - busca de usuário por id 
     static async buscarPorId(req, res) {
         try {
-            const  id_usuario  = req.user.id_usuario;
-            const  id_empresa  = req.user.id_empresa;
+            const id_usuario = req.user.id_usuario;
+            const id_empresa = req.user.id_empresa;
             // Validação básica do ID
-            if (!id || isNaN(id)) {
+            if (!id_usuario || isNaN(id_usuario)) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'ID de usuário inválido',
@@ -69,7 +69,7 @@ class UsuarioController {
     //POST api/usuarios - Criar novo usuário (apenas dmin)
     static async criarUsuario(req, res) {
         try {
-            const  id_empresa  = req.user.id_empresa;
+            const id_empresa = req.user.id_empresa;
             const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             const erros = [];
@@ -110,7 +110,7 @@ class UsuarioController {
 
             //validar email 
             if (!email || email.trim() == '') {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Email da empresa é obrigatório',
                     mensagem: 'O email da empresa é obrigatório!'
@@ -126,7 +126,7 @@ class UsuarioController {
             };
 
             //validação do setor
-            if (!id_setor || id_setor.trim() == '') {
+            if (!id_setor) {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Setor é obrigatório',
@@ -135,7 +135,7 @@ class UsuarioController {
             };
 
             //validação do turno
-            if (!id_turno || id_turno.trim() == '') {
+            if (!id_turno) {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
@@ -151,7 +151,7 @@ class UsuarioController {
                 })
             };
             //validação maquina
-            if (!id_maquina || id_maquina.trim() == '') {
+            if (!id_maquina) {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
@@ -182,7 +182,7 @@ class UsuarioController {
                     mensagem: 'Id do usuário não retornado!'
                 })
             }
-        
+
             //preparar dados de escala de trabalho para tabela escalaTrabalho
             const dadosEscala = {
                 id_empresa: Number(id_empresa),
@@ -257,38 +257,38 @@ class UsuarioController {
                 dadosUpdateUsuario.imagem_perfil = req.file.filename;
             }
 
-        if (id_setor !== undefined) {
-            dadosUpdateEscala.id_setor = id_setor;
-        }
-        if (id_turno !== undefined) {
-            dadosUpdateEscala.id_turno = id_turno;
-        }
-        if (id_maquina !== undefined) {
-            dadosUpdateEscala.id_maquina = id_maquina;
-        }
+            if (id_setor !== undefined) {
+                dadosUpdateEscala.id_setor = id_setor;
+            }
+            if (id_turno !== undefined) {
+                dadosUpdateEscala.id_turno = id_turno;
+            }
+            if (id_maquina !== undefined) {
+                dadosUpdateEscala.id_maquina = id_maquina;
+            }
 
 
-        if (
-            Object.keys(dadosUpdateUsuario).length === 0 &&
-            Object.keys(dadosUpdateEscala).length === 0
-        ) {
-            return res.status(400).json({
-                sucesso: false,
-                erro: 'Nenhum dado para atualizar',
-                mensagem: 'Forneça pelo menos um campo para atualizar'
-            });
-        }
+            if (
+                Object.keys(dadosUpdateUsuario).length === 0 &&
+                Object.keys(dadosUpdateEscala).length === 0
+            ) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Nenhum dado para atualizar',
+                    mensagem: 'Forneça pelo menos um campo para atualizar'
+                });
+            }
 
-        // Cada atualização só executa se tiver dados
-        let updateUsuario = null;
-        let updateEscala = null;
+            // Cada atualização só executa se tiver dados
+            let updateUsuario = null;
+            let updateEscala = null;
 
-        if (Object.keys(dadosUpdateUsuario).length > 0) {
-            updateUsuario = await UsuarioModel.atualizar(id_usuario, id_empresa, dadosUpdateUsuario)
-        }
-        if (Object.keys(dadosUpdateEscala).length > 0) {
-            updateEscala = await EscalaTrabalhoModel.atualizar(id_usuario, id_empresa, dadosUpdateEscala)
-        }
+            if (Object.keys(dadosUpdateUsuario).length > 0) {
+                updateUsuario = await UsuarioModel.atualizar(id_usuario, id_empresa, dadosUpdateUsuario)
+            }
+            if (Object.keys(dadosUpdateEscala).length > 0) {
+                updateEscala = await EscalaTrabalhoModel.atualizar(id_usuario, id_empresa, dadosUpdateEscala)
+            }
 
             return res.status(200).json({
                 sucesso: true,
@@ -312,8 +312,8 @@ class UsuarioController {
     //DELETE api/usuarios - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
-            const id_usuario = req.body
-            const  id_empresa  = req.user.id_empresa;
+            const { id_usuario } = req.body
+            const id_empresa = req.user.id_empresa;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -363,10 +363,10 @@ class UsuarioController {
     static async uploadImagem(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const id  = req.body;
+            const { id_usuario } = req.body;
 
             // Validação do ID
-            if (!id || isNaN(id)) {
+            if (!id_usuario || isNaN(id_usuario)) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'ID inválido',
@@ -375,12 +375,12 @@ class UsuarioController {
             }
 
             //verificar se usuário existe
-            const usuarioExistente = await UsuarioModel.buscarPorId(id, id_empresa);
+            const usuarioExistente = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
             if (!usuarioExistente) {
                 return res.status(404).json({
                     sucesso: false,
                     erro: 'Usuário não encontrado',
-                    mensagem: `Usuário com ID ${id} não foi encontrado`
+                    mensagem: `Usuário com ID ${id_usuario} não foi encontrado`
                 });
             }
 
@@ -411,6 +411,49 @@ class UsuarioController {
     }
 
     // --------------------------------------------dashboards---------------------------------------------------
-}
 
+    static async qtdDeUsuariosTipo(req, res) {
+        try {
+
+        } catch (error) {
+
+        }
+    }
+    static async tempoMedioSessaoTipo(req, res) {
+        try {
+
+        } catch (error) {
+
+        }
+    }
+    static async qtdUsuariosPorSetor(req, res) {
+        try {
+
+        } catch (error) {
+
+        }
+    }
+    static async top5Operadores(req, res) {
+        try {
+
+        } catch (error) {
+
+        }
+    }
+    static async producaoMediaPorDiaSetor(req, res) {
+        try {
+
+        } catch (error) {
+
+        }
+    }
+    static async rotatividade(req, res){
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
+}
 export default UsuarioController

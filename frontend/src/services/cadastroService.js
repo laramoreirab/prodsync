@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api"
 import { CadastroSchema } from "@features/cadastro/schemas/cadastroSchema";
 
 export const cadastroService = {
