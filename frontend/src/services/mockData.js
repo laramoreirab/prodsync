@@ -89,10 +89,17 @@ export const mockOperadoresMediaKPI = {
 
 export const mockOEEPorSetor = [
   { setor: "Engrenagens", oee: 90 },
-  { setor: "Roscas",      oee: 80 },
+  { setor: "Roscas",      oee: 82 },
+  { setor: "Usinagem",    oee: 78 },
+  { setor: "Fundição",    oee: 72 },
+  { setor: "Montagem",    oee: 68 },
   { setor: "Embalagens",  oee: 65 },
+  { setor: "Pintura",     oee: 58 },
+  { setor: "Soldagem",    oee: 52 },
+  { setor: "Corte CNC",   oee: 45 },
   { setor: "Injeção",     oee: 35 },
-  { setor: "Usinagem",    oee: 75 },
+  { setor: "Acabamento",  oee: 28 },
+  { setor: "Logística",   oee: 88 },
 ];
 
 export const mockRefugoPorSetor = [
@@ -284,4 +291,155 @@ export const mockOPConcluidasDia = [
   { dia: "Dia 5", total: 85 },
   { dia: "Dia 6", total: 82 },
   { dia: "Dia 7", total: 95 },
+];
+
+
+export const mockOEEOperador = {
+  disponibilidade: 85,
+  performance:     90,
+  qualidade:       90,
+  oee:             Math.round((85 * 90 * 90) / 10000), 
+}
+
+export const mockPecasPorDia = [
+  { dia: "Seg", qtd: 80 },
+  { dia: "Ter", qtd: 65 },
+  { dia: "Qua", qtd: 78 },
+  { dia: "Qui", qtd: 72 },
+  { dia: "Sex", qtd: 60 },
+  { dia: "Sáb", qtd: 55 },
+];
+
+export const mockProducaoPorHoraOperador = [
+  { hora: "0",  qtd: 12 },
+  { hora: "3",  qtd: 18 },
+  { hora: "6",  qtd: 22 },
+  { hora: "9",  qtd: 15 },
+  { hora: "12", qtd: 20 },
+  { hora: "15", qtd: 17 },
+  { hora: "18", qtd: 14 },
+  { hora: "21", qtd: 16 },
+];
+
+export const mockMetaProducao = {
+  completo: 92,
+  restante: 8,
+};
+
+export const mockParadasComparadasOperador = [
+  { dia: "Seg", registradas: 8,  reais: 7  },
+  { dia: "Ter", registradas: 7,  reais: 12 },
+  { dia: "Qua", registradas: 13, reais: 15 },
+  { dia: "Sex", registradas: 9,  reais: 8  },
+];
+
+export const mockEficienciaMaquina = [
+  { maquina: "THA-1", eficiencia: 85 },
+  { maquina: "THA-2", eficiencia: 60 },
+  { maquina: "THA-3", eficiencia: 72 },
+  { maquina: "THA-4", eficiencia: 90 },
+];
+
+export const mockMotivoRefugoMaquina = [
+  { name: "Rolhas na Injeção", value: 43 },
+  { name: "Peça Incompleta",   value: 29 },
+  { name: "Rebarba Grossa",    value: 28 },
+];
+
+export const mockMotivoSetupMaquina = [
+  { motivo: "Limpeza",           minutos: 150 },
+  { motivo: "Manutenção",        minutos: 95  },
+  { motivo: "Falta de Material", minutos: 70  },
+];
+
+export const mockOEEMaquina = {
+  disponibilidade: 85,
+  performance:     90,
+  qualidade:       90,
+  oee:             Math.round((85 * 90 * 90) / 10000),
+};
+
+export const mockOEEEvolucaoMaquina = [
+  { dia: "Dia 1", oee: 65 },
+  { dia: "Dia 2", oee: 78 },
+  { dia: "Dia 3", oee: 70 },
+  { dia: "Dia 4", oee: 82 },
+  { dia: "Dia 5", oee: 79 },
+  { dia: "Dia 6", oee: 85 },
+  { dia: "Dia 7", oee: 92 },
+];
+
+export const mockVelocidadeMaquina = [
+  { tipo: "Velocidade Normal", valor: 45 },
+  { tipo: "Velocidade Atual",  valor: 38 },
+];
+
+export const mockSetorMaquinaStatus = {
+  emProducao: 12,
+  emSetup: 3,
+  emParada: 2,
+};
+
+export const mockSetorOEEMedio = {
+  setor: "Engrenagens",
+  oee: 75,
+};
+
+export const mockSetorOEEEvolucao = [
+  { dia: "Dia 1", oee: 65 },
+  { dia: "Dia 2", oee: 80 },
+  { dia: "Dia 3", oee: 75 },
+  { dia: "Dia 4", oee: 78 },
+  { dia: "Dia 5", oee: 85 },
+  { dia: "Dia 6", oee: 83 },
+  { dia: "Dia 7", oee: 90 },
+];
+
+export const mockSetorTopOperadores = [
+  { operador: "Márcio",  qtd: 60 },
+  { operador: "Vinícius", qtd: 45 },
+  { operador: "Josefe",  qtd: 80 },
+  { operador: "Antônio", qtd: 30 },
+  { operador: "Maria",   qtd: 42 },
+];
+
+export const mockSetorMotivosParada = [
+  { motivo: "Manutenção",        qtd: 45 },
+  { motivo: "Falta de Materiais", qtd: 38 },
+  { motivo: "Limpeza",           qtd: 28 },
+];
+
+export const mockSetorProducaoSemanal = [
+  { dia: "Segunda", qtd: 120 },
+  { dia: "Terça",   qtd: 150 }, 
+  { dia: "Quarta",  qtd: 130 },
+  { dia: "Quinta",  qtd: 170 },
+  { dia: "Sexta",   qtd: 160 },
+  { dia: "Sábado",  qtd: 90  },
+  { dia: "Domingo", qtd: 50  },
+];
+ 
+export const mockOPProgresso = {
+  produzidos: 82.8,
+  aProduzir:  17.2,
+};
+ 
+export const mockOPOEEDetalhe = {
+  disponibilidade: 85,
+  performance:     90,
+  qualidade:       90,
+  oee:             72.5,
+};
+
+export const mockAndonStatusMaquinas = {
+  emProducao: 12,
+  emSetup:     3,
+  emParada:    2,
+};
+ 
+export const mockAndonRanking = [
+  { setor: "THAK-9879", produtividade: 95 },
+  { setor: "THAK-9878", produtividade: 80 },
+  { setor: "THAK-9877", produtividade: 70 },
+  { setor: "THAK-9876", produtividade: 55 },
 ];

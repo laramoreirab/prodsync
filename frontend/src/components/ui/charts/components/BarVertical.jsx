@@ -14,13 +14,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// ============================================================
-//  BAR CHART VERTICAL SIMPLES (Motivos de Parada)
-// ============================================================
-// Quando usar: comparação direta de poucos itens com label no eixo X.
-
-
-
 export function BarVerticalBase({
   title,
   description,
@@ -29,11 +22,14 @@ export function BarVerticalBase({
   loading,
   error,
   xKey,
-  yKey,
 }) {
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
   if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
+  if (!data?.length) return null;
+
+  // Pegamos todas as chaves do config para gerar as barras automaticamente
+  const keys = Object.keys(config);
 
   return (
     <div>
@@ -44,10 +40,24 @@ export function BarVerticalBase({
       <ChartContainer config={config} className="h-[200px] w-full">
         <BarChart data={data} margin={{ top: 10 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey={xKey} tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
-          <YAxis/>
+          <XAxis 
+            dataKey={xKey} 
+            tickLine={false} 
+            axisLine={false} 
+            tick={{ fontSize: 11 }} 
+          />
+          <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey={yKey} fill="#00357a" radius={[4, 4, 0, 0]} />
+          
+          {/* Mapeia as chaves do config para criar uma ou mais barras */}
+          {keys.map((key) => (
+            <Bar 
+              key={key}
+              dataKey={key} 
+              fill={`var(--color-${key})`} 
+              radius={[4, 4, 0, 0]} 
+            />
+          ))}
         </BarChart>
       </ChartContainer>
     </div>

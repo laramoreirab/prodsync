@@ -8,7 +8,7 @@ export function OEEPorSetorWidget() {
   const { data, loading, error } = useOEEPorSetor();
 
   return (
-    <div className="p-1 h-full">
+    <div className="w-full h-full"> 
       <BarVerticalBase
         title="OEE Médio por Setor"
         description="*Atualizado em tempo real"

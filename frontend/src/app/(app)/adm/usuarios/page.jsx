@@ -239,6 +239,56 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+      <Header />
+      {/* SEÇÃO 1: CHarts*/}
+      <section className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className=" bg-white border rounded-xl p-4">
+            <QtdUsuariosWidget />
+          </div>
+
+          <div className=" bg-white border rounded-xl p-4">
+            <QtdUsuariosPorSetorWidget />
+          </div>
+
+          <div className=" bg-white border rounded-xl p-4">
+            <TopOperadoresWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 2: Charts */}
+      <section className=" p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className=" bg-white border rounded-xl p-6">
+            <TempoSessaoWidget />
+          </div>
+
+          <div className=" bg-white border rounded-xl p-4">
+            <RotatividadeWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* SEÇÃO 3: Charts */}
+      <section className=" p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="border  bg-white rounded-xl p-4">
+            <SobrecargaSetorWidget />
+          </div>
+
+          <div className="border bg-white rounded-xl p-4">
+            <ProducaoMediaSetorWidget />
+          </div>
+
+        </div>
+      </section>
+
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">
