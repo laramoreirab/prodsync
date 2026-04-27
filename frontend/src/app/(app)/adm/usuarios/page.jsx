@@ -239,7 +239,6 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
       {/* SEÇÃO 1: CHarts*/}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -60,7 +60,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
     }
   ])
 
-  const pagesToShow = useMemo(() => {
+/*   const pagesToShow = useMemo(() => {
     const total = table.getPageCount();
     const current = table.getState().pagination.pageIndex + 1;
 
@@ -78,7 +78,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
   }, [table.getPageCount(), table.getState().pagination.pageIndex]);
 
   const currentPage = table.getState().pagination.pageIndex + 1;
-  const totalPages = table.getPageCount();
+  const totalPages = table.getPageCount(); */
 
   const [rowSelection, setRowSelection] = useState({});
 
@@ -87,7 +87,9 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting, getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    enableSortingRemoval: false,
+    getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     state: {
       sorting,
