@@ -9,7 +9,12 @@ import routes from './routes/rotas.js'; //todas as rotas estão sendo servidas d
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet(
+    {
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+        contentSecurityPolicy: false, // Desativa a CSP temporariamente para testes
+    }
+));
 app.use(cors({
     origin: 'http://localhost:3000', // Permitir todas as origens. Ajuste conforme necessário. Ex.: 'http://meufrontend.com'
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos

@@ -17,12 +17,12 @@ class UsuarioModel {
                     usuario: true, // Traz os dados do operador
                     turno: {
                         select: {
-                            nome: true, // Traz apenas o nome do turno
+                            nome_turno: true, // Traz apenas o nome do turno
                         },
                     },
                     setor: {
                         select: {
-                            nome: true, // Traz apenas o nome do setor
+                            nome_setor: true, // Traz apenas o nome do setor
                         },
                     },
                 },
@@ -48,7 +48,7 @@ class UsuarioModel {
     //buscar usuario por id
     static async buscarPorId(id, id_empresa) {
         try {
-            const row = await prisma.usuarios.findFirt({
+            const row = await prisma.usuarios.findFirst({
                 where: {
                     id_usuario: parseInt(id),
                     id_empresa: parseInt(id_empresa)
@@ -88,7 +88,7 @@ class UsuarioModel {
                     },
                     select: { id_usuario: true } //vai retornar o Id do novo usuário
                 });
-                return novoUsuario || null;
+                return novoUsuario.id_usuario || null;
             } catch (error) {
                 console.error('Erro ao registrar novo usuário', error);
                 throw error;
@@ -100,7 +100,7 @@ class UsuarioModel {
     //verificar credenciais do login 
     static async verificarCredenciais(id, senha) {
         try {
-            const usuario = await prisma.usuario.findUnique({
+            const usuario = await prisma.usuarios.findUnique({
                 where: {
                     id_usuario: id
                 }

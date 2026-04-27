@@ -39,9 +39,9 @@ export default function LoginForm() {
             localStorage.setItem("token", data.token)
 
             //redireciona pelo tipo que vem no token
-            if (data.tipo === "Adm") router.push("/adm/DashboardGeral")
-            if (data.tipo === "Gestor") router.push("/gestor/DashboardGeral")
-            if (data.tipo === "Operario") router.push("/operador/DashboardGeral")
+            if (data.tipo === "Adm") router.push("/adm")
+            if (data.tipo === "Gestor") router.push("/gestor")
+            if (data.tipo === "Operario") router.push("/operador")
 
         } catch (error) {
             setErro("Erro de conexão com o servidor")
