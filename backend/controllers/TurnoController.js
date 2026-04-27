@@ -34,20 +34,6 @@ class TurnoController {
         }
     }
 
-    // Cria a escala de trabalho do operador
-    static async criarEscala(req, res) {
-        try {
-            const id_empresa = req.user.id_empresa;
-            const dadosEscala = { ...req.body, id_empresa };
-
-            const escala = await TurnoModel.criarEscala(dadosEscala);
-            res.status(201).json({ sucesso: true, dados: escala });
-        } catch (error) {
-            console.error('Erro ao criar escala:', error);
-            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
-        }
-    }
-
     // Obtém todos os turnos de uma empresa
     static async obterTurnosPorEmpresa(req, res) {
         try {

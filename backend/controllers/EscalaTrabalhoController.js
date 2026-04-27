@@ -1,4 +1,4 @@
-const EscalaTrabalhoModel = require('../models/EscalaTrabalhoModel');
+import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js';
 
 class EscalaTrabalhoController {
 
@@ -85,4 +85,4 @@ class EscalaTrabalhoController {
     }
 }
 
-module.exports = EscalaTrabalhoController;
+export default EscalaTrabalhoController;
