@@ -25,22 +25,22 @@ const data = {
     },
     {
       title: "Maquinas",
-      url: "/adm/maquinas",
+      url: "/operador/maquinas",
       icon: <Wrench />,
     },
     {
       title: "Historico de Eventos",
-      url: "#",
+      url: "/operador/historicoEventos",
       icon: <Calendar />,
     },
     {
       title: "Ordem de Producao",
-      url: "#",
+      url: "/operador/ordensDeProducao",
       icon: <ListBulletsIcon size={32} />,
     },
     {
       title: "Andon",
-      url: "#",
+      url: "/operador/andon",
       icon: <RefreshCw />,
     },
   ],
