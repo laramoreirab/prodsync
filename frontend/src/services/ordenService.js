@@ -6,6 +6,8 @@ import {
   OPCargaSetorArraySchema,
   OPStatusArraySchema,
   OPConcluidasDiaArraySchema,
+  OPProgressoSchema,
+  OPOEEDetalheSchema,
 } from "@features/ordens/schemas/ordenSchema";
 import {
   mockOPAtivasKPI,
@@ -17,6 +19,8 @@ import {
   mockOPCargaSetor,
   mockOPStatus,
   mockOPConcluidasDia,
+  mockOPProgresso,
+  mockOPOEEDetalhe,
 } from "./mockData";
 
 const USE_MOCK = true;
@@ -92,3 +96,20 @@ export const opConcluidasDiaService = {
     return OPConcluidasDiaArraySchema.parse(data);
   },
 };
+ 
+export const opProgressoService = {
+  async getProgresso(opId) {
+    if (USE_MOCK) return OPProgressoSchema.parse(mockOPProgresso);
+    const data = await apiFetch(`/ordens/${opId}/progresso`);
+    return OPProgressoSchema.parse(data);
+  },
+};
+ 
+export const opOEEDetalheService = {
+  async getOEE(opId) {
+    if (USE_MOCK) return OPOEEDetalheSchema.parse(mockOPOEEDetalhe);
+    const data = await apiFetch(`/ordens/${opId}/oee`);
+    return OPOEEDetalheSchema.parse(data);
+  },
+};
+ 
