@@ -157,8 +157,9 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                   <TableCell key={`${row.id}-${col.key}`} className={col.className}>
 
                     {col.badge
-                      ? col.badge(row.original[col.key], row.original) /* se tiver BADGE (o caso de máquinas) */
-                      : row.original[col.key]}
+                      ? (col.badge(row.original[col.key], row.original) ?? null)
+                      : (row.original?.[col.key] ?? null)
+                    }
 
                   </TableCell>
                 ))}

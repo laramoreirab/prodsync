@@ -41,6 +41,9 @@ import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
 import { SobrecargaSetorWidget } from "@/features/usuarios/SobrecargaSetorWidget";
 import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
+import FormCadastroUsuario from '@/components/ui/forms/usuarios/formCadastroUsuario';
+import FormEdicaoUsuario from '@/components/ui/forms/usuarios/formEdicaoUsuario';
+import FormExclusaoUsuario from '@/components/ui/forms/usuarios/formExclusaoUsuario';
 
 
 
@@ -122,45 +125,45 @@ export default function Usuarios() {
     limparFormularios,
   } = useUsuarios();
 
-  const handleSubmitIndividual = async (e) => {
-    e.preventDefault();
-    const payload = new FormData();
-    Object.keys(formData).forEach(key => payload.append(key, formData[key]));
-    if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+  // const handleSubmitIndividual = async (e) => {
+  //   e.preventDefault();
+  //   const payload = new FormData();
+  //   Object.keys(formData).forEach(key => payload.append(key, formData[key]));
+  //   if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
 
-    try {
-      if (usuarioEditandoId) {
-        await usuarioService.editar(usuarioEditandoId, payload);
-        alert("Usuário atualizado com sucesso!");
-      } else {
-        await usuarioService.cadastrarIndividual(payload);
-        alert("Usuário criado com sucesso!");
-      }
-      limparFormularios();
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao salvar.");
-    }
-  };
+  //   try {
+  //     if (usuarioEditandoId) {
+  //       await usuarioService.editar(usuarioEditandoId, payload);
+  //       alert("Usuário atualizado com sucesso!");
+  //     } else {
+  //       await usuarioService.cadastrarIndividual(payload);
+  //       alert("Usuário criado com sucesso!");
+  //     }
+  //     limparFormularios();
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Erro ao salvar.");
+  //   }
+  // };
 
-  const handleSubmitLote = async (e) => {
-    e.preventDefault();
-    if (!arquivoLote) return alert("Selecione um arquivo CSV!");
+  // const handleSubmitLote = async (e) => {
+  //   e.preventDefault();
+  //   if (!arquivoLote) return alert("Selecione um arquivo CSV!");
 
-    const payloadLote = new FormData();
-    payloadLote.append("file", arquivoLote.raw);
+  //   const payloadLote = new FormData();
+  //   payloadLote.append("file", arquivoLote.raw);
 
-    try {
-      await usuarioService.cadastrarEmLote(payloadLote);
-      alert("Lote enviado com sucesso!");
-      limparFormularios();
-      setIsLoteModalOpen(false);
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao enviar lote.");
-    }
-  };
+  //   try {
+  //     await usuarioService.cadastrarEmLote(payloadLote);
+  //     alert("Lote enviado com sucesso!");
+  //     limparFormularios();
+  //     setIsLoteModalOpen(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Erro ao enviar lote.");
+  //   }
+  // };
 
   //lógica de ordenação
   const handleSort = (criterio) => {
@@ -233,8 +236,6 @@ export default function Usuarios() {
     );
   });
 
-  const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
-  const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
@@ -248,12 +249,8 @@ export default function Usuarios() {
           </div>
 
           {/* Modal de Cadastrar Usuário*/}
-          <Dialog open={isModalOpen} onOpenChange={(open) => {
-            setIsModalOpen(open);
-            if (!open) limparFormularios();
-          }}>
+          <Dialog>
             <DialogTrigger
-              onClick={() => { limparFormularios(); setIsModalOpen(true); }}
               className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
             >
               <Plus className="mr-2" />
@@ -261,189 +258,13 @@ export default function Usuarios() {
             </DialogTrigger>
 
             <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
-              <div className="title_modal flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                  <Plus className="mr-2 text-3xl text-white" />
-                  <DialogTitle className="text-3xl text-white">
-                    {usuarioEditandoId ? "Editar Usuário" : "Criar Usuário"}
-                  </DialogTitle>
-                </div>
-              </div>
-              <Separator className="m-2 bg-[#a6a6a6]" />
-
-              <form onSubmit={handleSubmitIndividual} className="px-8 pb-8 pt-4 flex flex-col gap-6">
-
-                <div className="flex justify-end">
-                  <Dialog open={isLoteModalOpen} onOpenChange={setIsLoteModalOpen}>
-                    <DialogTrigger className="bg-secondary-foreground px-4 py-2 rounded-md flex items-center text-white text-xl font-semibold">
-                      <Plus className="mr-2" />
-                      Criar em Lote
-                    </DialogTrigger>
-
-                    <DialogContent>
-                      <div className="flex items-center">
-                        <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                          <Plus className="mr-2 text-3xl text-white" />
-                          <DialogTitle className="text-3xl text-white">Criar Usuários em Lote</DialogTitle>
-                        </div>
-                      </div>
-                      <Separator className="m-2 bg-[#a6a6a6]" />
-
-                      <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
-                        <input
-                          type="file"
-                          ref={fileInputLoteRef}
-                          onChange={handleLoteChange}
-                          accept=".csv"
-                          className="hidden"
-                        />
-
-                        {/* div do upload clicavel */}
-                        <div
-                          onClick={() => fileInputLoteRef.current?.click()}
-                          className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
-                        >
-                          {!arquivoLote ? (
-                            <div className="flex flex-col items-center text-gray-500">
-                              <Upload className="w-12 h-12 mb-2 text-gray-400" />
-                              <span className="text-md font-medium">Clique aqui para fazer upload do arquivo CSV.</span>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col items-center w-full">
-                              <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
-                                <File className="w-4 h-4 mr-2 shrink-0" />
-                                <span className="text-sm truncate">{arquivoLote.nome}</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center">
-                          <Info className="text-[#7c7c81] mr-2" />
-                          <p className="text-[#7c7c81]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas. </p>
-                        </div>
-
-                        <div className="flex justify-center mt-4">
-                          <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
-                            Criar em Lote
-                          </button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <input
-                  type="file"
-                  ref={fileInputFotoRef}
-                  onChange={handleFotoChange}
-                  accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
-                  className="hidden"
-                />
-
-                {/* div do upload clicavel */}
-                <div
-                  onClick={() => fileInputFotoRef.current?.click()}
-                  className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  {!fotoPerfil ? (
-                    <div className="flex flex-col items-center text-gray-500">
-                      <Upload className="w-12 h-12 mb-2 text-gray-400" />
-                      <span className="text-md font-medium">Clique aqui para fazer upload da imagem.</span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center w-full">
-                      {/*pré-visualização da imagem */}
-                      <img
-                        src={fotoPerfil.preview}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg mb-2 border"
-                      />
-                      <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
-                        <File className="w-4 h-4 mr-2 shrink-0" />
-                        <span className="text-sm truncate">{fotoPerfil.nome}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-5">
-                  <div>
-                    <label className={labelStyle}>Nome</label>
-                    <input id="nomeUser" value={formData.nomeUser} onChange={handleInputChange} type="text" className={inputStyle} required />
-                  </div>
-                  <div>
-                    <label className={labelStyle}>CPF</label>
-                    <input id="cpfUser" value={formData.cpfUser} onChange={handleInputChange} type="text" className={inputStyle} required />
-                  </div>
-                  <div>
-                    <label className={labelStyle}>E-mail</label>
-                    <input id="emailUser" value={formData.emailUser} onChange={handleInputChange} type="email" className={inputStyle} required />
-                  </div>
-
-                  {/* Select personalizado com ícone */}
-                  <div className="relative">
-                    <label className={labelStyle}>Setor</label>
-                    <select id="setorUser" value={formData.setorUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
-                      <option value="">Selecione...</option>
-                      <option value="Roscas">Roscas</option>
-                      <option value="Brocas">Brocas</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="relative">
-                    <label className={labelStyle}>Função</label>
-                    <select
-                      id="funcaoUser"
-                      className={`${inputStyle} appearance-none pr-10 bg-white`}
-                      value={formData.funcaoUser}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="Operador">Operador</option>
-                      <option value="Gestor">Gestor</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  </div>
-                  <div className="relative">
-                    <label className={labelStyle}>Turno</label>
-                    <select id="turnoUser" value={formData.turnoUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
-                      <option value="">Selecione...</option>
-                      <option value="Manhã">Manhã</option>
-                      <option value="Tarde">Tarde</option>
-                      <option value="Noite">Noite</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Máquina a Gerenciar só aparece se função = operador */}
-                {formData.funcaoUser === "Operador" && (
-                  <div className="relative pt-1">
-                    <label className={labelStyle}>Máquina a Gerenciar</label>
-                    <select id="maquinaUser" value={formData.maquinaUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
-                      <option value="">Selecione...</option>
-                      <option value="M1">Máquina 1</option>
-                      <option value="M2">Máquina 2</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  </div>
-                )}
-
-                <div className="flex justify-center mt-4">
-                  <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
-                    {usuarioEditandoId ? "Salvar Edição" : "Criar"}
-                  </button>
-                </div>
-              </form>
+              <FormCadastroUsuario />
             </DialogContent>
           </Dialog>
 
         </div>
+
+        {/* Gráficos */}
       </section>
       {/* SEÇÃO 1: CHarts*/}
       <section className="p-6">
@@ -543,166 +364,23 @@ export default function Usuarios() {
               data={dadosExibidos} columns={colunasUsuarios}
 
               // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/usuarios/${row.id}`}
+              viewLink={(row) => `/adm/usuarios/${row.id}`}
 
               // 2.  modais de Editar e Excluir para a tabela renderizar - falta integrar!!!
               dialogs={{
                 edit: (row) => (
-                  <DialogContent className="rounded-lg">
-                    <div className="title_modal flex items-center">
-                      <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                        <Plus className="mr-2 text-3xl text-white" />
-                        <DialogTitle className="text-3xl text-white">
-                          Editar Usuário
-                        </DialogTitle>
-                      </div>
-                    </div>
-                    <Separator className="my-2" />
-                    <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
-                      <input
-                        type="file"
-                        ref={fileInputFotoRef}
-                        onChange={handleFotoChange}
-                        accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
-                        className="hidden"
-                      />
-
-                      {/* div do upload clicavel */}
-                      <div
-                        onClick={() => fileInputFotoRef.current?.click()}
-                        className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
-                      >
-                        {!fotoPerfil ? (
-                          <div className="flex flex-col items-center text-gray-500">
-                            <Upload className="w-12 h-12 mb-2 text-gray-400" />
-                            <span className="text-md font-medium">Clique aqui para fazer upload da imagem.</span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center w-full">
-                            {/*pré-visualização da imagem */}
-                            <img
-                              src={fotoPerfil.preview}
-                              alt="Preview"
-                              className="w-32 h-32 object-cover rounded-lg mb-2 border"
-                            />
-                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
-                              <File className="w-4 h-4 mr-2 shrink-0" />
-                              <span className="text-sm truncate">{fotoPerfil.nome}</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="space-y-5">
-                        <div>
-                          <label className={labelStyle}>Nome</label>
-                          <input id="nomeUser" value={formData.nomeUser} onChange={handleInputChange} type="text" className={inputStyle} required />
-                        </div>
-                        <div>
-                          <label className={labelStyle}>CPF</label>
-                          <input id="cpfUser" value={formData.cpfUser} onChange={handleInputChange} type="text" className={inputStyle} required />
-                        </div>
-                        <div>
-                          <label className={labelStyle}>E-mail</label>
-                          <input id="emailUser" value={formData.emailUser} onChange={handleInputChange} type="email" className={inputStyle} required />
-                        </div>
-
-                        {/* Select personalizado com ícone */}
-                        <div className="relative">
-                          <label className={labelStyle}>Setor</label>
-                          <select id="setorUser" value={formData.setorUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
-                            <option value="">Selecione...</option>
-                            <option value="Roscas">Roscas</option>
-                            <option value="Brocas">Brocas</option>
-                          </select>
-                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-5">
-                        <div className="relative">
-                          <label className={labelStyle}>Função</label>
-                          <select
-                            id="funcaoUser"
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            value={formData.funcaoUser}
-                            onChange={handleInputChange}
-                            required
-                          >
-                            <option value="">Selecione...</option>
-                            <option value="Operador">Operador</option>
-                            <option value="Gestor">Gestor</option>
-                          </select>
-                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                        </div>
-                        <div className="relative">
-                          <label className={labelStyle}>Turno</label>
-                          <select id="turnoUser" value={formData.turnoUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
-                            <option value="">Selecione...</option>
-                            <option value="Manha">Manhã</option>
-                            <option value="Tarde">Tarde</option>
-                            <option value="Noite">Noite</option>
-                          </select>
-                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                        </div>
-                      </div>
-
-                      {/* Máquina a Gerenciar só aparece se função = operador */}
-                      {formData.funcaoUser === "Operador" && (
-                        <div className="relative pt-1">
-                          <label className={labelStyle}>Máquina a Gerenciar</label>
-                          <select id="maquinaUser" value={formData.maquinaUser} onChange={handleInputChange} className={`${inputStyle} appearance-none pr-10 bg-white`} required>
-                            <option value="">Selecione...</option>
-                            <option value="M1">Máquina 1</option>
-                            <option value="M2">Máquina 2</option>
-                          </select>
-                          <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                        </div>
-                      )}
-
-                      <div className="flex justify-center mt-4">
-                        <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
-                          Editar
-                        </button>
-                      </div>
-                    </form>
-
-                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
-                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
-
-                  </DialogContent>
+                  <>
+                    <DialogContent>
+                      <FormEdicaoUsuario />
+                    </DialogContent>
+                  </>
                 ),
                 delete: (row) => (
-                  <DialogContent>
-                    <div className="title_modal flex items-center">
-                      <div className="bg-red-900 flex items-center px-4 py-2 rounded-md">
-                        <Trash2 className="mr-2 text-4xl text-white" />
-                        <DialogTitle className="text-3xl text-white">
-                          Excluir Usuário
-                        </DialogTitle>
-                      </div>
-                    </div>
-                    <Separator className="my-2" />
-                    <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
-
-                      <div className='w-full flex flex-col items-center justify-center'>
-                        <TriangleAlert className='text-[#00357a] text-4xl' />
-                        <h2 className='text-bold'>Você tem certeza que deseja excluir o usuário?</h2>
-                        <p>As informações serão excluídas PERMANENTEMENTE e não poderão ser restauradas após excluí-las!</p>
-                      </div>
-
-                    </form>
-
-                    {/*  Importante usar o row.id aqui para saber qual linha está sendo deletava (talvez seja interessante usar row.nome para saber 
-                      qual está sendo o usuário deletado [mas isso não ta no desing])
-                  
-                      <Button
-                        onClick={() => deletar(row.id)} APENAS EXEMPLO, não existe o onCLick ainda
-                      >
-                        Deletar
-                      </Button> */}
-
-                  </DialogContent>
+                  <>
+                    <DialogContent>
+                      <FormExclusaoUsuario/>
+                    </DialogContent>
+                  </>
                 )
               }}
             />

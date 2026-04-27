@@ -1,4 +1,3 @@
-// src/app/DashboardGeralEmpresaADM/page.jsx
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";
