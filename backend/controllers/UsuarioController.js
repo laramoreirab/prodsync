@@ -410,7 +410,7 @@ class UsuarioController {
         }
     }
 
-    // --------------------------------------------dashboards---------------------------------------------------
+    // --------------------------------------------dashboards-----------------------------------------------------------------------------------------
 
     static async qtdDeUsuariosTipo(req, res) {
         try {
@@ -469,14 +469,27 @@ class UsuarioController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
-    static async taxaCumprimentoMetaPorSetor(req, res) {
+
+    // ------------------------------------Dashboard da página específica de usuário----------------------------------------------------------------
+
+    static async metaProducao(req, res){
         try {
-            const dados = await UsuarioModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa)
+            const { id_usuario } = req.body
+            const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            console.error('Erro no gráfico Cumprimento de Meta de Produção Por Setor', error)
+             console.error('Erro no gráfico Meta de Produção', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
+
+    static async paradasJustificadasENaoJustificadasUsuario(req, res){
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
 }
 export default UsuarioController
