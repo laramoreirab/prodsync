@@ -240,6 +240,9 @@ class MaquinaModel {
             throw error;
         }
     }
+
+    // ---------------- Dashboards ------------------ //
+    
 }
 
 export default MaquinaModel;

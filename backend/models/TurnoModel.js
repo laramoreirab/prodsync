@@ -107,7 +107,45 @@ class TurnoModel {
 
     // ------------------------ Dashboards ----------------------- //
 
-    // Busca a soma total de lotes (qtd_boa) produzidos em um turno específico (para KPI)
+    // Busca a soma total de lotes produzidos em um turno específico
+    static async obterLotesProduzidosPorTurno(id_empresa) {
+        try {
+            const lotesPorTurno = await prisma.apontamento.groupBy({
+                by: ['id_turno'],
+                where: {
+                    id_empresa: id_empresa
+                },
+                _sum: {
+                    qtd_boa: true
+                }
+            });
+            return lotesPorTurno;
+        } catch (error) {
+            console.error('Erro ao obter lotes produzidos por turno:', error);
+            throw error;
+        }
+    }
+
+    // Busca a quantidade de máquinas únicas ativas em um turno específico
+    static async obterMaquinasAtivasPorTurno(id_empresa) {
+        try {
+            const maquinasAtivasPorTurno = await prisma.apontamento.groupBy({
+                by: ['id_turno'],
+                where: {
+                    id_empresa: id_empresa
+                },
+                _count: {
+                    id_maquina: true
+                }
+            });
+            return maquinasAtivasPorTurno;
+        } catch (error) {
+            console.error('Erro ao obter máquinas ativas por turno:', error);
+            throw error;
+        }
+    }
+
+    // Busca a soma total de lotes produzidos em um turno específico (para KPI)
     static async buscarProducaoTurnoLotes(id_turno) {
         try {
             const result = await prisma.apontamento.aggregate({
@@ -128,7 +166,6 @@ class TurnoModel {
     // Busca a quantidade de máquinas únicas ativas em um turno específico (para KPI)
     static async buscarMaquinasAtivasTurno(id_turno) {
         try {
-            // Conta as máquinas que tiveram apontamento no turno
             const result = await prisma.apontamento.findMany({
                 where: {
                     id_turno: Number(id_turno)
@@ -148,7 +185,7 @@ class TurnoModel {
     // Gráfico 1: Produção Timeline - Produção ao longo do tempo durante um turno
     static async obterProducaoTimeline(id_turno) {
         try {
-            const apontamentos = await prisma.apontamento.findMany({
+            const eventos = await prisma.apontamento.findMany({
                 where: {
                     id_turno: Number(id_turno)
                 },
@@ -164,12 +201,12 @@ class TurnoModel {
 
             // Agrupar por intervalo de tempo (hora/minuto do apontamento)
             const timeline = {};
-            apontamentos.forEach(ap => {
-                const time = ap.data_hora_fim.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+            eventos.forEach(evento => {
+                const time = evento.data_hora_fim.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
                 if (!timeline[time]) {
                     timeline[time] = 0;
                 }
-                timeline[time] += ap.qtd_boa || 0;
+                timeline[time] += evento.qtd_boa || 0;
             });
 
             return Object.entries(timeline).map(([timestamp, quantidade]) => ({
@@ -238,7 +275,7 @@ class TurnoModel {
                 const producao = item._sum.qtd_boa || 0;
                 return {
                     id_maquina: item.id_maquina,
-                    nome_maquina: maquina?.nome || 'Desconhecida',
+                    nome: maquina?.nome || 'Desconhecida',
                     producao: producao
                 };
             });
@@ -255,11 +292,15 @@ class TurnoModel {
                 prisma.historico_Eventos.findMany({
                     where: {
                         id_turno: Number(id_turno),
-                        status_atual: 'Parada' // Busca apenas os eventos de parada
+                        status_atual: 'Parada'
+                    },
+                    include: {
+                        motivo_parada: true
                     },
                     select: {
+                        motivo_parada: true,
                         duracao: true,
-                        motivo_parada: { select: { descricao: true } } // Traz o nome do motivo usando a relação
+                        inicio: true
                     }
                 }),
                 prisma.apontamento.aggregate({
@@ -324,9 +365,25 @@ class TurnoModel {
                 }
             });
 
+            // Se não encontrar por nome exato, tentar alternativa
+            if (operadores.length === 0) {
+                const operadoresAlt = await prisma.usuarios.findMany({
+                    select: {
+                        id_usuario: true,
+                        nome: true
+                    }
+                });
+                return operadoresAlt.map(op => ({
+                    id_usuario: op.id_usuario,
+                    nome: op.nome,
+                    status: 'Disponível',
+                    horas_trabalhadas: 0
+                }));
+            }
+
             return operadores.map(e => ({
                 id_usuario: e.operador.id_usuario,
-                nome_usuario: e.operador.nome,
+                nome: e.operador.nome,
                 status: 'Ativo',
                 horas_trabalhadas: 8 // Padrão para turno completo
             }));
@@ -344,9 +401,12 @@ class TurnoModel {
                     id_turno: Number(id_turno),
                     status_atual: 'Parada'
                 },
+                include: {
+                    motivo_parada: true
+                },
                 select: {
-                    duracao: true,
-                    motivo_parada: { select: { descricao: true } }
+                    motivo_parada: true,
+                    duracao: true
                 }
             });
 
@@ -377,59 +437,41 @@ class TurnoModel {
     // Gráfico 7: Resumo Geral do Turno (OEE, Disponibilidade, Produção)
     static async obterResumoTurno(id_turno) {
         try {
-            // 1. Busca os dados do turno (nome, horários)
-            const turno = await prisma.turno.findUnique({
-                where: {
-                    id_turno: Number(id_turno)
-                },
-                select: {
-                    nome_turno: true,
-                    hora_inicio: true,
-                    hora_fim: true
-                }
-            });
+            const [turno, producao, paradas, maquinas] = await Promise.all([
+                prisma.turno.findUnique({
+                    where: { id_turno: Number(id_turno) }
+                }),
+                prisma.apontamento.aggregate({
+                    where: {
+                        id_turno: Number(id_turno)
+                    },
+                    _sum: {
+                        qtd_boa: true
+                    }
+                }),
+                prisma.historico_Eventos.aggregate({
+                    where: {
+                        id_turno: Number(id_turno),
+                        status_atual: 'Parada'
+                    },
+                    _count: {
+                        id_evento: true
+                    },
+                    _sum: {
+                        duracao: true
+                    }
+                }),
+                prisma.apontamento.findMany({
+                    where: {
+                        id_turno: Number(id_turno)
+                    },
+                    distinct: ['id_maquina'],
+                    select: { id_maquina: true }
+                })
+            ]);
 
-            // 2. Busca o total e o tempo das paradas no Historico_Eventos
-            const paradas = await prisma.historico_Eventos.aggregate({
-                where: {
-                    id_turno: Number(id_turno),
-                    status_atual: 'Parada'
-                },
-                _count: {
-                    id_evento: true // Conta quantos eventos de parada ocorreram
-                },
-                _sum: {
-                    duracao: true // Soma a duração em minutos
-                }
-            });
-
-            // 3. Busca a produção total de lotes (qtd_boa) no Apontamento
-            const producao = await prisma.apontamento.aggregate({
-                where: {
-                    id_turno: Number(id_turno)
-                },
-                _sum: {
-                    qtd_boa: true
-                }
-            });
-
-            // 4. Busca a quantidade de máquinas ativas (que tiveram apontamento)
-            const maquinas = await prisma.apontamento.findMany({
-                where: {
-                    id_turno: Number(id_turno)
-                },
-                distinct: ['id_maquina'],
-                select: { id_maquina: true }
-            });
-
-            // Cálculos dos indicadores
             const tempoParado = paradas._sum.duracao || 0;
-            const numeroParadas = paradas._count.id_evento || 0;
-
-            // Considerando um turno padrão de 8h (480 minutos). 
-            // Se os turnos tiverem cargas horárias variadas, isso pode ser calculado pela diferença entre hora_inicio e hora_fim
-            const duracaoTurnoMinutos = 480;
-            const disponibilidade = Math.max(0, ((duracaoTurnoMinutos - tempoParado) / duracaoTurnoMinutos) * 100);
+            const disponibilidade = Math.max(0, ((480 - tempoParado) / 480) * 100);
 
             return {
                 turno: turno?.nome_turno || 'Desconhecido',
@@ -437,7 +479,7 @@ class TurnoModel {
                 hora_fim: turno?.hora_fim,
                 producao_total_lotes: producao._sum.qtd_boa || 0,
                 maquinas_ativas: maquinas.length,
-                numero_paradas: numeroParadas,
+                numero_paradas: paradas._count.id_evento,
                 tempo_parado_minutos: tempoParado,
                 tempo_parado_horas: (tempoParado / 60).toFixed(2),
                 disponibilidade_percentual: disponibilidade.toFixed(2),
