@@ -421,24 +421,103 @@ class UsuarioModel {
 
     // ------------------------------------------------------Dashboard da página específica de usuário-------------------------------------------------------------
 
-    static async metaProducao() {
+    static async metaProducao(id_empresa, id_usuario, id_maquina) {
         try {
-            const ordensDaMaquina =  await prisma.ordemproducao.findMany(
-                
-            )
-        } catch (error) {
+            const ultimaOrdem = await prisma.apontamento.findFirst({
+                where: {
+                    id_operador: id_usuario,
+                    id_maquina: id_maquina,
+                },
+                orderBy: {
+                    id_ordemProducao: "desc"
+                }
+            })
 
+            const metaTotal = await prisma.ordemproducao.findFirst({
+                where: {
+                    id_ordem: ultimaOrdem.id_ordemProducao,
+                    id_empresa: id_empresa
+                },
+                select: {
+                    qtd_planejada: true
+                }
+            })
+
+            const metaProducao = (ultimaOrdem.qtd_boa / metaTotal) * 100
+
+            return metaProducao
+
+        } catch (error) {
+            console.error('Erro ao retornar meta de produção alcançada no banco de dados:', error);
+            throw error;
         }
     }
 
-    static async paradasJustificadasENaoJustificadasUsuario(){
+    static async paradasJustificadasENaoJustificadasUsuario() {
         try {
-            
+            function semanaAtual() {
+                const hoje = new Date()
+                const diaSemana = hoje.getDay()  // 0=Dom, 1=Seg...
+
+                // se for domingo (0), volta 6 dias — senão volta (diaSemana - 1) dias
+                const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
+
+                const inicio = new Date(hoje)
+                inicio.setDate(hoje.getDate() - diasParaSegunda)
+                inicio.setHours(0, 0, 0, 0)
+
+                const fim = new Date(inicio)
+                fim.setDate(inicio.getDate() + 6)
+                fim.setHours(23, 59, 59, 999)
+
+                return { inicio, fim }
+            }
+
+            const { inicio, fim } = semanaAtual()
+
+            const paradas = await prisma.historico_Eventos.findMany({
+                where: {
+                    id_empresa,
+                    id_maquina: escala.id_maquina,
+                    status_atual: { in: ['Parada', 'Setup'] },
+                    inicio: { gte: inicio, lte: fim }   // ← só a semana atual
+                },
+                select: {
+                    inicio: true,
+                    id_motivo_parada: true
+                }
+            })
+
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
+
+            // agrupa por dia da semana
+            const agrupado = {}
+
+            for (const parada of paradas) {
+                const dia = diasSemana[new Date(parada.inicio).getDay()]
+
+                if (!agrupado[dia]) {
+                    agrupado[dia] = { dia, paradas_nao_justificadas: 0, paradas_justificadas: 0 }
+                }
+
+                agrupado[dia].paradas_nao_justificadas++  // conta todas
+
+                if (parada.id_motivo_parada !== null) {
+                    agrupado[dia].paradas_justificadas++  // conta só as justificadas
+                }
+            }
+
+            // ordena pelos dias úteis
+            const ordem = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
+            return ordem
+                .filter(dia => agrupado[dia])  // só mostra dias que tiveram paradas
+                .map(dia => agrupado[dia])
+
         } catch (error) {
-            
+            console.error('Erro ao retornar Paradas Justificadas x Não Justificadas específicas do usuário no banco de dados:', error);
+            throw error;
         }
     }
-
 
 }
 export default UsuarioModel

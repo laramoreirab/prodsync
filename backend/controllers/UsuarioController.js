@@ -474,8 +474,8 @@ class UsuarioController {
 
     static async metaProducao(req, res){
         try {
-            const { id_usuario } = req.body
-            const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario)
+            const { id_usuario, id_maquina } = req.body
+            const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
              console.error('Erro no gráfico Meta de Produção', error)
@@ -485,9 +485,12 @@ class UsuarioController {
 
     static async paradasJustificadasENaoJustificadasUsuario(req, res){
         try {
-            
+            const { id_usuario, id_maquina } = req.body
+            const dados = await UsuarioModel.paradasJustificadasENaoJustificadasUsuario(req.user.id_empresa, id_usuario, id_maquina)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            
+            console.error('Erro no gráfico Paradas Justificadas x Não justificadas do usuário', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
 

@@ -136,7 +136,7 @@ class EventoModel {
                     id_empresa: id_empresa
                 },
                 data:{
-                    status_op: status_maquina,
+                    status_op: 'Parada',
                     prioridade: 'Critica'
                 }
             })
