@@ -1,4 +1,4 @@
-import OrdemProducaoModel from '../models/OrdemProducaoModel'
+import OrdemProducaoModel from '../models/OrdemProducaoModel.js'
 
 class OrdemProducaoController{
     static async listarTodos(req,res){
@@ -6,7 +6,7 @@ class OrdemProducaoController{
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
 
-            const resultado = await OrdemProducaoModelModel.listarTodos(id_empresa, paginacao);
+            const resultado = await OrdemProducaoModel.listarTodos(id_empresa, paginacao);
 
             return res.status(200).json({
                 sucesso: true,

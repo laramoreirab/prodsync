@@ -1,4 +1,4 @@
-import ApontamentoModel from '../models/ApontamentoModel'
+import ApontamentoModel from '../models/ApontamentoModel.js'
 
 class ApontamentoController {
     //possível listagem de apontamentos no perfil do operario
@@ -30,14 +30,14 @@ class ApontamentoController {
                     mensagem: 'Turno é obrigatório!'
                 })
             };
-            if (!qtd_boa || qtd_boa === '') {
+            if (qtd_boa === undefined || qtd_boa === null || qtd_boa === '') {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Quantidade boa produzida é obrigatória',
                     mensagem: 'Quantidade boa produzida é obrigatória!'
                 })
             };
-            if (!qtd_refugo || qtd_refugo === '') {
+            if (qtd_refugo === undefined || qtd_refugo === null || qtd_refugo === '') {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Quantidade de refugo é obrigatória',
@@ -61,12 +61,12 @@ class ApontamentoController {
 
             const dadosApontamento = {
                 id_empresa: id_empresa,
-                id_ordemProducao: id_ordemProducao,
-                id_maquina: id_empresa,
+                id_ordemProducao: Number(id_ordemProducao),
+                id_maquina: Number(id_maquina),
                 id_operador: id_operador,
-                id_turno: id_turno,
-                qtd_boa: qtd_boa,
-                qtd_refugo: qtd_refugo,
+                id_turno: Number(id_turno),
+                qtd_boa: Number(qtd_boa),
+                qtd_refugo: Number(qtd_refugo),
                 data_hora_inicio: inicio,
                 data_hora_fim: fim,
                 observacao: observacao || null
@@ -161,7 +161,7 @@ class ApontamentoController {
         try {
             const id_empresa = req.user.id_empresa;
             const id_operario = req.user.id_usuario;
-            const id_apontamento = req.body;
+            const { id_apontamento } = req.body;
 
             //verificar se apontamento existe
             const apontamentoExistente = await ApontamentoModel.buscarApontamentoId(id_empresa, id_apontamento, id_operario)
