@@ -197,6 +197,54 @@ class SetorController {
         }
     }
 
+    // ------------------------ Dashboards ----------------------- //
+
+    static async obterProducaoPorSetor(req, res) {
+        try {
+            const dias = req.query.dias ? Number(req.query.dias) : null;
+            const dados = await SetorModel.obterProducaoPorSetor(req.user.id_empresa, dias);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter producao por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async obterQuantidadeMaquinasPorSetor(req, res) {
+        try {
+            const dados = await SetorModel.obterQuantidadeMaquinasPorSetor(req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter quantidade de maquinas por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async obterTempoMedioParadaPorSetor(req, res) {
+        try {
+            const dias = req.query.dias ? Number(req.query.dias) : null;
+            const dados = await SetorModel.obterTempoMedioParadaPorSetor(req.user.id_empresa, dias);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter tempo medio de parada por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async obterProducaoDefeitosPorSetor(req, res) {
+        try {
+            const dias = req.query.dias ? Number(req.query.dias) : null;
+            const dados = await SetorModel.obterProducaoDefeitosPorSetor(req.user.id_empresa, dias);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter producao de defeitos por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
 }
 
 export default SetorController;

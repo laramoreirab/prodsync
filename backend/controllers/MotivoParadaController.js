@@ -1,4 +1,4 @@
-import MotivoParadaModel from "../models/MotivoParadaModel";
+import MotivoParadaModel from "../models/MotivoParadaModel.js";
 
 class MotivoParadaController {
 
@@ -61,6 +61,31 @@ class MotivoParadaController {
         } catch (error) {
             console.error('Erro ao excluir motivo de parada:', error);
             res.status(500).json({ error: error.message });
+        }
+    }
+    static async listarMotivosFrequentes(req, res) {
+        try {
+            const id_empresa = req.user?.id_empresa ?? Number(req.params.id_empresa);
+            const limite = req.query.limite ? Number(req.query.limite) : 10;
+            const dados = await MotivoParadaModel.buscarMotivosFrequentes(id_empresa, limite);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar motivos frequentes:', error);
+            return res.status(500).json({ sucesso: false, erro: error.message });
+        }
+    }
+
+    static async listarTopMotivosSetup(req, res) {
+        try {
+            const id_empresa = req.user?.id_empresa ?? Number(req.params.id_empresa);
+            const limite = req.query.limite ? Number(req.query.limite) : 3;
+            const dados = await MotivoParadaModel.buscarTopMotivosSetup(id_empresa, limite);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar top motivos de setup:', error);
+            return res.status(500).json({ sucesso: false, erro: error.message });
         }
     }
 }

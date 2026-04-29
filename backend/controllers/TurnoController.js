@@ -159,7 +159,8 @@ class TurnoController {
                 id_operador,
                 dia_semana,
                 hora_inicio,
-                hora_fim
+                hora_fim,
+                req.user?.id_empresa
             );
 
             res.status(200).json({ sucesso: true, dados: { conflito } });
@@ -175,6 +176,7 @@ class TurnoController {
     static async obterKpisTurno(req, res) {
         try {
             const { idTurno } = req.params;
+            const id_empresa = req.user.id_empresa;
 
             if (!idTurno) {
                 return res.status(400).json({
@@ -186,8 +188,8 @@ class TurnoController {
 
             // Executa as duas buscas no banco ao mesmo tempo (mais rápido)
             const [totalLotes, totalMaquinasAtivas] = await Promise.all([
-                TurnoModel.buscarProducaoTurnoLotes(idTurno),
-                TurnoModel.buscarMaquinasAtivasTurno(idTurno)
+                TurnoModel.buscarProducaoTurnoLotes(idTurno, id_empresa),
+                TurnoModel.buscarMaquinasAtivasTurno(idTurno, id_empresa)
             ]);
 
             // Devolve um objeto simples com os valores absolutos para os cards
@@ -205,6 +207,50 @@ class TurnoController {
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível carregar os dados do turno.'
+            });
+        }
+    }
+
+    static async obterKpisTurnoAtual(req, res) {
+        try {
+            const dados = await TurnoModel.obterKpisTurnoAtual(req.user.id_empresa);
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: {
+                    ...dados,
+                    cards: {
+                        maquinasAtivas: {
+                            titulo: 'Maquinas Ativas por Turno',
+                            valor: String(dados.maquinasAtivas)
+                        },
+                        producaoLotes: {
+                            titulo: 'Producao por Turno em Lotes',
+                            valor: String(dados.producaoLotes)
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao obter KPIs do turno atual:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel carregar os KPIs do turno atual'
+            });
+        }
+    }
+
+    static async obterStatusMaquinasPorTurno(req, res) {
+        try {
+            const dados = await TurnoModel.obterStatusMaquinasPorTurno(req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter status de maquinas por turno:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel carregar o status das maquinas por turno'
             });
         }
     }

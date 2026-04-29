@@ -1,6 +1,74 @@
 import prisma from '../config/prisma.js';
 
 class TurnoModel {
+    static diasSemana = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
+
+    static normalizarDataReferencia(valor = new Date()) {
+        if (valor instanceof Date) return valor;
+
+        if (typeof valor === 'string' && /^\d{1,2}:\d{2}/.test(valor)) {
+            const [hora, minuto = '0', segundo = '0'] = valor.split(':');
+            const data = new Date();
+            data.setHours(Number(hora), Number(minuto), Number(segundo), 0);
+            return data;
+        }
+
+        return new Date(valor);
+    }
+
+    static obterNomeDiaSemana(data) {
+        return this.diasSemana[data.getDay()];
+    }
+
+    static obterNomeDiaAnterior(data) {
+        const anterior = new Date(data);
+        anterior.setDate(data.getDate() - 1);
+        return this.obterNomeDiaSemana(anterior);
+    }
+
+    static minutosDoDia(valor) {
+        if (typeof valor === 'string') {
+            const [hora, minuto = '0'] = valor.split(':');
+            return (Number(hora) * 60) + Number(minuto);
+        }
+
+        const data = new Date(valor);
+        return (data.getHours() * 60) + data.getMinutes();
+    }
+
+    static horarioPertenceAoTurno(minutoAtual, minutoInicio, minutoFim) {
+        if (minutoInicio <= minutoFim) {
+            return minutoAtual >= minutoInicio && minutoAtual <= minutoFim;
+        }
+
+        return minutoAtual >= minutoInicio || minutoAtual <= minutoFim;
+    }
+
+    static montarDataComMinutos(dataReferencia, minutos) {
+        const data = new Date(dataReferencia);
+        data.setHours(Math.floor(minutos / 60), minutos % 60, 0, 0);
+        return data;
+    }
+
+    static obterPeriodoTurno(turno, dataReferencia = new Date()) {
+        const data = this.normalizarDataReferencia(dataReferencia);
+        const inicioMinutos = this.minutosDoDia(turno.hora_inicio);
+        const fimMinutos = this.minutosDoDia(turno.hora_fim);
+        const minutoAtual = this.minutosDoDia(data);
+
+        let inicio = this.montarDataComMinutos(data, inicioMinutos);
+        let fim = this.montarDataComMinutos(data, fimMinutos);
+
+        if (inicioMinutos > fimMinutos) {
+            if (minutoAtual <= fimMinutos) {
+                inicio.setDate(inicio.getDate() - 1);
+            } else {
+                fim.setDate(fim.getDate() + 1);
+            }
+        }
+
+        return { inicio, fim };
+    }
 
     //Cria os turnos da empresa
     static async criarTurno(dados) {
@@ -84,23 +152,115 @@ class TurnoModel {
     }
 
     //Obtém o turno atual com base na hora atual e ID da empresa
-    static async obterTurnoAtual(id_empresa, hora_atual, dia_semana) {
+    static async obterTurnoAtual(id_empresa, hora_atual = new Date(), dia_semana = null) {
         try {
-            const turnoAtual = await prisma.turno.findFirst({
+            const dataReferencia = this.normalizarDataReferencia(hora_atual);
+            const minutoAtual = this.minutosDoDia(dataReferencia);
+            const diaAtual = dia_semana || this.obterNomeDiaSemana(dataReferencia);
+            const diaAnterior = this.obterNomeDiaAnterior(dataReferencia);
+
+            const turnos = await prisma.turno.findMany({
                 where: {
-                    id_empresa: id_empresa,
-                    dia_semana: dia_semana,
-                    hora_inicio: {
-                        lte: hora_atual
-                    },
-                    hora_fim: {
-                        gte: hora_atual
+                    id_empresa,
+                    dia_semana: {
+                        in: Array.from(new Set([diaAtual, diaAnterior]))
                     }
+                },
+                orderBy: {
+                    hora_inicio: 'asc'
                 }
             });
+
+            const turnoAtual = turnos.find(turno => {
+                const inicio = this.minutosDoDia(turno.hora_inicio);
+                const fim = this.minutosDoDia(turno.hora_fim);
+                const cruzaMeiaNoite = inicio > fim;
+
+                if (!cruzaMeiaNoite && turno.dia_semana !== diaAtual) {
+                    return false;
+                }
+
+                if (cruzaMeiaNoite && ![diaAtual, diaAnterior].includes(turno.dia_semana)) {
+                    return false;
+                }
+
+                return this.horarioPertenceAoTurno(minutoAtual, inicio, fim);
+            });
+
             return turnoAtual || null;
         } catch (error) {
             console.error('Erro ao obter turno atual:', error);
+            throw error;
+        }
+    }
+
+    static async listarOperadoresTurno(id_turno, dia_semana, id_empresa) {
+        try {
+            return await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_turno,
+                    id_empresa,
+                    turno: {
+                        dia_semana
+                    }
+                },
+                include: {
+                    operador: {
+                        select: {
+                            id_usuario: true,
+                            nome: true,
+                            email: true,
+                            tipo: true
+                        }
+                    },
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            status_atual: true
+                        }
+                    },
+                    setor: {
+                        select: {
+                            id_setor: true,
+                            nome_setor: true
+                        }
+                    },
+                    turno: true
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao listar operadores do turno:', error);
+            throw error;
+        }
+    }
+
+    static async verificarConflitoTurno(id_operador, dia_semana, hora_inicio, hora_fim, id_empresa = null) {
+        try {
+            const novoInicio = this.minutosDoDia(hora_inicio);
+            const novoFim = this.minutosDoDia(hora_fim);
+
+            const escalas = await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_operador,
+                    ...(id_empresa ? { id_empresa } : {}),
+                    turno: {
+                        dia_semana
+                    }
+                },
+                include: {
+                    turno: true
+                }
+            });
+
+            return escalas.some(escala => {
+                const inicio = this.minutosDoDia(escala.turno.hora_inicio);
+                const fim = this.minutosDoDia(escala.turno.hora_fim);
+                return novoInicio < fim && novoFim > inicio;
+            });
+        } catch (error) {
+            console.error('Erro ao verificar conflito de turno:', error);
             throw error;
         }
     }
@@ -110,16 +270,19 @@ class TurnoModel {
     // Busca a soma total de lotes produzidos em um turno específico
     static async obterLotesProduzidosPorTurno(id_empresa) {
         try {
-            const lotesPorTurno = await prisma.apontamento.groupBy({
-                by: ['id_turno'],
-                where: {
-                    id_empresa: id_empresa
-                },
-                _sum: {
-                    qtd_boa: true
+            const turnos = await prisma.turno.findMany({
+                where: { id_empresa },
+                select: {
+                    id_turno: true,
+                    nome_turno: true
                 }
             });
-            return lotesPorTurno;
+
+            return await Promise.all(turnos.map(async turno => ({
+                id_turno: turno.id_turno,
+                turno: turno.nome_turno,
+                lotes_produzidos: await this.buscarProducaoTurnoLotes(turno.id_turno, id_empresa)
+            })));
         } catch (error) {
             console.error('Erro ao obter lotes produzidos por turno:', error);
             throw error;
@@ -129,16 +292,19 @@ class TurnoModel {
     // Busca a quantidade de máquinas únicas ativas em um turno específico
     static async obterMaquinasAtivasPorTurno(id_empresa) {
         try {
-            const maquinasAtivasPorTurno = await prisma.apontamento.groupBy({
-                by: ['id_turno'],
-                where: {
-                    id_empresa: id_empresa
-                },
-                _count: {
-                    id_maquina: true
+            const turnos = await prisma.turno.findMany({
+                where: { id_empresa },
+                select: {
+                    id_turno: true,
+                    nome_turno: true
                 }
             });
-            return maquinasAtivasPorTurno;
+
+            return await Promise.all(turnos.map(async turno => ({
+                id_turno: turno.id_turno,
+                turno: turno.nome_turno,
+                maquinas_ativas: await this.buscarMaquinasAtivasTurno(turno.id_turno, id_empresa)
+            })));
         } catch (error) {
             console.error('Erro ao obter máquinas ativas por turno:', error);
             throw error;
@@ -146,17 +312,28 @@ class TurnoModel {
     }
 
     // Busca a soma total de lotes produzidos em um turno específico (para KPI)
-    static async buscarProducaoTurnoLotes(id_turno) {
+    static async buscarProducaoTurnoLotes(id_turno, id_empresa = null, dataInicio = null, dataFim = null) {
         try {
-            const result = await prisma.apontamento.aggregate({
+            const apontamentos = await prisma.apontamento.findMany({
                 where: {
-                    id_turno: Number(id_turno)
+                    id_turno: Number(id_turno),
+                    id_ordemProducao: {
+                        not: null
+                    },
+                    ...(id_empresa ? { id_empresa } : {}),
+                    ...(dataInicio || dataFim ? {
+                        data_hora_fim: {
+                            ...(dataInicio ? { gte: dataInicio } : {}),
+                            ...(dataFim ? { lte: dataFim } : {})
+                        }
+                    } : {})
                 },
-                _sum: {
-                    qtd_boa: true
+                distinct: ['id_ordemProducao'],
+                select: {
+                    id_ordemProducao: true
                 }
             });
-            return result._sum.qtd_boa || 0;
+            return apontamentos.length;
         } catch (error) {
             console.error('Erro ao buscar produção do turno:', error);
             throw error;
@@ -164,11 +341,18 @@ class TurnoModel {
     }
 
     // Busca a quantidade de máquinas únicas ativas em um turno específico (para KPI)
-    static async buscarMaquinasAtivasTurno(id_turno) {
+    static async buscarMaquinasAtivasTurno(id_turno, id_empresa = null, dataInicio = null, dataFim = null) {
         try {
             const result = await prisma.apontamento.findMany({
                 where: {
-                    id_turno: Number(id_turno)
+                    id_turno: Number(id_turno),
+                    ...(id_empresa ? { id_empresa } : {}),
+                    ...(dataInicio || dataFim ? {
+                        data_hora_fim: {
+                            ...(dataInicio ? { gte: dataInicio } : {}),
+                            ...(dataFim ? { lte: dataFim } : {})
+                        }
+                    } : {})
                 },
                 distinct: ['id_maquina'],
                 select: {
@@ -178,6 +362,97 @@ class TurnoModel {
             return result.length;
         } catch (error) {
             console.error('Erro ao buscar máquinas ativas do turno:', error);
+            throw error;
+        }
+    }
+
+    static async obterKpisTurnoAtual(id_empresa, dataReferencia = new Date()) {
+        try {
+            const turno = await this.obterTurnoAtual(id_empresa, dataReferencia);
+
+            if (!turno) {
+                return {
+                    turno: null,
+                    maquinasAtivas: 0,
+                    producaoLotes: 0
+                };
+            }
+
+            const periodo = this.obterPeriodoTurno(turno, dataReferencia);
+            const [maquinasAtivas, producaoLotes] = await Promise.all([
+                this.buscarMaquinasAtivasTurno(turno.id_turno, id_empresa, periodo.inicio, periodo.fim),
+                this.buscarProducaoTurnoLotes(turno.id_turno, id_empresa, periodo.inicio, periodo.fim)
+            ]);
+
+            return {
+                turno: {
+                    id_turno: turno.id_turno,
+                    nome_turno: turno.nome_turno,
+                    dia_semana: turno.dia_semana,
+                    inicio: periodo.inicio,
+                    fim: periodo.fim
+                },
+                maquinasAtivas,
+                producaoLotes
+            };
+        } catch (error) {
+            console.error('Erro ao obter KPIs do turno atual:', error);
+            throw error;
+        }
+    }
+
+    static async obterStatusMaquinasPorTurno(id_empresa) {
+        try {
+            const turnos = await prisma.turno.findMany({
+                where: { id_empresa },
+                include: {
+                    escalas: {
+                        include: {
+                            maquina: {
+                                select: {
+                                    id_maquina: true,
+                                    status_atual: true,
+                                    ativo: true
+                                }
+                            }
+                        }
+                    }
+                },
+                orderBy: {
+                    id_turno: 'asc'
+                }
+            });
+
+            return turnos.map(turno => {
+                const maquinasUnicas = new Map();
+
+                for (const escala of turno.escalas) {
+                    if (escala.maquina?.ativo) {
+                        maquinasUnicas.set(escala.maquina.id_maquina, escala.maquina.status_atual);
+                    }
+                }
+
+                const contadores = {
+                    ativas: 0,
+                    paradas: 0,
+                    manutencao: 0
+                };
+
+                for (const status of maquinasUnicas.values()) {
+                    if (status === 'Produzindo') contadores.ativas += 1;
+                    else if (status === 'Manutencao') contadores.manutencao += 1;
+                    else contadores.paradas += 1;
+                }
+
+                return {
+                    id_turno: turno.id_turno,
+                    turno: turno.nome_turno,
+                    dia_semana: turno.dia_semana,
+                    ...contadores
+                };
+            });
+        } catch (error) {
+            console.error('Erro ao obter status de maquinas por turno:', error);
             throw error;
         }
     }
@@ -294,9 +569,6 @@ class TurnoModel {
                         id_turno: Number(id_turno),
                         status_atual: 'Parada'
                     },
-                    include: {
-                        motivo_parada: true
-                    },
                     select: {
                         motivo_parada: true,
                         duracao: true,
@@ -400,9 +672,6 @@ class TurnoModel {
                 where: {
                     id_turno: Number(id_turno),
                     status_atual: 'Parada'
-                },
-                include: {
-                    motivo_parada: true
                 },
                 select: {
                     motivo_parada: true,
