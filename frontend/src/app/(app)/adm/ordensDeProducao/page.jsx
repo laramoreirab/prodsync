@@ -30,7 +30,7 @@ const dadosOriginais = [
   { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Parada', progresso: '15%' }
 ];
 
-export default function OrdensDeProducaoPage() {
+export default function OrdensDeProducao() {
 
   const colunasOrdemProd = [
     {
@@ -50,7 +50,7 @@ export default function OrdensDeProducaoPage() {
       key: "prioridade",
       label: "Prioridade",
       className: "w-45",
-       badge: (valor) => {
+       icone: (valor) => {
         const config = {
           "Média": {
             variant: "outline",
@@ -93,7 +93,7 @@ export default function OrdensDeProducaoPage() {
       id: "status",
       key: "status",
       label: 'Status',
-      badge: (valor) => {
+      icone: (valor) => {
         const config = {
           "Produzindo": {
             variant: "outline",
@@ -125,18 +125,8 @@ export default function OrdensDeProducaoPage() {
   ];
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-
-      <div className="w-full max-w-6xl mt-8 pb-10 px-4 space-y-4">
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+      <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         {/* TÍTULO */}
         <div className="flex items-center justify-between mb-6">

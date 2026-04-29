@@ -367,14 +367,14 @@ export default function Usuarios() {
 
 
       {/* Listagem */}
-      <section id="listagem_usuarios">
-        <div className="flex items-center p-8 gap-5">
+      <section id="listagem_usuarios" className='px-8'>
+        <div className="flex items-center py  -8 gap-5">
           <h1 className="text-4xl w-[125] font-semibold">Listagem de Usuários</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
 
         {/* Busca */}
-        <div className="flex px-8 searchbar">
+        <div className="flex searchbar">
           <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
             <input
               type="search"
@@ -388,7 +388,7 @@ export default function Usuarios() {
         </div>
 
         {/* Linha de quantidade total de usuarios e filtrar e ordenar funcional */}
-        <div className="row_ord_fil_cont flex items-center justify-between px-8 mt-3">
+        <div className="row_ord_fil_cont flex items-center justify-between mt-3">
           <p>{dadosExibidos.length} usuários encontrados</p>
 
           <div className="flex gap-4 items-center">

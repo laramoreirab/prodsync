@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Search, Upload, File, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 import React, { useState } from 'react';
@@ -38,18 +38,19 @@ const maquinasFilter = [
 ];
 
 const colunasMaquinas = [
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'nome', key: 'nome', label: 'Nome' },
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20' },
   { id: 'setor', key: 'id_setor', label: 'Setor' },
   {
     id: 'status',
     key: 'status',
     label: 'Status',
-    badge: (valor) => {
+    className: 'text-center justify-center',
+    icone: (valor) => {
       const config = {
         "Produzindo": {
           variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold"
+          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
         },
         "Setup": {
           variant: "secondary",
@@ -69,7 +70,32 @@ const colunasMaquinas = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data' },
+  {
+    id: 'ultimaParada', key: 'ultimaParada', label: 'Última parada',
+    icone: (valor) => {
+      const config = {
+        "Produzindo": {
+          variant: "outline",
+          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+        },
+        "Setup": {
+          variant: "secondary",
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+        },
+        "Parada": {
+          variant: "destructive",
+          className: "font-semibold text-sm border-none"
+        }
+      };
+
+      const estilo = config[valor] || { variant: "outline", className: "" };
+      return (
+        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+          {valor}
+        </Badge>
+      )
+    }
+  },
 ];
 
 export default function Maquinas() {
@@ -142,7 +168,7 @@ export default function Maquinas() {
   const dadosExibidos = dados.filter((maq) => {
     const termo = busca.toLowerCase();
     return (
-      maq.nome.toLowerCase().includes(termo) || 
+      maq.nome.toLowerCase().includes(termo) ||
       maq.id.toString().includes(termo)
     );
   });
@@ -286,7 +312,7 @@ export default function Maquinas() {
         </div>
 
         {/* tabela temporária, apenas para testes */}
-        <div className="flex flex-col flex-1 items-center w-full mt-4">
+        <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
           {dadosExibidos.length > 0 ? (
 
             <TableListagens

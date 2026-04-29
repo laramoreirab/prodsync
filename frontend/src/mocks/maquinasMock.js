@@ -11,7 +11,7 @@ export let maquinasMock = [
     dataAquisicao: "2021-03-15T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    data: "2024-01-10T00:00:00.000Z",
+    ultimaParada: "2024-01-10T00:00:00.000Z",
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ export let maquinasMock = [
     dataAquisicao: "2020-07-22T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    data: "2024-02-05T00:00:00.000Z",
+    ultimaParada: "2024-02-05T00:00:00.000Z",
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ export let maquinasMock = [
     dataAquisicao: "2019-11-30T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    data: "2024-03-18T00:00:00.000Z",
+    ultimaParada: "2024-03-18T00:00:00.000Z",
   },
   {
     id: 4,
@@ -53,7 +53,7 @@ export let maquinasMock = [
     dataAquisicao: "2022-01-10T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    data: "2024-04-01T00:00:00.000Z",
+    ultimaParada: "2024-04-01T00:00:00.000Z",
   },
   {
     id: 5,
@@ -67,7 +67,7 @@ export let maquinasMock = [
     dataAquisicao: "2023-06-05T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    data: "2024-05-12T00:00:00.000Z",
+    ultimaParada: "2024-05-12T00:00:00.000Z"
   },
 ];
 
@@ -107,7 +107,7 @@ export const maquinasMockService = {
       dataAquisicao: formData.get("dataAquisicao"),
       operador: formData.get("operador"),
       imagemUrl: null,
-      data: new Date().toISOString(),
+      ultimaParada: new Date().toISOString(),
     };
     maquinasMock.push(nova);
     return { ...nova };

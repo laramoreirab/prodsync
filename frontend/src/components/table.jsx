@@ -112,10 +112,10 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
   return (
     <div className='w-full mb-5'>
 
-      {enableSelection && selectedRows.length > 0 && (
-        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-vermelho-vivido text-md text-white font-bold">
+      {enableSelection && selectedRows.length > 1 && (
+        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-vermelho-vivido bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
+          <div className="flex items-center gap-1">
+            <span className="flex items-center justify-center text-lg text-vermelho-vivido font-medium">
               {selectedRows.length}
             </span>
             <p className="text-sm font-medium text-vermelho-vivido">
@@ -185,8 +185,8 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                 {columns.map((col) => (
                   <TableCell key={`${row.id}-${col.key}`} className={col.className}>
 
-                    {col.badge
-                      ? (col.badge(row.original[col.key], row.original) ?? null)
+                    {col.icone
+                      ? (col.icone(row.original[col.key], row.original) ?? null)
                       : (row.original?.[col.key] ?? null)
                     }
 
