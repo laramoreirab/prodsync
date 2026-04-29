@@ -15,11 +15,15 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert } from "lucide-react";
+import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert, EyeIcon, Pencil } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+
+import { DropdownMenuGroup, DropdownMenuItem, DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+
+import Link from 'next/link';
 
 const usuariosFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Brocas", "Roscas"] },
@@ -241,55 +245,7 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      {/* SEÇÃO 1: CHarts*/}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          <div className=" bg-white border rounded-xl p-4">
-            <QtdUsuariosWidget />
-          </div>
-
-          <div className=" bg-white border rounded-xl p-4">
-            <QtdUsuariosPorSetorWidget />
-          </div>
-
-          <div className=" bg-white border rounded-xl p-4">
-            <TopOperadoresWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: Charts */}
-      <section className=" p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className=" bg-white border rounded-xl p-6">
-            <TempoSessaoWidget />
-          </div>
-
-          <div className=" bg-white border rounded-xl p-4">
-            <RotatividadeWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 3: Charts */}
-      <section className=" p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className="border  bg-white rounded-xl p-4">
-            <CumprimentoMetaSetorWidget />
-          </div>
-
-          <div className="border bg-white rounded-xl p-4">
-            <ProducaoMediaSetorWidget />
-          </div>
-
-        </div>
-      </section>
-
+      
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">
@@ -370,7 +326,7 @@ export default function Usuarios() {
 
       {/* Listagem */}
       <section id="listagem_usuarios" className='px-8'>
-        <div className="flex items-center py  -8 gap-5">
+        <div className="flex items-center py-8 gap-5">
           <h1 className="text-4xl w-[125] font-semibold">Listagem de Usuários</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
@@ -412,28 +368,47 @@ export default function Usuarios() {
 
             <TableListagens
               /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-              data={dadosExibidos} columns={colunasUsuarios}
+              data={dadosExibidos}
+              columns={colunasUsuarios}
+              acoesDropdown={(user) => (
+                <>
 
-              // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/adm/usuarios/${row.id}`}
+                  {/* Ação 1: Link Direto */}
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`usuarios/${user.id}`}>
+                      <EyeIcon className="mr-2 h-10 w-10" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
 
-              // 2.  modais de Editar e Excluir para a tabela renderizar - falta integrar!!!
-              dialogs={{
-                edit: (row) => (
-                  <>
+                  {/* Editar (Abre um modal) */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar
+                      </DropdownMenuItem>
+                    </DialogTrigger>
                     <DialogContent>
                       <FormEdicaoUsuario />
                     </DialogContent>
-                  </>
-                ),
-                delete: (row) => (
-                  <>
+                  </Dialog>
+
+                  {/* Ação 3: Excluir (Abre um Dialog de Confirmação) */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoUsuario/>
+                      <FormExclusaoUsuario />
                     </DialogContent>
-                  </>
-                )
-              }}
+                  </Dialog>
+                  
+                </>
+              )}
             />
           ) : (
             //caso não encontre nada correspondente

@@ -1,6 +1,8 @@
 "use client"
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4 } from "lucide-react";
+import Link from "next/link";
+
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 import React, { useState } from 'react';
@@ -28,6 +30,7 @@ import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 
 
@@ -318,24 +321,43 @@ export default function Maquinas() {
             <TableListagens
               /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
               data={dadosExibidos} columns={colunasMaquinas}
+              acoesDropdown={(maquina) => (
+                <>
 
-              // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/adm/maquinas/${row.id}`}
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`maquinas/${maquina.id}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
 
-              // 2.  modais de Editar e Excluir para a tabela renderizar
-              dialogs={{
-                edit: (row) => (
-                  <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none">
-                    <FormEdicaoMaquina maquinaId={row.id} onEdicaoSucesso={refresh} />
-                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
-                  </DialogContent>
-                ),
-                delete: (row) => (
-                  <DialogContent>
-                    <FormExclusaoMaquina maquinaId={row.id} onExclusaoSucesso={refresh} />
-                  </DialogContent>
-                )
-              }}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoMaquina />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormExclusaoMaquina />
+                    </DialogContent>
+                  </Dialog>
+
+                </>
+              )}
+
             />
           ) : (
             //caso não encontre nada correspondente

@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import {
   Table,
   TableBody,
@@ -45,7 +43,7 @@ import {
 
 import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = false, onDeleteSelected }) => {
+const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelected, acoesDropdown }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
   const [pagination, setPagination] = useState({
@@ -195,7 +193,6 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
 
                 <TableCell className='text-right'>
                   <div className="flex justify-end">
-
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant='outline' className="border-none bg-transparent">
@@ -204,51 +201,12 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent align='end' className='w-46 font-semibold'>
-                        <DropdownMenuGroup>
-
-                          {/* link leva para a página específica (detalhes) */}
-                          {viewLink && (
-                            <DropdownMenuItem asChild>
-                              <Link href={viewLink(row.original)} className="cursor-pointer">
-                                <EyeIcon className="mr-2 h-4 w-4 text-[50px]" />
-                                Ver Detalhes
-                              </Link>
-                            </DropdownMenuItem>
-                          )}
-
-                          {/* DIALOG DE EDITAR */}
-                          {dialogs?.edit && (
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                                  <Pencil className='text-primary mr-2 h-4 w-4' />
-                                  Editar
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              {dialogs.edit(row.original)}
-                            </Dialog>
-                          )}
-
-                          {/* DIALOG DE EXCLUIR */}
-                          {dialogs?.delete && (
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                                  <Trash2 className='text-vermelho-vivido mr-2 h-4 w-4' />
-                                  Excluir
-                                </DropdownMenuItem>
-                              </DialogTrigger>
-                              {dialogs.delete(row.original)}
-                            </Dialog>
-                          )}
-
-                        </DropdownMenuGroup>
+                        {acoesDropdown && acoesDropdown(row.original)}
                       </DropdownMenuContent>
                     </DropdownMenu>
-
                   </div>
                 </TableCell>
-
+               
               </TableRow>
             ))}
           </TableBody>
@@ -300,7 +258,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                   aria-label='Vá para a próxima página'>
                   <ChevronRightIcon aria-hidden='true'
                     strokeWidth={3}
-                    className='!w-7 !h-7' />
+                    className='w-5! h-5!' />
                 </Button>
               </PaginationItem>
             </PaginationContent>

@@ -54,29 +54,29 @@ export default function OrdensDeProducao() {
         const config = {
           "Média": {
             variant: "outline",
-            className: "border border-[var(--azul-cobalto)] p-2  text-sm font-medium",
-            icon: <MoveHorizontal size={25} />
+            className: "border border-[var(--azul-cobalto)]",
+            icon: <MoveHorizontal className="text-azul-cobalto" />
           },
           "Alta": {
             variant: "secondary",
-            className: "border border-[var(--amarelo)] p-2 bg-transparent font-medium text-sm",
-            icon: <AlertTriangle size={25} />
+            className: "border border-[var(--amarelo)] bg-transparent",
+            icon: <AlertTriangle className="text-amarelo" />
           },
           "Crítica": {
             variant: "destructive",
-            className: "font-medium border border-[var(--vermelho-vivido)] p-2 text-sm bg-transparent text-black",
-            icon: <Flame size={25} />
+            className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+            icon: <Flame className="text-vermelho-vivido" />
           },
           "Baixa": {
             variant: "destructive",
-            className: "font-medium border border-[var(--muted-foreground)] text-sm bg-transparent text-black",
-            icon: <ArrowDown size={25} />
+            className: "border border-gray-400 text-sm bg-transparent text-black",
+            icon: <ArrowDown className="text-gray-400" />
           }
         };
 
         const item= config[valor] || { icon: null };
         return (
-          <Badge variant="outline" className={`whitespace-nowrap ${item.className}`}>
+          <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
             {item.icon}
             {valor}
           </Badge>
@@ -169,6 +169,7 @@ export default function OrdensDeProducao() {
           data={dadosOriginais}
           columns={colunasOrdemProd}
           enableSelection={true}
+          
           // 1. Para a ação "ver detalhes" Url com base na linha clicada
           viewLink={(row) => `/maquinas/${row.id}`}
           // 2.  modais de Editar e Excluir para a tabela renderizar
