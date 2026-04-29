@@ -1,11 +1,10 @@
 "use client";
-
-import { useParadasOperador } from "./hooks/useParadasOperador";
+import { useTempoParadoTempoProduzindoOperador } from "./hooks/useTempoParadoTempoProduzindoOperador";
 import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
-import { paradasConfig } from "@/features/operador/config/operadorConfig"
+import { tempoParadoTempoProduzindoOperadorConfig } from "@/features/operador/config/operadorConfig"
 
-export function ParadasComparadasOperadorWidget({ operadorId }) {
-  const { data, loading, error } = useParadasOperador(operadorId);
+export function TempoParadoTempoProduzindoOperadorWidget({ operadorId }) {
+  const { data, loading, error } = useTempoParadoTempoProduzindoOperador(operadorId);
 
   return (
     <div className="flex flex-col">
@@ -14,11 +13,11 @@ export function ParadasComparadasOperadorWidget({ operadorId }) {
       
       <BarVerticalBase
         data={data}
-        config={paradasConfig}
+        config={tempoParadoTempoProduzindoOperadorConfig}
         loading={loading}
         error={error}
         xKey="dia"
-        yKey="reais" 
+        yKey="paradas" 
       />
     </div>
   );

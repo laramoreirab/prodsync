@@ -4,7 +4,7 @@ import {
   PecasPorDiaArraySchema,
   ProducaoPorHoraOperadorArraySchema,
   MetaProducaoSchema,
-  ParadasComparadasOperadorArraySchema,
+  TempoParadoTempoProduzindoOperadorArraySchema,
   EficienciaMaquinaArraySchema,
 } from "@features/operador/schemas/operadorSchema";
 
@@ -13,7 +13,7 @@ import {
   mockPecasPorDia,
   mockProducaoPorHoraOperador,
   mockMetaProducao,
-  mockParadasComparadasOperador,
+  mockTempoParadoTempoProduzindoOperador,
   mockEficienciaMaquina,
 } from "./mockData";
 
@@ -53,11 +53,11 @@ export const metaProducaoService = {
   },
 };
 
-export const paradasOperadorService = {
-  async getParadas(operadorId) {
-    if (USE_MOCK) return ParadasComparadasOperadorArraySchema.parse(mockParadasComparadasOperador);
-    const data = await apiFetch(`/operador/${operadorId}/paradas`);
-    return ParadasComparadasOperadorArraySchema.parse(data);
+export const TempoParadoTempoProduzindoOperadorService = {
+  async getTempoParadoTempoProduzindoOperador(operadorId) {
+    if (USE_MOCK) return TempoParadoTempoProduzindoOperadorArraySchema.parse(mockTempoParadoTempoProduzindoOperador);
+    const data = await apiFetch(`/operador/${operadorId}/tempo_parado_tempo_produzindo_operador`);
+    return TempoParadoTempoProduzindoOperadorArraySchema.parse(data);
   },
 };
 

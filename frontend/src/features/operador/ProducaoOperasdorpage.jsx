@@ -9,7 +9,7 @@ import Header from "@/components/ui/topbar";
 
 // Widgets novos do operador
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
-import { ParadasComparadasOperadorWidget } from "@/features/operador/ParadasComparadasOperadorWidget";
+import { ParadasComparadasOperadorWidget } from "@/features/operador/TempoParadoTempoProduzindoOperadorWidget";
 
 // Widgets que já existem mas precisam de versão para operador
 import { OEEOperadorWidget } from "@/features/operador/OEEOperadorWidget";

@@ -28,17 +28,17 @@ export const MetaProducaoSchema = z.object({
   restante:   z.number().min(0).max(100), // percentual restante
 });
 
-// Paradas registradas vs reais por dia
-export const ParadasComparadasOperadorSchema = z.object({
+// TempoParadoTempoProduzindoOperador
+export const TempoParadoTempoProduzindoOperadorSchema = z.object({
   dia:        z.string(),   // "Seg", "Ter"
-  registradas: z.number(),
-  reais:       z.number(),
+  produzindo: z.number(),
+  parada:       z.number(),
 });
-export const ParadasComparadasOperadorArraySchema = z.array(ParadasComparadasOperadorSchema);
+export const TempoParadoTempoProduzindoOperadorArraySchema = z.array(TempoParadoTempoProduzindoOperadorSchema);
 
 // Eficiência por máquina 
 export const EficienciaMaquinaSchema = z.object({
-  maquina:    z.string(),   //THA-1
+  dia:    z.string(),   //THA-1
   eficiencia: z.number().min(0).max(100),
 });
 export const EficienciaMaquinaArraySchema = z.array(EficienciaMaquinaSchema);
