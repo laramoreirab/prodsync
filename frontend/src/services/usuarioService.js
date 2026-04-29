@@ -6,7 +6,7 @@ import {
   TopOperadoresArraySchema,
   TempoSessaoPerfilArraySchema,
   RotatividadeArraySchema,
-  SobrecargaSetorArraySchema,
+  CumprimentoMetaSetorArraySchema,
   ProducaoMediaSetorArraySchema,
 } from "@features/usuarios/schemas/usuarioSchema";
 import {
@@ -15,7 +15,7 @@ import {
   mockTopOperadores,
   mockTempoSessaoPerfil,
   mockRotatividade,
-  mockSobrecargaSetor,
+  mockCumprimentoMetaSetor,
   mockProducaoMediaSetor,
 } from "./mockData";
 
@@ -61,11 +61,11 @@ export const rotatividadeService = {
   },
 };
 
-export const sobrecargaSetorService = {
-  async getSobrecarga() {
-    if (USE_MOCK) return SobrecargaSetorArraySchema.parse(mockSobrecargaSetor);
-    const data = await apiFetch("/usuarios/sobrecarga_por_setor");
-    return SobrecargaSetorArraySchema.parse(data);
+export const CumprimentoMetaSetorService = {
+  async getCumprimentoMetaSetor() {
+    if (USE_MOCK) return CumprimentoMetaSetorArraySchema.parse(mockCumprimentoMetaSetor);
+    const data = await apiFetch("/usuarios/cumprimento_meta_por_setor");
+    return CumprimentoMetaSetorArraySchema.parse(data);
   },
 };
 

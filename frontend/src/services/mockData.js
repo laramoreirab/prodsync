@@ -224,8 +224,8 @@ export const mockRotatividade = [
   { mes: "Jun", novos: 25, desligados: 15 },
 ];
 
-// Sobrecarga 
-export const mockSobrecargaSetor = [
+// CumprimentoMetaSetor
+export const mockCumprimentoMetaSetor = [
   { setor: "Engrenagens", media: 95 },
   { setor: "Turbinas",    media: 70 },
   { setor: "Válvulas",    media: 55 },
