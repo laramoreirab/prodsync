@@ -22,6 +22,7 @@ import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
 import FormExclusaoSetor from '@/components/ui/forms/setores/formExclusaoSetor';
 import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
 
+
 const setoresFilter = [
   {
     id: "setor",
