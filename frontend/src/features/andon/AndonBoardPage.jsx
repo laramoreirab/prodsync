@@ -28,7 +28,7 @@ export function AndonBoardPage({ scope = "factory" }) {
           {content.pageTitle}
         </h1>
 
-        <div className="self-start rounded-full border border-slate-200 bg-white/95 px-4 py-2 shadow-sm">
+        <div className="flex items-end">
           <AndonRelogioWidget />
         </div>
       </div>

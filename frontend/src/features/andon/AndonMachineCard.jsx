@@ -26,6 +26,7 @@ const statusMeta = {
 export function AndonMachineCard({ machine }) {
   const meta = statusMeta[machine.status];
   const StatusIcon = meta.Icon;
+  const oeePercentage = Math.max(0, Math.min(machine.oee, 100));
 
   return (
     <article
@@ -62,8 +63,22 @@ export function AndonMachineCard({ machine }) {
         </dl>
 
         <div className="mt-auto space-y-3 pt-4">
-          <div className="border-t border-slate-100 pt-3 text-center text-sm font-semibold text-slate-900">
-            OEE: {machine.oee}%
+          <div className="border-t border-slate-100 pt-3">
+            <div
+              aria-label={`OEE de ${machine.oee}%`}
+              aria-valuemax={100}
+              aria-valuemin={0}
+              aria-valuenow={oeePercentage}
+              className="relative h-5 overflow-hidden rounded-sm bg-slate-200"
+              role="progressbar">
+              <div
+                className="absolute inset-y-0 left-0 bg-[#6f87ba] transition-[width]"
+                style={{ width: `${oeePercentage}%` }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold text-slate-900">
+                OEE: {machine.oee}%
+              </div>
+            </div>
           </div>
 
           <div className={`inline-flex items-center gap-2 rounded-md px-2.5 py-1 text-xs font-medium ${meta.badge}`}>
