@@ -483,11 +483,14 @@ class UsuarioController {
         }
     }
 
-    static async paradasJustificadasENaoJustificadasUsuario(req, res){
+    static async tempoParadoTempoProduzindoUsuario(req, res){
         try {
-            
+            const { id_usuario, id_maquina } = req.body
+            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_usuario, id_maquina)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            
+            console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo da máquina do operador', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
 

@@ -431,7 +431,7 @@ class UsuarioModel {
         }
     }
 
-    static async paradasJustificadasENaoJustificadasUsuario(){
+    static async tempoParadoTempoProduzindoUsuario(id_empresa, id_){
         try {
             
         } catch (error) {
