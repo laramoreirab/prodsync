@@ -33,7 +33,7 @@ export const RoatividadeSchema = z.object({
 });
 
 // Sobrecarga de máquina por usuário por setor 
-export const SobrecargaSetorSchema = z.object({
+export const CumprimentoMetaSetorSchema = z.object({
   setor: z.string(),
   media: z.number(),
 });
@@ -44,7 +44,7 @@ export const ProducaoMediaSetorSchema = z.object({
   media: z.number(),
 });
 export const ProducaoMediaSetorArraySchema = z.array(ProducaoMediaSetorSchema);
-export const SobrecargaSetorArraySchema = z.array(SobrecargaSetorSchema);
+export const CumprimentoMetaSetorArraySchema = z.array(CumprimentoMetaSetorSchema);
 export const RotatividadeArraySchema = z.array(RoatividadeSchema);
 export const TempoSessaoPerfilArraySchema = z.array(TempoSessaoPerfilSchema);
 export const TopOperadoresArraySchema = z.array(TopOperadoresSchema);

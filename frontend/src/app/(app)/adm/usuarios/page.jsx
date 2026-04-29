@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 
 import TableListagens from "@/components/table";
 
+import Header from '@/components/ui/headerHome';
+
 import { useUsuarios } from "@/hooks/useUsuarios";
 import { usuarioService } from "@/services/usuariosCrudService";
 import {
@@ -38,7 +40,7 @@ import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSet
 import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
 import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
-import { SobrecargaSetorWidget } from "@/features/usuarios/SobrecargaSetorWidget";
+import { CumprimentoMetaSetorWidget } from "@/features/usuarios/CumprimentoMetaSetorWidget";
 import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
 
 
@@ -276,7 +278,7 @@ export default function Usuarios() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="border  bg-white rounded-xl p-4">
-            <SobrecargaSetorWidget />
+            <CumprimentoMetaSetorWidget />
           </div>
 
           <div className="border bg-white rounded-xl p-4">
@@ -532,7 +534,7 @@ export default function Usuarios() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="border rounded-xl p-4">
-            <SobrecargaSetorWidget />
+            <CumprimentoMetaSetorWidget />
           </div>
 
           <div className="border rounded-xl p-4">

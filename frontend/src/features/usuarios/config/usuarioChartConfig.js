@@ -20,7 +20,7 @@ export const rotatividadeConfig = {
   desligados: { label: "Desligados:", color: "#212e4b" },
 };
 
-export const sobrecargaConfig = {
+export const cumprimentoMetaConfig = {
   media: { label: "Máquinas/usuário:", color: "#00357a" },
 };
 

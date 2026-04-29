@@ -1,11 +1,11 @@
 "use client";
 
 import { BarComLimiteDegrade } from "@/components/ui/charts/components/BarComLimiteDegrade";
-import { useSobrecargaSetor } from "./hooks/useSobrecargaSetor";
-import { sobrecargaConfig } from "./config/usuarioChartConfig";
+import { useCumprimentoMetaSetor } from "./hooks/useCumprimentoMetaSetor";
+import { cumprimentoMetaConfig } from "./config/usuarioChartConfig";
 
-export function SobrecargaSetorWidget() {
-  const { data, loading, error } = useSobrecargaSetor();
+export function CumprimentoMetaSetorWidget() {
+  const { data, loading, error } =  useCumprimentoMetaSetor();
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
@@ -13,7 +13,7 @@ export function SobrecargaSetorWidget() {
   return (
     <div>
       <p className="text-sm font-semibold text-black">
-        Indicador de sobrecarga de máquina por usuário por setor
+        Cumprimento de meta de produção por setor
       </p>
       <p className="text-xs text-gray-400 font-semibold mt-1">
         *Atualizado em tempo real
@@ -22,7 +22,7 @@ export function SobrecargaSetorWidget() {
       <div className="mt-2">
         <BarComLimiteDegrade
           data={data}
-          config={sobrecargaConfig}
+          config={cumprimentoMetaConfig}
         />
       </div>
     </div>
