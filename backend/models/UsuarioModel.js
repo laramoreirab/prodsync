@@ -421,24 +421,46 @@ class UsuarioModel {
 
     // ------------------------------------------------------Dashboard da página específica de usuário-------------------------------------------------------------
 
-    static async metaProducao() {
+    static async metaProducao(id_empresa, id_usuario, id_maquina) {
         try {
-            const ordensDaMaquina =  await prisma.ordemproducao.findMany(
-                
-            )
-        } catch (error) {
+            const ultimaOrdem = await prisma.apontamento.findFirst({
+                where: {
+                    id_operador: id_usuario,
+                    id_maquina: id_maquina,
+                },
+                orderBy: {
+                    id_ordemProducao: "desc"
+                }
+            })
 
+            const metaTotal = await prisma.ordemproducao.findFirst({
+                where: {
+                    id_ordem: ultimaOrdem.id_ordemProducao,
+                    id_empresa: id_empresa
+                },
+                select: {
+                    qtd_planejada: true
+                }
+            })
+
+            const metaProducao = (ultimaOrdem.qtd_boa / metaTotal) * 100
+
+            return metaProducao
+
+        } catch (error) {
+            console.error('Erro ao retornar meta de produção alcançada no banco de dados:', error);
+            throw error;
         }
     }
 
-    static async tempoParadoTempoProduzindoUsuario(id_empresa, id_){
-        try {
-            
+    static async tempoParadoTempoProduzindoUsuario() {
+        try {    
+
         } catch (error) {
-            
+            console.error('Erro ao retornar Tempo Total Parado x Tempo Total Produzindo da máquina do usuário no banco de dados:', error);
+            throw error;
         }
     }
-
 
 }
 export default UsuarioModel
