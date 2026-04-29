@@ -200,4 +200,18 @@ class EventoController{
             
         }
     }
+
+    // -------------------------------------Dashboards Página histórico de eventos------------------------------------------------------------------------------------------
+
+    static async tempoParadoTempoProduzindoEvento(req, res){
+        try {
+            const dados = await MaquinaDashboardModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo geral da fábrica:', error)
+        return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+
 }

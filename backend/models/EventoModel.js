@@ -263,6 +263,66 @@ class EventoModel {
             throw error;
         }
     }
+
+    // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
+
+    static async tempoParadoTempoProduzindoEvento(){
+        function semanaAtual() {
+            const hoje         = new Date()
+            const diaSemana    = hoje.getDay()
+            const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
+          
+            const inicio = new Date(hoje)
+            inicio.setDate(hoje.getDate() - diasParaSegunda)
+            inicio.setHours(0, 0, 0, 0)
+          
+            const fim = new Date(inicio)
+            fim.setDate(inicio.getDate() + 6)
+            fim.setHours(23, 59, 59, 999)
+          
+            return { inicio, fim }
+          }
+
+          const { inicio, fim } = semanaAtual()
+
+          const [apontamentos, paradas] = await Promise.all([
+            // tempo produzido — todos os apontamentos da empresa na semana
+            prisma.apontamento.findMany({
+              where: {
+                id_empresa,
+                data_hora_inicio: { gte: inicio, lte: fim }
+              },
+              select: {
+                data_hora_inicio: true,
+                data_hora_fim:    true
+              }
+            }),
+            // tempo parado — todas as paradas da empresa na semana
+            prisma.historico_Eventos.aggregate({
+              where: {
+                id_empresa,
+                status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
+                inicio:       { gte: inicio, lte: fim },
+                duracao:      { not: null }
+              },
+              _sum: { duracao: true }
+            })
+          ])
+
+          const tempoProduzido = apontamentos.reduce((acc, ap) => {
+            if (!ap.data_hora_fim) return acc  // ← ignora em andamento
+          
+            const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
+            return acc + Math.round(minutos)
+          }, 0)
+
+          const tempoParado = paradas._sum.duracao ?? 0
+
+          return [
+            { nome: 'Tempo Produzido', valor: tempoProduzido },
+            { nome: 'Tempo Parado',    valor: tempoParado    }
+          ]
+    }
 }
 
 export default EventoModel;
