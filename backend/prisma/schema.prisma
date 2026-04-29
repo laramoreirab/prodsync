@@ -19,7 +19,14 @@ enum StatusMaquina {
   Parada
   Manutencao
   Setup
-  Aguardando 
+  Aguardando
+}
+
+enum StatusOP{
+  Aguardando
+  Em_Andamento @map("Em Andamento")
+  Parada
+  Finalizada
 }
 
 enum DiaSemana {
@@ -193,7 +200,7 @@ model OrdemProducao {
   data_inicio   DateTime?
   data_fim      DateTime?
   qtd_planejada Int
-  status_op     StatusMaquina
+  status_op     StatusOP
   prioridade    TipoPrioridade
   observacao_op    String    @db.VarChar(450)
 

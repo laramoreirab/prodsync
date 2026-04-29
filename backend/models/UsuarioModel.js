@@ -426,24 +426,119 @@ class UsuarioModel {
 
     // ------------------------------------------------------Dashboard da página específica de usuário-------------------------------------------------------------
 
-    static async metaProducao() {
+    static async metaProducao(id_empresa, id_usuario, id_maquina) {
         try {
-            const ordensDaMaquina =  await prisma.ordemProducao.findMany(
-                
-            )
-        } catch (error) {
+            const ultimaOrdem = await prisma.apontamento.findFirst({
+                where: {
+                    id_operador: id_usuario,
+                    id_maquina: id_maquina,
+                },
+                orderBy: {
+                    id_ordemProducao: "desc"
+                }
+            })
 
+            const metaTotal = await prisma.ordemProducao.findFirst({
+                where: {
+                    id_ordem: ultimaOrdem.id_ordemProducao,
+                    id_empresa: id_empresa
+                },
+                select: {
+                    qtd_planejada: true
+                }
+            })
+
+            const metaProducao = (ultimaOrdem.qtd_boa / metaTotal) * 100
+
+            return metaProducao
+
+        } catch (error) {
+            console.error('Erro ao retornar meta de produção alcançada no banco de dados:', error);
+            throw error;
         }
     }
 
-    static async paradasJustificadasENaoJustificadasUsuario(){
+    static async tempoParadoTempoProduzindoUsuario(id_empresa, id_maquina) {
         try {
-            
+            function semanaAtual() {
+                const hoje = new Date()
+                const diaSemana = hoje.getDay()
+                const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
+
+                const inicio = new Date(hoje)
+                inicio.setDate(hoje.getDate() - diasParaSegunda)
+                inicio.setHours(0, 0, 0, 0)
+
+                const fim = new Date(inicio)
+                fim.setDate(inicio.getDate() + 6)
+                fim.setHours(23, 59, 59, 999)
+
+                return { inicio, fim }
+            }
+
+            const { inicio, fim } = semanaAtual()
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
+
+
+            // busca apontamentos da semana — tempo produzido
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_empresa,
+                    id_maquina: id_maquina,
+                    data_hora_inicio: { gte: inicio, lte: fim }
+                },
+                select: {
+                    data_hora_inicio: true,
+                    data_hora_fim: true
+                }
+            })
+
+            // busca paradas da semana — tempo parado
+            const paradas = await prisma.historico_Eventos.findMany({
+                where: {
+                    id_empresa,
+                    id_maquina: id_maquina,
+                    status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
+                    inicio: { gte: inicio, lte: fim },
+                    duracao: { not: null }
+                },
+                select: {
+                    inicio: true,
+                    duracao: true  // já em minutos
+                }
+            })
+
+            // agrupa por dia
+            const agrupado = {}
+
+            for (const ap of apontamentos) {
+                if (!ap.data_hora_fim) continue  // ← pula se ainda não terminou
+              
+                const dia     = diasSemana[new Date(ap.data_hora_inicio).getDay()]
+                const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
+              
+                if (!agrupado[dia]) agrupado[dia] = { dia, tempo_produzido: 0, tempo_parado: 0 }
+                agrupado[dia].tempo_produzido += Math.round(minutos)
+              }
+
+            for (const parada of paradas) {
+                const dia = diasSemana[new Date(parada.inicio).getDay()]
+
+                if (!agrupado[dia]) agrupado[dia] = { dia, tempo_produzido: 0, tempo_parado: 0 }
+                agrupado[dia].tempo_parado += parada.duracao
+            }
+
+            // ordena de Seg a Dom e retorna só dias que tiveram dados
+            const ordem = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
+            return ordem
+                .filter(dia => agrupado[dia])
+                .map(dia => agrupado[dia])
+
         } catch (error) {
-            
+            console.error('Erro ao retornar Tempo Total Parado x Tempo Total Produzindo da máquina do usuário no banco de dados:', error);
+            throw error;
         }
     }
-
 
 }
 export default UsuarioModel
