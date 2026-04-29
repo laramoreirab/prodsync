@@ -18,14 +18,16 @@ import {
 } from "@/components/ui/dialog";
 
 import { Badge } from "@/components/ui/badge";
+import { Flame, AlertTriangle, ArrowDown, MoveHorizontal } from 'lucide-react';
+
 import TableListagens from "@/components/table";
 
 const dadosOriginais = [
-  { id: 1, nome: 'Ana Silva', prioridade: 'Isso vai virar um badge', setor: 'Escavadeiras', status: 'Produzindo', progresso: '25%' },
-  { id: 2, nome: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status: 'Setup' },
-  { id: 3, nome: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status: 'Parada' },
-  { id: 4, nome: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status: 'Setup' },
-  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Parada' }
+  { id: 1, nome: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status: 'Produzindo', progresso: '25%' },
+  { id: 2, nome: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status: 'Setup', progresso: '35%' },
+  { id: 3, nome: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status: 'Parada', progresso: '55%' },
+  { id: 4, nome: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status: 'Setup', progresso: '85%' },
+  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Parada', progresso: '15%' }
 ];
 
 export default function OrdensDeProducaoPage() {
@@ -48,6 +50,38 @@ export default function OrdensDeProducaoPage() {
       key: "prioridade",
       label: "Prioridade",
       className: "w-45",
+       badge: (valor) => {
+        const config = {
+          "Média": {
+            variant: "outline",
+            className: "border border-[var(--azul-cobalto)] p-2  text-sm font-medium",
+            icon: <MoveHorizontal size={25} />
+          },
+          "Alta": {
+            variant: "secondary",
+            className: "border border-[var(--amarelo)] p-2 bg-transparent font-medium text-sm",
+            icon: <AlertTriangle size={25} />
+          },
+          "Crítica": {
+            variant: "destructive",
+            className: "font-medium border border-[var(--vermelho-vivido)] p-2 text-sm bg-transparent text-black",
+            icon: <Flame size={25} />
+          },
+          "Baixa": {
+            variant: "destructive",
+            className: "font-medium border border-[var(--muted-foreground)] text-sm bg-transparent text-black",
+            icon: <ArrowDown size={25} />
+          }
+        };
+
+        const item= config[valor] || { icon: null };
+        return (
+          <Badge variant="outline" className={`whitespace-nowrap ${item.className}`}>
+            {item.icon}
+            {valor}
+          </Badge>
+        );
+      }
     },
     {
       id: "setor",
@@ -63,11 +97,11 @@ export default function OrdensDeProducaoPage() {
         const config = {
           "Produzindo": {
             variant: "outline",
-            className: "bg-green-500/15 text-green-600 text-sm font-medium"
+            className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
           },
           "Setup": {
             variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-medium text-sm "
+            className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
           },
           "Parada": {
             variant: "destructive",

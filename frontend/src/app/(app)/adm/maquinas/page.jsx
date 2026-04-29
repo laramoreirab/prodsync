@@ -49,11 +49,11 @@ const colunasMaquinas = [
       const config = {
         "Produzindo": {
           variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-medium"
+          className: "bg-green-500/15 text-green-600 text-sm font-semibold"
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-medium text-sm "
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
