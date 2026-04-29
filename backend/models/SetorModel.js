@@ -257,6 +257,26 @@ class SetorModel {
         return inicio;
     }
 
+    static async obterLimitesDiaIndustrial(id_empresa) {
+        const turnos = await prisma.turno.findMany({
+            where: { id_empresa }
+        });
+
+        if (turnos.length === 0) return { horaInicio: 0, minutoInicio: 0 }; // Default meia-noite
+
+        const converterParaMinutos = (data) => {
+            const d = new Date(data);
+            return d.getHours() * 60 + d.getMinutes();
+        };
+
+        const minutosInicio = Math.min(...turnos.map(t => converterParaMinutos(t.hora_inicio)));
+
+        return {
+            horaInicio: Math.floor(minutosInicio / 60),
+            minutoInicio: minutosInicio % 60
+        };
+    }
+
     static montarFiltroPeriodo(campo, dias) {
         const quantidadeDias = Number(dias);
 
@@ -274,47 +294,80 @@ class SetorModel {
         };
     }
 
-    static async obterProducaoPorSetor(id_empresa, dias = null) {
+    static async obterProducaoPorSetor(id_empresa) {
         try {
-            const apontamentos = await prisma.apontamento.findMany({
-                where: {
-                    id_empresa,
-                    ...this.montarFiltroPeriodo('data_hora_fim', dias)
-                },
+            const limites = await this.obterLimitesDiaIndustrial(id_empresa);
+
+            const agora = new Date();
+            let inicioBusca = new Date(agora);
+
+            // CORREÇÃO AQUI: Comparar em minutos para precisão total!
+            const minutosAgora = (agora.getHours() * 60) + agora.getMinutes();
+            const minutosInicioTurno = (limites.horaInicio * 60) + limites.minutoInicio;
+
+            // Se o momento atual for anterior ao minuto exato em que o 1º turno começa,
+            // o "dia industrial" ainda pertence a ontem.
+            if (minutosAgora < minutosInicioTurno) {
+                inicioBusca.setDate(inicioBusca.getDate() - 1);
+            }
+
+            // Crava o início da busca no horário exato do 1º turno (Ex: 06:30:00)
+            inicioBusca.setHours(limites.horaInicio, limites.minutoInicio, 0, 0);
+
+            // O fim da busca é exatamente 24 horas (em milissegundos) após o início
+            // Usar getTime() evita bugs em dias de transição de horário de verão!
+            const fimBusca = new Date(inicioBusca.getTime() + (24 * 60 * 60 * 1000));
+
+            // ... A partir daqui o Prisma fará o findMany exatamente como desenhámos ...
+            const setoresComProducao = await prisma.setores.findMany({
+                where: { id_empresa },
                 select: {
-                    qtd_boa: true,
-                    qtd_refugo: true,
-                    maquina: {
+                    id_setor: true,
+                    nome_setor: true,
+                    ordens_producao: {
+                        where: { status_op: 'Produzindo' },
                         select: {
-                            setor: {
-                                select: {
-                                    id_setor: true,
-                                    nome_setor: true
-                                }
+                            qtd_planejada: true,
+                            apontamentos: {
+                                where: {
+                                    data_hora_fim: {
+                                        gte: inicioBusca,
+                                        lt: fimBusca // Usamos `lt` (menor que) para não sobrepor o 1º segundo do dia seguinte
+                                    }
+                                },
+                                select: { qtd_boa: true }
                             }
                         }
                     }
                 }
             });
 
-            const producaoPorSetor = new Map();
+            const resultado = setoresComProducao.map(setor => {
+                let totalPlanejado = 0;
+                let totalProduzido = 0;
 
-            for (const apontamento of apontamentos) {
-                const setor = apontamento.maquina?.setor;
-                const chave = setor?.id_setor ?? 0;
-                const acumulado = producaoPorSetor.get(chave) ?? {
-                    id_setor: setor?.id_setor ?? null,
-                    setor: setor?.nome_setor ?? 'Sem setor',
-                    qtd: 0
+                setor.ordens_producao.forEach(op => {
+                    totalPlanejado += op.qtd_planejada;
+                    const produzidoNaOP = op.apontamentos.reduce((sum, ap) => sum + (ap.qtd_boa || 0), 0);
+                    totalProduzido += produzidoNaOP;
+                });
+
+                let porcentagem = 0;
+                if (totalPlanejado > 0) {
+                    porcentagem = (totalProduzido / totalPlanejado) * 100;
+                }
+
+                return {
+                    id_setor: setor.id_setor,
+                    setor: setor.nome_setor,
+                    porcentagem: Number(Math.min(porcentagem, 100).toFixed(1))
                 };
+            });
 
-                acumulado.qtd += (apontamento.qtd_boa ?? 0) + (apontamento.qtd_refugo ?? 0);
-                producaoPorSetor.set(chave, acumulado);
-            }
+            return resultado.sort((a, b) => b.porcentagem - a.porcentagem);
 
-            return Array.from(producaoPorSetor.values()).sort((a, b) => b.qtd - a.qtd);
         } catch (error) {
-            console.error('Erro ao obter producao por setor:', error);
+            console.error('Erro ao calcular produção por setor:', error);
             throw error;
         }
     }
