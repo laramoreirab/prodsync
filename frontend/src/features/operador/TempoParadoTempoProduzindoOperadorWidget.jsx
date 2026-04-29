@@ -8,7 +8,7 @@ export function TempoParadoTempoProduzindoOperadorWidget({ operadorId }) {
 
   return (
     <div className="flex flex-col">
-      <p className="text-sm font-semibold text-black">Paradas Registradas x Paradas Reais</p>
+      <p className="text-sm font-semibold text-black">Tempo Total Parado x Tempo Produzindo</p>
       <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
       
       <BarVerticalBase

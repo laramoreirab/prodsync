@@ -1,4 +1,4 @@
-import { TempoParadoTempoProduzindoWidget } from "@/features/eventos/TempoParadoTempoProduzindoWidget";
+import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
 
 export default function PageLayout() {
@@ -38,7 +38,7 @@ export default function PageLayout() {
             
             {/* Widget 1/3 */}
             <div className="bg-white border rounded-xl p-4 md:col-span-1">
-              <TempoParadoTempoProduzindoOperadorWidget />
+              <ParadasComparadasWidget />
             </div>
 
             {/* Widget 2/3 */}
