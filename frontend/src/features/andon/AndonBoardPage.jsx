@@ -22,9 +22,9 @@ export function AndonBoardPage({ scope = "factory" }) {
   const { data: sections, loading, error } = useAndonSections(scope);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 pb-10">
+    <div className="mx-auto flex w-full flex-col gap-6 p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="inline-block border-b-4 border-[var(--secondary-foreground)] pb-1 text-3xl font-semibold text-slate-950 md:text-4xl">
+        <h1 className="inline-block border-b-4 border-secondary-foreground pb-1 text-3xl font-semibold text-slate-950 md:text-4xl">
           {content.pageTitle}
         </h1>
 
