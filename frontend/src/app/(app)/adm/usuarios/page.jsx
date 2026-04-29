@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import TableListagens from "@/components/table";
+import DataTableWithPaginationDemo from '@/components/shadcn-studio/data-table/data-table-11';
 
 import { useUsuarios } from "@/hooks/useUsuarios";
 import { usuarioService } from "@/services/usuariosCrudService";
@@ -43,6 +44,7 @@ import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetor
 import FormCadastroUsuario from '@/components/ui/forms/usuarios/formCadastroUsuario';
 import FormEdicaoUsuario from '@/components/ui/forms/usuarios/formEdicaoUsuario';
 import FormExclusaoUsuario from '@/components/ui/forms/usuarios/formExclusaoUsuario';
+
 
 
 export default function Usuarios() {
@@ -237,7 +239,6 @@ export default function Usuarios() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <Header />
       {/* SEÇÃO 1: CHarts*/}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -441,6 +442,8 @@ export default function Usuarios() {
             </div>
           )}
         </div>
+
+        <DataTableWithPaginationDemo />
 
       </section>
     </main >

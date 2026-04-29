@@ -25,7 +25,7 @@ import {
 import { EllipsisVertical, EyeIcon, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { usePagination } from '@/hooks/use-pagination';
 
@@ -45,7 +45,7 @@ import {
 
 import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = false }) => {
+const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = false, onDeleteSelected }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
   const [pagination, setPagination] = useState({
@@ -59,6 +59,26 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
       desc: false
     }
   ])
+
+  /*   const pagesToShow = useMemo(() => {
+      const total = table.getPageCount();
+      const current = table.getState().pagination.pageIndex + 1;
+  
+      if (total <= 1) return [1];
+  
+      const pages = new Set();
+  
+      pages.add(1);
+      if (total >= 2) pages.add(2);
+      pages.add(current);
+      if (total >= 3) pages.add(total - 1);
+      pages.add(total);
+  
+      return Array.from(pages).filter(p => p > 0 && p <= total).sort((a, b) => a - b);
+    }, [table.getPageCount(), table.getState().pagination.pageIndex]);
+  
+    const currentPage = table.getState().pagination.pageIndex + 1;
+    const totalPages = table.getPageCount(); */
 
   const [rowSelection, setRowSelection] = useState({});
 
@@ -80,6 +100,8 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
     getCoreRowModel: getCoreRowModel(),
   })
 
+  const selectedRows = table.getSelectedRowModel().rows;
+
   /* Calculos botões da paginação */
   const { showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage: table.getState().pagination.pageIndex + 1,
@@ -88,15 +110,40 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
   })
 
   return (
-    <div className='w-full px-8 mb-5'>
-      <div className='overflow-hidden rounded-md border bg-white/50 backdrop-blur-sm'>
+    <div className='w-full mb-5'>
+
+      {enableSelection && selectedRows.length > 0 && (
+        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
+          <div className="flex items-center gap-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-vermelho-vivido text-md text-white font-bold">
+              {selectedRows.length}
+            </span>
+            <p className="text-sm font-medium text-vermelho-vivido">
+              Itens selecionados
+            </p>
+          </div>
+
+          <Button
+            className="h-8 bg-vermelho-vivido text-white"
+            onClick={() => {
+              const selectedData = selectedRows.map(row => row.original);
+              onDeleteSelected?.(selectedData); // Passa os dados para o componente pai
+            }}
+          >
+            <Trash2 className="mr-1 h-4 w-4" />
+            Excluir
+          </Button>
+        </div>
+      )}
+
+      <div className='overflow-hidden rounded-md border bg-white/50 backdrop-blur-sm w-full'>
         <Table className="overflow-auto">
 
           <TableHeader>
             <TableRow className="font-semibold bg-muted/50">
 
               {enableSelection && (
-                <TableHead className="w-[50px]">
+                <TableHead className="w-12.5">
                   <Checkbox
                     checked={table.getIsAllPageRowsSelected()}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
@@ -122,7 +169,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
               <TableRow
                 key={row.id || index}
                 className='font-medium'
-                data-state={row.getIsSelected() ? "selected" : undefined} > {/* linhas selecioanada */}
+                data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
 
                 {enableSelection && (
                   <TableCell>
@@ -222,7 +269,7 @@ const TableListagens = ({ data, columns, viewLink, dialogs, enableSelection = fa
                   aria-label='Página anterior'>
                   <ChevronLeftIcon aria-hidden='true'
                     strokeWidth={3}
-                    className='!w-7 !h-7' />
+                    size={16} />
                 </Button>
               </PaginationItem>
 

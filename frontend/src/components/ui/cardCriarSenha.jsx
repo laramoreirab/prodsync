@@ -8,10 +8,12 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import InputSenha from "./inputSenha";
 import { useState } from "react";
 import { CheckCircle2, EyeClosed, Info, Eye } from "lucide-react";
+import { apiFetch } from "@/lib/api"
 
 export default function CriarSenha() {
 
@@ -26,6 +28,7 @@ export default function CriarSenha() {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
+    const [erro, setErro] = useState("")
 
 
     const validations = [
@@ -36,36 +39,73 @@ export default function CriarSenha() {
 
     const strength = validations.filter((v) => v.valid).length;
 
-    const handleContinuar = (e) => {
+    async function handleContinuar(e) {
         e.preventDefault()
-        if (userId.trim() !== "") {
-            setStep(2) // Avança para a tela de senha
+        setErro("")
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/primeiroAcesso`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId })
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                setErro(data.mensagem || "Erro ao validar usuário");
+                return;
+            }
+            if (data.token) {
+                localStorage.setItem("token", data.token,);
+                localStorage.setItem("tipo", data.tipo,);
+                setStep(2);
+            }
+
+        } catch (error) {
+            setErro("Erro de conexão com o servidor")
         }
     }
 
-    const handleCriarSenha = (e) => {
+    async function handleCriarSenha(e) {
         e.preventDefault()
-        const isAllValid = validations.every(v => v.valid)
-        if (isAllValid) {
-            alert("Senha criada com sucesso!")
+        const isAllValid = validations.every(v => v.valid);
+
+        if (!isAllValid) {
+            setErro("A senha não atende a todos os requisitos de segurança.");
+            return;
         }
+
+        if (password !== confirmPassword) {
+            setErro("As senhas não coincidem.");
+            return;
+        }
+
+        try {
+            const res = await apiFetch("/api/registroSenha", {
+                method: "POST",
+                body: JSON.stringify({ password, confirmPassword })
+            })
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setErro(data.mensagem || "Erro ao registrar senha.");
+                return;
+            }
+
+            alert("Senha criada com sucesso!");
+
+            //redireciona pelo tipo que vem no token
+            if (localStorage.getItem("tipo") === "Adm") router.push("/adm/DashboardGeral")
+            if (localStorage.getItem("tipo") === "Gestor") router.push("/gestor/DashboardGeral")
+            if (localStorage.getItem("tipo") === "Operador") router.push("/operador/DashboardGeral")
+
+        } catch (error) {
+            setErro("Erro de conexão com o servidor")
+        }
+
     }
-
-    /* const getStrengthText = (score) => {
-        if (score === 0) return "";
-        if (score <= 1) return "Weak";
-        if (score <= 2) return "Moderate";
-        if (score <= 3) return "Strong";
-        return "Very Strong";
-    };
-
-    const getStrengthTextColor = (score) => {
-        if (score === 0) return "text-muted-foreground";
-        if (score <= 1) return "text-red-500";
-        if (score <= 2) return "text-orange-500";
-        if (score <= 3) return "text-teal-400";
-        return "text-teal-500";
-    }; */
 
     return (
         <section
@@ -94,7 +134,7 @@ export default function CriarSenha() {
 
 
                         <CardContent className="p-0">
-                            <form onSubmit={handleContinuar} className="space-y-6" noValidate>
+                            <form onSubmit={(e) => handleContinuar(e)} className="space-y-6" noValidate>
                                 <FieldGroup className="gap-2">
                                     <Field>
                                         <FieldLabel htmlFor="userId" className="text-xs font-semibold text-muted-foreground">ID</FieldLabel>
@@ -127,6 +167,8 @@ export default function CriarSenha() {
                         </CardContent>
                     </Card>
 
+                    {/* erro vindo do backend */}
+                    {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
                 </div>
             )}
 
@@ -216,6 +258,8 @@ export default function CriarSenha() {
                                             <InputSenha />
 
                                         </Field>
+                                        {/* erro vindo do backend */}
+                                        {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
                                     </div>
 
 
@@ -239,13 +283,3 @@ export default function CriarSenha() {
         </section>
     );
 }
-
-
-
-
-
-
-
-/* 
-
-*/

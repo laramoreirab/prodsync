@@ -5,7 +5,8 @@ import { gerarIdUsuario } from '../dev-utils/gerarIdUsuario.js';
 class EmpresaModel {
     //Registrar nova empresa
     static async criarEmpresa(dados) {
-        const {
+        try {
+            const {
             nome_empresa, cnpj, email, telefone, endereco,
             nome_representante, cpf, senha
         } = dados;
@@ -41,7 +42,12 @@ class EmpresaModel {
             }
         });
 
-        return novaEmpresa;
+        return novaEmpresa; 
+        } catch (error) {
+            console.error('Erro ao cadastrar empresa e usuário administrador', error);
+            throw error;
+        }
+       
     }
 
     //buscar por cnpj

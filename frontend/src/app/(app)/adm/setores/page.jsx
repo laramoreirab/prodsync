@@ -119,7 +119,7 @@ const dadosOriginais = [
   },
 ];
 
-export default function PageLayout() {
+export default function PageSetores() {
   //estado que vai para a tela (começa com todos os dados)
   const [dados, setDados] = useState(dadosOriginais);
   const [busca, setBusca] = useState("");
