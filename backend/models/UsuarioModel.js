@@ -9,12 +9,10 @@ class UsuarioModel {
 
             const regrasDaBusca = {
                 where: {
-                    usuario: {
-                        id_empresa: id_empresa// Substitua pelo ID da empresa ou o campo correto
-                    }
+                    id_empresa: id_empresa
                 },
                 include: {
-                    usuario: true, // Traz os dados do operador
+                    operador: true, // Traz os dados do operador
                     turno: {
                         select: {
                             nome_turno: true, // Traz apenas o nome do turno
@@ -27,12 +25,12 @@ class UsuarioModel {
                     },
                 },
                 orderBy: {
-                    id_usuario: 'asc' // Mantém a lista organizada
+                    id_operador: 'asc'
                 },
             }
 
             const resultadoPaginado = await paginarPrisma(
-                prisma.escalatrabalho,
+                prisma.escalaTrabalho,
                 regrasDaBusca,
                 paginacao
             );
@@ -159,14 +157,21 @@ class UsuarioModel {
             if (dados.senha) {
                 dados.senha = await bcrypt.hash(dados.senha, 10)
             }
-            const row = await prisma.usuarios.update({
+            const row = await prisma.usuarios.updateMany({
                 where: {
                     id_usuario: id,
                     id_empresa: id_empresa
                 },
                 data: { ...dados }
             })
-            return row || null
+            if (row.count === 0) return null
+
+            return await prisma.usuarios.findFirst({
+                where: {
+                    id_usuario: id,
+                    id_empresa: id_empresa
+                }
+            })
         } catch (error) {
             console.error('Erro ao atualizar usuário:', error);
             throw error;
@@ -176,7 +181,7 @@ class UsuarioModel {
     //Deletar dados dos usuários
     static async deletar(id, id_empresa) {
         try {
-            const deletarUser = await prisma.usuarios.delete({
+            const deletarUser = await prisma.usuarios.deleteMany({
                 where: {
                     id_usuario: id,
                     id_empresa: id_empresa
@@ -267,7 +272,7 @@ class UsuarioModel {
     static async qtdPorSetor(id_empresa) {
         try {
 
-            const resultado = await prisma.escalatrabalho.groupBy({
+            const resultado = await prisma.escalaTrabalho.groupBy({
                 by: ['id_setor'],
                 where: { id_empresa },
                 _count: { id_operador: true }
@@ -433,7 +438,7 @@ class UsuarioModel {
                 }
             })
 
-            const metaTotal = await prisma.ordemproducao.findFirst({
+            const metaTotal = await prisma.ordemProducao.findFirst({
                 where: {
                     id_ordem: ultimaOrdem.id_ordemProducao,
                     id_empresa: id_empresa
