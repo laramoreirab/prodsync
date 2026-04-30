@@ -205,10 +205,19 @@ class EventoController{
 
     static async tempoParadoTempoProduzindoEvento(req, res){
         try {
-            const dados = await MaquinaDashboardModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa)
+            const dados = await EventoModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo geral da fábrica:', error)
+        return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+    static async top3MotivosParada(req, res){
+        try {
+            const dados = await EventoModel.top3MotivosParada(req.user.id_empresa)
+            return res.status(200).json({sucesso: true, dados})
+        } catch (error) {
+            console.error('Erro no gráfico Top 3 Motivos de Parada:', error)
         return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }

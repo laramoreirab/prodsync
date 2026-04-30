@@ -323,6 +323,14 @@ class EventoModel {
             { nome: 'Tempo Parado',    valor: tempoParado    }
           ]
     }
+    static async top3MotivosParada(id_empresa){
+        try {
+            const res = 
+        } catch (error) {
+            console.error('Erro captar top 3 motivos de parada:', error);
+            throw error;
+        }
+    }
 }
 
 export default EventoModel;
