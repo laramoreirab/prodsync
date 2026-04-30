@@ -1,4 +1,4 @@
-import { prisma  } from '../config/prisma.js';
+import prisma from '../config/prisma.js';
 
 class ApontamentoModel{
 
@@ -47,7 +47,7 @@ class ApontamentoModel{
 
     static async atualizar(id_apontamento, id_empresa, dados){
         try {
-            const resultado = await prisma.apontamento.update({
+            const resultado = await prisma.apontamento.updateMany({
                 where: {
                     id_apontamento: id_apontamento,
                     id_empresa: id_empresa
@@ -57,7 +57,16 @@ class ApontamentoModel{
                 }
             })
 
-            return resultado;
+            if (resultado.count === 0) {
+                throw new Error('Apontamento nao encontrado ou nao pertence a empresa');
+            }
+
+            return await prisma.apontamento.findFirst({
+                where: {
+                    id_apontamento,
+                    id_empresa
+                }
+            });
             
         } catch (error) {
             console.error('Erro atualizar apontamento no banco de dados:', error);
@@ -67,7 +76,7 @@ class ApontamentoModel{
 
     static async deletar(id_empresa,id_operador,id_apontamento){
         try {
-            const deletarApontamento = await prisma.apontamento.delete({
+            const deletarApontamento = await prisma.apontamento.deleteMany({
                 where:{
                      id_apontamento:id_apontamento,
                     id_empresa:id_empresa,

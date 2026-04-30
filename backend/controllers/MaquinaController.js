@@ -1,6 +1,20 @@
 import MaquinaModel from '../models/MaquinaModel.js';
 
 class MaquinaController {
+    static obterIdMaquina(req, res) {
+        const { id } = req.params;
+
+        if (!id || isNaN(id)) {
+            res.status(400).json({
+                sucesso: false,
+                erro: 'ID invalido',
+                mensagem: 'O ID da maquina deve ser um numero valido'
+            });
+            return null;
+        }
+
+        return parseInt(id);
+    }
 
     static async listarMaquinas(req, res) {
         try {
@@ -139,7 +153,7 @@ class MaquinaController {
             if (!id || isNaN(id)) return res.status(400).json({ sucesso: false, erro: 'ID inválido' });
 
             // NOVO: Validação do Enum do Prisma
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup'];
+            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
             if (!statusValidos.includes(status_atual)) {
                 return res.status(400).json({
                     sucesso: false,
@@ -168,7 +182,7 @@ class MaquinaController {
             const id_empresa = req.user.id_empresa;
 
             // ADICIONADO: Validação do Enum para evitar erro 500 do Prisma
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup'];
+            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
 
             if (!status || !statusValidos.includes(status.trim())) {
                 return res.status(400).json({
@@ -228,13 +242,199 @@ class MaquinaController {
 
     // ----------------------------------------------dashboard--------------------------------------------------
     //dashboard novo da tela de usuário adm 
-     static async taxaCumprimentoMetaPorSetor(req, res) {
+    static async taxaCumprimentoMetaPorSetor(req, res) {
         try {
-            const dados = await UsuarioModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa)
+            const dados = await MaquinaModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Cumprimento de Meta de Produção Por Setor', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    // GET /maquinas/dashboard/status-geral
+    static async obterStatusGeralMaquinas(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa;
+            const dados = await MaquinaModel.obterStatusGeralMaquinas(id_empresa);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter status geral das maquinas:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter o status geral das maquinas'
+            });
+        }
+    }
+
+    static async obterProducaoTotalMaquinas(req, res) {
+        try {
+            const dias = req.query.dias ? Number(req.query.dias) : 7;
+            const dados = await MaquinaModel.obterProducaoTotalMaquinas(req.user.id_empresa, dias);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter producao total das maquinas:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter a producao total das maquinas'
+            });
+        }
+    }
+
+    static async obterMediaParadasPorDia(req, res) {
+        try {
+            const dias = req.query.dias ? Number(req.query.dias) : 7;
+            const dados = await MaquinaModel.obterMediaParadasPorDia(req.user.id_empresa, dias);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter media de paradas por dia:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter a media de paradas por dia'
+            });
+        }
+    }
+
+    static async obterPecasPorMinuto(req, res) {
+        try {
+            const dias = req.query.dias ? Number(req.query.dias) : 7;
+            const dados = await MaquinaModel.obterPecasPorMinuto(req.user.id_empresa, dias);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter pecas por minuto:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter pecas por minuto'
+            });
+        }
+    }
+
+    static async obterResumoOeeMaquina(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const dados = await MaquinaModel.obterResumoOeeMaquina(id_maquina, req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter resumo OEE da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter o resumo OEE da maquina'
+            });
+        }
+    }
+
+    static async obterEvolucaoOeeMaquina(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const dados = await MaquinaModel.obterEvolucaoOeeMaquina(id_maquina, req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter evolucao OEE da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter a evolucao OEE da maquina'
+            });
+        }
+    }
+
+    static async obterVelocidadeMaquina(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const dados = await MaquinaModel.obterVelocidadeMaquina(id_maquina, req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter velocidade da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter a velocidade da maquina'
+            });
+        }
+    }
+
+    // GET /maquinas/:id/top-motivos-parada
+    static async obterTopMotivosParada(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+            const dados = await MaquinaModel.obterTopMotivosParada(id_maquina, id_empresa);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter top motivos de parada:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter os principais motivos de parada'
+            });
+        }
+    }
+
+    // GET /maquinas/:id/refugos
+    static async obterRefugosMaquina(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+            const dados = await MaquinaModel.obterRefugosMaquina(id_maquina, id_empresa);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter refugos da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter os refugos da maquina'
+            });
+        }
+    }
+
+    // GET /maquinas/:id/historico-eventos
+    static async obterHistoricoEventosTabela(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const limite = parseInt(req.query.limite) || 50;
+
+            if (limite <= 0 || limite > 200) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Limite invalido',
+                    mensagem: 'O limite deve ser um numero entre 1 e 200'
+                });
+            }
+
+            const id_empresa = req.user.id_empresa;
+            const dados = await MaquinaModel.obterHistoricoEventosTabela(id_maquina, id_empresa, limite);
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter historico de eventos da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter o historico da maquina'
+            });
         }
     }
 }

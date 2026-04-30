@@ -1,5 +1,5 @@
 import prisma from '../config/prisma.js';
-import { paginarPrisma } from '../utils/paginacaoUtil.js';
+import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 
 class OrdemProducaoModel {
 
@@ -15,7 +15,7 @@ class OrdemProducaoModel {
             }
 
             const resultadoPaginado = await paginarPrisma(
-                prisma.ordemproducao,
+                prisma.ordemProducao,
                 regrasDaBusca,
                 paginacao
             );
@@ -32,12 +32,12 @@ class OrdemProducaoModel {
             const inicio = await this.converterTimestamp(dados.data_inicio)
             const fim = await this.converterTimestamp(dados.data_fim)
 
-            const resultado = await prisma.ordemproducao.create({
+            const resultado = await prisma.ordemProducao.create({
                 data: {
                     ...dados,
                     data_inicio: inicio,
                     data_fim: fim,
-                    observacao_op: dados.observacao_op || null
+                    observacao_op: dados.observacao_op || ''
                 }
             })
             return resultado
@@ -55,8 +55,8 @@ class OrdemProducaoModel {
     }
     static async buscarOrdem(id_ordem) {
         try {
-            const resultado = await prisma.ordemproducao.findFirst({
-                where: {
+            const resultado = await prisma.ordemProducao.findFirst({
+                where:{
                     id_ordem: id_ordem
                 }
             })
@@ -69,8 +69,8 @@ class OrdemProducaoModel {
     static async buscarOrdemAtiva(id_maquina) {
         //retorna o ID da ordem de prodção pelo ID da máquina
         try {
-            const ordemId = await prisma.ordemproducao.findFirst({
-                where: {
+            const ordem = await prisma.ordemProducao.findFirst({
+                where:{
                     id_maquina: id_maquina,
                     status_op: 'Em Andamento'
                 },
@@ -78,7 +78,7 @@ class OrdemProducaoModel {
                     id_ordem: true
                 }
             })
-            return ordemId
+            return ordem?.id_ordem ?? null
         } catch (error) {
             console.error('Erro ao buscar Ordem de Produção ativa:', error);
             throw error;
@@ -86,8 +86,8 @@ class OrdemProducaoModel {
     }
     static async atualizar(id_ordem, id_empresa, dados) {
         try {
-            const resultado = prisma.ordemproducao.update({
-                where: {
+            const resultado = await prisma.ordemProducao.updateMany({
+                where:{
                     id_ordem: id_ordem,
                     id_empresa: id_empresa
                 },
@@ -96,7 +96,16 @@ class OrdemProducaoModel {
                 }
             })
 
-            return resultado
+            if (resultado.count === 0) {
+                throw new Error('Ordem de producao nao encontrada ou nao pertence a empresa');
+            }
+
+            return await prisma.ordemProducao.findFirst({
+                where: {
+                    id_ordem,
+                    id_empresa
+                }
+            });
         } catch (error) {
             console.error('Erro ao atualizar Ordem de Produção:', error);
             throw error;
@@ -104,7 +113,7 @@ class OrdemProducaoModel {
     }
     static async deletar(id_ordem, id_empresa) {
         try {
-            const deletar = await prisma.ordemproducao.delete({
+            const deletar = await prisma.ordemProducao.deleteMany({
                 where: {
                     id_empresa: id_empresa,
                     id_ordem: id_ordem
