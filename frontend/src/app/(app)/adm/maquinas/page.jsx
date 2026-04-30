@@ -314,7 +314,6 @@ export default function Maquinas() {
           </div>
         </div>
 
-        {/* tabela temporária, apenas para testes */}
         <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
           {dadosExibidos.length > 0 ? (
 
@@ -363,8 +362,8 @@ export default function Maquinas() {
             //caso não encontre nada correspondente
             <div className="flex flex-col items-center justify-center p-8 text-gray-500">
               <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
-              <p>Não encontramos nenhum resultado "{busca}".</p>
+              <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
+              <p>Não encontramos nenhuma máquina "{busca}".</p>
             </div>
           )}
         </div>

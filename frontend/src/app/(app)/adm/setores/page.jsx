@@ -281,12 +281,12 @@ export default function PageSetores() {
         {/* SEÇÃO 1 */}
         <section className="grid grid-cols-1 sm:grid-cols-6 gap-4">
           {/* KPI 1 */}
-          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-[120px]">
+          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-30">
             <SetorTotalWidget />
           </div>
 
           {/* KPI 2  */}
-          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-[120px]">
+          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-30">
             <OperadoresMediaWidget />
           </div>
 

@@ -18,9 +18,10 @@ import {
 } from "@/components/ui/dialog";
 
 import { Badge } from "@/components/ui/badge";
-import { Flame, AlertTriangle, ArrowDown, MoveHorizontal } from 'lucide-react';
-
+import { AlertTriangle, ArrowDown, BellRing, Flame, MoveHorizontal, Pencil, Plus } from 'lucide-react';
 import TableListagens from "@/components/table";
+
+import Link from "next/link";
 
 const dadosOriginais = [
   { id: 1, nome: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status: 'Produzindo', progresso: '25%' },
@@ -50,7 +51,7 @@ export default function OrdensDeProducao() {
       key: "prioridade",
       label: "Prioridade",
       className: "w-45",
-       icone: (valor) => {
+      icone: (valor) => {
         const config = {
           "Média": {
             variant: "outline",
@@ -74,7 +75,7 @@ export default function OrdensDeProducao() {
           }
         };
 
-        const item= config[valor] || { icon: null };
+        const item = config[valor] || { icon: null };
         return (
           <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
             {item.icon}
@@ -130,16 +131,23 @@ export default function OrdensDeProducao() {
 
         {/* TÍTULO */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
+          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
             Ordens de Produção
           </h1>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-xl bg-[var(--secondary-foreground)] hover:bg-[#004aad] text-white text-sm font-medium transition-colors shadow-lg">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Nova OP
-          </button>
+
+          {/* Modal de Criação de OP */}
+          <div className="modal_cadastro">
+            <Dialog>
+              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+                <Plus className="mr-2" />
+                Criar OP
+              </DialogTrigger>
+              <DialogContent>
+                <h1>criar op</h1>
+              </DialogContent>
+
+            </Dialog>
+          </div>
         </div>
 
         {/*SEÇÃO 1: Graphs*/}
@@ -169,26 +177,21 @@ export default function OrdensDeProducao() {
           data={dadosOriginais}
           columns={colunasOrdemProd}
           enableSelection={true}
-          
-          // 1. Para a ação "ver detalhes" Url com base na linha clicada
-          viewLink={(row) => `/maquinas/${row.id}`}
-          // 2.  modais de Editar e Excluir para a tabela renderizar
-          dialogs={{
-            edit: (row) => (
-              <DialogContent className="rounded-lg">
-
-
-                {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
-              </DialogContent>
-            ),
-            delete: (row) => (
-              <DialogContent>
-
-
-
-              </DialogContent>
-            ),
-          }}
+          acoesDropdown={(ordemProd) => (
+            <>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <Pencil className="mr-2 h-4 w-4 text-primary" />
+                    Editar
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  {/* Form para editar ordem Prod*/}
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
         />
 
 

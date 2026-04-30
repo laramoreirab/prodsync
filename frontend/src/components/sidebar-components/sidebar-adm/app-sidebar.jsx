@@ -50,7 +50,7 @@ const data = {
     },
     {
       title: "Andon",
-      url: "#",
+      url: "/adm/andon",
       icon: <RefreshCw />,
     },
   ],

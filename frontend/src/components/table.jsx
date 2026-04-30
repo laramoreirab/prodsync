@@ -113,7 +113,7 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
       {enableSelection && selectedRows.length > 1 && (
         <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-vermelho-vivido bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
           <div className="flex items-center gap-1">
-            <span className="flex items-center justify-center text-lg text-vermelho-vivido font-medium">
+            <span className="flex items-center justify-center text-md text-vermelho-vivido font-medium">
               {selectedRows.length}
             </span>
             <p className="text-sm font-medium text-vermelho-vivido">
@@ -200,7 +200,7 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
                         </Button>
                       </DropdownMenuTrigger>
 
-                      <DropdownMenuContent align='end' className='w-46 font-semibold'>
+                      <DropdownMenuContent align='end' className='max-w-62 w-auto font-semibold pr-2'>
                         {acoesDropdown && acoesDropdown(row.original)}
                       </DropdownMenuContent>
                     </DropdownMenu>
