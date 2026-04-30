@@ -29,23 +29,23 @@ class EventoModel {
     }
 
     //listar paradas não justificadas
-    static async listarNaoJustificadas(id_empresa, paginacao){
+    static async listarNaoJustificadas(id_empresa, paginacao) {
         try {
 
             const regrasDaBusca = {
                 where: {
-                    id_empresa : id_empresa,
-                    id_motivo_parada : {
-                         equals: null
+                    id_empresa: id_empresa,
+                    id_motivo_parada: {
+                        equals: null
                     },
                 }
             }
-             const resultadoPaginado = await paginarPrisma(
+            const resultadoPaginado = await paginarPrisma(
                 prisma.historico_eventos,
                 regrasDaBusca,
                 paginacao
-             );
-             return resultadoPaginado
+            );
+            return resultadoPaginado
         } catch (error) {
             console.error('Erro ao listar eventos não justificadas:', error);
             throw error;
@@ -53,23 +53,23 @@ class EventoModel {
     }
 
     //listar tabelas justificadas
-    static async listarJustificadas(id_empresa, paginacao){
+    static async listarJustificadas(id_empresa, paginacao) {
         try {
             const regrasDaBusca = {
                 where: {
-                    id_empresa : id_empresa,
-                    id_motivo_parada : {
-                         not: null
+                    id_empresa: id_empresa,
+                    id_motivo_parada: {
+                        not: null
                     },
                 }
             }
-             const resultadoPaginado = await paginarPrisma(
+            const resultadoPaginado = await paginarPrisma(
                 prisma.historico_eventos,
                 regrasDaBusca,
                 paginacao
-             );
-             return resultadoPaginado
-            
+            );
+            return resultadoPaginado
+
         } catch (error) {
             console.error('Erro ao listar eventos justificados:', error);
             throw error;
@@ -121,7 +121,7 @@ class EventoModel {
                     id_maquina: id_maquina
 
                 },
-                select:{
+                select: {
                     id_turno: true
                 }
             })
@@ -130,13 +130,13 @@ class EventoModel {
 
             //atualiza status da OP na tabela de Ordem de produção 
             const atualizaOP = await prisma.ordemProducao.update({
-                where:{
+                where: {
                     id_ordem: ordemProducaoId,
-                    id_maquina:id_maquina,
+                    id_maquina: id_maquina,
                     id_empresa: id_empresa
                 },
-                data:{
-                    status_op: 'Parada',
+                data: {
+                    status_op: `${status_maquina}`,
                     prioridade: 'Critica'
                 }
             })
@@ -164,14 +164,14 @@ class EventoModel {
     }
 
     static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, id_maquina, inicio, fim, id_motivo_parada, observacao = null) {
-       try {
+        try {
             const duracao = await this.calcularDuracao(inicio, fim);
             const inicio_convertido = await this.converterTimestamp(inicio);
             const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio_convertido);
 
             // Mapeia todas as máquinas para criar os objetos de inserção
             const eventosData = await Promise.all(maquinas.map(async (id_maquina) => {
-                
+
                 const ordem = await prisma.ordemProducao.findFirst({
                     where: {
                         id_empresa: id_empresa,
@@ -208,15 +208,15 @@ class EventoModel {
             throw error;
         }
 
-        } catch (error) {
-            console.error('Erro registrar evento no banco de dados:', error);
-            throw error;
-        }
+    } catch(error) {
+        console.error('Erro registrar evento no banco de dados:', error);
+        throw error;
+    }
 
     static async verificaJustificativa(id_empresa, id_evento) {
         //verificar se o evento não há justificativas registradas
         try {
-            const evento  = await prisma.historico_eventos.findFirst({
+            const evento = await prisma.historico_eventos.findFirst({
                 where: {
                     id_empresa: id_empresa,
                     id_evento: id_evento,
@@ -249,9 +249,9 @@ class EventoModel {
     static async justificar(id_empresa, id_evento, id_motivo_parada, observacao = null) {
         try {
             return await prisma.historico_eventos.update({
-                where: { 
+                where: {
                     id_empresa: id_empresa,
-                    id_evento: id_evento 
+                    id_evento: id_evento
                 },
                 data: {
                     id_motivo_parada: id_motivo_parada,
@@ -266,66 +266,92 @@ class EventoModel {
 
     // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
 
-    static async tempoParadoTempoProduzindoEvento(){
+    static async tempoParadoTempoProduzindoEvento() {
         function semanaAtual() {
-            const hoje         = new Date()
-            const diaSemana    = hoje.getDay()
+            const hoje = new Date()
+            const diaSemana = hoje.getDay()
             const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
-          
+
             const inicio = new Date(hoje)
             inicio.setDate(hoje.getDate() - diasParaSegunda)
             inicio.setHours(0, 0, 0, 0)
-          
+
             const fim = new Date(inicio)
             fim.setDate(inicio.getDate() + 6)
             fim.setHours(23, 59, 59, 999)
-          
+
             return { inicio, fim }
-          }
+        }
 
-          const { inicio, fim } = semanaAtual()
+        const { inicio, fim } = semanaAtual()
 
-          const [apontamentos, paradas] = await Promise.all([
+        const [apontamentos, paradas] = await Promise.all([
             // tempo produzido — todos os apontamentos da empresa na semana
             prisma.apontamento.findMany({
-              where: {
-                id_empresa,
-                data_hora_inicio: { gte: inicio, lte: fim }
-              },
-              select: {
-                data_hora_inicio: true,
-                data_hora_fim:    true
-              }
+                where: {
+                    id_empresa,
+                    data_hora_inicio: { gte: inicio, lte: fim }
+                },
+                select: {
+                    data_hora_inicio: true,
+                    data_hora_fim: true
+                }
             }),
             // tempo parado — todas as paradas da empresa na semana
             prisma.historico_Eventos.aggregate({
-              where: {
-                id_empresa,
-                status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
-                inicio:       { gte: inicio, lte: fim },
-                duracao:      { not: null }
-              },
-              _sum: { duracao: true }
+                where: {
+                    id_empresa,
+                    status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
+                    inicio: { gte: inicio, lte: fim },
+                    duracao: { not: null }
+                },
+                _sum: { duracao: true }
             })
-          ])
+        ])
 
-          const tempoProduzido = apontamentos.reduce((acc, ap) => {
+        const tempoProduzido = apontamentos.reduce((acc, ap) => {
             if (!ap.data_hora_fim) return acc  // ← ignora em andamento
-          
+
             const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
             return acc + Math.round(minutos)
-          }, 0)
+        }, 0)
 
-          const tempoParado = paradas._sum.duracao ?? 0
+        const tempoParado = paradas._sum.duracao ?? 0
 
-          return [
+        return [
             { nome: 'Tempo Produzido', valor: tempoProduzido },
-            { nome: 'Tempo Parado',    valor: tempoParado    }
-          ]
+            { nome: 'Tempo Parado', valor: tempoParado }
+        ]
     }
-    static async top3MotivosParada(id_empresa){
+    static async top3MotivosParada(id_empresa) {
         try {
-            const res = 
+            const resultado = await prisma.historico_eventos.groupBy({
+                by: ['id_motivo_parada'],
+                where: {
+                    id_empresa,
+                    duracao: { not: null },
+                    id_motivo_parada: { not: null }
+                },
+                _sum: { duracao: true },
+                orderBy: { _sum: { duracao: 'desc' } },
+                take: 3
+            })
+            // 2. Agora buscamos os NOMES na tabela 'motivos_parada'
+            const resultadoComNomes = await Promise.all(
+                agrupado.map(async (item) => {
+                    const infoMotivo = await prisma.motivos_parada.findUnique({
+                        where: { id: item.id_motivo_parada },
+                        select: { nome_motivo: true } // Verifique se o nome da coluna é este mesmo!
+                    });
+
+                    return {
+                        // O Recharts usará essas chaves: 'name' e 'minutos'
+                        name: infoMotivo?.nome_motivo || "Outros",
+                        minutos: item._sum.duracao || 0
+                    };
+                })
+            );
+
         } catch (error) {
             console.error('Erro captar top 3 motivos de parada:', error);
             throw error;

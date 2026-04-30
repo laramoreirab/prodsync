@@ -221,6 +221,4 @@ class EventoController{
         return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
-
-
 }
