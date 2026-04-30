@@ -26,6 +26,7 @@ enum StatusOP{
   Aguardando
   Em_Andamento @map("Em Andamento")
   Parada
+  Setup
   Finalizada
 }
 
