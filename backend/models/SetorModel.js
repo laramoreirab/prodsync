@@ -262,7 +262,7 @@ class SetorModel {
             where: { id_empresa }
         });
 
-        if (turnos.length === 0) return { horaInicio: 0, minutoInicio: 0 }; // Default meia-noite
+        if (turnos.length === 0) return { horaInicio: 0, minutoInicio: 0 };
 
         const converterParaMinutos = (data) => {
             const d = new Date(data);
@@ -301,24 +301,16 @@ class SetorModel {
             const agora = new Date();
             let inicioBusca = new Date(agora);
 
-            // CORREÇÃO AQUI: Comparar em minutos para precisão total!
             const minutosAgora = (agora.getHours() * 60) + agora.getMinutes();
             const minutosInicioTurno = (limites.horaInicio * 60) + limites.minutoInicio;
 
-            // Se o momento atual for anterior ao minuto exato em que o 1º turno começa,
-            // o "dia industrial" ainda pertence a ontem.
             if (minutosAgora < minutosInicioTurno) {
                 inicioBusca.setDate(inicioBusca.getDate() - 1);
             }
 
-            // Crava o início da busca no horário exato do 1º turno (Ex: 06:30:00)
             inicioBusca.setHours(limites.horaInicio, limites.minutoInicio, 0, 0);
-
-            // O fim da busca é exatamente 24 horas (em milissegundos) após o início
-            // Usar getTime() evita bugs em dias de transição de horário de verão!
             const fimBusca = new Date(inicioBusca.getTime() + (24 * 60 * 60 * 1000));
 
-            // ... A partir daqui o Prisma fará o findMany exatamente como desenhámos ...
             const setoresComProducao = await prisma.setores.findMany({
                 where: { id_empresa },
                 select: {
@@ -332,7 +324,7 @@ class SetorModel {
                                 where: {
                                     data_hora_fim: {
                                         gte: inicioBusca,
-                                        lt: fimBusca // Usamos `lt` (menor que) para não sobrepor o 1º segundo do dia seguinte
+                                        lt: fimBusca
                                     }
                                 },
                                 select: { qtd_boa: true }
@@ -497,6 +489,59 @@ class SetorModel {
             }).sort((a, b) => b.total_refugo - a.total_refugo);
         } catch (error) {
             console.error('Erro ao obter producao de defeitos por setor:', error);
+            throw error;
+        }
+    }
+
+    // Quantidade de operadores escalados por setor
+
+    static async obterQuantidadeOperadoresPorSetor(id_empresa) {
+        try {
+            // Busca setores da empresa com a contagem de operadores únicos na escala
+            const [escalasAgrupadas, setores] = await Promise.all([
+                prisma.escalaTrabalho.groupBy({
+                    by: ['id_setor'],
+                    where: { id_empresa },
+                    _count: {
+                        id_operador: true
+                    }
+                }),
+                prisma.setores.findMany({
+                    where: { id_empresa },
+                    select: { id_setor: true, nome_setor: true }
+                })
+            ]);
+
+            // Mapa id_setor → nome
+            const setoresPorId = new Map(setores.map(s => [s.id_setor, s.nome_setor]));
+
+            // Garante que setores sem nenhum operador escalado apareçam com qtd 0
+            const resultado = setores.map(setor => {
+                const escala = escalasAgrupadas.find(e => e.id_setor === setor.id_setor);
+                return {
+                    id_setor: setor.id_setor,
+                    setor: setor.nome_setor,
+                    qtdOperadores: escala?._count.id_operador ?? 0
+                };
+            });
+
+            return resultado.sort((a, b) => b.qtdOperadores - a.qtdOperadores);
+        } catch (error) {
+            console.error('Erro ao obter quantidade de operadores por setor:', error);
+            throw error;
+        }
+    }
+
+    static async obterSetorCritico(id_empresa) {
+        try {
+            const setores = await this.obterOeePorSetor(id_empresa);
+
+            if (setores.length === 0) return null;
+
+            // Ordena crescente e pega o pior
+            return setores.sort((a, b) => a.oee - b.oee)[0];
+        } catch (error) {
+            console.error('Erro ao obter setor critico:', error);
             throw error;
         }
     }

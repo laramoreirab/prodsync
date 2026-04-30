@@ -32,7 +32,7 @@ class SetorController {
     static async associarMaquinas(req, res) {
         try {
             const id_setor = Number(req.params.id_setor);
-            const { ids_maquinas } = req.body; // Espera um array: [1, 2, 5]
+            const { ids_maquinas } = req.body;
             const id_empresa = req.user.id_empresa;
 
             if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor inválido' });
@@ -201,9 +201,7 @@ class SetorController {
 
     static async obterProducaoPorSetor(req, res) {
         try {
-            const dias = req.query.dias ? Number(req.query.dias) : null;
-            const dados = await SetorModel.obterProducaoPorSetor(req.user.id_empresa, dias);
-
+            const dados = await SetorModel.obterProducaoPorSetor(req.user.id_empresa);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter producao por setor:', error);
@@ -225,7 +223,6 @@ class SetorController {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : null;
             const dados = await SetorModel.obterTempoMedioParadaPorSetor(req.user.id_empresa, dias);
-
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter tempo medio de parada por setor:', error);
@@ -237,10 +234,56 @@ class SetorController {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : null;
             const dados = await SetorModel.obterProducaoDefeitosPorSetor(req.user.id_empresa, dias);
-
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter producao de defeitos por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // GET /setores/dashboard/operadores-por-setor
+    // Retorna a quantidade de operadores escalados em cada setor.
+    // Usado pela tabela mockSetores (campo qtdOperadores) e pelo gráfico mockQtdUsuariosPorSetor.
+    // Resposta: [{ id_setor, setor, qtdOperadores }]
+    static async obterQuantidadeOperadoresPorSetor(req, res) {
+        try {
+            const dados = await SetorModel.obterQuantidadeOperadoresPorSetor(req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter quantidade de operadores por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // GET /setores/dashboard/oee
+    // Retorna o OEE calculado (disponibilidade, performance, qualidade e oee) para cada setor.
+    // Usado pelo gráfico mockOEEPorSetor e pela tabela mockSetores (campo oeeMedio).
+    // Resposta: [{ id_setor, setor, oee, disponibilidade, performance, qualidade }]
+    static async obterOeePorSetor(req, res) {
+        try {
+            const dados = await SetorModel.obterOeePorSetor(req.user.id_empresa);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter OEE por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // GET /setores/dashboard/critico
+    // Retorna o setor com o pior OEE (setor crítico).
+    // Usado pelo card mockOEECritico.
+    // Resposta: { id_setor, setor, oee, disponibilidade, performance, qualidade }
+    static async obterSetorCritico(req, res) {
+        try {
+            const dados = await SetorModel.obterSetorCritico(req.user.id_empresa);
+
+            if (!dados) {
+                return res.status(404).json({ sucesso: false, erro: 'Nenhum setor encontrado' });
+            }
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter setor critico:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
