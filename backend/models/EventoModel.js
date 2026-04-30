@@ -102,36 +102,41 @@ class EventoModel {
         try {
             const regrasDaBusca = {
                 where: {
-                    id_empresa,
-                    id_motivo_parada: null
-                },
-                orderBy: { inicio: 'desc' }
-            };
-
-            return await paginarPrisma(prisma.historico_Eventos, regrasDaBusca, paginacao);
+                    id_empresa: id_empresa,
+                    id_motivo_parada: {
+                        equals: null
+                    },
+                }
+            }
+            const resultadoPaginado = await paginarPrisma(
+                prisma.historico_eventos,
+                regrasDaBusca,
+                paginacao
+            );
+            return resultadoPaginado
         } catch (error) {
             console.error('Erro ao listar eventos nao justificados:', error);
             throw error;
         }
     }
     //listar tabelas justificadas
-
     static async listarJustificadas(id_empresa, paginacao) {
         try {
             const regrasDaBusca = {
                 where: {
-                    id_empresa,
+                    id_empresa: id_empresa,
                     id_motivo_parada: {
                         not: null
-                    }
-                },
-                include: {
-                    motivo_parada: true
-                },
-                orderBy: { inicio: 'desc' }
-            };
+                    },
+                }
+            }
+            const resultadoPaginado = await paginarPrisma(
+                prisma.historico_eventos,
+                regrasDaBusca,
+                paginacao
+            );
+            return resultadoPaginado
 
-            return await paginarPrisma(prisma.historico_Eventos, regrasDaBusca, paginacao);
         } catch (error) {
             console.error('Erro ao listar eventos justificados:', error);
             throw error;
@@ -164,10 +169,26 @@ class EventoModel {
 
             const id_ordemProducao = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
 
-            await prisma.maquinas.update({
-                where: { id_maquina },
-                data: { status_atual: status_maquina }
-            });
+                },
+                select: {
+                    id_turno: true
+                }
+            })
+            // busca a ordem de produção ativa da máquina
+            const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
+
+            //atualiza status da OP na tabela de Ordem de produção 
+            const atualizaOP = await prisma.ordemProducao.update({
+                where: {
+                    id_ordem: ordemProducaoId,
+                    id_maquina: id_maquina,
+                    id_empresa: id_empresa
+                },
+                data: {
+                    status_op: status_maquina,
+                    prioridade: 'Critica'
+                }
+            })
 
             if (id_ordemProducao) {
                 await prisma.ordemProducao.update({
@@ -199,29 +220,15 @@ class EventoModel {
         }
     }
 
-    static async registrarEventoSistema(
-        id_empresa,
-        status_maquina,
-        setor_afetado,
-        maquinas,
-        inicio,
-        fim,
-        id_motivo_parada,
-        observacao = ''
-    ) {
+    static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, id_maquina, inicio, fim, id_motivo_parada, observacao = null) {
         try {
-            const inicioConvertido = this.converterTimestamp(inicio);
-            const fimConvertido = this.converterTimestamp(fim);
-            const duracao = this.calcularDuracao(inicioConvertido, fimConvertido);
-            const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicioConvertido);
+            const duracao = await this.calcularDuracao(inicio, fim);
+            const inicio_convertido = await this.converterTimestamp(inicio);
+            const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio_convertido);
 
-            if (!turno) {
-                throw new Error('Nenhum turno ativo encontrado para o horario informado');
-            }
+            // Mapeia todas as máquinas para criar os objetos de inserção
+            const eventosData = await Promise.all(maquinas.map(async (id_maquina) => {
 
-            const maquinasIds = maquinas.map(id => Number(id)).filter(id => Number.isInteger(id) && id > 0);
-
-            const eventosData = await Promise.all(maquinasIds.map(async id_maquina => {
                 const ordem = await prisma.ordemProducao.findFirst({
                     where: {
                         id_empresa,
@@ -267,16 +274,14 @@ class EventoModel {
                 }
             });
 
-            return resultado;
-        } catch (error) {
-            console.error('Erro registrar evento no banco de dados:', error);
-            throw error;
-        }
+    } catch(error) {
+        console.error('Erro registrar evento no banco de dados:', error);
+        throw error;
     }
 
     static async verificaJustificativa(id_empresa, id_evento) {
         try {
-            const evento = await prisma.historico_Eventos.findFirst({
+            const evento = await prisma.historico_eventos.findFirst({
                 where: {
                     id_empresa,
                     id_evento
@@ -324,62 +329,96 @@ class EventoModel {
 
     // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
 
-    static async tempoParadoTempoProduzindoEvento(){
+    static async tempoParadoTempoProduzindoEvento() {
         function semanaAtual() {
-            const hoje         = new Date()
-            const diaSemana    = hoje.getDay()
+            const hoje = new Date()
+            const diaSemana = hoje.getDay()
             const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
-          
+
             const inicio = new Date(hoje)
             inicio.setDate(hoje.getDate() - diasParaSegunda)
             inicio.setHours(0, 0, 0, 0)
-          
+
             const fim = new Date(inicio)
             fim.setDate(inicio.getDate() + 6)
             fim.setHours(23, 59, 59, 999)
-          
+
             return { inicio, fim }
-          }
+        }
 
-          const { inicio, fim } = semanaAtual()
+        const { inicio, fim } = semanaAtual()
 
-          const [apontamentos, paradas] = await Promise.all([
+        const [apontamentos, paradas] = await Promise.all([
             // tempo produzido — todos os apontamentos da empresa na semana
             prisma.apontamento.findMany({
-              where: {
-                id_empresa,
-                data_hora_inicio: { gte: inicio, lte: fim }
-              },
-              select: {
-                data_hora_inicio: true,
-                data_hora_fim:    true
-              }
+                where: {
+                    id_empresa,
+                    data_hora_inicio: { gte: inicio, lte: fim }
+                },
+                select: {
+                    data_hora_inicio: true,
+                    data_hora_fim: true
+                }
             }),
             // tempo parado — todas as paradas da empresa na semana
             prisma.historico_Eventos.aggregate({
-              where: {
-                id_empresa,
-                status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
-                inicio:       { gte: inicio, lte: fim },
-                duracao:      { not: null }
-              },
-              _sum: { duracao: true }
+                where: {
+                    id_empresa,
+                    status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
+                    inicio: { gte: inicio, lte: fim },
+                    duracao: { not: null }
+                },
+                _sum: { duracao: true }
             })
-          ])
+        ])
 
-          const tempoProduzido = apontamentos.reduce((acc, ap) => {
+        const tempoProduzido = apontamentos.reduce((acc, ap) => {
             if (!ap.data_hora_fim) return acc  // ← ignora em andamento
-          
+
             const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
             return acc + Math.round(minutos)
-          }, 0)
+        }, 0)
 
-          const tempoParado = paradas._sum.duracao ?? 0
+        const tempoParado = paradas._sum.duracao ?? 0
 
-          return [
+        return [
             { nome: 'Tempo Produzido', valor: tempoProduzido },
-            { nome: 'Tempo Parado',    valor: tempoParado    }
-          ]
+            { nome: 'Tempo Parado', valor: tempoParado }
+        ]
+    }
+    static async top3MotivosParada(id_empresa) {
+        try {
+            const resultado = await prisma.historico_eventos.groupBy({
+                by: ['id_motivo_parada'],
+                where: {
+                    id_empresa,
+                    duracao: { not: null },
+                    id_motivo_parada: { not: null }
+                },
+                _sum: { duracao: true },
+                orderBy: { _sum: { duracao: 'desc' } },
+                take: 3
+            })
+            // 2. Agora buscamos os NOMES na tabela 'motivos_parada'
+            const resultadoComNomes = await Promise.all(
+                agrupado.map(async (item) => {
+                    const infoMotivo = await prisma.motivos_parada.findUnique({
+                        where: { id: item.id_motivo_parada },
+                        select: { nome_motivo: true } // Verifique se o nome da coluna é este mesmo!
+                    });
+
+                    return {
+                        // O Recharts usará essas chaves: 'name' e 'minutos'
+                        name: infoMotivo?.nome_motivo || "Outros",
+                        minutos: item._sum.duracao || 0
+                    };
+                })
+            );
+
+        } catch (error) {
+            console.error('Erro captar top 3 motivos de parada:', error);
+            throw error;
+        }
     }
 
     // -------------- Dashboards --------------- //
