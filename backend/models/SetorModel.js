@@ -217,7 +217,7 @@ class SetorModel {
                 },
                 include: {
                     gestor: {
-                        select: { id_usuario: true, nome: true, email: true, tipo_usuario: true }
+                        select: { id_usuario: true, nome: true, email: true, tipo: true }
                     }
                 }
             });
@@ -245,6 +245,303 @@ class SetorModel {
             return setores;
         } catch (error) {
             console.error('Erro ao listar setores do gestor:', error);
+            throw error;
+        }
+    }
+
+    // ------------------------ Dashboards ----------------------- //
+
+    static inicioDoDia(data) {
+        const inicio = new Date(data);
+        inicio.setHours(0, 0, 0, 0);
+        return inicio;
+    }
+
+    static async obterLimitesDiaIndustrial(id_empresa) {
+        const turnos = await prisma.turno.findMany({
+            where: { id_empresa }
+        });
+
+        if (turnos.length === 0) return { horaInicio: 0, minutoInicio: 0 };
+
+        const converterParaMinutos = (data) => {
+            const d = new Date(data);
+            return d.getHours() * 60 + d.getMinutes();
+        };
+
+        const minutosInicio = Math.min(...turnos.map(t => converterParaMinutos(t.hora_inicio)));
+
+        return {
+            horaInicio: Math.floor(minutosInicio / 60),
+            minutoInicio: minutosInicio % 60
+        };
+    }
+
+    static montarFiltroPeriodo(campo, dias) {
+        const quantidadeDias = Number(dias);
+
+        if (!Number.isInteger(quantidadeDias) || quantidadeDias <= 0) {
+            return {};
+        }
+
+        const inicio = this.inicioDoDia(new Date());
+        inicio.setDate(inicio.getDate() - (quantidadeDias - 1));
+
+        return {
+            [campo]: {
+                gte: inicio
+            }
+        };
+    }
+
+    static async obterProducaoPorSetor(id_empresa) {
+        try {
+            const limites = await this.obterLimitesDiaIndustrial(id_empresa);
+
+            const agora = new Date();
+            let inicioBusca = new Date(agora);
+
+            const minutosAgora = (agora.getHours() * 60) + agora.getMinutes();
+            const minutosInicioTurno = (limites.horaInicio * 60) + limites.minutoInicio;
+
+            if (minutosAgora < minutosInicioTurno) {
+                inicioBusca.setDate(inicioBusca.getDate() - 1);
+            }
+
+            inicioBusca.setHours(limites.horaInicio, limites.minutoInicio, 0, 0);
+            const fimBusca = new Date(inicioBusca.getTime() + (24 * 60 * 60 * 1000));
+
+            const setoresComProducao = await prisma.setores.findMany({
+                where: { id_empresa },
+                select: {
+                    id_setor: true,
+                    nome_setor: true,
+                    ordens_producao: {
+                        where: { status_op: 'Produzindo' },
+                        select: {
+                            qtd_planejada: true,
+                            apontamentos: {
+                                where: {
+                                    data_hora_fim: {
+                                        gte: inicioBusca,
+                                        lt: fimBusca
+                                    }
+                                },
+                                select: { qtd_boa: true }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const resultado = setoresComProducao.map(setor => {
+                let totalPlanejado = 0;
+                let totalProduzido = 0;
+
+                setor.ordens_producao.forEach(op => {
+                    totalPlanejado += op.qtd_planejada;
+                    const produzidoNaOP = op.apontamentos.reduce((sum, ap) => sum + (ap.qtd_boa || 0), 0);
+                    totalProduzido += produzidoNaOP;
+                });
+
+                let porcentagem = 0;
+                if (totalPlanejado > 0) {
+                    porcentagem = (totalProduzido / totalPlanejado) * 100;
+                }
+
+                return {
+                    id_setor: setor.id_setor,
+                    setor: setor.nome_setor,
+                    porcentagem: Number(Math.min(porcentagem, 100).toFixed(1))
+                };
+            });
+
+            return resultado.sort((a, b) => b.porcentagem - a.porcentagem);
+
+        } catch (error) {
+            console.error('Erro ao calcular produção por setor:', error);
+            throw error;
+        }
+    }
+
+    static async obterQuantidadeMaquinasPorSetor(id_empresa) {
+        try {
+            const setores = await prisma.setores.findMany({
+                where: { id_empresa },
+                include: {
+                    maquinas: {
+                        where: { ativo: true },
+                        select: { id_maquina: true }
+                    }
+                }
+            });
+
+            return setores.map(setor => ({
+                id_setor: setor.id_setor,
+                setor: setor.nome_setor,
+                qtd: setor.maquinas.length
+            })).sort((a, b) => b.qtd - a.qtd);
+        } catch (error) {
+            console.error('Erro ao obter quantidade de maquinas por setor:', error);
+            throw error;
+        }
+    }
+
+    static async obterTempoMedioParadaPorSetor(id_empresa, dias = null) {
+        try {
+            const [paradas, setores] = await Promise.all([
+                prisma.historico_Eventos.groupBy({
+                    by: ['setor_afetado'],
+                    where: {
+                        id_empresa,
+                        status_atual: {
+                            in: ['Parada', 'Manutencao', 'Setup']
+                        },
+                        duracao: {
+                            not: null
+                        },
+                        ...this.montarFiltroPeriodo('inicio', dias)
+                    },
+                    _avg: {
+                        duracao: true
+                    },
+                    _sum: {
+                        duracao: true
+                    },
+                    _count: {
+                        id_evento: true
+                    }
+                }),
+                prisma.setores.findMany({
+                    where: { id_empresa },
+                    select: { id_setor: true, nome_setor: true }
+                })
+            ]);
+
+            const setoresPorId = new Map(setores.map(setor => [setor.id_setor, setor.nome_setor]));
+
+            return paradas.map(parada => ({
+                id_setor: parada.setor_afetado,
+                setor: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
+                minutos: Number((parada._avg.duracao ?? 0).toFixed(1)),
+                tempo_total_minutos: parada._sum.duracao ?? 0,
+                total_eventos: parada._count.id_evento
+            })).sort((a, b) => b.minutos - a.minutos);
+        } catch (error) {
+            console.error('Erro ao obter tempo medio de parada por setor:', error);
+            throw error;
+        }
+    }
+
+    static async obterProducaoDefeitosPorSetor(id_empresa, dias = null) {
+        try {
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_empresa,
+                    ...this.montarFiltroPeriodo('data_hora_fim', dias)
+                },
+                select: {
+                    qtd_boa: true,
+                    qtd_refugo: true,
+                    maquina: {
+                        select: {
+                            setor: {
+                                select: {
+                                    id_setor: true,
+                                    nome_setor: true
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const dadosPorSetor = new Map();
+
+            for (const apontamento of apontamentos) {
+                const setor = apontamento.maquina?.setor;
+                const chave = setor?.id_setor ?? 0;
+                const acumulado = dadosPorSetor.get(chave) ?? {
+                    id_setor: setor?.id_setor ?? null,
+                    setor: setor?.nome_setor ?? 'Sem setor',
+                    boas: 0,
+                    defeitos: 0
+                };
+
+                acumulado.boas += apontamento.qtd_boa ?? 0;
+                acumulado.defeitos += apontamento.qtd_refugo ?? 0;
+                dadosPorSetor.set(chave, acumulado);
+            }
+
+            return Array.from(dadosPorSetor.values()).map(setor => {
+                const total = setor.boas + setor.defeitos;
+                const produzidas = total > 0 ? Number(((setor.boas / total) * 100).toFixed(1)) : 0;
+                const defeito = total > 0 ? Number(((setor.defeitos / total) * 100).toFixed(1)) : 0;
+
+                return {
+                    id_setor: setor.id_setor,
+                    setor: setor.setor,
+                    produzidas,
+                    defeito,
+                    total_produzido: total,
+                    total_refugo: setor.defeitos
+                };
+            }).sort((a, b) => b.total_refugo - a.total_refugo);
+        } catch (error) {
+            console.error('Erro ao obter producao de defeitos por setor:', error);
+            throw error;
+        }
+    }
+
+    // Quantidade de operadores escalados por setor
+
+    static async obterQuantidadeOperadoresPorSetor(id_empresa) {
+        try {
+            // Busca setores da empresa com a contagem de operadores únicos na escala
+            const [escalasAgrupadas, setores] = await Promise.all([
+                prisma.escalaTrabalho.groupBy({
+                    by: ['id_setor'],
+                    where: { id_empresa },
+                    _count: {
+                        id_operador: true
+                    }
+                }),
+                prisma.setores.findMany({
+                    where: { id_empresa },
+                    select: { id_setor: true, nome_setor: true }
+                })
+            ]);
+
+            // Mapa id_setor → nome
+            const setoresPorId = new Map(setores.map(s => [s.id_setor, s.nome_setor]));
+
+            // Garante que setores sem nenhum operador escalado apareçam com qtd 0
+            const resultado = setores.map(setor => {
+                const escala = escalasAgrupadas.find(e => e.id_setor === setor.id_setor);
+                return {
+                    id_setor: setor.id_setor,
+                    setor: setor.nome_setor,
+                    qtdOperadores: escala?._count.id_operador ?? 0
+                };
+            });
+
+            return resultado.sort((a, b) => b.qtdOperadores - a.qtdOperadores);
+        } catch (error) {
+            console.error('Erro ao obter quantidade de operadores por setor:', error);
+            throw error;
+        }
+    }
+
+    static async obterSetorCritico(id_empresa) {
+        try {
+            const setores = await this.obterOeePorSetor(id_empresa);
+
+            if (setores.length === 0) return null;
+
+            // Ordena crescente e pega o pior
+            return setores.sort((a, b) => a.oee - b.oee)[0];
+        } catch (error) {
+            console.error('Erro ao obter setor critico:', error);
             throw error;
         }
     }
