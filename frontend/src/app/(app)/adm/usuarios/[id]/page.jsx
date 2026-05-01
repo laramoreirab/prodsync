@@ -1,3 +1,5 @@
+"use client"
+
 import Header from "@/components/ui/topbar";
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
 import { ParadasComparadasOperadorWidget } from "@/features/operador/ParadasComparadasOperadorWidget";
@@ -6,9 +8,11 @@ import { PecasPorDiaWidget } from "@/features/operador/PecasPorDiaWidget";
 import { ProducaoPorHoraOperadorWidget } from "@/features/operador/ProducaoPorHoraOperadorWidget";
 import { EficienciaMaquinaWidget } from "@/features/operador/EficienciaMaquinaWidget";
 
+import { use } from "react";
 
-export default async function ProducaoOperadorPage({ params }) {
-  const { id } = await params;         
+
+export default function ProducaoOperadorPage({ params }) {
+  const { id } = use(params);         
   const operadorId = Number(id);       
 
   return (

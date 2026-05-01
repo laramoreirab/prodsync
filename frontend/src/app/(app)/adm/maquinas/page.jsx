@@ -207,7 +207,7 @@ export default function Maquinas() {
           {/* Modal de Cadastro */}
           <div className="modal_cadastro">
             <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                 <Plus className="mr-2" />
                 Cadastrar
               </DialogTrigger>

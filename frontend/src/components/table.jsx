@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -23,9 +25,9 @@ import {
 import { EllipsisVertical, EyeIcon, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
-import { usePagination } from '@/hooks/use-pagination';
+// import { usePagination } from '@/hooks/use-pagination';
 
 import {
   useReactTable,
@@ -43,42 +45,20 @@ import {
 
 import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelected, acoesDropdown }) => {
+const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelected, onEditSelected, acoesDropdown }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
+  const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
-
   const [sorting, setSorting] = useState([
     {
       id: 'id', /* ordenar coluna por padrão */
       desc: false
     }
-  ])
-
-  /*   const pagesToShow = useMemo(() => {
-      const total = table.getPageCount();
-      const current = table.getState().pagination.pageIndex + 1;
-  
-      if (total <= 1) return [1];
-  
-      const pages = new Set();
-  
-      pages.add(1);
-      if (total >= 2) pages.add(2);
-      pages.add(current);
-      if (total >= 3) pages.add(total - 1);
-      pages.add(total);
-  
-      return Array.from(pages).filter(p => p > 0 && p <= total).sort((a, b) => a - b);
-    }, [table.getPageCount(), table.getState().pagination.pageIndex]);
-  
-    const currentPage = table.getState().pagination.pageIndex + 1;
-    const totalPages = table.getPageCount(); */
-
-  const [rowSelection, setRowSelection] = useState({});
+  ]);
 
   const table = useReactTable({
     data: data,
@@ -95,42 +75,76 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
       rowSelection
     },
     onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(),
   })
 
+  const pagesToShow = useMemo(() => {
+    const total = table.getPageCount();
+    const current = table.getState().pagination.pageIndex + 1;
+
+    if (total <= 1) return [1];
+
+    const pages = new Set();
+
+    pages.add(1);
+    pages.add(current);
+    pages.add(total);
+
+    return Array.from(pages).filter(p => p > 0 && p <= total).sort((a, b) => a - b);
+  }, [table.getPageCount(), table.getState().pagination.pageIndex]);
+
+  const currentPage = table.getState().pagination.pageIndex + 1;
   const selectedRows = table.getSelectedRowModel().rows;
+  const hasSelection = selectedRows.length > 0;
 
-  /* Calculos botões da paginação */
-  const { showLeftEllipsis, showRightEllipsis } = usePagination({
-    currentPage: table.getState().pagination.pageIndex + 1,
-    totalPages: table.getPageCount(),
-    paginationItemsToDisplay: 5
-  })
+  const showBatchBar = enableSelection && hasSelection && (onDeleteSelected || onEditSelected);
+ 
+  const handleBatchDelete = () => {
+    const selectedData = selectedRows.map(row => row.original);
+    onDeleteSelected?.(selectedData);
+  };
+ 
+  const handleBatchEdit = () => {
+    const selectedData = selectedRows.map(row => row.original);
+    onEditSelected?.(selectedData);
+  };
 
   return (
     <div className='w-full mb-5'>
 
-      {enableSelection && selectedRows.length > 1 && (
-        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-vermelho-vivido bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
+      {showBatchBar && (
+        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
           <div className="flex items-center gap-1">
-            <span className="flex items-center justify-center text-md text-vermelho-vivido font-medium">
+            <span className="flex items-center justify-center text-md text-primary font-medium">
               {selectedRows.length}
             </span>
-            <p className="text-sm font-medium text-vermelho-vivido">
-              Itens selecionados
+            <p className="text-sm font-medium text-primary">
+              {selectedRows.length === 1 ? 'item selecionado' : 'itens selecionados'}
             </p>
           </div>
 
-          <Button
-            className="h-8 bg-vermelho-vivido text-white"
-            onClick={() => {
-              const selectedData = selectedRows.map(row => row.original);
-              onDeleteSelected?.(selectedData); // Passa os dados para o componente pai
-            }}
-          >
-            <Trash2 className="mr-1 h-4 w-4" />
-            Excluir
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Botão de edição em lote — só aparece se onEditSelected foi passado */}
+            {onEditSelected && (
+              <Button
+                className="h-8 bg-primary text-white"
+                onClick={handleBatchEdit}
+              >
+                <Pencil className="mr-1 h-4 w-4" />
+                Editar
+              </Button>
+            )}
+
+            {/* Botão de exclusão em lote — só aparece se onDeleteSelected foi passado */}
+            {onDeleteSelected && (
+              <Button
+                className="h-8 bg-vermelho-vivido text-white"
+                onClick={handleBatchDelete}
+              >
+                <Trash2 className="mr-1 h-4 w-4" />
+                Excluir
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
@@ -195,7 +209,7 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
                   <div className="flex justify-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant='outline' className="border-none bg-transparent">
+                        <Button variant='outline' className="border-none bg-transparent cursor-pointer">
                           <EllipsisVertical />
                         </Button>
                       </DropdownMenuTrigger>
@@ -206,7 +220,7 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
                     </DropdownMenu>
                   </div>
                 </TableCell>
-               
+
               </TableRow>
             ))}
           </TableBody>
@@ -214,79 +228,69 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
         </Table>
       </div>
 
-      <div className='flex items-center max-sm:flex-col mt-7 justify-center text-center'>
+      <div className='flex flex-col items-center gap-3 mt-2'>
+        <Pagination>
+          <PaginationContent>
 
-        <div className='grow items-center'>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem className="flex items-center">
-                <Button
-                  className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                  aria-label='Página anterior'>
-                  <ChevronLeftIcon aria-hidden='true'
-                    strokeWidth={3}
-                    size={16} />
-                </Button>
-              </PaginationItem>
+            <PaginationItem className="flex items-center">
+              <Button
+                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                aria-label='Página anterior'>
+                <ChevronLeftIcon aria-hidden='true'
+                  strokeWidth={3}
+                  size={16} />
+              </Button>
+            </PaginationItem>
 
-              {showLeftEllipsis && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
+            {pagesToShow.map((page, index) => {
+              const pageAnterior = pagesToShow[index - 1];
 
-              <p
-                className='text-muted-foreground flex-1 text-2x1 whitespace-nowrap text-left mx-2 font-medium'
-                aria-live='polite'>
-                Página <span className='text-foreground'>{table.getState().pagination.pageIndex + 1}</span> de{' '}
-                <span className='text-foreground'>{table.getPageCount()}</span>
-              </p>
+              const showEllipsis = pageAnterior && page - pageAnterior > 1;
 
-              {showRightEllipsis && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
+              return (
+                <div key={page} className='flex items-center'>
+                  {showEllipsis && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
 
-              <PaginationItem className="flex items-center">
-                <Button
-                  className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                  aria-label='Vá para a próxima página'>
-                  <ChevronRightIcon aria-hidden='true'
-                    strokeWidth={3}
-                    className='w-5! h-5!' />
-                </Button>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+                  <PaginationItem>
+                    <Button
+                      size='icon'
+                      variant={page === currentPage ? 'outline' : 'ghost'}
+                      className={`w-9 h-8 ${page === currentPage ? 'border-2 border-primary/20' : ''}`}
+                      onClick={() => table.setPageIndex(page - 1)}
+                    >
+                      {page}
+                    </Button>
+                  </PaginationItem>
+                </div>
+              );
+            })}
 
-        {/* <div className='flex flex-1 justify-end'>
-          <Select
-            value={table.getState().pagination.pageSize.toString()}
-            onValueChange={value => {
-              table.setPageSize(Number(value))
-            }}>
-            <SelectTrigger
-              id='results-per-page'
-              className='w-fit whitespace-nowrap'
-              aria-label='Results per page'>
-              <SelectValue placeholder='Select number of results' />
-            </SelectTrigger>
-            <SelectContent>
-              {[5, 10, 25, 50].map(pageSize => (
-                <SelectItem key={pageSize} value={pageSize.toString()}>
-                  {pageSize} / page
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div> */}
+            <PaginationItem className="flex items-center">
+              <Button
+                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                aria-label='Vá para a próxima página'>
+                <ChevronRightIcon aria-hidden='true'
+                  strokeWidth={3}
+                  className='w-5! h-5!' />
+              </Button>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
 
+        <p
+          className='text-muted-foreground flex-1 text-2x1 whitespace-nowrap text-left mx-2 font-medium'
+          aria-live='polite'>
+          Página <span className='text-foreground'>{table.getState().pagination.pageIndex + 1}</span> de{' '}
+          <span className='text-foreground'>{table.getPageCount()}</span>
+        </p>
 
       </div>
 

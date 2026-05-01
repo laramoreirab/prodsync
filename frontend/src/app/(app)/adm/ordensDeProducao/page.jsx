@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/dialog";
 
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, ArrowDown, BellRing, Flame, MoveHorizontal, Pencil, Plus } from 'lucide-react';
+import { AlertTriangle, ArrowDown, Flame, MoveHorizontal, Pencil, Plus, EyeIcon, Trash2 } from 'lucide-react';
 import TableListagens from "@/components/table";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 import Link from "next/link";
 
@@ -28,7 +29,11 @@ const dadosOriginais = [
   { id: 2, nome: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status: 'Setup', progresso: '35%' },
   { id: 3, nome: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status: 'Parada', progresso: '55%' },
   { id: 4, nome: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status: 'Setup', progresso: '85%' },
-  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Parada', progresso: '15%' }
+  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
+  { id: 6, nome: 'Carol Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
+  { id: 7, nome: 'Guilherme Santos', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
+  { id: 8, nome: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status: 'Concluída', progresso: '15%' },
+  { id: 9, nome: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
 ];
 
 export default function OrdensDeProducao() {
@@ -94,6 +99,7 @@ export default function OrdensDeProducao() {
       id: "status",
       key: "status",
       label: 'Status',
+      className: "text-center",
       icone: (valor) => {
         const config = {
           "Produzindo": {
@@ -107,6 +113,14 @@ export default function OrdensDeProducao() {
           "Parada": {
             variant: "destructive",
             className: "font-semibold text-sm border-none"
+          },
+          "Concluída":{
+            variant: "outline",
+            className: "bg-blue-500/10 text-blue-600 text-sm font-semibold border-none"
+          },
+          "Aguardando Início":{
+            variant: "outline",
+            className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
           }
         };
 
@@ -179,15 +193,34 @@ export default function OrdensDeProducao() {
           enableSelection={true}
           acoesDropdown={(ordemProd) => (
             <>
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href={`ordensDeProducao/${ordemProd.id}`}>
+                  <EyeIcon className="mr-2 h-4 w-4" />
+                  Ver Detalhes
+                </Link>
+              </DropdownMenuItem>
+
               <Dialog>
                 <DialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4 text-primary" />
-                    Editar
+                    Editar OP
                   </DropdownMenuItem>
                 </DialogTrigger>
                 <DialogContent>
                   {/* Form para editar ordem Prod*/}
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  {/* Form para excluir ordem Prod*/}
                 </DialogContent>
               </Dialog>
             </>

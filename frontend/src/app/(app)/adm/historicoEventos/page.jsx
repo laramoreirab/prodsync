@@ -50,9 +50,9 @@ const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'status',
-    key: 'status',
-    label: 'Status',
+    id: 'tipo',
+    key: 'tipo',
+    label: 'Tipo',
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
@@ -80,11 +80,11 @@ const colunasEventos = [
 ];
 
 const dadosOriginais = [
-  { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
-  { id: 2, maquina: 'Máquina B', status: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false },
-  { id: 3, maquina: 'Máquina C', status: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true },
-  { id: 4, maquina: 'Máquina D', status: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true },
-  { id: 5, maquina: 'Máquina E', status: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
+  { id: 1, maquina: 'Máquina A', tipo: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
+  { id: 2, maquina: 'Máquina B', tipo: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false },
+  { id: 3, maquina: 'Máquina C', tipo: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true },
+  { id: 4, maquina: 'Máquina D', tipo: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true },
+  { id: 5, maquina: 'Máquina E', tipo: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
 ];
 
 const acoesDropdown = (row) => (
@@ -226,7 +226,7 @@ export default function HistoricoEventos() {
         </div>
 
         {/* SEÇÃO DOS GRÁFICOS  */}
-        <section className=" p-6">
+        <section className="py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             {/* Widget 1/3 */}
@@ -243,7 +243,7 @@ export default function HistoricoEventos() {
         </section>
 
         <Tabs defaultValue="todos" className="w-full">
-          <div className="flex items-center justify-between px-4 lg:px-6">
+          <div className="flex items-center justify-between">
             <Label htmlFor="view-selector" className="sr-only">
               Visualizar
             </Label>
@@ -264,19 +264,15 @@ export default function HistoricoEventos() {
           </Select>
 
           {/* Telas maiores */}
-          <div className="flex px-8">
+          <div className="flex">
             <TabsList className="hidden sm:flex">
-              <TabsTrigger value="todos">Todos</TabsTrigger>
-              <TabsTrigger value="justificadas">
-                Justificadas
-              </TabsTrigger>
-              <TabsTrigger value="nao-justificadas">
-                Não Justificadas
-              </TabsTrigger>
+              <TabsTrigger value="todos" className="cursor-pointer">Todos</TabsTrigger>
+              <TabsTrigger value="justificadas" className="cursor-pointer">Justificadas</TabsTrigger>
+              <TabsTrigger value="nao-justificadas" className="cursor-pointer">Não Justificadas</TabsTrigger>
             </TabsList>
           </div>
 
-          <div className="flex px-8 searchbar">
+          <div className="flex searchbar">
             <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
               <input
                 type="search"
@@ -291,7 +287,7 @@ export default function HistoricoEventos() {
             </div>
           </div>
 
-          <div className="row_ord_fil_cont flex items-center justify-between px-8 mt-3">
+          <div className="row_ord_fil_cont flex items-center justify-between mt-2">
             <p>{dadosExibidos.length} máquinas encontradas</p>
 
             <div className="flex items-center gap-4">
@@ -309,13 +305,14 @@ export default function HistoricoEventos() {
           </div>
 
           {/* Tab todos */}
-          <TabsContent value="todos" className="px-8">
+          <TabsContent value="todos">
             {dadosExibidos.length > 0 ? (
               <TableListagens
                 data={dadosExibidos}
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
+                onEditSelected={(rows) => handleEditBatch(rows)}
               />
             ) : (
               <EmptyState busca="" />
@@ -330,6 +327,7 @@ export default function HistoricoEventos() {
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
+                onEditSelected={(rows) => handleEditBatch(rows)}
               />
             ) : (
               <EmptyState busca="Paradas Justificadas" />
@@ -337,13 +335,14 @@ export default function HistoricoEventos() {
           </TabsContent>
 
           {/* Tab paradas não justificadas */}
-          <TabsContent value="nao-justificadas" className="px-8">
+          <TabsContent value="nao-justificadas">
             {paradasNaoJustificadas.length > 0 ? (
               <TableListagens
                 data={paradasNaoJustificadas}
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
+                onEditSelected={(rows) => handleEditBatch(rows)}
               />
             ) : (
               <EmptyState busca="Paradas Não Justificadas" />

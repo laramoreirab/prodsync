@@ -12,10 +12,10 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Search } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Plus, Search, EyeIcon, Pencil, Trash2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import DropdownMenuItem from "@/components/ui/dropdown-menu-item";
 
 import TableListagens from "@/components/table";
 import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
@@ -269,7 +269,7 @@ export default function PageSetores() {
               </DialogTrigger>
 
               <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <FormCadastroSetor/>
+                <FormCadastroSetor />
               </DialogContent>
             </Dialog>
           </div>
@@ -350,33 +350,48 @@ export default function PageSetores() {
           </div>
         </div>
 
-        <div className="flex flex-col flex-1 items-center w-full mt-4">
+        <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
           {dadosExibidos.length > 0 ? (
             /* dados só renderizam a tabela se tiver resultado */
             <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
-              // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/maquinas/${row.id}`}
-              // 2.  modais de Editar e Excluir para a tabela renderizar
-              dialogs={{
-                edit: (row) => (
-                  <DialogContent className="rounded-lg">
-                    
-                    <FormEdicaoSetor/>
-                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
-                  </DialogContent>
-                ),
-                delete: (row) => (
-                  <DialogContent>
+              acoesDropdown={(setor) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`setores/${setor.id}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
 
-                    <FormExclusaoSetor/>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoSetor />
+                    </DialogContent>
+                  </Dialog>
 
-                  </DialogContent>
-                ),
-              }}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormExclusaoSetor />
+                    </DialogContent>
+                  </Dialog>
+
+                </>
+              )}
             />
           ) : (
             /* se não tiver correspondência (length === 0), mostra apenas a div */
