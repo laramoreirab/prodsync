@@ -17,7 +17,7 @@ export function TempoParadoTempoProduzindoOperadorWidget({ operadorId }) {
         loading={loading}
         error={error}
         xKey="dia"
-        yKey="paradas" 
+        yKey="parada" 
       />
     </div>
   );
