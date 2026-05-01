@@ -29,3 +29,8 @@ export const pecasPorDiaConfig = {
 export const producaoPorHoraConfig = {
   qtd: { label: "Peças/hora:", color: "#00357a" },
 };
+
+export const produtividadeDiariaConfig = {
+  produzido: { label: "Produzido:", color: "#00357a" },
+  meta:      { label: "Sua Meta:", color: "#b0bfd8" },
+};

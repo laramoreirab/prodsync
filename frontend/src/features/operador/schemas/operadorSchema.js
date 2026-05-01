@@ -41,4 +41,25 @@ export const EficienciaMaquinaSchema = z.object({
   dia:    z.string(),   //THA-1
   eficiencia: z.number().min(0).max(100),
 });
+
+export const MetaKPISchema = z.object({
+  titulo: z.string(),
+  valor: z.string(),       // "500"
+  unidade: z.string(),     // "peças"
+});
+
+export const ProdutividadeDiaSchema = z.object({
+  produzido: z.number(),   // ex: 43.5 (%)
+  meta: z.number(),        // ex: 56.5 (%)
+});
+
+export const QualidadeSchema = z.object({
+  pecasBoas: z.number(),   // ex: 68.8 (%)
+  refugo: z.number(),      // ex: 31.2 (%)
+});
+
+export const VelocimetroSchema = z.object({
+  atual: z.number(),       // 50
+  ideal: z.number(),       // 70
+});
 export const EficienciaMaquinaArraySchema = z.array(EficienciaMaquinaSchema);

@@ -445,3 +445,21 @@ export const mockAndonRanking = [
   { setor: "THAK-9877", produtividade: 70 },
   { setor: "THAK-9876", produtividade: 55 },
 ];
+
+export const mockMetaKPI = {
+  titulo: "Sua Meta", valor: "500", unidade: "peças"
+};
+export const mockProdutividadeDia = { 
+  produzido: 43.5, meta: 56.5 
+};
+export const mockQualidade = { 
+  pecasBoas: 68.8, refugo: 31.2 
+};
+export const mockVelocimetro = { 
+  atual: 50, ideal: 70 
+};
+
+export const mockOEEMaquinaOperador = [
+  { setor: "Média das máquinas do Setor", oee: 85 },
+  { setor: "Minha máquina",              oee: 72 },
+];
