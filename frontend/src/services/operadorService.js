@@ -10,6 +10,7 @@ import {
   ProdutividadeDiaSchema,
   QualidadeSchema,
   VelocimetroSchema,
+  
 } from "@features/operador/schemas/operadorSchema";
 
 import {
@@ -24,6 +25,7 @@ import {
   mockQualidade,
   mockVelocimetro,
   mockOEEMaquinaOperador,
+  mockOEEMaquinaDetalhes,
 } from "./mockData";
 
 const USE_MOCK = true;
@@ -114,6 +116,14 @@ export const oeeMaquinaService = {
   async getOEEMaquina(id_usuario) {
     if (USE_MOCK) return mockOEEMaquinaOperador; // array direto
     const data = await apiFetch(`/operador/${id_usuario}/oee_maquina`);
+    return data.dados;
+  },
+};
+
+export const oeeMaquinaDetalhesService = {
+  async getDetalhes(id_usuario) {
+    if (USE_MOCK) return mockOEEMaquinaDetalhes;
+    const data = await apiFetch(`/operador/${id_usuario}/maquina_oee_detalhes`);
     return data.dados;
   },
 };

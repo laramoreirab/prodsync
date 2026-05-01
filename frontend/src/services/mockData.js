@@ -463,3 +463,12 @@ export const mockOEEMaquinaOperador = [
   { setor: "Média das máquinas do Setor", oee: 85 },
   { setor: "Minha máquina",              oee: 72 },
 ];
+
+export const mockOEEMaquinaDetalhes = {
+  nome_maquina:    "THAK-909816",
+  status:          "Produzindo",
+  disponibilidade: 82,
+  performance:     76,
+  qualidade:       91,
+  oee:             57,
+};

@@ -2,6 +2,8 @@
 //PASSIVEL DE MUDANÇAS
 //PESSOAL DO BACK OLHEM AQUI
 export function getUserFromToken() {
+  // Verifica se o código está rodando no navegador (client-side)
+  if (typeof window === "undefined") return null;
   const token = localStorage.getItem("token");
   if (!token) return null;
   const payload = JSON.parse(atob(token.split(".")[1]));
