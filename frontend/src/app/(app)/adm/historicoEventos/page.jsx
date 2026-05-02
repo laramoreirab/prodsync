@@ -7,6 +7,8 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
+  DialogHeader,
+  DialogFooter
 } from "@/components/ui/dialog";
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing } from "lucide-react";
@@ -35,6 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea";
 
 import {
   Tabs,
@@ -115,6 +118,27 @@ const acoesDropdown = (row) => (
 export default function HistoricoEventos() {
   const [dados, setDados] = useState(dadosOriginais);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
+
+  const handleEdit = (rows) => {
+    console.log("Editar:", rows);
+  };
+
+  const handleJustificativa = (rows) => {
+    console.log("Solicitar justificativa:", rows);
+  };
+
+  const modalEditar = (
+    <DialogContent>
+      <DialogTitle>Editar Evento</DialogTitle>
+    </DialogContent>
+  );
+
+  const modalJustificativa = (
+    <DialogContent>
+      <DialogTitle>Solicitar Justificativa</DialogTitle>      
+    </DialogContent>
+  );
 
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
@@ -312,7 +336,9 @@ export default function HistoricoEventos() {
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
-                onEditSelected={(rows) => handleEditBatch(rows)}
+                onSelectedChange={setSelecionados}
+                editarLote={modalEditar}
+                solicitarJustificativa={modalJustificativa}
               />
             ) : (
               <EmptyState busca="" />
@@ -323,11 +349,13 @@ export default function HistoricoEventos() {
           <TabsContent value="justificadas" className="px-8">
             {paradasJustificadas.length > 0 ? (
               <TableListagens
-                data={paradasJustificadas}
+                data={dadosExibidos}
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
-                onEditSelected={(rows) => handleEditBatch(rows)}
+                onSelectedChange={setSelecionados}
+                editarLote={modalEditar}
+                solicitarJustificativa={modalJustificativa}
               />
             ) : (
               <EmptyState busca="Paradas Justificadas" />
@@ -338,11 +366,13 @@ export default function HistoricoEventos() {
           <TabsContent value="nao-justificadas">
             {paradasNaoJustificadas.length > 0 ? (
               <TableListagens
-                data={paradasNaoJustificadas}
+                data={dadosExibidos}
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
-                onEditSelected={(rows) => handleEditBatch(rows)}
+                onSelectedChange={setSelecionados}
+                editarLote={modalEditar}
+                solicitarJustificativa={modalJustificativa}
               />
             ) : (
               <EmptyState busca="Paradas Não Justificadas" />

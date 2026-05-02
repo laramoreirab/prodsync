@@ -22,7 +22,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 
-import { EllipsisVertical, EyeIcon, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { EllipsisVertical, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
 import { useState, useMemo } from 'react';
@@ -45,7 +45,7 @@ import {
 
 import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelected, onEditSelected, acoesDropdown }) => {
+const TableListagens = ({ data, columns, enableSelection = false, excluirLote, editarLote, solicitarJustificativa, acoesDropdown }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
   const [rowSelection, setRowSelection] = useState({});
@@ -96,7 +96,7 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
   const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
-  const showBatchBar = enableSelection && hasSelection && (onDeleteSelected || onEditSelected);
+  const barraSelecionados = enableSelection && hasSelection && (excluirLote || editarLote || solicitarJustificativa);
  
   const handleBatchDelete = () => {
     const selectedData = selectedRows.map(row => row.original);
@@ -111,8 +111,8 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
   return (
     <div className='w-full mb-5'>
 
-      {showBatchBar && (
-        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 animate-in fade-in slide-in-from-top-2 w-full">
+      {barraSelecionados && (
+        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 w-full">
           <div className="flex items-center gap-1">
             <span className="flex items-center justify-center text-md text-primary font-medium">
               {selectedRows.length}
@@ -124,25 +124,41 @@ const TableListagens = ({ data, columns, enableSelection = false, onDeleteSelect
 
           <div className="flex items-center gap-2">
             {/* Botão de edição em lote — só aparece se onEditSelected foi passado */}
-            {onEditSelected && (
-              <Button
-                className="h-8 bg-primary text-white"
-                onClick={handleBatchEdit}
-              >
-                <Pencil className="mr-1 h-4 w-4" />
-                Editar
-              </Button>
+            {editarLote && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="h-8 bg-primary text-white">
+                    <Pencil className="mr-1 h-4 w-4" />
+                    Editar
+                  </Button>
+                </DialogTrigger>
+                {editarLote}
+              </Dialog>
+            )}
+
+             {solicitarJustificativa && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="h-8 border-primary text-primary hover:bg-primary/10">
+                    <BellRing className="mr-1 h-4 w-4" />
+                    Solicitar Justificativa
+                  </Button>
+                </DialogTrigger>
+                {solicitarJustificativa}
+              </Dialog>
             )}
 
             {/* Botão de exclusão em lote — só aparece se onDeleteSelected foi passado */}
-            {onDeleteSelected && (
-              <Button
-                className="h-8 bg-vermelho-vivido text-white"
-                onClick={handleBatchDelete}
-              >
-                <Trash2 className="mr-1 h-4 w-4" />
-                Excluir
-              </Button>
+            {excluirLote && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="h-8 bg-vermelho-vivido text-white">
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    Excluir
+                  </Button>
+                </DialogTrigger>
+                {excluirLote}
+              </Dialog>
             )}
           </div>
         </div>

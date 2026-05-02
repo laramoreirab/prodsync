@@ -241,16 +241,8 @@ export default function PageSetores() {
   });
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+
       <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">
           {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
@@ -357,6 +349,20 @@ export default function PageSetores() {
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
+              excluirLote={
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Excluir {selecionados.length} setor(es)?</DialogTitle>
+                    <DialogDescription>Essa ação não pode ser desfeita.</DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                    <Button className="bg-vermelho-vivido text-white" onClick={() => handleDelete(selecionados)}>
+                      Confirmar
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              }
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
