@@ -4,10 +4,10 @@
   "description": "Orquestrador de Front e Back",
   "main": "index.js",
   "scripts": {
-    "dev:front": "npm run dev --prefix frontend",
-    "dev:back": "npm start --prefix backend",
+    "dev:front": "cd frontend && npm run dev",
+    "dev:back": "cd backend && npm start",
     "dev": "concurrently -n \"FRONT,BACK\" -c \"magenta,blue\" \"npm run dev:front\" \"npm run dev:back\""
-  },
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

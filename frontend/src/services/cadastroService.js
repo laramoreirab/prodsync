@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api"
+import { apiFetch } from "@/lib/api.js"
 import { CadastroSchema } from "@features/cadastro/schemas/cadastroSchema";
 
 export const cadastroService = {
@@ -15,7 +15,7 @@ export const cadastroService = {
 
     console.log(dadosLimpos)
 
-    return apiFetch(`/api/auth/cadastrar`, {
+    return apiFetch('/api/auth/cadastrar', {
       method: "POST",
       body: JSON.stringify(dadosLimpos),
     });
