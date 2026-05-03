@@ -100,7 +100,7 @@ class UsuarioModel {
         try {
             const usuario = await prisma.usuarios.findUnique({
                 where: {
-                    id_usuario: id
+                    id_usuario: Number(id)
                 }
             });
             if (!usuario) {
