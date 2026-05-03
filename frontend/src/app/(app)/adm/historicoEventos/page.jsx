@@ -130,7 +130,9 @@ export default function HistoricoEventos() {
 
   const modalEditar = (
     <DialogContent>
-      <DialogTitle>Editar Evento</DialogTitle>
+      <DialogTitle>
+        Editar {selecionados.length === 1 ? 'evento' : 'eventos'}
+      </DialogTitle>
     </DialogContent>
   );
 

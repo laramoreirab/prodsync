@@ -25,9 +25,7 @@ import {
 import { EllipsisVertical, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-import { useState, useMemo } from 'react';
-
-// import { usePagination } from '@/hooks/use-pagination';
+import { useState, useMemo, useEffect } from 'react';
 
 import {
   useReactTable,
@@ -45,7 +43,7 @@ import {
 
 import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, enableSelection = false, excluirLote, editarLote, solicitarJustificativa, acoesDropdown }) => {
+const TableListagens = ({ data, columns, enableSelection = false, excluirLote, editarLote, solicitarJustificativa, onSelectedChange, acoesDropdown }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
   const [rowSelection, setRowSelection] = useState({});
@@ -53,12 +51,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
     pageIndex: 0,
     pageSize: 10,
   });
-  const [sorting, setSorting] = useState([
-    {
-      id: 'id', /* ordenar coluna por padrão */
-      desc: false
-    }
-  ]);
+  const [sorting, setSorting] = useState([]);
 
   const table = useReactTable({
     data: data,
@@ -96,9 +89,13 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
+  useEffect(() => {
+    onSelectedChange?.(selectedRows.map(row => row.original));
+  }, [selectedRows.length]);
+
   const barraSelecionados = enableSelection && hasSelection && (excluirLote || editarLote || solicitarJustificativa);
- 
-  const handleBatchDelete = () => {
+
+  /* const handleBatchDelete = () => {
     const selectedData = selectedRows.map(row => row.original);
     onDeleteSelected?.(selectedData);
   };
@@ -106,7 +103,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   const handleBatchEdit = () => {
     const selectedData = selectedRows.map(row => row.original);
     onEditSelected?.(selectedData);
-  };
+  }; */
 
   return (
     <div className='w-full mb-5'>
@@ -136,7 +133,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
               </Dialog>
             )}
 
-             {solicitarJustificativa && (
+            {solicitarJustificativa && (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="h-8 border-primary text-primary hover:bg-primary/10">
@@ -197,7 +194,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
               <TableRow
                 key={row.id || index}
                 className='font-medium'
-                data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
+                data-state={row.getIsSelected() ? "selected" : undefined} > {/* linhas selecioanada */}
 
                 {enableSelection && (
                   <TableCell>

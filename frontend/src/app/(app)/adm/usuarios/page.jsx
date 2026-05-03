@@ -419,9 +419,6 @@ export default function Usuarios() {
             </div>
           )}
         </div>
-
-        <DataTableWithPaginationDemo />
-
       </section>
     </main >
   );

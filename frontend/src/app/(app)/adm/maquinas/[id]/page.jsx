@@ -10,7 +10,7 @@ import { VelocidadeMaquinaWidget } from "@/features/maquinas/VelocidadeMaquinaWi
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 
-import { BellRing, Pencil } from "lucide-react";
+import { BellRing, Pencil, EyeIcon } from "lucide-react";
 
 import { use } from "react";
 import Link from "next/link";
@@ -25,11 +25,10 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const colunasMaquina = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
-  { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'status',
-    key: 'status',
-    label: 'Status',
+    id: 'tipo',
+    key: 'tipo',
+    label: 'Tipo',
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
@@ -54,32 +53,12 @@ const colunasMaquina = [
   { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  {
-    id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
-          {valor}
-        </Badge>
-      );
-    }
-  },
-  {
-    id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="destructive" className="font-semibold text-sm border-none">
-          {valor}
-        </Badge>
-      );
-    }
-  },
 ];
 
 const colunasApontamento = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
-  { id: 'op', key: 'op', label: 'OP' },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
+  { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
   {
     id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
     icone: (valor) => {
@@ -104,10 +83,10 @@ const colunasApontamento = [
 ];
 
 const dadosExibidos = [
-  { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta', produzido: '15', refugo: '2' },
-  { id: 2, maquina: 'Máquina B', status: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva', produzido: '10', refugo: '5' },
-  { id: 3, maquina: 'Máquina C', status: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros', produzido: '20', refugo: '1' },
-  { id: 4, maquina: 'Máquina D', status: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica', produzido: '5', refugo: '8' },
+  { id: 1, maquina: 'Máquina A', tipo: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta', produzido: '15', refugo: '2' },
+  { id: 2, maquina: 'Máquina B', tipo: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva', produzido: '10', refugo: '5' },
+  { id: 3, maquina: 'Máquina C', tipo: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros', produzido: '20', refugo: '1' },
+  { id: 4, maquina: 'Máquina D', tipo: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica', produzido: '5', refugo: '8' },
 ];
 
 export default function MaquinaDetalhePage({ params }) {
@@ -201,7 +180,7 @@ export default function MaquinaDetalhePage({ params }) {
             acoesDropdown={(apontamento) => (
               <>
                <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`ordemDeProducao/${apontamento.op}`}>
+                    <Link href={`/adm/ordensDeProducao/${apontamento.op}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver OP relacionada
                     </Link>

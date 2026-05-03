@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link";
 
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
 import { ParadasComparadasOperadorWidget } from "@/features/operador/ParadasComparadasOperadorWidget";
@@ -11,11 +12,12 @@ import { use } from "react";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { EyeIcon } from "lucide-react";
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 const colunasUsuario = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
-  { id: 'op', key: 'op', label: 'OP' },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
+  { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
   {
     id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
     icone: (valor) => {
@@ -108,11 +110,11 @@ export default function ProducaoOperadorPage({ params }) {
             acoesDropdown={(usuario) => (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`ordemDeProducao/${usuario.op}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver OP relacionada
-                    </Link>
-                  </DropdownMenuItem>
+                  <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver OP relacionada
+                  </Link>
+                </DropdownMenuItem>
               </>
             )}
           />

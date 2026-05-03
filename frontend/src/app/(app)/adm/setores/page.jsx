@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import React, { useState } from "react";
 import { OEEPorSetorWidget } from "@/features/setores/OEEPorSetorWidget";
 import { RefugoPorSetorWidget } from "@/features/setores/RefugoPorSetorWidget";
@@ -11,11 +12,16 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
+  DialogHeader,
+  DialogDescription,
+  DialogFooter,
+  DialogClose
 } from "@/components/ui/dialog";
 import { Plus, Search, EyeIcon, Pencil, Trash2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
-import DropdownMenuItem from "@/components/ui/dropdown-menu-item";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 import TableListagens from "@/components/table";
 import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
@@ -123,6 +129,11 @@ export default function PageSetores() {
   //estado que vai para a tela (começa com todos os dados)
   const [dados, setDados] = useState(dadosOriginais);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
+
+  const handleDelete = (rows) => {
+    console.log("Excluir:", rows);
+  };
 
   //lógica de ordenação
   const handleSort = (criterio) => {
@@ -349,24 +360,21 @@ export default function PageSetores() {
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
+              onSelectedChange={setSelecionados}
               excluirLote={
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Excluir {selecionados.length} setor(es)?</DialogTitle>
-                    <DialogDescription>Essa ação não pode ser desfeita.</DialogDescription>
+                    <DialogTitle>
+                      Excluir {selecionados.length} {selecionados.length === 1 ? 'setor' : 'setores'}?
+                    </DialogTitle>
                   </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                    <Button className="bg-vermelho-vivido text-white" onClick={() => handleDelete(selecionados)}>
-                      Confirmar
-                    </Button>
-                  </DialogFooter>
+                  <DialogDescription>Essa ação não pode ser desfeita.</DialogDescription>
                 </DialogContent>
               }
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`setores/${setor.id}`}>
+                    <Link href={`setores/${setor.setor}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver Detalhes
                     </Link>
