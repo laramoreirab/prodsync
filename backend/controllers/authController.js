@@ -340,7 +340,7 @@ class AuthController {
 
             //verificar se o id ainda não possui senha cadastrada
             const verificacaoSenha = await UsuarioModel.verificaSenhaUsuario(id);
-            if (verificacao === true) {
+            if (verificacaoSenha === true) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha já criada para o identificador',
