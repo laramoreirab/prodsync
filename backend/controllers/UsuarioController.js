@@ -410,48 +410,87 @@ class UsuarioController {
         }
     }
 
-    // --------------------------------------------dashboards---------------------------------------------------
+    // --------------------------------------------dashboards-----------------------------------------------------------------------------------------
 
     static async qtdDeUsuariosTipo(req, res) {
         try {
-
+            const dados = await UsuarioModel.qtdPorTipo(req.user.id_empresa)
+            return res.status(200).json({
+                sucesso: true,
+                dados
+            })
         } catch (error) {
-
+            console.error('Erro no gráfico Quantidade de Usuários por tipo:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
     static async tempoMedioSessaoTipo(req, res) {
         try {
-
+            const dados = await UsuarioModel.tempoMedioSessaoPorTipo(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-
+            console.error('Erro no gráfico Tempo Médio de Sessão por Perfil:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
     static async qtdUsuariosPorSetor(req, res) {
         try {
-
+            const dados = await UsuarioModel.qtdPorSetor(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-
+            console.error('Erro no gráfico Quantidade de Usuários por Setor:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
     static async top5Operadores(req, res) {
         try {
-
+            const dados = await UsuarioModel.top5Operadores(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-
+            console.error('Erro no gráfico Top 5 Operadores Com Mais Peças Produzidas:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
     static async producaoMediaPorDiaSetor(req, res) {
         try {
-
+            const dados = await UsuarioModel.producaoMediaPorDiaSetor(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-
+            console.error('Erro no gráfico Produção Média de Usuário Por Dia Por Setor:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
-    static async rotatividade(req, res){
+    static async rotatividade(req, res) {
         try {
-            
+            const dados = await UsuarioModel.rotatividade(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            
+            console.error('Erro no gráfico Rotatividade De Usuários:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    // ------------------------------------Dashboard da página específica de usuário----------------------------------------------------------------
+
+    static async metaProducao(req, res){
+        try {
+            const { id_usuario, id_maquina } = req.body
+            const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario, id_maquina)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+             console.error('Erro no gráfico Meta de Produção', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    static async tempoParadoTempoProduzindoUsuario(req, res){
+        try {
+            const { id_maquina } = req.body
+            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_maquina)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo da máquina do operador', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
 
