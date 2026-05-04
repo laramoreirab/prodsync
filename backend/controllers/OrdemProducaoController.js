@@ -117,7 +117,8 @@ class OrdemProducaoController {
     static async atualizar(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { id_ordem, prioridade, codigo_lote, id_setor, id_maquina, qtd_planejada, produto, data_inicio, data_fim, observacao_op } = req.body
+            const id_ordem = req.params
+            const { prioridade, codigo_lote, id_setor, id_maquina, qtd_planejada, produto, data_inicio, data_fim, observacao_op } = req.body
 
             //verificar se ordem de produção existe
             const ordemExistente = await OrdemProducaoModel.buscarOrdem(id_ordem)
@@ -181,7 +182,8 @@ class OrdemProducaoController {
     static async deletar(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { id_ordem, id_maquina } = req.body;
+            const id_ordem = req.params
+            const { id_maquina } = req.body;
             //verificar se ordem de produção existe
             const ordemExistente = await OrdemProducaoModel.buscarOrdem(id_ordem)
             if (!ordemExistente) {
@@ -267,7 +269,7 @@ class OrdemProducaoController {
 
     static async progressoOP(req, res) {
         try {
-            const { id_ordem } = req.body
+            const  id_ordem  = req.params
             const dados = await OrdemProducaoModel.progressoOP(
                 req.user.id_empresa,
                 id_ordem
