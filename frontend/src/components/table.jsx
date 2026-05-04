@@ -165,7 +165,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         <Table className="overflow-auto">
 
           <TableHeader>
-            <TableRow className="font-semibold bg-muted/50">
+            <TableRow className="font-semibold bg-muted/50 h-14">
 
               {enableSelection && (
                 <TableHead className="w-12.5">
@@ -184,8 +184,10 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                 </TableHead>
               ))}
 
-              {/* Essa coluna deve ter em todos */}
-              <TableHead className='text-right'>Ações</TableHead>
+              {acoesDropdown && (
+                <TableHead className='text-right'>Ações</TableHead>
+              )}
+
             </TableRow>
           </TableHeader>
 
@@ -193,7 +195,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
             {table.getRowModel().rows.map((row, index) => (
               <TableRow
                 key={row.id || index}
-                className='font-medium'
+                className='font-medium h-14'
                 data-state={row.getIsSelected() ? "selected" : undefined} > {/* linhas selecioanada */}
 
                 {enableSelection && (
@@ -218,21 +220,25 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                   </TableCell>
                 ))}
 
-                <TableCell className='text-right'>
-                  <div className="flex justify-end">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant='outline' className="border-none bg-transparent cursor-pointer">
-                          <EllipsisVertical />
-                        </Button>
-                      </DropdownMenuTrigger>
+                {acoesDropdown && (
+                  <TableCell className='text-right'>
+                    <div className="flex justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant='outline' className="border-none bg-transparent cursor-pointer">
+                            <EllipsisVertical />
+                          </Button>
+                        </DropdownMenuTrigger>
 
-                      <DropdownMenuContent align='end' className='max-w-62 w-auto font-semibold pr-2'>
-                        {acoesDropdown && acoesDropdown(row.original)}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
+                        <DropdownMenuContent align='end' className='max-w-62 w-auto font-semibold pr-2'>
+                          {acoesDropdown && acoesDropdown(row.original)}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                )}
+
+
 
               </TableRow>
             ))}
