@@ -6,10 +6,10 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
-function DropdownMenu({
-  ...props
-}) {
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
+function DropdownMenu({ modal = false, ...props }) {
+  return <DropdownMenuPrimitive.Root 
+  data-slot="dropdown-menu" 
+  modal={modal} {...props} />; /* modal indica se deve se comportar como modal (ex.: tirando a scroll vertical) */
 }
 
 function DropdownMenuPortal({

@@ -10,7 +10,7 @@ const Header = ({
   showSidebarTrigger = false,
 }) => {
   return (
-    <header className="fixed top-0 left-0 z-50 w-full border-b bg-card/95 backdrop-blur">
+    <header className="fixed top-0 left-0 z-50 w-full border-b bg-white backdrop-blur">
       <div className="flex w-full items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           {showSidebarTrigger ? (

@@ -433,7 +433,13 @@ export const mockOPOEEDetalhe = {
   oee:             72.5,
 };
 
-export const mockAndonStatusMaquinas = {
+export const mockAndonFactoryStatusMaquinas = {
+  emProducao: 12,
+  emSetup: 3,
+  emParada: 2,
+};
+
+export const mockAndonSectorStatusMaquinas = {
   emProducao: 12,
   emSetup:     3,
   emParada:    2,

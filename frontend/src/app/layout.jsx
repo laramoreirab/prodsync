@@ -1,6 +1,7 @@
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -20,7 +21,10 @@ export default function RootLayout({ children }) {
       lang="pt-br"
       className={`${montserrat.variable} ${virtualFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col"><TooltipProvider>{children}</TooltipProvider></body>
+      <body className="min-h-full flex flex-col">
+        <TooltipProvider>{children}</TooltipProvider>
+        <Toaster position="bottom-right" />
+      </body>
     </html>
   );
 }

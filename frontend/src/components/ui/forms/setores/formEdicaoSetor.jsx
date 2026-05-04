@@ -1,0 +1,26 @@
+import { Pencil } from "lucide-react";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogTitle,
+    DialogClose,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+
+export default function FormEdicaoSetor() {
+    return (
+        <>
+            <div className="flex items-center">
+                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
+                    <Pencil className="mr-2 text-3xl text-white" />
+                    <DialogTitle className="text-3xl text-white">Editar Setor</DialogTitle>
+                </div>
+            </div>
+            <Separator className="m-2 bg-[#a6a6a6]" />
+            <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+
+            </form>
+        </>
+    )
+} 
