@@ -10,6 +10,8 @@ class AuthController {
         try {
             const { id, senha } = req.body;
 
+            console.log('Requisição chegando até aqui com o id:', id)
+
             if (!id || id.trim() == '') {
                 return res.status(400).json({
                     sucesso: false,
@@ -46,6 +48,7 @@ class AuthController {
                 { expiresIn: JWT_CONFIG.expiresIn }
             );
 
+
             return res.status(200).json({
                 sucesso: true,
                 mensagem: 'Login realizado com sucesso!',
@@ -72,6 +75,8 @@ class AuthController {
     static async cadastrar(req, res) {
         try {
             const { nome_empresa, cnpj, telefone, email, endereco, nome_representante, cpf, senha } = req.body;
+
+            console.log('Requisição chegando aqui e recebendo os dados, por ex cpf:', cpf)
 
             //validações básicas
             if (!nome_empresa || nome_empresa.trim() == '') {
@@ -209,6 +214,8 @@ class AuthController {
                 })
             };
 
+            console.log('Requisição chegando depois de conferir se a empresa existe!!')
+
             //Preparar dados da empresa para adicionar na tabela Empresa
             const dadosEmpresa = {
                 nome_empresa: nome_empresa,
@@ -333,7 +340,7 @@ class AuthController {
 
             //verificar se o id ainda não possui senha cadastrada
             const verificacaoSenha = await UsuarioModel.verificaSenhaUsuario(id);
-            if (verificacao === true) {
+            if (verificacaoSenha === true) {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha já criada para o identificador',

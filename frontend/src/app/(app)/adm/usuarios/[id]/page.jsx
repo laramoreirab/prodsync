@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
-import { ParadasComparadasOperadorWidget } from "@/features/operador/ParadasComparadasOperadorWidget";
+import { TempoParadoTempoProduzindoOperadorWidget } from "@/features/operador/TempoParadoTempoProduzindoOperadorWidget";
 import { OEEOperadorWidget } from "@/features/operador/OEEOperadorWidget";
 import { PecasPorDiaWidget } from "@/features/operador/PecasPorDiaWidget";
 import { ProducaoPorHoraOperadorWidget } from "@/features/operador/ProducaoPorHoraOperadorWidget";
@@ -96,7 +96,7 @@ export default function ProducaoOperadorPage({ params }) {
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <ParadasComparadasOperadorWidget operadorId={operadorId} />
+            <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
           </div>
           <div className="bg-white border rounded-xl p-4 shadow-sm">
             <EficienciaMaquinaWidget operadorId={operadorId} />

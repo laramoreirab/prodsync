@@ -5,9 +5,11 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 // Cria a pool de conexão padrão do Node
 const pool = new pg.Pool({
-    connectionString: process.env.DATABASE_URL
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
-
 // Inicializa o adapter
 const adapter = new PrismaPg(pool);
 

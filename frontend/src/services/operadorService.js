@@ -4,8 +4,13 @@ import {
   PecasPorDiaArraySchema,
   ProducaoPorHoraOperadorArraySchema,
   MetaProducaoSchema,
-  ParadasComparadasOperadorArraySchema,
+  TempoParadoTempoProduzindoOperadorArraySchema,
   EficienciaMaquinaArraySchema,
+  MetaKPISchema,
+  ProdutividadeDiaSchema,
+  QualidadeSchema,
+  VelocimetroSchema,
+  
 } from "@features/operador/schemas/operadorSchema";
 
 import {
@@ -13,8 +18,14 @@ import {
   mockPecasPorDia,
   mockProducaoPorHoraOperador,
   mockMetaProducao,
-  mockParadasComparadasOperador,
+  mockTempoParadoTempoProduzindoOperador,
   mockEficienciaMaquina,
+  mockMetaKPI,
+  mockProdutividadeDia,
+  mockQualidade,
+  mockVelocimetro,
+  mockOEEMaquinaOperador,
+  mockOEEMaquinaDetalhes,
 } from "./mockData";
 
 const USE_MOCK = true;
@@ -53,11 +64,11 @@ export const metaProducaoService = {
   },
 };
 
-export const paradasOperadorService = {
-  async getParadas(operadorId) {
-    if (USE_MOCK) return ParadasComparadasOperadorArraySchema.parse(mockParadasComparadasOperador);
-    const data = await apiFetch(`/operador/${operadorId}/paradas`);
-    return ParadasComparadasOperadorArraySchema.parse(data);
+export const TempoParadoTempoProduzindoOperadorService = {
+  async getTempoParadoTempoProduzindoOperador(operadorId) {
+    if (USE_MOCK) return TempoParadoTempoProduzindoOperadorArraySchema.parse(mockTempoParadoTempoProduzindoOperador);
+    const data = await apiFetch(`/operador/${operadorId}/tempo_parado_tempo_produzindo_operador`);
+    return TempoParadoTempoProduzindoOperadorArraySchema.parse(data);
   },
 };
 
@@ -66,5 +77,53 @@ export const eficienciaMaquinaService = {
     if (USE_MOCK) return EficienciaMaquinaArraySchema.parse(mockEficienciaMaquina);
     const data = await apiFetch(`/operador/${operadorId}/eficiencia_maquinas`);
     return EficienciaMaquinaArraySchema.parse(data);
+  },
+};
+
+export const metaKPIService = {
+  async getMetaKPI(operadorId) {
+    if (USE_MOCK) return MetaKPISchema.parse(mockMetaKPI);
+    const data = await apiFetch(`/operador/${operadorId}/meta_kpi`);
+    return MetaKPISchema.parse(data);
+  },
+};
+
+export const produtividadeDiaService = {
+  async getProdutividade(operadorId) {
+    if (USE_MOCK) return ProdutividadeDiaSchema.parse(mockProdutividadeDia);
+    const data = await apiFetch(`/operador/${operadorId}/produtividade_dia`);
+    return ProdutividadeDiaSchema.parse(data);
+  },
+};
+
+export const qualidadeService = {
+  async getQualidade(operadorId) {
+    if (USE_MOCK) return QualidadeSchema.parse(mockQualidade);
+    const data = await apiFetch(`/operador/${operadorId}/qualidade`);
+    return QualidadeSchema.parse(data);
+  },
+};
+
+export const velocimetroService = {
+  async getVelocimetro(operadorId) {
+    if (USE_MOCK) return VelocimetroSchema.parse(mockVelocimetro);
+    const data = await apiFetch(`/operador/${operadorId}/velocimetro`);
+    return VelocimetroSchema.parse(data);
+  },
+};
+
+export const oeeMaquinaService = {
+  async getOEEMaquina(id_usuario) {
+    if (USE_MOCK) return mockOEEMaquinaOperador; // array direto
+    const data = await apiFetch(`/operador/${id_usuario}/oee_maquina`);
+    return data.dados;
+  },
+};
+
+export const oeeMaquinaDetalhesService = {
+  async getDetalhes(id_usuario) {
+    if (USE_MOCK) return mockOEEMaquinaDetalhes;
+    const data = await apiFetch(`/operador/${id_usuario}/maquina_oee_detalhes`);
+    return data.dados;
   },
 };

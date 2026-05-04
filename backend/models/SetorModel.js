@@ -317,7 +317,7 @@ class SetorModel {
                     id_setor: true,
                     nome_setor: true,
                     ordens_producao: {
-                        where: { status_op: 'Produzindo' },
+                        where: { status_op: 'Em Andamento' },
                         select: {
                             qtd_planejada: true,
                             apontamentos: {
@@ -350,7 +350,6 @@ class SetorModel {
                 }
 
                 return {
-                    id_setor: setor.id_setor,
                     setor: setor.nome_setor,
                     porcentagem: Number(Math.min(porcentagem, 100).toFixed(1))
                 };

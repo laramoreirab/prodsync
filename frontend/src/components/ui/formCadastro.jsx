@@ -32,11 +32,14 @@ export default function RegisterForm() {
   async function handleSubmit() {
     setLoading(true);
     setErros({});
-
     try {
       const data = await cadastroService.cadastrar(form);
-    if (data?.token) {
+      if (data?.token) {
       localStorage.setItem("token", data.token);
+      setOpen(true);
+    } else {
+      // Caso o backend retorne 200 mas sem token por algum motivo
+      setErros({ geral: "Erro inesperado: token não recebido." });
     }
     setOpen(true);
     } catch (err) {

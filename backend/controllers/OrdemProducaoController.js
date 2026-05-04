@@ -268,7 +268,7 @@ class OrdemProducaoController {
     static async progressoOP(req, res) {
         try {
             const { id_ordem } = req.body
-            const dados = await OPDashboardModel.progressoOP(
+            const dados = await OrdemProducaoModel.progressoOP(
                 req.user.id_empresa,
                 id_ordem
             )
@@ -285,7 +285,7 @@ class OrdemProducaoController {
 
     static async eficienciaGeral(req, res) {
         try {
-            const dados = await OrdemProducaoModelModel.eficienciaGeral(req.user.id_empresa)
+            const dados = await OrdemProducaoModel.eficienciaGeral(req.user.id_empresa)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro ao retornar gráfico Eficiência Geral Das OPs:', error)
