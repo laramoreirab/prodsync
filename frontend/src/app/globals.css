@@ -94,37 +94,37 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0b1020;
+  --foreground: #f8f8f8;
+  --card: #151d33;
+  --card-foreground: #f8f8f8;
+  --popover: #151d33;
+  --popover-foreground: #f8f8f8;
+  --primary: #00357a;
+  --primary-foreground: #f8f8f8;
+  --secondary: #23304c;
+  --secondary-foreground: #00357a;
+  --muted: #1b2740;
+  --muted-foreground: #c3c7c8;
+  --accent: #23304c;
+  --accent-foreground: #f8f8f8;
+  --destructive: #ff6b6b;
+  --border: #4e506f;
+  --input: #4e506f;
+  --ring: #7d95c6;
+  --chart-1: #7d95c6;
+  --chart-2: #636f87;
+  --chart-3: #c3c7c8;
+  --chart-4: #4e506f;
+  --chart-5: #f8f8f8;
+  --sidebar: #00357a;
+  --sidebar-foreground: #f8f8f8;
+  --sidebar-primary: #f8f8f8;
+  --sidebar-primary-foreground: #00357a;
+  --sidebar-accent: rgba(255, 255, 255, 0.12);
+  --sidebar-accent-foreground: #f8f8f8;
+  --sidebar-border: rgba(255, 255, 255, 0.18);
+  --sidebar-ring: rgba(255, 255, 255, 0.3);
 }
 
 @layer base {
@@ -139,4 +139,187 @@
   html {
     @apply font-sans;
   }
+}
+
+.dark body {
+  background: #0b1020;
+  color: #f8f8f8;
+}
+
+.dark [data-app-shell] {
+  color: #f8f8f8;
+}
+
+.dark [data-app-shell] [class*="bg-[url"] {
+  background-color: #0b1020 !important;
+  background-image: none !important;
+}
+
+.dark [data-app-shell] [class~="bg-white"],
+.dark [data-app-shell] [class~="bg-white/50"],
+.dark [data-app-shell] [class~="bg-white/75"],
+.dark [data-app-shell] [class~="bg-white/80"],
+.dark [data-app-shell] [class~="bg-white/95"] {
+  background-color: #151d33 !important;
+}
+
+.dark [data-app-shell] [class~="bg-background"],
+.dark [data-app-shell] [class~="bg-card"] {
+  background-color: #151d33 !important;
+}
+
+.dark [data-app-shell] [class~="text-black"],
+.dark [data-app-shell] [class~="text-zinc-950"],
+.dark [data-app-shell] [class~="text-slate-950"],
+.dark [data-app-shell] [class~="text-gray-950"] {
+  color: #f8f8f8 !important;
+}
+
+.dark [data-app-shell] [class~="text-gray-400"],
+.dark [data-app-shell] [class~="text-gray-500"],
+.dark [data-app-shell] [class~="text-zinc-400"],
+.dark [data-app-shell] [class~="text-zinc-500"],
+.dark [data-app-shell] [class~="text-slate-400"],
+.dark [data-app-shell] [class~="text-slate-500"],
+.dark [data-app-shell] [class~="text-muted-foreground"] {
+  color: #c3c7c8 !important;
+}
+
+.dark [data-app-shell] [class*="border-gray-"],
+.dark [data-app-shell] [class*="border-zinc-"],
+.dark [data-app-shell] [class*="border-slate-"] {
+  border-color: rgba(195, 199, 200, 0.22) !important;
+}
+
+.dark [data-app-shell] input:not([type="checkbox"]),
+.dark [data-app-shell] textarea,
+.dark [data-app-shell] select {
+  background-color: #0f172a !important;
+  color: #f8f8f8 !important;
+  border-color: rgba(195, 199, 200, 0.22) !important;
+}
+
+.dark [data-app-shell] select option {
+  background-color: #f8f8f8;
+  color: #23304c;
+}
+
+.dark [data-app-shell] .contrast-control {
+  background-color: #f8f8f8 !important;
+  border-color: #7d95c6 !important;
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .contrast-control input {
+  background-color: transparent !important;
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .contrast-control input::placeholder {
+  color: #636f87 !important;
+}
+
+.dark [data-app-shell] .contrast-control svg {
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .searchid {
+  background-color: #f8f8f8 !important;
+  border: 1px solid #7d95c6 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .searchid:focus-within {
+  border-color: #7d95c6 !important;
+  box-shadow: 0 0 0 2px rgba(125, 149, 198, 0.28);
+}
+
+.dark [data-app-shell] .searchid input {
+  background-color: transparent !important;
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .searchid input::placeholder {
+  color: #636f87 !important;
+}
+
+.dark [data-app-shell] .searchid svg {
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .contrast-menu {
+  background-color: #f8f8f8 !important;
+  border-color: #7d95c6 !important;
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .contrast-menu [class~="bg-white"],
+.dark [data-app-shell] .contrast-menu [class~="bg-white/50"],
+.dark [data-app-shell] .contrast-menu [class~="bg-white/75"],
+.dark [data-app-shell] .contrast-menu [class~="bg-white/80"],
+.dark [data-app-shell] .contrast-menu [class~="bg-white/95"] {
+  background-color: #ffffff !important;
+}
+
+.dark [data-app-shell] .contrast-menu [class*="text-gray-"],
+.dark [data-app-shell] .contrast-menu [class*="text-zinc-"],
+.dark [data-app-shell] .contrast-menu [class*="text-slate-"] {
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] .contrast-menu input {
+  background-color: #ffffff !important;
+  border-color: #c3c7c8 !important;
+  color: #23304c !important;
+}
+
+.dark [data-app-shell] input::placeholder,
+.dark [data-app-shell] textarea::placeholder {
+  color: #9b9d9d;
+}
+
+[data-app-shell] .searchid {
+  border: 1px solid #7d95c6;
+  background-color: #f8f8f8;
+  color: #23304c;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+[data-app-shell] .searchid:focus-within {
+  border-color: #00357a;
+  box-shadow: 0 0 0 2px rgba(125, 149, 198, 0.28);
+}
+
+[data-app-shell] .searchid input {
+  background-color: transparent;
+  color: #23304c;
+}
+
+[data-app-shell] .searchid input::placeholder {
+  color: #636f87;
+}
+
+[data-app-shell] .searchid svg {
+  color: #23304c;
+}
+
+.dark [data-app-shell] [data-chart] {
+  color: #f8f8f8;
+}
+
+.dark [data-app-shell] .recharts-cartesian-axis-tick text,
+.dark [data-app-shell] .recharts-text {
+  fill: #c3c7c8 !important;
+}
+
+.dark [data-app-shell] .recharts-cartesian-grid line,
+.dark [data-app-shell] .recharts-polar-grid-angle line,
+.dark [data-app-shell] .recharts-polar-grid-concentric path {
+  stroke: rgba(195, 199, 200, 0.22) !important;
+}
+
+.dark [data-app-shell] .recharts-tooltip-cursor {
+  fill: rgba(125, 149, 198, 0.12) !important;
+  stroke: rgba(125, 149, 198, 0.45) !important;
 }

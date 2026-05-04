@@ -107,8 +107,8 @@ export default function OrdensDeProducao() {
             className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
           },
           "Setup": {
-            variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+            variant: "outline",
+            className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
           },
           "Parada": {
             variant: "destructive",

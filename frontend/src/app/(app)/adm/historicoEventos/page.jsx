@@ -46,8 +46,8 @@ import {
   TabsContent,
 } from "@/components/ui/tabs";
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 
 const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
@@ -60,8 +60,8 @@ const colunasEventos = [
     icone: (valor) => {
       const config = {
         "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          variant: "outline",
+          className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
         },
         "Parada": {
           variant: "destructive",

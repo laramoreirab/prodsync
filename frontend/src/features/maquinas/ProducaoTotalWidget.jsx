@@ -39,10 +39,10 @@ export function ProducaoTotalWidget() {
             <button
               key={key}
               onClick={() => setPeriodoKey(key)}
-              className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
+              className={`h-8 rounded-lg border px-3 text-xs font-semibold transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] ${
                 periodoKey === key
-                  ? "bg-[var(--secondary-foreground)] text-white shadow-sm"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "border-[#00357a] bg-[#00357a] text-[#f8f8f8] shadow-sm dark:border-[#a9b9dc] dark:bg-[#a9b9dc] dark:text-[#0b1020]"
+                  : "border-[#c3c7c8] bg-[#f8f8f8] text-[#23304c] hover:border-[#7d95c6] hover:bg-[#eef2f8] dark:border-[#7d95c6]/45 dark:bg-[#0f172a] dark:text-[#f8f8f8] dark:hover:bg-[#1b2740]"
               }`}
             >
               {label}

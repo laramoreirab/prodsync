@@ -1,66 +1,41 @@
-//como funciona para deixar os parametros dentro do filtrar:
-//1. definir uma constante dentro da pagina desejada para configurar os filtros, como uma
-//   array fora e antes do "export default function" 
-//2. oq colocar dentro dessa constante? definir as infos de cada objeto (bloco de seleção) --> {id: "comoVaiPuxarEssaInfoParaFiltrar",
-//   label: "nomeDoParametro", type:"tipoDeSeleção"} 
-// obs: se type = checkbox, tem que adicionar mais um par de chaves (options: ["opçao1", "opcao2", "opcao3"]) 
-// obs 2: blocos como turnos e setores, vai puxar do back --> essa parte é com eles para enviar essas informações pra gente
-//sobre o type de cada bloco de seleção:
-// se oq tiver dentro for checkbox, type="checkbox"; se for intervalo de data e horario, type = "date-range"
-// se for a duração máxima de tempo: "time-max"; se for um intervalo de valor minimo e maximo, type = "number-range"
-//ex na prática:
-//   const maquinasFilters = [
-//    { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
-//    { id: "data", label: "Data", type: "date-range" },
-//    { id: "duracao", label: "Duração", type: "time-max" },
-//    { id: "produzido", label: "Produzido", type: "number-range" },
-//    { id: "refugo", label: "Refugo", type: "number-range" },
-// ];
-//para utilizar: criar constante com tudo dentro e dentro do export, puxar o <FilterDropdown filtersConfig={nomeDaConstante} onApply={suaFuncaoDeFiltrar} /> 
-
 "use client";
 
 import { useState } from "react";
 import { FadersHorizontalIcon } from "@phosphor-icons/react";
-import { Plus, Minus, X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 
-// recebendo a propriedade onApply
 export default function FilterDropdown({ filtersConfig, onApply }) {
   const [isOpen, setIsOpen] = useState(false);
   const [openSections, setOpenSections] = useState({});
-  
-  //objeto que guarda os valores por ID do filtro
   const [filterValues, setFilterValues] = useState({});
 
   const toggleSection = (id) => {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  //atualiza checkboxes
   const handleCheckbox = (filterId, option) => {
     setFilterValues((prev) => {
       const currentValues = prev[filterId] || [];
+
       if (currentValues.includes(option)) {
         return { ...prev, [filterId]: currentValues.filter((item) => item !== option) };
       }
+
       return { ...prev, [filterId]: [...currentValues, option] };
     });
   };
 
-  //atualiza inputs de range(min/max, comeco/fim)
   const handleInputChange = (filterId, field, value) => {
     setFilterValues((prev) => {
       const currentValues = prev[filterId] || {};
       const newValues = { ...currentValues, [field]: value };
-      
-      // se limpou o input, removemos a chave
-      if (!value) delete newValues[field]; 
-      
+
+      if (!value) delete newValues[field];
+
       return { ...prev, [filterId]: newValues };
     });
   };
 
-  //remove filtro inteiro (quando o X das tags de range é apertado)
   const clearFilterGroup = (filterId) => {
     setFilterValues((prev) => {
       const newObj = { ...prev };
@@ -69,15 +44,13 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
     });
   };
 
-  //função que lê o estado e gera a lista visual das tags
   const generateTags = () => {
-    let tags = [];
+    const tags = [];
 
     Object.entries(filterValues).forEach(([filterId, value]) => {
-      const config = filtersConfig.find((f) => f.id === filterId);
+      const config = filtersConfig.find((filter) => filter.id === filterId);
       if (!config) return;
 
-      //tags para checkbox
       if (config.type === "checkbox" && Array.isArray(value)) {
         value.forEach((opt) => {
           tags.push({
@@ -88,7 +61,6 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
         });
       }
 
-      //tags para datas(desde/até)
       if (config.type === "date-range" && value) {
         if (value.start) {
           tags.push({
@@ -97,6 +69,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
             onRemove: () => handleInputChange(filterId, "start", ""),
           });
         }
+
         if (value.end) {
           tags.push({
             key: `${filterId}-end`,
@@ -106,7 +79,6 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
         }
       }
 
-      //tags para range de números
       if (config.type === "number-range" && value) {
         if (value.min && value.max) {
           tags.push({
@@ -115,13 +87,20 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
             onRemove: () => clearFilterGroup(filterId),
           });
         } else if (value.min) {
-          tags.push({ key: `${filterId}-min`, label: `${config.label} Min: ${value.min}`, onRemove: () => clearFilterGroup(filterId) });
+          tags.push({
+            key: `${filterId}-min`,
+            label: `${config.label} Min: ${value.min}`,
+            onRemove: () => clearFilterGroup(filterId),
+          });
         } else if (value.max) {
-          tags.push({ key: `${filterId}-max`, label: `${config.label} Max: ${value.max}`, onRemove: () => clearFilterGroup(filterId) });
+          tags.push({
+            key: `${filterId}-max`,
+            label: `${config.label} Max: ${value.max}`,
+            onRemove: () => clearFilterGroup(filterId),
+          });
         }
       }
 
-      //tags para tempo único(até) --> duracão
       if (config.type === "time-max" && value?.max) {
         tags.push({
           key: `${filterId}-max`,
@@ -134,11 +113,8 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
     return tags;
   };
 
-  //função que envia os dados para a página
   const handleApplyClick = () => {
-    if (onApply) {
-      onApply(filterValues);
-    }
+    onApply?.(filterValues);
     setIsOpen(false);
   };
 
@@ -148,126 +124,121 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-secondary-foreground px-3 py-1.5 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer hover:opacity-90 transition-opacity"
+        className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-[#00357a] px-4 py-2 text-base font-semibold text-[#f8f8f8] shadow-sm transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]"
       >
-        <FadersHorizontalIcon className="mr-2" size={24} />
+        <FadersHorizontalIcon size={22} />
         Filtrar
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 w-80 bg-gray-100 shadow-2xl rounded-lg p-4 border border-gray-200 z-50">
-          <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
-            
-            {/* renderizador dinamico dos blocos */}
+        <div className="contrast-menu absolute right-0 top-12 z-50 w-80 rounded-lg border border-[#7d95c6] bg-[#f8f8f8] p-4 text-[#23304c] shadow-2xl">
+          <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto pr-1">
             {filtersConfig.map((filter) => (
-              <div key={filter.id} className="bg-white border border-gray-200 rounded-md shadow-sm">
-                
+              <div key={filter.id} className="rounded-md border border-[#c3c7c8] bg-white shadow-sm">
                 <div
-                  className="flex justify-between items-center p-3 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
+                  className="flex cursor-pointer items-center justify-between rounded-md p-3 transition-colors hover:bg-[#f8f8f8]"
                   onClick={() => toggleSection(filter.id)}
                 >
-                  <span className="font-semibold text-gray-800">{filter.label}</span>
-                  {openSections[filter.id] ? <Minus size={18} className="text-gray-600" /> : <Plus size={18} className="text-gray-600" />}
+                  <span className="font-semibold text-[#23304c]">{filter.label}</span>
+                  {openSections[filter.id] ? (
+                    <Minus size={18} className="text-[#636f87]" />
+                  ) : (
+                    <Plus size={18} className="text-[#636f87]" />
+                  )}
                 </div>
 
                 {openSections[filter.id] && (
-                  <div className="px-3 pb-3 flex flex-col gap-3">
-                    
-                    {/*caso 1: checkbox */}
-                    {filter.type === "checkbox" && filter.options.map((opt) => (
-                      <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={(filterValues[filter.id] || []).includes(opt)}
-                          onChange={() => handleCheckbox(filter.id, opt)}
-                          className="w-4 h-4 rounded border-gray-300 text-secondary-foreground cursor-pointer"
-                        />
-                        <span className="text-sm text-gray-700">{opt}</span>
-                      </label>
-                    ))}
+                  <div className="flex flex-col gap-3 px-3 pb-3">
+                    {filter.type === "checkbox" &&
+                      filter.options.map((opt) => (
+                        <label key={opt} className="flex cursor-pointer items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={(filterValues[filter.id] || []).includes(opt)}
+                            onChange={() => handleCheckbox(filter.id, opt)}
+                            className="size-4 cursor-pointer rounded border-[#c3c7c8] accent-[#00357a]"
+                          />
+                          <span className="text-sm text-[#23304c]">{opt}</span>
+                        </label>
+                      ))}
 
-                    {/* caso 2: date range */}
                     {filter.type === "date-range" && (
                       <>
                         <div className="flex flex-col gap-1">
-                          <label className="text-xs text-gray-500">Desde</label>
-                          <input 
-                            type="datetime-local" 
+                          <label className="text-xs text-[#636f87]">Desde</label>
+                          <input
+                            type="datetime-local"
                             value={filterValues[filter.id]?.start || ""}
-                            onChange={(e) => handleInputChange(filter.id, "start", e.target.value)}
-                            className="text-sm border border-gray-200 rounded p-1 outline-none focus:border-secondary-foreground" 
+                            onChange={(event) => handleInputChange(filter.id, "start", event.target.value)}
+                            className="rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <label className="text-xs text-gray-500">Até</label>
-                          <input 
-                            type="datetime-local" 
+                          <label className="text-xs text-[#636f87]">Até</label>
+                          <input
+                            type="datetime-local"
                             value={filterValues[filter.id]?.end || ""}
-                            onChange={(e) => handleInputChange(filter.id, "end", e.target.value)}
-                            className="text-sm border border-gray-200 rounded p-1 outline-none focus:border-secondary-foreground" 
+                            onChange={(event) => handleInputChange(filter.id, "end", event.target.value)}
+                            className="rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
                       </>
                     )}
 
-                    {/* caso 3: number range */}
                     {filter.type === "number-range" && (
                       <div className="flex gap-2">
-                        <div className="flex flex-col gap-1 w-full">
-                          <label className="text-xs text-gray-500">Mínimo</label>
-                          <input 
+                        <div className="flex w-full flex-col gap-1">
+                          <label className="text-xs text-[#636f87]">Mínimo</label>
+                          <input
                             type="number"
                             value={filterValues[filter.id]?.min || ""}
-                            onChange={(e) => handleInputChange(filter.id, "min", e.target.value)}
-                            className="text-sm border border-gray-200 rounded p-1 outline-none w-full" 
+                            onChange={(event) => handleInputChange(filter.id, "min", event.target.value)}
+                            className="w-full rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
-                        <div className="flex flex-col gap-1 w-full">
-                          <label className="text-xs text-gray-500">Máximo</label>
-                          <input 
+                        <div className="flex w-full flex-col gap-1">
+                          <label className="text-xs text-[#636f87]">Máximo</label>
+                          <input
                             type="number"
                             value={filterValues[filter.id]?.max || ""}
-                            onChange={(e) => handleInputChange(filter.id, "max", e.target.value)}
-                            className="text-sm border border-gray-200 rounded p-1 outline-none w-full" 
+                            onChange={(event) => handleInputChange(filter.id, "max", event.target.value)}
+                            className="w-full rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
                       </div>
                     )}
 
-                    {/* caso 4: time max (duracao) */}
                     {filter.type === "time-max" && (
                       <div className="flex flex-col gap-1">
-                        <label className="text-xs text-gray-500">Até</label>
-                        <input 
+                        <label className="text-xs text-[#636f87]">Até</label>
+                        <input
                           type="time"
                           value={filterValues[filter.id]?.max || ""}
-                          onChange={(e) => handleInputChange(filter.id, "max", e.target.value)}
-                          className="text-sm border border-gray-200 rounded p-1 outline-none" 
+                          onChange={(event) => handleInputChange(filter.id, "max", event.target.value)}
+                          className="rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                         />
                       </div>
                     )}
-
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          {/*área das tags */}
           {activeTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-300">
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-[#c3c7c8] pt-3">
               {activeTags.map((tag) => (
-                <span key={tag.key} className="flex items-center gap-1 bg-[#e2e2e2] text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
-                  {tag.label} <X size={12} className="cursor-pointer hover:text-red-500" onClick={tag.onRemove} />
+                <span key={tag.key} className="flex items-center gap-1 rounded-md bg-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#23304c]">
+                  {tag.label}
+                  <X size={12} className="cursor-pointer hover:text-red-600" onClick={tag.onRemove} />
                 </span>
               ))}
             </div>
           )}
 
-          {/*disparando a função handleApplyClick */}
-          <button 
+          <button
             onClick={handleApplyClick}
-            className="w-full mt-4 bg-secondary-foreground text-white py-2 rounded-md font-semibold hover:opacity-90 transition-opacity"
+            className="mt-4 min-h-10 w-full rounded-md bg-[#00357a] py-2 font-semibold text-[#f8f8f8] transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]"
           >
             Aplicar Filtros
           </button>

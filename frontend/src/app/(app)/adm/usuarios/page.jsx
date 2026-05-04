@@ -18,8 +18,8 @@ import {
 import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert, EyeIcon, Pencil } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 

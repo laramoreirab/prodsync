@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import React, { useState } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import {
@@ -53,15 +53,15 @@ const colunasMaquinas = [
       const config = {
         "Produzindo": {
           variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+          className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm font-semibold dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
         },
         "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          variant: "outline",
+          className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
         },
         "Parada": {
           variant: "destructive",
-          className: "font-semibold text-sm border-none"
+          className: "!border-red-500/30 !bg-red-100 !text-red-800 font-semibold text-sm dark:!border-red-300/35 dark:!bg-red-300/20 dark:!text-red-100"
         }
       };
 
@@ -79,15 +79,15 @@ const colunasMaquinas = [
       const config = {
         "Produzindo": {
           variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+          className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm font-semibold dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
         },
         "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          variant: "outline",
+          className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
         },
         "Parada": {
           variant: "destructive",
-          className: "font-semibold text-sm border-none"
+          className: "!border-red-500/30 !bg-red-100 !text-red-800 font-semibold text-sm dark:!border-red-300/35 dark:!bg-red-300/20 dark:!text-red-100"
         }
       };
 
@@ -207,8 +207,8 @@ export default function Maquinas() {
           {/* Modal de Cadastro */}
           <div className="modal_cadastro">
             <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                <Plus className="mr-2" />
+              <DialogTrigger className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-[#00357a] px-4 py-2 text-base font-semibold text-[#f8f8f8] shadow-sm transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]">
+                <Plus className="size-5" />
                 Cadastrar
               </DialogTrigger>
 
@@ -285,15 +285,15 @@ export default function Maquinas() {
 
         {/* Busca */}
         <div className="flex px-8 searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+          <div className="contrast-control flex searchid items-center w-full justify-between rounded-md border border-[#7d95c6] bg-[#f8f8f8] px-2 py-1 shadow-sm focus-within:border-[#00357a] focus-within:ring-2 focus-within:ring-[#7d95c6]/30">
             <input
               type="search"
-              className="p-2 w-full outline-none bg-transparent"
+              className="w-full bg-transparent p-2 text-[#23304c] outline-none placeholder:text-[#636f87]"
               placeholder="Busque por nome ou id..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
-            <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            <button className="mr-2 cursor-pointer text-[#23304c] outline-none hover:text-[#00357a]" aria-label="Buscar máquinas"><Search className="size-5" /></button>
           </div>
         </div>
 

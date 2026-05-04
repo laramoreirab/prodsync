@@ -18,8 +18,8 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { Plus, Search, EyeIcon, Pencil, Trash2 } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
