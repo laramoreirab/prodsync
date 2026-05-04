@@ -145,7 +145,7 @@ model OrdemProducao {
   id_setor          Int
   observacao_op     String              @db.VarChar(450)
   prioridade        TipoPrioridade
-  status_op         StatusMaquina
+  status_op         StatusOP
   apontamentos      Apontamento[]
   historico_eventos Historico_Eventos[]
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
@@ -238,6 +238,13 @@ enum DiaSemana {
   Quinta
   Sexta
   Sabado
+}
+
+enum StatusOP{
+  Parada
+  Em_Andamento @map("Em Andamento")
+  Setup
+  Finalizada
 }
 
 enum TipoMotivoParada {

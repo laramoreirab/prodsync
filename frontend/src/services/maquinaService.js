@@ -22,7 +22,7 @@ const USE_MOCK = true;
 export const maquinaStatusService = {
   async getStatus() {
     if (USE_MOCK) return MaquinaStatusArraySchema.parse(mockMaquinaStatus);
-    const data = await apiFetch("/maquinas/status");
+    const data = await apiFetch("/api/maquinas/dashboard/status-geral");
     return MaquinaStatusArraySchema.parse(data);
   },
 };

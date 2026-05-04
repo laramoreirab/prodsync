@@ -166,7 +166,7 @@ class EventoModel {
             if (!turno) {
                 throw new Error('Nenhum turno ativo encontrado para o horario informado');
             }
-                  
+
             // busca a ordem de produção ativa da máquina
             const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
 
@@ -183,9 +183,9 @@ class EventoModel {
                 }
             })
 
-            if (id_ordemProducao) {
+            if (ordemProducaoId) {
                 await prisma.ordemProducao.update({
-                    where: { id_ordem: id_ordemProducao },
+                    where: { id_ordem: ordemProducaoId },
                     data: {
                         status_op: 'Parada',
                         prioridade: status_maquina === 'Parada' ? 'Critica' : undefined
@@ -197,7 +197,7 @@ class EventoModel {
                 data: {
                     id_empresa,
                     id_maquina,
-                    id_ordemProducao,
+                    id_ordemProducao:ordemProducaoId,
                     id_turno: turno.id_turno,
                     status_atual: status_maquina,
                     setor_afetado: maquina.id_setor ?? 0,
@@ -213,33 +213,29 @@ class EventoModel {
         }
     }
 
-    static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, id_maquina, inicio, fim, id_motivo_parada, observacao = null) {
+    static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, maquinas, inicio, fim, id_motivo_parada, observacao = null) {
         try {
-            const duracao = await this.calcularDuracao(inicio, fim);
-            const inicio_convertido = await this.converterTimestamp(inicio);
-            const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio_convertido);
+            const inicioConvertido = this.converterTimestamp(inicio)
+            const fimConvertido = this.converterTimestamp(fim)
+            const duracao = this.calcularDuracao(inicio, fim)
+            const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicioConvertido)
 
-            // Mapeia todas as máquinas para criar os objetos de inserção
             const eventosData = await Promise.all(maquinas.map(async (id_maquina) => {
-
                 const ordem = await prisma.ordemProducao.findFirst({
                     where: {
                         id_empresa,
                         id_maquina,
                         data_inicio: { lte: inicioConvertido },
-                        OR: [
-                            { data_fim: null },
-                            { data_fim: { gte: inicioConvertido } }
-                        ]
+                        OR: [{ data_fim: null }, { data_fim: { gte: inicioConvertido } }]
                     },
                     orderBy: { data_inicio: 'desc' },
                     select: { id_ordem: true }
-                });
+                })
 
                 return {
                     id_empresa,
                     id_maquina,
-                    id_ordemProducao: ordem?.id_ordem ?? null,
+                    ordemProducaoId: ordem?.id_ordem ?? null,
                     id_turno: turno.id_turno,
                     status_atual: status_maquina,
                     setor_afetado: Number(setor_afetado),
@@ -248,30 +244,22 @@ class EventoModel {
                     duracao,
                     id_motivo_parada: Number(id_motivo_parada),
                     observacao: observacao ?? ''
-                };
-            }));
+                }
+            }))
 
-            const resultado = await prisma.historico_Eventos.createMany({
-                data: eventosData
-            });
+            await prisma.historico_Eventos.createMany({ data: eventosData })
 
             await prisma.maquinas.updateMany({
-                where: {
-                    id_empresa,
-                    id_maquina: {
-                        in: maquinasIds
-                    }
-                },
-                data: {
-                    status_atual: status_maquina
-                }
-            });
+                where: { id_empresa, id_maquina: { in: maquinas } },
+                data: { status_atual: status_maquina }
+            })
 
-    } catch(error) {
-        console.error('Erro registrar evento no banco de dados:', error);
-        throw error;
+            return eventosData
+        } catch (error) {
+            console.error('Erro registrar evento no banco de dados:', error)
+            throw error
+        }
     }
-}
 
     static async verificaJustificativa(id_empresa, id_evento) {
         try {
@@ -323,7 +311,7 @@ class EventoModel {
 
     // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
 
-    static async tempoParadoTempoProduzindoEvento() {
+    static async tempoParadoTempoProduzindoEvento(id_empresa) {
         function semanaAtual() {
             const hoje = new Date()
             const diaSemana = hoje.getDay()
@@ -382,7 +370,7 @@ class EventoModel {
     }
     static async top3MotivosParada(id_empresa) {
         try {
-            const resultado = await prisma.historico_eventos.groupBy({
+            const resultado = await prisma.historico_Eventos.groupBy({
                 by: ['id_motivo_parada'],
                 where: {
                     id_empresa,
@@ -393,25 +381,23 @@ class EventoModel {
                 orderBy: { _sum: { duracao: 'desc' } },
                 take: 3
             })
-            // 2. Agora buscamos os NOMES na tabela 'motivos_parada'
+
             const resultadoComNomes = await Promise.all(
-                agrupado.map(async (item) => {
-                    const infoMotivo = await prisma.motivos_parada.findUnique({
-                        where: { id: item.id_motivo_parada },
-                        select: { nome_motivo: true } // Verifique se o nome da coluna é este mesmo!
-                    });
-
+                resultado.map(async (item) => {
+                    const infoMotivo = await prisma.motivos_Parada.findUnique({
+                        where: { id_motivo: item.id_motivo_parada },
+                        select: { descricao: true }
+                    })
                     return {
-                        // O Recharts usará essas chaves: 'name' e 'minutos'
-                        name: infoMotivo?.nome_motivo || "Outros",
+                        name: infoMotivo?.descricao || "Outros",
                         minutos: item._sum.duracao || 0
-                    };
+                    }
                 })
-            );
-
+            )
+            return resultadoComNomes
         } catch (error) {
-            console.error('Erro captar top 3 motivos de parada:', error);
-            throw error;
+            console.error('Erro captar top 3 motivos de parada:', error)
+            throw error
         }
     }
 

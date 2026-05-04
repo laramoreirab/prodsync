@@ -28,9 +28,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use('/api', routes); //todas as rotas terão /api na frente pois é padrão RESTful (*lembrar disso)
-
 app.use(logMiddleware)
+app.use('/api', routes); //todas as rotas terão /api na frente pois é padrão RESTful (*lembrar disso)
 
 // Middleware global de tratamento de erros (deve ser o último)
 app.use(errorMiddleware);
