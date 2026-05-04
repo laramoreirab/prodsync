@@ -166,14 +166,7 @@ class EventoModel {
             if (!turno) {
                 throw new Error('Nenhum turno ativo encontrado para o horario informado');
             }
-
-            const id_ordemProducao = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
-
-                },
-                select: {
-                    id_turno: true
-                }
-            })
+                  
             // busca a ordem de produção ativa da máquina
             const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
 
@@ -278,6 +271,7 @@ class EventoModel {
         console.error('Erro registrar evento no banco de dados:', error);
         throw error;
     }
+}
 
     static async verificaJustificativa(id_empresa, id_evento) {
         try {

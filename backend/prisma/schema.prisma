@@ -6,7 +6,215 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- ENUMS ---
+model Empresas {
+  id_empresa         Int                 @id @default(autoincrement())
+  nome_empresa       String              @db.VarChar(255)
+  cnpj               String              @unique @db.VarChar(18)
+  data_cadastro      DateTime?           @default(now())
+  email              String?             @db.VarChar(255)
+  telefone           String?             @db.VarChar(20)
+  endereco           String?             @db.VarChar(255)
+  nome_representante String?             @db.VarChar(255)
+  cpf_representante  String?             @db.VarChar(14)
+  apontamentos       Apontamento[]
+  categoria_maquinas Categoria_Maquina[]
+  escalas_trabalho   EscalaTrabalho[]
+  historico_eventos  Historico_Eventos[]
+  maquinas           Maquinas[]
+  motivos_parada     Motivos_Parada[]
+  ordens_producao    OrdemProducao[]
+  setor_gestores     Setor_Gestor[]
+  setores            Setores[]
+  turnos             Turno[]
+  usuarios           Usuarios[]
+}
+
+model Usuarios {
+  id_usuario      Int              @id
+  id_empresa      Int
+  nome            String           @db.VarChar(255)
+  tipo            TipoUsuario
+  cpf             String           @unique @db.VarChar(14)
+  email           String           @unique @db.VarChar(255)
+  senha           String           @db.VarChar(255)
+  imagem_perfil   String?          @db.VarChar(255)
+  apontamentos    Apontamento[]
+  escalas         EscalaTrabalho[]
+  logs            Logs[]
+  setores_geridos Setor_Gestor[]
+  empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+}
+
+model Setores {
+  id_setor        Int              @id @default(autoincrement())
+  id_empresa      Int
+  nome_setor      String           @db.VarChar(100)
+  localizacao     String?          @db.VarChar(255)
+  escalas         EscalaTrabalho[]
+  maquinas        Maquinas[]
+  gestores        Setor_Gestor[]
+  empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  ordens_producao OrdemProducao[]  @relation("OrdemProducaoToSetores")
+}
+
+model Categoria_Maquina {
+  id_categoria Int        @id @default(autoincrement())
+  id_empresa   Int
+  nome         String     @db.VarChar(100)
+  descricao    String?
+  empresa      Empresas   @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  maquinas     Maquinas[]
+}
+
+model Maquinas {
+  id_maquina        Int                 @id @default(autoincrement())
+  id_empresa        Int
+  nome              String              @db.VarChar(100)
+  serie             String?             @unique @db.VarChar(50)
+  status_atual      StatusMaquina       @default(Parada)
+  id_setor          Int?
+  id_categoria      Int
+  data_ativacao     DateTime?           @db.Date
+  ativo             Boolean             @default(true)
+  apontamentos      Apontamento[]
+  escala_trabalho   EscalaTrabalho[]
+  historico_eventos Historico_Eventos[]
+  categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
+  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
+  ordens_producao   OrdemProducao[]
+}
+
+model Setor_Gestor {
+  id_setor   Int
+  id_gestor  Int
+  id_empresa Int
+  empresa    Empresas @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  gestor     Usuarios @relation(fields: [id_gestor], references: [id_usuario], onDelete: Cascade)
+  setor      Setores  @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
+
+  @@id([id_setor, id_gestor])
+}
+
+model Turno {
+  id_turno          Int                 @id @default(autoincrement())
+  id_empresa        Int
+  nome_turno        String              @db.VarChar(50)
+  hora_inicio       DateTime            @db.Time(6)
+  hora_fim          DateTime            @db.Time(6)
+  dia_semana        DiaSemana
+  apontamentos      Apontamento[]
+  escalas           EscalaTrabalho[]
+  historico_eventos Historico_Eventos[]
+  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+}
+
+model EscalaTrabalho {
+  id_operador Int
+  id_turno    Int
+  id_setor    Int
+  id_maquina  Int?
+  id_empresa  Int
+  empresa     Empresas  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  maquina     Maquinas? @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
+  operador    Usuarios  @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
+  setor       Setores   @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
+  turno       Turno     @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
+
+  @@id([id_operador, id_turno])
+}
+
+model Motivos_Parada {
+  id_motivo         Int                 @id @default(autoincrement())
+  id_empresa        Int
+  descricao         String              @db.VarChar(255)
+  tipo              TipoMotivoParada    @default(Nao_Programada)
+  historico_eventos Historico_Eventos[]
+  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+}
+
+model OrdemProducao {
+  id_ordem          Int                 @id @default(autoincrement())
+  id_empresa        Int
+  id_maquina        Int
+  codigo_lote       String              @db.VarChar(100)
+  produto           String              @db.VarChar(150)
+  data_inicio       DateTime?
+  data_fim          DateTime?
+  qtd_planejada     Int
+  id_setor          Int
+  observacao_op     String              @db.VarChar(450)
+  prioridade        TipoPrioridade
+  status_op         StatusMaquina
+  apontamentos      Apontamento[]
+  historico_eventos Historico_Eventos[]
+  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  maquina           Maquinas            @relation(fields: [id_maquina], references: [id_maquina])
+  setores           Setores[]           @relation("OrdemProducaoToSetores")
+}
+
+model Historico_Eventos {
+  id_evento        Int             @id @default(autoincrement())
+  id_empresa       Int
+  id_maquina       Int
+  id_ordemProducao Int?
+  id_turno         Int
+  id_motivo_parada Int?
+  status_atual     StatusMaquina
+  inicio           DateTime
+  termino          DateTime?
+  duracao          Int?
+  observacao       String          @db.VarChar(450)
+  setor_afetado    Int
+  empresa          Empresas        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  maquina          Maquinas        @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
+  motivo_parada    Motivos_Parada? @relation(fields: [id_motivo_parada], references: [id_motivo])
+  ordem_producao   OrdemProducao?  @relation(fields: [id_ordemProducao], references: [id_ordem])
+  turno            Turno           @relation(fields: [id_turno], references: [id_turno])
+
+  @@index([id_empresa])
+}
+
+model Apontamento {
+  id_apontamento   Int           @id @default(autoincrement())
+  id_empresa       Int
+  id_ordemProducao Int
+  id_maquina       Int
+  id_operador      Int
+  id_turno         Int
+  qtd_boa          Int           @default(0)
+  qtd_refugo       Int           @default(0)
+  data_hora_inicio DateTime
+  data_hora_fim    DateTime
+  observacao       String?
+  empresa          Empresas      @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  maquina          Maquinas      @relation(fields: [id_maquina], references: [id_maquina])
+  operador         Usuarios      @relation(fields: [id_operador], references: [id_usuario])
+  ordem_producao   OrdemProducao @relation(fields: [id_ordemProducao], references: [id_ordem], onDelete: Cascade)
+  turno            Turno         @relation(fields: [id_turno], references: [id_turno])
+
+  @@index([id_empresa])
+}
+
+model Logs {
+  id_log            Int       @id @default(autoincrement())
+  usuario_id        Int?
+  rota              String    @db.VarChar(255)
+  metodo            String    @db.VarChar(10)
+  status_code       Int?
+  ip_address        String?   @db.VarChar(45)
+  user_agent        String?   @db.VarChar(500)
+  tempo_resposta_ms Int?
+  dados_requisicao  String?
+  dados_resposta    String?
+  criado_em         DateTime  @default(now())
+  usuario           Usuarios? @relation(fields: [usuario_id], references: [id_usuario])
+
+  @@index([usuario_id])
+  @@index([rota])
+  @@index([status_code])
+  @@index([criado_em])
+}
 
 enum TipoUsuario {
   Adm
@@ -20,14 +228,6 @@ enum StatusMaquina {
   Manutencao
   Setup
   Aguardando
-}
-
-enum StatusOP{
-  Aguardando
-  Em_Andamento @map("Em Andamento")
-  Parada
-  Setup
-  Finalizada
 }
 
 enum DiaSemana {
@@ -45,235 +245,9 @@ enum TipoMotivoParada {
   Nao_Programada @map("Nao Programada")
 }
 
-enum TipoPrioridade{
+enum TipoPrioridade {
   Alta
   Media
   Baixa
   Critica
-}
-
-// --- MODELS ---
-
-model Empresas {
-  id_empresa         Int       @id @default(autoincrement())
-  nome_empresa       String    @db.VarChar(255)
-  cnpj               String    @unique @db.VarChar(18)
-  data_cadastro      DateTime? @default(now())
-  email              String?   @db.VarChar(255)
-  telefone           String?   @db.VarChar(20)
-  endereco           String?   @db.VarChar(255)
-  nome_representante String?   @db.VarChar(255)
-  cpf_representante  String?   @db.VarChar(14)
-
-  // Relações
-  usuarios           Usuarios[]
-  setores            Setores[]
-  categoria_maquinas Categoria_Maquina[]
-  maquinas           Maquinas[]
-  setor_gestores     Setor_Gestor[]
-  turnos             Turno[]
-  motivos_parada     Motivos_Parada[]
-  ordens_producao    OrdemProducao[]
-  historico_eventos  Historico_Eventos[]
-  apontamentos       Apontamento[]
-  escalas_trabalho   EscalaTrabalho[]
-}
-
-model Usuarios {
-  id_usuario    Int         @id
-  id_empresa    Int
-  nome          String      @db.VarChar(255)
-  tipo          TipoUsuario
-  cpf           String      @unique @db.VarChar(14)
-  email         String      @unique @db.VarChar(255)
-  senha         String      @db.VarChar(255)
-  imagem_perfil String?     @db.VarChar(255)
-
-  empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  setores_geridos Setor_Gestor[]
-  escalas         EscalaTrabalho[]
-  apontamentos    Apontamento[]
-  logs            Logs[] 
-}
-
-model Setores {
-  id_setor    Int     @id @default(autoincrement())
-  id_empresa  Int
-  nome_setor  String  @db.VarChar(100)
-  localizacao String? @db.VarChar(255)
-
-  empresa  Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  maquinas Maquinas[]
-  gestores Setor_Gestor[]
-  escalas  EscalaTrabalho[]
-  ordens_producao    OrdemProducao[]
-}
-
-model Categoria_Maquina {
-  id_categoria Int     @id @default(autoincrement())
-  id_empresa   Int
-  nome         String  @db.VarChar(100)
-  descricao    String? @db.Text
-
-  empresa  Empresas   @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  maquinas Maquinas[]
-}
-
-model Maquinas {
-  id_maquina    Int           @id @default(autoincrement())
-  id_empresa    Int
-  nome          String        @db.VarChar(100)
-  serie         String?       @unique @db.VarChar(50)
-  status_atual  StatusMaquina @default(Parada)
-  id_setor      Int?
-  id_categoria  Int
-  data_ativacao DateTime?     @db.Date
-  ativo         Boolean       @default(true)
-
-  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
-  categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
-  ordens_producao   OrdemProducao[]
-  historico_eventos Historico_Eventos[]
-  apontamentos      Apontamento[]
-  escala_trabalho   EscalaTrabalho[]
-}
-
-model Setor_Gestor {
-  id_setor   Int
-  id_gestor  Int
-  id_empresa Int
-
-  setor   Setores  @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
-  gestor  Usuarios @relation(fields: [id_gestor], references: [id_usuario], onDelete: Cascade)
-  empresa Empresas @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-
-  @@id([id_setor, id_gestor])
-}
-
-model Turno {
-  id_turno    Int       @id @default(autoincrement())
-  id_empresa  Int
-  nome_turno  String    @db.VarChar(50)
-  hora_inicio DateTime  @db.Time
-  hora_fim    DateTime  @db.Time
-  dia_semana  DiaSemana
-
-  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  escalas           EscalaTrabalho[]
-  historico_eventos Historico_Eventos[]
-  apontamentos      Apontamento[]
-}
-
-model EscalaTrabalho {
-  id_operador Int
-  id_turno    Int
-  id_setor    Int
-  id_maquina  Int?
-  id_empresa  Int
-
-  setor    Setores   @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
-  operador Usuarios  @relation(fields: [id_operador], references: [id_usuario], onDelete: Cascade)
-  turno    Turno     @relation(fields: [id_turno], references: [id_turno], onDelete: Cascade)
-  maquina  Maquinas? @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
-  empresa  Empresas  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-
-  @@id([id_operador, id_turno])
-}
-
-model Motivos_Parada {
-  id_motivo  Int              @id @default(autoincrement())
-  id_empresa Int
-  descricao  String           @db.VarChar(255)
-  tipo       TipoMotivoParada @default(Nao_Programada)
-
-  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  historico_eventos Historico_Eventos[]
-}
-
-model OrdemProducao {
-  id_ordem      Int       @id @default(autoincrement())
-  id_empresa    Int
-  id_maquina    Int
-  id_setor      Int
-  codigo_lote   String    @db.VarChar(100)
-  produto       String    @db.VarChar(150)
-  data_inicio   DateTime?
-  data_fim      DateTime?
-  qtd_planejada Int
-  status_op     StatusOP
-  prioridade    TipoPrioridade
-  observacao_op    String    @db.VarChar(450)
-
-  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  maquina           Maquinas            @relation(fields: [id_maquina], references: [id_maquina])
-  historico_eventos Historico_Eventos[]
-  apontamentos       Apontamento[]
-  setores           Setores[]
-}
-
-model Historico_Eventos {
-  id_evento        Int           @id @default(autoincrement())
-  id_empresa       Int
-  id_maquina       Int
-  id_ordemProducao Int?
-  id_turno         Int
-  id_motivo_parada Int?
-  status_atual     StatusMaquina
-  setor_afetado    Int
-  inicio           DateTime
-  termino          DateTime?
-  duracao          Int? // Duração em minutos
-  observacao       String    @db.VarChar(450)
-
-  empresa        Empresas        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  maquina        Maquinas        @relation(fields: [id_maquina], references: [id_maquina], onDelete: Cascade)
-  ordem_producao OrdemProducao?  @relation(fields: [id_ordemProducao], references: [id_ordem])
-  turno          Turno           @relation(fields: [id_turno], references: [id_turno])
-  motivo_parada  Motivos_Parada? @relation(fields: [id_motivo_parada], references: [id_motivo])
-
-  @@index([id_empresa])
-}
-
-model Apontamento {
-  id_apontamento   Int      @id @default(autoincrement())
-  id_empresa       Int
-  id_ordemProducao Int
-  id_maquina       Int
-  id_operador      Int
-  id_turno         Int
-  qtd_boa          Int      @default(0)
-  qtd_refugo       Int      @default(0)
-  data_hora_inicio DateTime
-  data_hora_fim    DateTime
-  observacao       String?  @db.Text
-
-  empresa        Empresas      @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  ordem_producao OrdemProducao @relation(fields: [id_ordemProducao], references: [id_ordem], onDelete: Cascade)
-  maquina        Maquinas      @relation(fields: [id_maquina], references: [id_maquina])
-  operador       Usuarios      @relation(fields: [id_operador], references: [id_usuario])
-  turno          Turno         @relation(fields: [id_turno], references: [id_turno])
-
-  @@index([id_empresa])
-}
-model Logs {
-  id_log              Int      @id @default(autoincrement())
-  usuario_id          Int?     // null quando não autenticado (rotas públicas)
-  rota                String   @db.VarChar(255)
-  metodo              String   @db.VarChar(10)  // GET, POST, PUT, DELETE
-  status_code         Int?     // null até a resposta ser enviada
-  ip_address          String?  @db.VarChar(45)  // suporta IPv6
-  user_agent          String?  @db.VarChar(500)
-  tempo_resposta_ms   Int?     // em milissegundos
-  dados_requisicao    String?  @db.Text         // JSON stringificado
-  dados_resposta      String?  @db.Text         // só preenchido em erros (status >= 400)
-  criado_em           DateTime @default(now())
-
-  // relação com usuário — opcional pois rotas públicas não têm usuário
-  usuario Usuarios? @relation(fields: [usuario_id], references: [id_usuario], onDelete: SetNull)
-
-  @@index([usuario_id])   // facilita buscar logs de um usuário específico
-  @@index([rota])         // facilita buscar logs de uma rota específica
-  @@index([status_code])  // facilita filtrar só erros
-  @@index([criado_em])    // facilita ordenar por data
 }
