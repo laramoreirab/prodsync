@@ -53,9 +53,9 @@ const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'tipo',
-    key: 'tipo',
-    label: 'Tipo',
+    id: 'status',
+    key: 'status',
+    label: 'Status',
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
@@ -77,17 +77,17 @@ const colunasEventos = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data' },
+  { id: 'data', key: 'data', label: 'Data(Início - Fim)' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
 ];
 
 const dadosOriginais = [
-  { id: 1, maquina: 'Máquina A', tipo: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
-  { id: 2, maquina: 'Máquina B', tipo: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false },
-  { id: 3, maquina: 'Máquina C', tipo: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true },
-  { id: 4, maquina: 'Máquina D', tipo: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true },
-  { id: 5, maquina: 'Máquina E', tipo: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
+  { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
+  { id: 2, maquina: 'Máquina B', status: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false },
+  { id: 3, maquina: 'Máquina C', status: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true },
+  { id: 4, maquina: 'Máquina D', status: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true },
+  { id: 5, maquina: 'Máquina E', status: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
 ];
 
 const acoesDropdown = (row) => (
@@ -331,7 +331,7 @@ export default function HistoricoEventos() {
           </div>
 
           {/* Tab todos */}
-          <TabsContent value="todos">
+          <TabsContent value="todos" className="text-md">
             {dadosExibidos.length > 0 ? (
               <TableListagens
                 data={dadosExibidos}

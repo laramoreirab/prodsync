@@ -77,6 +77,46 @@ export default function OPDetalhePage({ params }) {
     { id: 8, evento: 'Parada', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', motivo: 'Boa qualidade' },
   ];
 
+  const colunasApontamento = [
+      { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+      { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
+      { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
+      {
+        id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
+        icone: (valor) => {
+          return (
+            <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+              {valor}
+            </Badge>
+          );
+        }
+      },
+      {
+        id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
+        icone: (valor) => {
+          return (
+            <Badge variant="destructive" className="font-semibold text-sm border-none">
+              {valor}
+            </Badge>
+          );
+        }
+      },
+      { id: 'observacao', key: 'observacao', label: 'Observação' },
+    ];
+  
+    const dadosApontamento = [
+      { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
+      { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
+      { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
+      { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
+      { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
+      { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
+      { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
+      { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
+    ];
+  
+
+
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
@@ -106,6 +146,7 @@ export default function OPDetalhePage({ params }) {
         </section>
 
         <section>
+          <h1>Historico de Eventos da OP</h1>
           <TableListagens
             /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
             data={dadosOP}
@@ -136,6 +177,36 @@ export default function OPDetalhePage({ params }) {
               </>
             )}
 
+          />
+
+          <h1>Histórico de Apontamentos da OP</h1>
+          <TableListagens
+            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+            data={dadosApontamento}
+            columns={colunasApontamento}
+            acoesDropdown={(ordemProd) => (
+              <>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <BellRing className="mr-2 h-4 w-4" />
+                      Solicitar Justificativa
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent />
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar Evento
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent />
+                </Dialog>
+              </>
+            )}
           />
         </section>
 

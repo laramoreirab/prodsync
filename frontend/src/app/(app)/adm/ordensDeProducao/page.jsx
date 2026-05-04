@@ -37,7 +37,7 @@ const dadosOriginais = [
 ];
 
 export default function OrdensDeProducao() {
-
+  
   const colunasOrdemProd = [
     {
       id: "id",
@@ -114,11 +114,11 @@ export default function OrdensDeProducao() {
             variant: "destructive",
             className: "font-semibold text-sm border-none"
           },
-          "Concluída":{
+          "Concluída": {
             variant: "outline",
             className: "bg-blue-500/10 text-blue-600 text-sm font-semibold border-none"
           },
-          "Aguardando Início":{
+          "Aguardando Início": {
             variant: "outline",
             className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
           }
@@ -136,6 +136,7 @@ export default function OrdensDeProducao() {
       id: "progresso",
       key: "progresso",
       label: "Progresso",
+      className: "text-center"
     },
   ];
 
@@ -186,47 +187,53 @@ export default function OrdensDeProducao() {
         </section>
 
         {/* Tabela sem filtros ainda */}
-        <TableListagens
-          /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-          data={dadosOriginais}
-          columns={colunasOrdemProd}
-          enableSelection={true}
-          acoesDropdown={(ordemProd) => (
-            <>
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href={`ordensDeProducao/${ordemProd.id}`}>
-                  <EyeIcon className="mr-2 h-4 w-4" />
-                  Ver Detalhes
-                </Link>
-              </DropdownMenuItem>
+        <section>
+          <h1>Historico de Eventos da OP</h1>
+          <TableListagens
+            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+            data={dadosOriginais}
+            columns={colunasOrdemProd}
+            enableSelection={true}
+            acoesDropdown={(ordemProd) => (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`ordensDeProducao/${ordemProd.id}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver Detalhes
+                  </Link>
+                </DropdownMenuItem>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                    <Pencil className="mr-2 h-4 w-4 text-primary" />
-                    Editar OP
-                  </DropdownMenuItem>
-                </DialogTrigger>
-                <DialogContent>
-                  {/* Form para editar ordem Prod*/}
-                </DialogContent>
-              </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar OP
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    {/* Form para editar ordem Prod*/}
+                  </DialogContent>
+                </Dialog>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DialogTrigger>
-                <DialogContent>
-                  {/* Form para excluir ordem Prod*/}
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
-        />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    {/* Form para excluir ordem Prod*/}
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          />
 
+          
+
+
+        </section>
 
       </div>
     </main>

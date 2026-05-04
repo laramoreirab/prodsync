@@ -247,7 +247,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
             <PaginationItem className="flex items-center">
               <Button
-                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
+                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8 cursor-pointer'
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
                 aria-label='Página anterior'>
@@ -286,7 +286,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
             <PaginationItem className="flex items-center">
               <Button
-                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
+                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8 cursor-pointer'
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
                 aria-label='Vá para a próxima página'>

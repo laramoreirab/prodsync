@@ -227,18 +227,19 @@ export default function PageSetores() {
       id: "oee_medio",
       key: "oee_medio",
       label: "OEE Médio",
-      className: "w-45",
+      className: "w-45 text-center justify-center",
     },
     {
       id: "qtd_de_maquinas",
       key: "qtd_de_maquinas",
       label: "Qtd. de Máquinas",
-      className: "w-1/5",
+      className: "w-1/5 text-center justify-center",
     },
     {
       id: "qtd_de_operadores",
       key: "qtd_de_operadores",
       label: "Qtd. de Operadores",
+      className: "w-1/5 text-center justify-center",
     },
   ];
 
