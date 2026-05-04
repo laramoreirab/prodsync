@@ -240,53 +240,6 @@ export default function Usuarios() {
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <Header />
       {/* SEÇÃO 1: CHarts*/}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          <div className=" bg-white border rounded-xl p-4">
-            <QtdUsuariosWidget />
-          </div>
-
-          <div className=" bg-white border rounded-xl p-4">
-            <QtdUsuariosPorSetorWidget />
-          </div>
-
-          <div className=" bg-white border rounded-xl p-4">
-            <TopOperadoresWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: Charts */}
-      <section className=" p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className=" bg-white border rounded-xl p-6">
-            <TempoSessaoWidget />
-          </div>
-
-          <div className=" bg-white border rounded-xl p-4">
-            <RotatividadeWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 3: Charts */}
-      <section className=" p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className="border  bg-white rounded-xl p-4">
-            <CumprimentoMetaSetorWidget />
-          </div>
-
-          <div className="border bg-white rounded-xl p-4">
-            <ProducaoMediaSetorWidget />
-          </div>
-
-        </div>
-      </section>
 
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
@@ -593,7 +546,7 @@ export default function Usuarios() {
               data={dadosExibidos} columns={colunasUsuarios}
 
               // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/usuarios/${row.id}`}
+              viewLink={(row) => `adm/usuarios/${row.id}`}
 
               // 2.  modais de Editar e Excluir para a tabela renderizar - falta integrar!!!
               dialogs={{
