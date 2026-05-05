@@ -6,7 +6,6 @@ import { oeeMaquinaService } from "@services/operadorService";
 export function useOEEMaquina(operadorId) {  
 if (loading) return <p>Carregando...</p>;
 if (error)   return <p>Erro.</p>;
-if (!data || (Array.isArray(data) && data.length === 0)) return <p>Sem dados.</p>;
   const fetcher = useCallback(
     () => {
       if (!operadorId) return Promise.resolve(null);
