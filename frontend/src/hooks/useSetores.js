@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { setorService } from '@/services/setorService';
+import { setorService } from "@services/setorService"; 
 
 export const useSetores = () => {
   const [setores, setSetores] = useState([]);

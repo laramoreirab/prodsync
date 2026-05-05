@@ -11,6 +11,7 @@ import { OEEMaquinaWidget }                from "@/features/operador/OEEMaquinaW
 export default function DashboardGeralOperador() {
   const [operadorId, setOperadorId] = useState(null);
 
+
   // Lê o token só no cliente, após a hidratação
   useEffect(() => {
     try {
@@ -22,6 +23,7 @@ export default function DashboardGeralOperador() {
       // token ausente ou malformado
     }
   }, []);
+
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">

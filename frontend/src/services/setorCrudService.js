@@ -1,7 +1,7 @@
 // src/services/setorService.js
 import { apiFetch } from './api';
 
-export const setorService = {
+export const setorCrudService = {
   
   criarSetor: async (dadosSetor) => {
     try {
