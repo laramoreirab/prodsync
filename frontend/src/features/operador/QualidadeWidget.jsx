@@ -11,6 +11,7 @@ export function QualidadeWidget({ operadorId }) {
   const { data, loading, error } = useQualidade(operadorId);
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro.</p>;
+  if (!data) return <p className="text-sm text-muted-foreground">Aguardando dados...</p>;
 
   const chartData = [
     { name: "pecasBoas", value: data.pecasBoas },

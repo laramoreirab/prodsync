@@ -39,9 +39,9 @@ export default function DashboardGeralOperador() {
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          {/* OEE da Máquina (lê token internamente via useEffect) */}
+          {/* OEE da Máquina */}
           <div className="bg-white border rounded-xl p-4">
-            <OEEMaquinaWidget />
+            <OEEMaquinaWidget operadorId={operadorId} />
           </div>
 
           {/* Produtividade Diária */}
