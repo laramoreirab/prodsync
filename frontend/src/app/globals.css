@@ -34,6 +34,7 @@
   --color-cinza-escuro: var(--cinza-escuro);
   --color-vermelho-vivido: var(--vermelho-vivido);
   --color-amarelo: var(--amarelo);
+  --color-azul-cobalto: var(--azul-cobalto);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -62,7 +63,7 @@
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: #00357a;
-  --muted: oklch(0.97 0 0) /* ou #dedfdf */;
+  --muted: oklch(0.97 0 0);
   --muted-foreground: #9b9d9d;
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
@@ -84,11 +85,12 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --cinza-escuro: #545454;
   --bg_app: url('/bg_app.svg');
   --vermelho-vivido: #b30000;
   --cinza-claro: #efefef;
   --amarelo: #ffd51e;
+  --azul-cobalto: #004aad;
+  --cinza-escuro: #545454;
 }
 
 .dark {
@@ -129,9 +131,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
