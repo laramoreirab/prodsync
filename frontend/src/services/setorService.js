@@ -15,7 +15,7 @@ import {
     SetorProducaoSemanalArraySchema,
   } from "@features/setores/schemas/setorSchema";
 import {
-  mockSetores,
+  mockUSE_MOCK = false;
   mockSetorTotalKPI,
   mockOperadoresMediaKPI,
   mockOEEPorSetor,

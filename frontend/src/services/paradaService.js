@@ -5,7 +5,7 @@ import { mockMotivosFrequentesParadas } from "./mockData";
 import {MediaParadasDiaArraychema} from "@/features/paradas/schemas/paradasSchema";
 import { mockMediaParadasDia } from "./mockData";
 
-const USE_MOCK = true; 
+const USE_MOCK = false; 
 
 export const paradaService = {
   async getParadas() {
