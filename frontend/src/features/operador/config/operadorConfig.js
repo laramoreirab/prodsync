@@ -14,9 +14,9 @@ export const metricas = [
   { key: "oee",             label: "OEE Geral Consolidado:", color: "#00357a" },
 ];
 
-export const paradasConfig = {
-  registradas: { label: "Paradas Registradas:", color: "#7d95c6" },
-  reais:       { label: "Paradas Reais:",        color: "#212e4b" },
+export const tempoParadoTempoProduzindoOperadorConfig  = {
+  produzindo: { label: "Tempo Produzindo:", color: "#7d95c6" },
+  parada:       { label: "Tempo Parado:",        color: "#212e4b" },
 };
 
 export const pecasPorDiaConfig = {
@@ -28,4 +28,9 @@ export const pecasPorDiaConfig = {
 
 export const producaoPorHoraConfig = {
   qtd: { label: "Peças/hora:", color: "#00357a" },
+};
+
+export const produtividadeDiariaConfig = {
+  produzido: { label: "Produzido:", color: "#00357a" },
+  meta:      { label: "Sua Meta:", color: "#b0bfd8" },
 };

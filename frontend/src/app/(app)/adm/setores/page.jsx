@@ -15,12 +15,15 @@ import {
 import { Plus, Search, EyeIcon, Pencil, Trash2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
-import DropdownMenuItem from "@/components/ui/dropdown-menu-item";
+import DropdownMenuItem from "@/components/ui/dropdown-menu";
 
 import TableListagens from "@/components/table";
 import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
 import FormExclusaoSetor from '@/components/ui/forms/setores/formExclusaoSetor';
 import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
+import Link from "next/link";
+import { DialogClose, DialogDescription, DialogFooter, DialogHeader } from "@/components/ui/dialog";
+import Button from "@/components/ui/button";
 
 
 const setoresFilter = [
@@ -124,75 +127,82 @@ export default function PageSetores() {
   const [dados, setDados] = useState(dadosOriginais);
   const [busca, setBusca] = useState("");
 
+  const getDadosBase = () => dadosOriginais;
+
   //lógica de ordenação
   const handleSort = (criterio) => {
-    const dadosCopiados = [...dados];
+    const base = [...dados]; // estado atual (já filtrado)
 
-    dadosCopiados.sort((a, b) => {
-      //transformando string em numero
-      const parseOEE = (valor) => parseFloat(valor.replace("%", ""));
+    const parseOEE = (v) => parseFloat(v.replace("%", ""));
 
+    base.sort((a, b) => {
       switch (criterio) {
         case "nome":
           return a.setor.localeCompare(b.setor);
+
         case "oee_asc":
-          return parseOEE(a.OEE_Médio) - parseOEE(b.OEE_Médio);
+          return parseOEE(a.oee_medio) - parseOEE(b.oee_medio);
+
         case "oee_desc":
-          return parseOEE(b.OEE_Médio) - parseOEE(a.OEE_Médio);
+          return parseOEE(b.oee_medio) - parseOEE(a.oee_medio);
+
         case "qtdMaquinas_asc":
-          return a.QTD_De_Máquinas - b.QTD_De_Máquinas;
+          return a.qtd_de_maquinas - b.qtd_de_maquinas;
+
         case "qtdMaquinas_desc":
-          return b.QTD_De_Máquinas - a.QTD_De_Máquinas;
+          return b.qtd_de_maquinas - a.qtd_de_maquinas;
+
         case "qtdOperadores_asc":
-          return a.QTD_De_Operadores - b.QTD_De_Operadores;
+          return a.qtd_de_operadores - b.qtd_de_operadores;
+
         case "qtdOperadores_desc":
-          return b.QTD_De_Operadores - a.QTD_De_Operadores;
+          return b.qtd_de_operadores - a.qtd_de_operadores;
+
         default:
           return 0;
       }
     });
 
-    setDados(dadosCopiados);
+    setDados(base);
   };
 
   const aplicarFiltros = (filtrosSelecionados) => {
     let dadosFiltrados = [...dadosOriginais];
 
-    //filtro por setor
-    if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
+    // setor
+    if (filtrosSelecionados.setor?.length) {
       dadosFiltrados = dadosFiltrados.filter((item) =>
         filtrosSelecionados.setor.some(
-          (f) => f.toLowerCase() === item.setor.toLowerCase(),
-        ),
+          (f) => f.toLowerCase() === item.setor.toLowerCase()
+        )
       );
     }
 
-    // filtro por oee médio
+    // OEE
     if (filtrosSelecionados.oeeMedioSetor) {
-      const { min, max } = filtrosSelecionados.oeeMedioSetor;
+      const { min = 0, max = 100 } = filtrosSelecionados.oeeMedioSetor;
+
       dadosFiltrados = dadosFiltrados.filter((item) => {
-        const valor = parseFloat(item.OEE_Médio.replace("%", ""));
-        return valor >= (min || 0) && valor <= (max || 100); //se usuario nao prencher minimo, o minimo assume zero; se usuario nao prencher maximo, o max assume 100 (pois é porcentagem)
+        const valor = parseFloat(item.oee_medio.replace("%", ""));
+        return valor >= min && valor <= max;
       });
     }
 
-    //filtro por qtd de máquinas
+    // máquinas
     if (filtrosSelecionados.qtdMaquinasSetor) {
-      const { min, max } = filtrosSelecionados.qtdMaquinasSetor;
-      dadosFiltrados = dadosFiltrados.filter(
-        (item) =>
-          item.QTD_De_Máquinas >= (min || 0) &&
-          item.QTD_De_Máquinas <= (max || Infinity), //se usuario nao prencher minimo, o minimo assume zero; se usuario nao prencher maximo, o max assume infinito
+      const { min = 0, max = Infinity } = filtrosSelecionados.qtdMaquinasSetor;
+
+      dadosFiltrados = dadosFiltrados.filter((item) =>
+        item.qtd_de_maquinas >= min && item.qtd_de_maquinas <= max
       );
     }
 
-    //filtro por qtd de operadores
+    // operadores
     if (filtrosSelecionados.qtdOperadoresSetor) {
-      const { min, max } = filtrosSelecionados.qtdOperadoresSetor;
-      dadosFiltrados = dadosFiltrados.filter(
-        (item) =>
-          item.QTD_De_Operadores >= (min || 0) &&
-          item.QTD_De_Operadores <= (max || Infinity), //se usuario nao prencher minimo, o minimo assume zero; se usuario nao prencher maximo, o max assume infinito
+      const { min = 0, max = Infinity } = filtrosSelecionados.qtdOperadoresSetor;
+
+      dadosFiltrados = dadosFiltrados.filter((item) =>
+        item.qtd_de_operadores >= min && item.qtd_de_operadores <= max
       );
     }
 
@@ -234,9 +244,10 @@ export default function PageSetores() {
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((setor) => {
     const termo = busca.toLowerCase();
+
     return (
       setor.setor.toLowerCase().includes(termo) ||
-      setor.gestor.toString().includes(termo)
+      setor.gestor.toLowerCase().includes(termo)
     );
   });
 
@@ -246,7 +257,7 @@ export default function PageSetores() {
       <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">
           {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
-          <div className="flex justify-between p-8">
+          <div className="flex justify-between">
             <div className="title_tela">
               <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
                 Setores
@@ -352,7 +363,7 @@ export default function PageSetores() {
               excluirLote={
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Excluir {selecionados.length} setor(es)?</DialogTitle>
+                    <DialogTitle>Excluir setor(es)?</DialogTitle>
                     <DialogDescription>Essa ação não pode ser desfeita.</DialogDescription>
                   </DialogHeader>
                   <DialogFooter>

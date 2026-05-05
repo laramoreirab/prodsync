@@ -116,9 +116,11 @@ export const mockOEECritico = {
 };
 
 
-export const mockParadasComparadas = [
-  { name: "justificada",      value: 62 },
-  { name: "naoJustificada",     value: 23 },
+export const mockTempoParadoTempoProduzindoOperador = [
+  { dia: "Seg", produzindo: 8,  parada: 7  },
+  { dia: "Ter", produzindo: 7,  parada: 12 },
+  { dia: "Qua", produzindo: 13, parada: 15 },
+  { dia: "Sex", produzindo: 9,  parada: 8  },
 ];
 
 export const mockTopMotivosTempo = [
@@ -327,17 +329,17 @@ export const mockMetaProducao = {
 };
 
 export const mockParadasComparadasOperador = [
-  { dia: "Seg", registradas: 8,  reais: 7  },
-  { dia: "Ter", registradas: 7,  reais: 12 },
-  { dia: "Qua", registradas: 13, reais: 15 },
-  { dia: "Sex", registradas: 9,  reais: 8  },
+  { dia: "Seg", produzindo: 8,  parada: 7  },
+  { dia: "Ter", produzindo: 7,  parada: 12 },
+  { dia: "Qua", produzindo: 13, parada: 15 },
+  { dia: "Sex", produzindo: 9,  parada: 8  },
 ];
 
 export const mockEficienciaMaquina = [
-  { maquina: "THA-1", eficiencia: 85 },
-  { maquina: "THA-2", eficiencia: 60 },
-  { maquina: "THA-3", eficiencia: 72 },
-  { maquina: "THA-4", eficiencia: 90 },
+  {  dia: "Seg", eficiencia: 85 },
+  { dia: "Ter", eficiencia: 60 },
+  {  dia: "Qua", eficiencia: 72 },
+  {  dia: "Qui", eficiencia: 90 },
 ];
 
 export const mockMotivoRefugoMaquina = [

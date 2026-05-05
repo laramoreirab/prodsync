@@ -1,4 +1,4 @@
 export const paradasComparadasConfig = {
-  justificada:    { label: "Justificada:",     color: "#212e4b" },
-  naoJustificada: { label: "Não Justificada:", color: "var(--secondary-foreground)" },
+  produzindo:  { label: "Produzindo:",   color: "#00357a" },
+  parado:      { label: "Parado:",       color: "#7d95c6" },
 };

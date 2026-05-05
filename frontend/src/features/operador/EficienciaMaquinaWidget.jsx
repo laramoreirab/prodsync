@@ -13,12 +13,12 @@ export function EficienciaMaquinaWidget({ operadorId }) {
 
   const formattedData = data?.map(item => ({
     ...item,
-    setor: item.maquina 
+    setor: item.dia 
   }));
 
   return (
     <div className="flex flex-col">
-      <p className="text-sm font-semibold text-black">Eficiência da Máquina</p>
+      <p className="text-sm font-semibold text-black">Eficiência da Máquina por Dia</p>
       <p className="text-xs text-gray-400 font-semibold mt-1 mb-2">*Atualizado em tempo real</p>
       
       <BarHorizontal 

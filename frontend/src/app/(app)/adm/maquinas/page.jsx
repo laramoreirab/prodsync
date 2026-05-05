@@ -176,11 +176,6 @@ export default function Maquinas() {
     );
   });
 
-  //ações da tabela
-  const abrirModalExclusao = (maquina) => {
-    setMaquinaSelecionada(maquina);
-  };
-
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
     return (

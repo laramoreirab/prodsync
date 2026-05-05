@@ -1,15 +1,19 @@
 import { apiFetch } from "./api";
-import { mockParadasComparadas, mockTopMotivosTempo } from "./mockData";
-import { ParadasComparadasArraySchema } from "@/features/eventos/shemas/eventosSchema";
+import { mockTopMotivosTempo } from "./mockData";
 import { MotivoTempoArraySchema } from "@/features/eventos/shemas/eventosSchema";
+
+const mockTempoParadoProduzindo = [
+  { name: "produzindo", value: 62 },
+  { name: "parado",     value: 38 },
+];
 
 const USE_MOCK = true;
 
 export const eventosService = {
   async getParadasComparadas() {
-    if (USE_MOCK) return ParadasComparadasArraySchema.parse(mockParadasComparadas);
-    const data = await apiFetch("/eventos/justificativas_comparadas");
-    return ParadasComparadasArraySchema.parse(data);
+    if (USE_MOCK) return mockTempoParadoProduzindo;
+    const data = await apiFetch("/eventos/tempo_parado_produzindo");
+    return data;
   },
 };
 
