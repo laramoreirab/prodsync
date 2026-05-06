@@ -66,4 +66,4 @@ const apiService = {
 export const usuariosCrudService = USE_MOCK ? usuariosMockService : apiService;
 //após a conexão com o backend, remover o arquivo usuariosMock.js e o USE_MOCK do service
 //além disso, coloque o que está dentro da const apiService dentro de:
-//export const maquinaCrudService ={o que ta dentro de apiService aqui dentro}
+//export const usuariosCrudService ={o que ta dentro de apiService aqui dentro}

@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api"
 import { mockTopMotivosTempo } from "./mockData";
 import { MotivoTempoArraySchema } from "@/features/eventos/shemas/eventosSchema";
 
