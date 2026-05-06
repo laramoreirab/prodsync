@@ -27,7 +27,7 @@ export default function LeftCards() {
            }} 
          />
 
-        {/* Player Lottie - CENTRALIZADO AQUI */}
+        {/* Player Lottie */}
         <div className="relative z-20 w-full h-full flex items-center justify-center">
             <Player
               autoplay
@@ -42,7 +42,7 @@ export default function LeftCards() {
             />
         </div>
 
-        {/* Gradiente sutil */}
+        {/* Gradiente */}
         <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
       </div>
     </div>
