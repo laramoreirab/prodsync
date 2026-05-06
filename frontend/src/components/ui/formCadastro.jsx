@@ -35,7 +35,7 @@ export default function RegisterForm() {
     try {
       const data = await cadastroService.cadastrar(form);
       if (data?.token) {
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.dados.token);
       setOpen(true);
     } else {
       // Caso o backend retorne 200 mas sem token por algum motivo

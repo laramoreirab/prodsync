@@ -35,7 +35,7 @@ import {
 } from "@features/producao/schemas/producaoSchema";
 import { mockProducaoPorSetor, mockProducaoPorHora, mockOEE, mockPecasPorMinuto, mockProducaoPorTurnoLotes } from "./mockData";
 
-const USE_MOCK = true; 
+const USE_MOCK = false; 
 export const producaoService = {
   async getPorHora() {
     if (USE_MOCK) return ProducaoPorHoraArraySchema.parse(mockProducaoPorHora);

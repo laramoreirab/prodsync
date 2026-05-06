@@ -31,7 +31,7 @@ class UsuarioController {
     //GET api/usuarios - busca de usuário por id 
     static async buscarPorId(req, res) {
         try {
-            const id_usuario = req.user.id_usuario;
+            const id_usuario = req.params;
             const id_empresa = req.user.id_empresa;
             // Validação básica do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -218,7 +218,8 @@ class UsuarioController {
     static async atualizarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { id_usuario, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const id_usuario = req.params;
+            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -312,7 +313,7 @@ class UsuarioController {
     //DELETE api/usuarios - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
-            const { id_usuario } = req.body
+            const id_usuario  = req.params
             const id_empresa = req.user.id_empresa;
 
             // Validação do ID
@@ -363,7 +364,7 @@ class UsuarioController {
     static async uploadImagem(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { id_usuario } = req.body;
+            const  id_usuario  = req.params;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {

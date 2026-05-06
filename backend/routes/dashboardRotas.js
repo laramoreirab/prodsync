@@ -6,8 +6,8 @@ const router = Router()
 
 router.use(authMiddleware, adminMiddleware)
 
-router.get('/producao-dia',    DashboardController.producaoDiaria)
+router.get('/producao-dia', DashboardController.producaoDiaria)
 router.get('/tendencia-refugo',DashboardController.tendenciaRefugo)
-router.get('/paradas-ppm',     DashboardController.paradasEPPM)
+router.get('/paradas-ppm', DashboardController.paradasEPPM)
 
 export default router
