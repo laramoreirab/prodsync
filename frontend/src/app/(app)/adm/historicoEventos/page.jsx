@@ -314,7 +314,7 @@ export default function HistoricoEventos() {
           </div>
 
           <div className="row_ord_fil_cont flex items-center justify-between mt-2">
-            <p>{dadosExibidos.length} máquinas encontradas</p>
+            <p>{dadosExibidos.length} eventos encontrados</p>
 
             <div className="flex items-center gap-4">
               <OrdenarDropdown
