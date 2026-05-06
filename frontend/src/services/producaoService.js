@@ -40,18 +40,18 @@ export const producaoService = {
   async getPorHora() {
     if (USE_MOCK) return ProducaoPorHoraArraySchema.parse(mockProducaoPorHora);
     const data = await apiFetch("/api/dashboard/producao-dia");
-    return ProducaoPorHoraArraySchema.parse(data);
+    return ProducaoPorHoraArraySchema.parse(data.dados);
   },
 
   async getPorSetor() {
     if (USE_MOCK) return ProducaoPorSetorArraySchema.parse(mockProducaoPorSetor);
     const data = await apiFetch("/api/setores/obterProducaoPorSetor");
-    return ProducaoPorSetorArraySchema.parse(data);
+    return ProducaoPorSetorArraySchema.parse(data.dados);
   },
    async getOEE() {
     if (USE_MOCK) return OEESchema.parse(mockOEE);
     const data = await apiFetch("/api/oee/geral");
-    return OEESchema.parse(data);
+    return OEESchema.parse(data.dados);
   },
   
 };
@@ -59,8 +59,8 @@ export const producaoService = {
 export const pecasPorMinutosService = {
   async getPecasPorMinuto(){
     if (USE_MOCK) return PecasPorMinutoSchema.parse(mockPecasPorMinuto);
-    const data = await apiFetch("/producao/pecas_por_minuto");
-    return PecasPorMinutoSchema.parse(data);
+    const data = await apiFetch("/api/maquinas/obter-pecas-por-minuto");
+    return PecasPorMinutoSchema.parse(data.dados);
   }
 };
 
