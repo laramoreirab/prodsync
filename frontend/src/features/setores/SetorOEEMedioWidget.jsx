@@ -10,10 +10,11 @@ const oeeConfig = {
 export function SetorOEEMedioWidget({ setorId }) {
   const { data, loading, error } = useSetorOEEMedio(setorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error) return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
-  if (!data) return null;
-
+   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
+ if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
+ if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+ if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+ 
   return (
     <div className="flex flex-col gap-2">
       <div>

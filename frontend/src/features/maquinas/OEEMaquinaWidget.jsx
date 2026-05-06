@@ -6,9 +6,11 @@ import { oeeMetricasMaquinaConfig } from "./config/maquinaDetalheConfig";
 export function OEEMaquinaWidget({ maquinaId }) {
   const { data, loading, error } = useOEEMaquina(maquinaId);
  
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
- 
+  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
+if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
+if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+
   return (
     <div className="flex flex-col gap-2">
       <div>
