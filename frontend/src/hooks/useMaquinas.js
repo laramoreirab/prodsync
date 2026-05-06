@@ -1,82 +1,69 @@
-import { useState, useRef } from 'react';
-
-const estadoInicial = {
-  nomeMaquina: "",
-  idMaquina: "",
-  setorMaquina: "",
-  capacidadeNormalMaquina: "",
-  tipoMaquina: "",
-  dataAquisicaoMaquina: "",
-  operadorMaquina: "",
-  statusMaquina: ""
-};
+import { useState, useEffect, useCallback } from 'react';
+import { maquinaCrudService } from '@/services/maquinaCrudService';
 
 export function useMaquinas() {
-  const [formData, setFormData] = useState(estadoInicial);
-  const [arquivo, setArquivo] = useState(null);
-  const fileInputRef = useRef(null);
+  const [maquinas, setMaquinas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  //manipulação dos inputs de texto e selects pelo id
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
+  //carregar dados
+  const fetchMaquinas = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await maquinaCrudService.getAll();
+      setMaquinas(data);
+      setError(null);
+    } catch (err) {
+      setError('Falha ao carregar máquinas');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  //abre a seleção de arquivos
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
+  useEffect(() => {
+    fetchMaquinas();
+  }, [fetchMaquinas]);
 
-  //tratamento e validação da imagem
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
-
-      if (!tiposPermitidos.includes(file.type)) {
-        alert("Formato inválido! Por favor, envie apenas JPG, PNG ou WEBP.");
-        e.target.value = ""; // Limpa o input
-        return;
-      }
-
-      setArquivo({
-        nome: file.name,
-        preview: URL.createObjectURL(file),
-        raw: file
-      });
+  //criar
+  const cadastrarMaquina = async (dados) => {
+    try {
+      const nova = await maquinaCrudService.create(dados);
+      setMaquinas(prev => [...prev, nova]);
+      return nova;
+    } catch (err) {
+      throw err;
     }
   };
 
-  //a editar -- integração com editar e excluir
-  // Prepara o formulário para a EDIÇÃO (você vai usar isso no clique da tabela)
-  const preencherParaEdicao = (maquina) => {
-    setFormData({
-      nomeMaquina: maquina.nome || "",
-      idMaquina: maquina.id || "",
-      setorMaquina: maquina.setor || "",
-      capacidadeNormalMaquina: maquina.capacidadeNormal || "",
-      tipoMaquina: maquina.tipoMaquina || "",
-      dataAquisicaoMaquina: maquina.dataAquisicao || "",
-      operadorMaquina: maquina.operador || "",
-      statusMaquina: maquina.status || ""
-    });
-    // Lógica adicional para imagem existente virá aqui se necessário
+  //editar
+  const editarMaquina = async (id, dados) => {
+    try {
+      const atualizada = await maquinaCrudService.update(id, dados);
+      setMaquinas(prev => prev.map(m => m.id === id ? atualizada : m));
+      return atualizada;
+    } catch (err) {
+      throw err;
+    }
   };
 
-  //zera o form dps de salvar ou fechar o modal
-  const limparFormulario = () => {
-    setFormData(estadoInicial);
-    setArquivo(null);
+  //deletar
+  const excluirMaquina = async (id) => {
+    try {
+      await maquinaCrudService.delete(id);
+      setMaquinas(prev => prev.filter(m => m.id !== id));
+    } catch (err) {
+      throw err;
+    }
   };
 
   return {
-    formData,
-    arquivo,
-    fileInputRef,
-    handleInputChange,
-    handleUploadClick,
-    handleFileChange,
-    preencherParaEdicao,
-    limparFormulario
+    maquinas,
+    loading,
+    error,
+    refresh: fetchMaquinas,
+    cadastrarMaquina,
+    editarMaquina,
+    excluirMaquina
   };
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import React, { useState } from "react";
 import { OEEPorSetorWidget } from "@/features/setores/OEEPorSetorWidget";
 import { RefugoPorSetorWidget } from "@/features/setores/RefugoPorSetorWidget";
@@ -11,13 +12,22 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
+  DialogHeader,
+  DialogDescription,
+  DialogFooter,
+  DialogClose
 } from "@/components/ui/dialog";
-import { Plus, Search } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Plus, Search, EyeIcon, Pencil, Trash2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 import TableListagens from "@/components/table";
+import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
+import FormExclusaoSetor from '@/components/ui/forms/setores/formExclusaoSetor';
+import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
+
 
 const setoresFilter = [
   {
@@ -115,10 +125,15 @@ const dadosOriginais = [
   },
 ];
 
-export default function PageLayout() {
+export default function PageSetores() {
   //estado que vai para a tela (começa com todos os dados)
   const [dados, setDados] = useState(dadosOriginais);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
+
+  const handleDelete = (rows) => {
+    console.log("Excluir:", rows);
+  };
 
   //lógica de ordenação
   const handleSort = (criterio) => {
@@ -212,18 +227,19 @@ export default function PageLayout() {
       id: "oee_medio",
       key: "oee_medio",
       label: "OEE Médio",
-      className: "w-45",
+      className: "w-45 text-center justify-center",
     },
     {
       id: "qtd_de_maquinas",
       key: "qtd_de_maquinas",
       label: "Qtd. de Máquinas",
-      className: "w-1/5",
+      className: "w-1/5 text-center justify-center",
     },
     {
       id: "qtd_de_operadores",
       key: "qtd_de_operadores",
       label: "Qtd. de Operadores",
+      className: "w-1/5 text-center justify-center",
     },
   ];
 
@@ -237,16 +253,8 @@ export default function PageLayout() {
   });
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+
       <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">
           {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
@@ -265,16 +273,7 @@ export default function PageLayout() {
               </DialogTrigger>
 
               <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <div className="flex items-center">
-                  <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
-                      Criar Setor
-                    </DialogTitle>
-                  </div>
-                </div>
-                <Separator className="m-2 bg-[#a6a6a6]" />
-                <form className="px-8 pb-8 pt-4 flex flex-col gap-6"></form>
+                <FormCadastroSetor />
               </DialogContent>
             </Dialog>
           </div>
@@ -286,12 +285,12 @@ export default function PageLayout() {
         {/* SEÇÃO 1 */}
         <section className="grid grid-cols-1 sm:grid-cols-6 gap-4">
           {/* KPI 1 */}
-          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-[120px]">
+          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-30">
             <SetorTotalWidget />
           </div>
 
           {/* KPI 2  */}
-          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-[120px]">
+          <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-30">
             <OperadoresMediaWidget />
           </div>
 
@@ -355,35 +354,59 @@ export default function PageLayout() {
           </div>
         </div>
 
-        <div className="flex flex-col flex-1 items-center w-full mt-4">
+        <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
           {dadosExibidos.length > 0 ? (
             /* dados só renderizam a tabela se tiver resultado */
             <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
-              // 1. Para a ação "ver detalhes" Url com base na linha clicada
-              viewLink={(row) => `/maquinas/${row.id}`}
-              // 2.  modais de Editar e Excluir para a tabela renderizar
-              dialogs={{
-                edit: (row) => (
-                  <DialogContent className="rounded-lg">
-                    <DialogTitle>Editar Máquina </DialogTitle>{" "}
-                    {/* Faz seu nome Gi, não estiizei nada */}
-                    <Separator className="my-2" />
-                    {/* Formulário do Modal aqui Gi, pode ser estatico ou um componente (sou apaixonada) rs */}
-                    {/* colocar {row.nome} e assim por diante no placehoder pra saber o que está sendo editado */}
-                  </DialogContent>
-                ),
-                delete: (row) => (
-                  <DialogContent>
-                    <DialogTitle className="text-red-600">
-                      Excluir Máquina
+              onSelectedChange={setSelecionados}
+              excluirLote={
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      Excluir {selecionados.length} {selecionados.length === 1 ? 'setor' : 'setores'}?
                     </DialogTitle>
-                  </DialogContent>
-                ),
-              }}
+                  </DialogHeader>
+                  <DialogDescription>Essa ação não pode ser desfeita.</DialogDescription>
+                </DialogContent>
+              }
+              acoesDropdown={(setor) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`setores/${setor.setor}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoSetor />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormExclusaoSetor />
+                    </DialogContent>
+                  </Dialog>
+
+                </>
+              )}
             />
           ) : (
             /* se não tiver correspondência (length === 0), mostra apenas a div */

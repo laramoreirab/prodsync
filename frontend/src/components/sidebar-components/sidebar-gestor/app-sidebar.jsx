@@ -25,27 +25,27 @@ const data = {
     },
     {
       title: "Maquinas",
-      url: "#",
+      url: "/gestor/maquinas",
       icon: <Wrench />,
     },
     {
       title: "Usuarios",
-      url: "#",
+      url: "/gestor/usuarios",
       icon: <Users />,
     },
     {
       title: "Historico de Eventos",
-      url: "#",
+      url: "/gestor/historicoEventos",
       icon: <Calendar />,
     },
     {
       title: "Ordem de Producao",
-      url: "#",
+      url: "/gestor/ordensDeProducao",
       icon: <ListBulletsIcon size={32} />,
     },
     {
       title: "Andon",
-      url: "#",
+      url: "/gestor/andon",
       icon: <RefreshCw />,
     },
   ],
