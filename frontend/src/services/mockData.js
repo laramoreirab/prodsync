@@ -657,3 +657,11 @@ export const mockAndonSectorSections = [
 export const mockAndonStatusMaquinas = mockAndonFactoryStatusMaquinas;
 
 export const mockAndonRanking = mockAndonFactoryRanking;
+
+
+export const mockProducaoPorMaquinaSetor = [
+  { setor: "THAK-002", qtd: 80 },
+  { setor: "THAK-004", qtd: 60 },
+  { setor: "THAK-005", qtd: 40 },
+  { setor: "THAK-008", qtd: 25 },
+];

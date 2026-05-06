@@ -1,14 +1,16 @@
 "use client";
+import { useCallback } from "react";
 import { useChartData } from "@/hooks/useChartData";
 import { metaKPIService } from "@services/operadorService";
-import { getUserFromToken } from "@/lib/auth";
-import { useCallback } from "react";
 
-export function useMetaKPI() {
-  const { id_usuario } = getUserFromToken() ?? {};
+export function useMetaKPI(operadorId) {
   const fetcher = useCallback(
-    () => metaKPIService.getMetaKPI(id_usuario),
-    [id_usuario]
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return metaKPIService.getMetaKPI(operadorId);
+    },
+    [operadorId]
   );
+
   return useChartData(fetcher);
 }

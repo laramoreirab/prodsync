@@ -7,8 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { BellRing, Pencil } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
-import { OPProgressoWidget } from "@/features/ordens/OPProgressoWidget";
+import { OPProgressoWidget }  from "@/features/ordens/OPProgressoWidget";
 import { OPOEEDetalheWidget } from "@/features/ordens/OPOEEDetalheWidget";
 
 const colunasOP = [
@@ -103,11 +102,13 @@ export default function OPDetalhePage({ params }) {
 
 
         <div className="mb-2 flex justify-start">
-          <h1 className="inline-block border-b-4 border-[var(--secondary-foreground)] pb-0 text-4xl font-semibold text-black">
+          <h1 className="inline-block border-b-4 border-secondary-foreground pb-0 text-4xl font-semibold text-black">
             Ordem de Produção
           </h1>
         </div>
 
+
+        {/* Gráficos */}
         {/* SEÇÃO 1: Info card + Progresso */}
         <section className="bg-white border rounded-xl p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -170,5 +171,8 @@ export default function OPDetalhePage({ params }) {
 
       </div>
     </main>
+
+
+
   );
 }

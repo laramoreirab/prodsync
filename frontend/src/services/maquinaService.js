@@ -1,5 +1,4 @@
-// src/services/maquinaService.js
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api"
 import {
   MaquinaStatusArraySchema,
   MaquinaAtivaPorTurnoSchema,

@@ -1,14 +1,16 @@
 "use client";
+import { useCallback } from "react";
 import { useChartData } from "@/hooks/useChartData";
 import { produtividadeDiaService } from "@services/operadorService";
-import { getUserFromToken } from "@/lib/auth";
-import { useCallback } from "react";
 
-export function useProdutividadeDia() {
-const { id_usuario } = getUserFromToken() ?? {};
-const fetcher = useCallback(
-    () => produtividadeDiaService.getProdutividade(id_usuario),
-    [id_usuario]
+export function useProdutividadeDia(operadorId) {
+  const fetcher = useCallback(
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return produtividadeDiaService.getProdutividade(operadorId);
+    },
+    [operadorId]
   );
+
   return useChartData(fetcher);
 }

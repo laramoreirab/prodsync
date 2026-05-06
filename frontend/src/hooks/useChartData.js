@@ -1,12 +1,12 @@
-// src/hooks/useChartData.js
+// frontend/src/hooks/useChartData.js
 "use client";
 
 import { useEffect, useState } from "react";
 
-export function useChartData(fetcher) {
-  const [data,    setData]    = useState([]);
+export function useChartData(fetcher, ...args) {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -15,7 +15,7 @@ export function useChartData(fetcher) {
       try {
         setLoading(true);
         setError(null);
-        const result = await fetcher();
+        const result = await fetcher(...args);
         if (!cancelled) setData(result);
       } catch (err) {
         if (!cancelled) setError(err);
@@ -25,8 +25,10 @@ export function useChartData(fetcher) {
     }
 
     load();
-    return () => { cancelled = true; }; 
-  }, [fetcher]);
+
+    // Reexecuta se qualquer argumento mudar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetcher, JSON.stringify(args)]);
 
   return { data, loading, error };
 }
