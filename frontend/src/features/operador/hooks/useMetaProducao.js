@@ -5,8 +5,14 @@ import { metaProducaoService } from "@services/operadorService";
 
 export function useMetaProducao(operadorId) {
   const fetcher = useCallback(
-    () => metaProducaoService.getMeta(operadorId),
+    () => {
+      // Trava de segurança: Se não houver ID, não tenta buscar a meta.
+      if (!operadorId) return Promise.resolve(null);
+
+      return metaProducaoService.getMeta(operadorId);
+    },
     [operadorId]
   );
+
   return useChartData(fetcher);
 }

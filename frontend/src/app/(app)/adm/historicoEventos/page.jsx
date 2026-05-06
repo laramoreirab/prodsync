@@ -1,5 +1,6 @@
 "use client"
 
+
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
 import {
@@ -11,13 +12,17 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing } from "lucide-react";
+
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Loader2 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+
+import { useEventos } from "@/hooks/useEventos";
 
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"
+
 
 import {
   DropdownMenu,
@@ -27,7 +32,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+
 import { Label } from "@/components/ui/label"
+
 
 import {
   Select,
@@ -39,6 +46,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea";
 
+
 import {
   Tabs,
   TabsList,
@@ -46,11 +54,15 @@ import {
   TabsContent,
 } from "@/components/ui/tabs";
 
+
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
+import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
+import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 
 const colunasEventos = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
     id: 'status',
@@ -61,7 +73,7 @@ const colunasEventos = [
       const config = {
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm"
         },
         "Parada": {
           variant: "destructive",
@@ -77,10 +89,11 @@ const colunasEventos = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data(Início - Fim)' },
+  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
 ];
+
 
 const dadosOriginais = [
   { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
@@ -90,139 +103,167 @@ const dadosOriginais = [
   { id: 5, maquina: 'Máquina E', status: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
 ];
 
-const acoesDropdown = (row) => (
-  <>
-    <Dialog>
-      <DialogTrigger asChild>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-          <BellRing className="mr-2 h-4 w-4" />
-          Solicitar Justificativa
-        </DropdownMenuItem>
-      </DialogTrigger>
-      <DialogContent />
-    </Dialog>
+const historicoEventosFilter = [
+  { id: "tipo", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+  { id: "data", label: "Data", type: "date-range" },
+  // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+];
 
-    <Dialog>
-      <DialogTrigger asChild>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-          <Pencil className="mr-2 h-4 w-4 text-primary" />
-          Editar Evento
-        </DropdownMenuItem>
-      </DialogTrigger>
-      <DialogContent />
-    </Dialog>
-  </>
-);
 
+const opcoesOrdenacao = [
+  { label: 'ID Crescente', value: 'id_asc' },
+  { label: 'ID Decrescente', value: 'id_desc' },
+  { label: 'Data Crescente', value: 'data_asc' },
+  { label: 'Data Decrescente', value: 'data_desc' },
+  { label: 'Duração Crescente', value: 'duracao_asc' },
+  { label: 'Duração Decrescente', value: 'duracao_desc' }
+];
 
 export default function HistoricoEventos() {
-  const [dados, setDados] = useState(dadosOriginais);
+  const { eventos, loading, error, refresh } = useEventos();
+  const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
 
-  const handleEdit = (rows) => {
-    console.log("Editar:", rows);
-  };
 
-  const handleJustificativa = (rows) => {
-    console.log("Solicitar justificativa:", rows);
-  };
-
-  const modalEditar = (
-    <DialogContent>
-      <DialogTitle>
-        Editar {selecionados.length === 1 ? 'evento' : 'eventos'}
-      </DialogTitle>
-    </DialogContent>
-  );
-
-  const modalJustificativa = (
-    <DialogContent>
-      <DialogTitle>Solicitar Justificativa</DialogTitle>      
-    </DialogContent>
-  );
+  //sincronizar dados da API com estado local
+  useEffect(() => {
+    setDados(eventos);
+  }, [eventos]);
 
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
 
+
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'nome') return a.nome.localeCompare(b.nome);
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'turno') return a.turno.localeCompare(b.turno);
-      if (criterio === 'funcao') return a.funcao.localeCompare(b.funcao);
-      if (criterio === 'eventos') return a.eventos.localeCompare(b.eventos);
+      if (criterio === 'maquina') return a.maquina.localeCompare(b.maquina);
+      if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === 'duracao_asc') {
+        const [horasA, minutosA] = a.duracao.split(':').map(Number);
+        const [horasB, minutosB] = b.duracao.split(':').map(Number);
+        return (horasA * 60 + minutosA) - (horasB * 60 + minutosB);
+      }
+      if (criterio === 'duracao_desc') {
+        const [horasA, minutosA] = a.duracao.split(':').map(Number);
+        const [horasB, minutosB] = b.duracao.split(':').map(Number);
+        return (horasB * 60 + minutosB) - (horasA * 60 + minutosA);
+      }
       return 0;
     });
+
 
     setDados(dadosCopiados);
   };
 
-  const dadosExibidos = dados.filter((eventos) => {
+
+  const aplicarFiltros = (filtrosSelecionados) => {
+    let dadosFiltrados = [...eventos]; // usa o estado da API
+
+    //filtro por tipo
+    if (filtrosSelecionados.tipo && filtrosSelecionados.tipo.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter(evento =>
+        filtrosSelecionados.tipo.includes(evento.tipo)
+      );
+    }
+
+    //filtro por data
+    if (filtrosSelecionados.data) {
+      if (filtrosSelecionados.data.start) {
+        dadosFiltrados = dadosFiltrados.filter(evento =>
+          new Date(evento.inicio) >= new Date(filtrosSelecionados.data.start)
+        );
+      }
+      if (filtrosSelecionados.data.end) {
+        dadosFiltrados = dadosFiltrados.filter(evento =>
+          new Date(evento.inicio) <= new Date(filtrosSelecionados.data.end)
+        );
+      }
+    }
+
+    // //filtro por duração --> não funcionou
+    //  if (filtrosSelecionados.duracao) {
+    //   const duracaoMax = filtrosSelecionados.duracao;
+    //   dadosFiltrados = dadosFiltrados.filter(evento => {    
+    //     const [horas, minutos] = evento.duracao.split(':').map(Number);
+    //     const duracaoEvento = horas * 60 + minutos;
+    //     return duracaoEvento <= duracaoMax;
+    //   });
+    // }
+
+    setDados(dadosFiltrados);
+  };
+
+  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
+  const dadosExibidos = dados.filter((evento) => {
     const termo = busca.toLowerCase();
     return (
-      eventos.motivo.toLowerCase().includes(termo) ||
-      eventos.gestor.toString().includes(termo)
+      evento.maquina.toLowerCase().includes(termo) ||
+      evento.id.toString().includes(termo)
     );
   });
+
 
   const paradasJustificadas = useMemo(
     () => dadosExibidos.filter(d => d.justificada === true),
     [dadosExibidos]
   );
 
+
   const paradasNaoJustificadas = useMemo(
     () => dadosExibidos.filter(d => d.justificada === false),
     [dadosExibidos]
   );
 
-  const opcoesOrdenacao = [
-    { label: 'Ordem Alfabética', value: 'nome' },
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'eventos', value: 'eventos' }
-  ];
 
-  const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...historicoEventos];
+  const modalJustificativa = (
+    <DialogContent>
+      <ModalSucessNotificacao />
+    </DialogContent>
+  );
 
-    //filtro por status
-    if (filtrosSelecionados.status && filtrosSelecionados.status.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq =>
-        filtrosSelecionados.status.includes(maq.status)
-      );
-    }
+  // ações do dropdown da tabela
+  const acoesDropdown = (row) => (
+    <>
+      <Dialog>
+        <DialogTrigger asChild>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+            <BellRing className="mr-2 h-4 w-4" />
+            Solicitar Justificativa
+          </DropdownMenuItem>
+        </DialogTrigger>
+        <DialogContent>
+          <ModalSucessNotificacao />
+        </DialogContent>
+      </Dialog>
 
-    if (filtrosSelecionados.eventos && filtrosSelecionados.eventos.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq =>
-        filtrosSelecionados.eventos.includes(maq.eventos)
-      );
-    }
+      <Dialog>
+        <DialogTrigger asChild>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+            <Pencil className="mr-2 h-4 w-4 text-primary" />
+            Editar Evento
+          </DropdownMenuItem>
+        </DialogTrigger>
+        <DialogContent>
+          <FormEdicaoEvento eventoId={row.id} onEdicaoSucesso={refresh} />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 
-    //filtro por data (dia, literalmente, não é data de dados)
-    if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(maq =>
-          new Date(maq.data) >= new Date(filtrosSelecionados.data.start)
-        );
-      }
-      if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(maq =>
-          new Date(maq.data) <= new Date(filtrosSelecionados.data.end)
-        );
-      }
-    }
-
-    setDados(dadosFiltrados);
-  };
-
-  const historicoEventosFilter = [
-    { id: "eventos", label: "eventos", type: "checkbox", options: ["Roscas", "Engrenagens"] },
-    { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
-    { id: "data", label: "Parada", type: "date-range" }
-  ];
-
-
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando eventos...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
@@ -239,35 +280,38 @@ export default function HistoricoEventos() {
           {/* Modal de Registro de Evento */}
           <div className="modal_cadastro">
             <Dialog>
-              <DialogTrigger className="bg-secondary-foreground py-1 rounded-md flex items-center text-white text-xl font-semibold">
+              <DialogTrigger className="bg-secondary-foreground py-1.5 px-5 rounded-md flex items-center text-white text-xl font-semibold">
                 <Plus className="mr-2" />
                 Registrar Evento
               </DialogTrigger>
               <DialogContent>
-                <h1>registrando evento</h1>
+                <FormCadastroEvento onCadastroSucesso={refresh} />
               </DialogContent>
-
             </Dialog>
           </div>
         </div>
 
-        {/* SEÇÃO DOS GRÁFICOS  */}
+
+        {/* SEÇÃO DOS GRÁFICOS */}
         <section className="py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
             {/* Widget 1/3 */}
             <div className="bg-white border rounded-xl p-4 md:col-span-1">
               <ParadasComparadasWidget />
             </div>
-
             {/* Widget 2/3 */}
             <div className="bg-white border rounded-xl p-4 md:col-span-2">
               <TopMotivosTempoWidget />
             </div>
-
           </div>
         </section>
 
+
+        {/* Listagem */}
+        <div className="flex items-center gap-5">
+          <h1 className="text-4xl w-[125] font-semibold">Listagem de Eventos</h1>
+          <hr className="bg-black flex-1 h-1" />
+        </div>
         <Tabs defaultValue="todos" className="w-full">
           <div className="flex items-center justify-between">
             <Label htmlFor="view-selector" className="sr-only">
@@ -279,15 +323,16 @@ export default function HistoricoEventos() {
               <SelectValue placeholder="Selecione o filtro" />
             </SelectTrigger>
 
+
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="justificadas">Justificadas</SelectItem>
                 <SelectItem value="nao-justificadas">Não Justificadas</SelectItem>
-
               </SelectGroup>
             </SelectContent>
           </Select>
+
 
           {/* Telas maiores */}
           <div className="flex">
@@ -298,12 +343,14 @@ export default function HistoricoEventos() {
             </TabsList>
           </div>
 
+
+
           <div className="flex searchbar">
             <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
               <input
                 type="search"
                 className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por nome ou gestor..."
+                placeholder="Busque por id do evento ou máquina..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
@@ -313,8 +360,9 @@ export default function HistoricoEventos() {
             </div>
           </div>
 
+
           <div className="row_ord_fil_cont flex items-center justify-between mt-2">
-            <p>{dadosExibidos.length} máquinas encontradas</p>
+            <p>{dadosExibidos.length} eventos encontrados</p>
 
             <div className="flex items-center gap-4">
               <OrdenarDropdown
@@ -322,13 +370,13 @@ export default function HistoricoEventos() {
                 options={opcoesOrdenacao}
                 onSortChange={handleSort}
               />
-
               <FilterDropdown
                 filtersConfig={historicoEventosFilter}
                 onApply={aplicarFiltros}
               />
             </div>
           </div>
+
 
           {/* Tab todos */}
           <TabsContent value="todos" className="text-md">
@@ -339,24 +387,23 @@ export default function HistoricoEventos() {
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
                 onSelectedChange={setSelecionados}
-                editarLote={modalEditar}
                 solicitarJustificativa={modalJustificativa}
               />
             ) : (
-              <EmptyState busca="" />
+              <EmptyState busca={busca} />
             )}
           </TabsContent>
 
+
           {/* Tab paradas justificadas */}
-          <TabsContent value="justificadas" className="px-8">
+          <TabsContent value="justificadas">
             {paradasJustificadas.length > 0 ? (
               <TableListagens
-                data={dadosExibidos}
+                data={paradasJustificadas}
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
                 onSelectedChange={setSelecionados}
-                editarLote={modalEditar}
                 solicitarJustificativa={modalJustificativa}
               />
             ) : (
@@ -364,16 +411,16 @@ export default function HistoricoEventos() {
             )}
           </TabsContent>
 
+
           {/* Tab paradas não justificadas */}
           <TabsContent value="nao-justificadas">
             {paradasNaoJustificadas.length > 0 ? (
               <TableListagens
-                data={dadosExibidos}
+                data={paradasNaoJustificadas}
                 columns={colunasEventos}
                 enableSelection={true}
                 acoesDropdown={acoesDropdown}
                 onSelectedChange={setSelecionados}
-                editarLote={modalEditar}
                 solicitarJustificativa={modalJustificativa}
               />
             ) : (
@@ -386,12 +433,14 @@ export default function HistoricoEventos() {
   );
 }
 
+
 function EmptyState({ busca }) {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-gray-500">
       <Search className="w-12 h-12 mb-4 text-gray-300" />
-      <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-      <p>Não encontramos nenhuma máquina "{busca}".</p>
+      <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
+      <p>Não encontramos nenhum resultado para "{busca}".</p>
     </div>
   );
 }
+

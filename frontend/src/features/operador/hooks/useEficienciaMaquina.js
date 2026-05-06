@@ -5,8 +5,14 @@ import { eficienciaMaquinaService } from "@services/operadorService";
 
 export function useEficienciaMaquina(operadorId) {
   const fetcher = useCallback(
-    () => eficienciaMaquinaService.getEficiencia(operadorId),
+    () => {
+      // Trava de segurança: se não tiver o ID do operador, não faz a chamada
+      if (!operadorId) return Promise.resolve(null);
+      
+      return eficienciaMaquinaService.getEficiencia(operadorId);
+    },
     [operadorId]
   );
+
   return useChartData(fetcher);
 }

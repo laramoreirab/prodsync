@@ -1,5 +1,4 @@
-// src/services/maquinaService.js
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api"
 import {
   MaquinaStatusArraySchema,
   MaquinaAtivaPorTurnoSchema,
@@ -17,7 +16,7 @@ import {
   mockMaquinasPorTurno,
 } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const maquinaStatusService = {
   async getStatus() {

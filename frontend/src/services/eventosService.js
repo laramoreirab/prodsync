@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api"
 import { mockTopMotivosTempo } from "./mockData";
 import { MotivoTempoArraySchema } from "@/features/eventos/shemas/eventosSchema";
 
@@ -7,7 +7,7 @@ const mockTempoParadoProduzindo = [
   { name: "parado",     value: 38 },
 ];
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const eventosService = {
   async getParadasComparadas() {
