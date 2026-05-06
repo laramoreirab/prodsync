@@ -226,12 +226,6 @@ export default function Maquinas() {
 
           {/* Status Operacional */}
           <div className=" bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
-            <p className="text-sm font-semibold text-black self-start">
-              Status Operacional das Máquinas
-            </p>
-            <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">
-              *Atualizado em tempo real
-            </p>
 
             <div className="w-full">
               <MaquinaStatusDonutWidget />

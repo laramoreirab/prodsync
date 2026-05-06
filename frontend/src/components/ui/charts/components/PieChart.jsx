@@ -10,7 +10,7 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
     <div className="relative flex flex-col items-center justify-center">
       {title && <h3 className="text-sm font-medium mb-3 self-start">{title}</h3>}
       
-      <ChartContainer config={config} className="h-[180px] w-[180px]">
+      <ChartContainer config={config} className="h-[280px] w-[280px]">
         <RechartsPieChart>
           <ChartTooltip content={<ChartTooltipContent hideLabel />} />
           <Pie
@@ -19,8 +19,8 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
             nameKey="name"
             cx="50%"
             cy="50%"
-            innerRadius={55} // Donut
-            outerRadius={80}
+            innerRadius={90}
+            outerRadius={125}
             startAngle={90}
             endAngle={-270}
             strokeWidth={0}

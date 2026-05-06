@@ -22,7 +22,7 @@ export function DonutChart({ data, config, title, dataKey, nameKey }) {
   return (
     <div>
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
-      <ChartContainer config={config} className="h-[180px] w-full">
+      <ChartContainer config={config} className="h-[280px] w-full">
         <PieChart>
           <ChartTooltip content={<ChartTooltipContent hideLabel />} />
           <Pie
@@ -31,9 +31,9 @@ export function DonutChart({ data, config, title, dataKey, nameKey }) {
             nameKey={nameKey}
             cx="50%"
             cy="50%"
-            innerRadius={45}
-            outerRadius={70}label={({ [nameKey]: name, [dataKey]: value }) => `${name} ${value}%`}
-            
+            innerRadius={60}
+            outerRadius={115}
+            label={({ [nameKey]: name, [dataKey]: value }) => `${name} ${value}%`}
           >
             {data.map((entry) => (
               <Cell key={entry[nameKey]} fill={`var(--color-${entry[nameKey]})`} />
