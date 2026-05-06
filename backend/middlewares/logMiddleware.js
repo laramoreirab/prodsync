@@ -43,7 +43,7 @@ export const logMiddleware = async (req, res, next) => {
             finalLogData.dados_resposta = JSON.stringify({
                 error: true,
                 status: res.statusCode,
-                message: typeof data === 'string' ? data.substring(0, 500) : data
+                message: typeof data === 'object' ? JSON.stringify(data).substring(0, 500) : data
             });
         }
         
@@ -73,7 +73,7 @@ export const logMiddleware = async (req, res, next) => {
             finalLogData.dados_resposta = {
                 error: true,
                 status: res.statusCode,
-                message: typeof data === 'object' ? JSON.stringify(data).substring(0, 500) : data
+                message: typeof data === 'object' ? JSON.stringify(data) : data
             };
         }
         
@@ -108,13 +108,22 @@ function sanitizeRequestBody(body) {
 // Função para salvar o log no banco de dados
 async function saveLog(logData) {
     try {
+        const dataParaSalvar = {
+            ...logData,
+            // Se dados_resposta for um objeto, vira string. Se não, mantém.
+            dados_resposta: typeof logData.dados_resposta === 'object' 
+                ? JSON.stringify(logData.dados_resposta) 
+                : logData.dados_resposta,
+            
+            usuario_id: logData.usuario_id ? parseInt(logData.usuario_id) : null
+        };
+
         await prisma.logs.create({
-            data:{
-                ...logData
-            }
-        })
+            data: dataParaSalvar
+        });
     } catch (error) {
-        console.error('Erro ao inserir log no banco:', error);
+        // Usar erro de mensagem simples para não poluir o console caso o log falhe
+        console.error('Erro crítico ao inserir log no Prisma:', error.message);
     }
 }
 

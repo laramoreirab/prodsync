@@ -155,10 +155,11 @@ class EventoController {
     static async justificarEvento(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const id_evento = Number(req.body.id_evento);
+            const id_evento = req.params;
             const id_motivo_parada = Number(req.body.id_motivo_parada);
             const { observacao } = req.body;
 
+            
             if (!Number.isInteger(id_evento) || id_evento <= 0) {
                 return res.status(400).json({ sucesso: false, erro: 'ID do evento invalido' });
             }
