@@ -13,7 +13,7 @@ export let eventosMock = [
     fim: null, // evento ativo
     id_motivo_parada: 1,
     motivo: "Troca de Molde",
-    observacao: "",
+    observacao: "AAAAAAAAAAAAAAAAAAAAAAA",
     data: "26/03 (14:08 - Ativo)",
     duracao: "20:08",
     justificada: true,
@@ -29,7 +29,7 @@ export let eventosMock = [
     fim: "2024-03-26T13:40:00.000Z",
     id_motivo_parada: null,
     motivo: "Aguardando Justificativa",
-    observacao: "",
+    observacao: "BBBBBBBBBBBBBBBBBBBBBBBB",
     data: "26/03 (13:09 - 13:40)",
     duracao: "13:09",
     justificada: false,
@@ -45,7 +45,7 @@ export let eventosMock = [
     fim: "2024-03-26T19:06:00.000Z",
     id_motivo_parada: 2,
     motivo: "Troca de Molde",
-    observacao: "",
+    observacao: "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
     data: "26/03 (06:30 - 19:06)",
     duracao: "06:30",
     justificada: true,
@@ -77,7 +77,7 @@ export let eventosMock = [
     fim: "2024-03-26T14:45:00.000Z",
     id_motivo_parada: 4,
     motivo: "Limpeza",
-    observacao: "",
+    observacao: "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
     data: "26/03 (14:10 - 14:45)",
     duracao: "00:35",
     justificada: true,
@@ -89,18 +89,35 @@ let proximoId = 6;
 // Simula delay de rede
 const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const calcularDuracao = (inicio, fim) => {
+  if (!inicio) return "-";
+  const dataInicio = new Date(inicio);
+  const dataFim = fim ? new Date(fim) : new Date(); // Se não tem fim, usa a hora atual
+
+  const diffMs = Math.abs(dataFim - dataInicio);
+  const diffHrs = Math.floor(diffMs / 3600000);
+  const diffMins = Math.floor((diffMs % 3600000) / 60000);
+
+  return `${String(diffHrs).padStart(2, '0')}:${String(diffMins).padStart(2, '0')}`;
+};
+
 export const eventosMockService = {
+
   getAll: async () => {
     await delay();
-    return [...eventosMock];
+
+    return eventosMock.map(evento => ({
+      ...evento,
+      duracao: calcularDuracao(evento.inicio, evento.fim)
+    }));
   },
 
   getById: async (id) => {
-  await delay();
-  const evento = eventosMock.find((e) => e.id === Number(id));
-  if (!evento) throw new Error("Evento não encontrado");
-  return { ...evento };
-},
+    await delay();
+    const evento = eventosMock.find((e) => e.id === Number(id));
+    if (!evento) throw new Error("Evento não encontrado");
+    return { ...evento };
+  },
 
   getJustificados: async () => {
     await delay();

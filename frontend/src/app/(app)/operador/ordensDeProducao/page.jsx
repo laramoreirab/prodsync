@@ -36,13 +36,13 @@ export default function OrdensDeProducao() {
       id: "id",
       key: "id",
       label: "ID",
-      className: "w-1/7"
+      className: "w-25 text-center justify-center"
     },
     {
       id: "prioridade",
       key: "prioridade",
       label: "Prioridade",
-      className: "w-45",
+      className: "lg:pl-25 w-40",
       icone: (valor) => {
         const config = {
           "Média": {
@@ -93,7 +93,7 @@ export default function OrdensDeProducao() {
           },
           "Parada": {
             variant: "destructive",
-            className: "font-semibold text-sm border-none"
+            className: "bg-vermelho-vivido/10 text-vermelho-vivido font-semibold text-sm border-none"
           },
           "Concluída": {
             variant: "outline",

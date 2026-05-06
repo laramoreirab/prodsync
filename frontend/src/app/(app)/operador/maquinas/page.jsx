@@ -23,12 +23,12 @@ export default function MaquinaPage() {
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">
       {/* OEE + Status */}
       <section className="bg-white border rounded-xl p-6">
-        <OEEMaquinaWidget operadorId={operadorId} />
+        {/* <OEEMaquinaWidget operadorId={operadorId} /> */}
       </section>
 
       {/* Metas */}
       <section className="bg-white border rounded-xl p-6">
-        <MetaProducaoWidget operadorId={operadorId} />
+        {/* <MetaProducaoWidget operadorId={operadorId} /> */}
       </section>
     </div>
   );

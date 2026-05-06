@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Loader2 } from "lucide-react";
+import { Plus, Search, Pencil, Clock4, EyeIcon, BellRing, Loader2 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
 import { useEventos } from "@/hooks/useEventos";
@@ -21,15 +21,9 @@ import { useEventos } from "@/hooks/useEventos";
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button"
-
 
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 
@@ -57,6 +51,7 @@ import {
 
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
@@ -65,9 +60,9 @@ const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'status',
-    key: 'status',
-    label: 'Status',
+    id: 'tipo',
+    key: 'tipo',
+    label: 'Tipo',
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
@@ -92,15 +87,7 @@ const colunasEventos = [
   { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
-];
-
-
-const dadosOriginais = [
-  { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
-  { id: 2, maquina: 'Máquina B', status: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false },
-  { id: 3, maquina: 'Máquina C', status: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true },
-  { id: 4, maquina: 'Máquina D', status: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true },
-  { id: 5, maquina: 'Máquina E', status: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
+  { id: 'observacao', key: 'observacao', label: 'Observação' },
 ];
 
 const historicoEventosFilter = [
@@ -227,6 +214,19 @@ export default function HistoricoEventos() {
   // ações do dropdown da tabela
   const acoesDropdown = (row) => (
     <>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+            <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+            Ver Detalhes
+          </DropdownMenuItem>
+        </DialogTrigger>
+        <DialogContent>
+          <DetalhaeEvento />
+        </DialogContent>
+      </Dialog>
+
       <Dialog>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -250,6 +250,7 @@ export default function HistoricoEventos() {
           <FormEdicaoEvento eventoId={row.id} onEdicaoSucesso={refresh} />
         </DialogContent>
       </Dialog>
+
     </>
   );
 

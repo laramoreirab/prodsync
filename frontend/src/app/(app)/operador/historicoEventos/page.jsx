@@ -11,7 +11,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing } from "lucide-react";
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Info } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 
@@ -21,11 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"
 
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 import { Label } from "@/components/ui/label"
@@ -49,6 +45,8 @@ import {
 
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+
+import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
 const colunasEventos = [
   {
@@ -77,7 +75,7 @@ const colunasEventos = [
     }
   },
 
-  { id: 'data', key: 'data', label: 'Data(Início - Fim)' },
+  { id: 'data', key: 'data', label: 'Data(Início - Fim)', className: 'pl-20 w-1/5' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
   { id: 'observacao', key: 'observacao', label: 'Observação', className: 'text-right' },
@@ -238,11 +236,11 @@ export default function HistoricoEventos() {
             </div>
           </div>
 
-          <div className="row_ord_fil_cont flex items-center justify-between px-8 mt-3">
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
             <p>{dadosExibidos.length} eventos encontrados</p>
 
             <div className="flex items-center gap-4">
-             <OrdenarDropdown
+              <OrdenarDropdown
                 label="Ordenar por"
                 options={opcoesOrdenacao}
                 onSortChange={handleSort}
@@ -261,6 +259,22 @@ export default function HistoricoEventos() {
               <TableListagens
                 /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
                 data={dadosExibidos} columns={colunasEventos}
+                acoesDropdown={(maquina) => (
+                  <>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DetalhaeEvento />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
               />
             ) : (
               //caso não encontre nada correspondente
