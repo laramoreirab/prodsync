@@ -6,14 +6,13 @@ import { OEEOperadorWidget } from "@/features/operador/OEEOperadorWidget";
 import { PecasPorDiaWidget } from "@/features/operador/PecasPorDiaWidget";
 import { ProducaoPorHoraOperadorWidget } from "@/features/operador/ProducaoPorHoraOperadorWidget";
 import { EficienciaMaquinaWidget } from "@/features/operador/EficienciaMaquinaWidget";
-
 import { use, useState, useEffect } from "react";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { EyeIcon, Pencil, Trash2, ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
@@ -21,9 +20,9 @@ import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 
 const colunasUsuario = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
-  { id: 'op', key: 'op', label: 'OP' },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
+  { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
   {
     id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
     icone: (valor) => {
@@ -248,7 +247,7 @@ export default function ProducaoOperadorPage({ params }) {
 
         <section id="maquina_responsavel" className="mt-5">
           <h1 className="font-bold text-3xl">Responsável por:</h1>
-          <Link href="/adm/maquinas/1" >
+          <Link href="/adm/maquinas/{maquina.id}" >
             <div className="bg-white w-full shadow-md border rounded-lg flex justify-between items-start p-8 mt-6">
               <div className="flex">
                 <Image src="/demo_maq.png" alt="Demo Maquina" className="rounded-lg" width={200} height={150} />
@@ -350,10 +349,11 @@ export default function ProducaoOperadorPage({ params }) {
             acoesDropdown={(usuario) => (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`ordemDeProducao/${usuario.op}`}>
+                  <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
                     <EyeIcon className="mr-2 h-4 w-4" />
                     Ver OP relacionada
                   </Link>
+                  
                 </DropdownMenuItem>
               </>
             )}

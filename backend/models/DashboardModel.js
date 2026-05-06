@@ -34,65 +34,14 @@ class DashboardModel {
                 producaoPorHora[horaFormatada] += ap.qtd_boa || 0;
             });
 
-            return Object.entries(producaoPorHora).map(([hora, quantidade]) => ({
+            return Object.entries(producaoPorHora).map(([hora, pcs]) => ({
                 hora,
-                quantidade
+                pcs
             }));
         }
         catch (error) {
             console.error('Erro ao buscar produção diária:', error);
             throw new Error('Erro ao buscar produção diária');
-        }
-    }
-
-    // Resumo OEE geral da fábrica (Disponibilidade, Performance, Qualidade, Geral)
-    static async buscarOEEGeral(id_empresa) {
-        try {
-            const [producao, paradas] = await Promise.all([
-                prisma.apontamento.aggregate({
-                    where: { id_empresa: Number(id_empresa) },
-                    _sum: { qtd_boa: true, qtd_refugo: true }
-                }),
-                prisma.historico_Eventos.aggregate({
-                    where: {
-                        id_empresa: Number(id_empresa),
-                        status_atual: 'Parada'
-                    },
-                    _sum: { duracao: true } // duracao já é guardada em minutos no BD
-                })
-            ]);
-
-            const qtdBoa = producao._sum.qtd_boa || 0;
-            const qtdRefugo = producao._sum.qtd_refugo || 0;
-            const tempoParado = paradas._sum.duracao || 0;
-
-            // Simulação de tempo total da fábrica (idealmente isso viria das escalas/turnos ativos)
-            const tempoTotalTrabalho = 480 * 5; // Ex: 5 máquinas operando 8h (2400 minutos)
-
-            // Cálculos
-            // Previne divisão por zero caso tempoTotalTrabalho seja 0
-            const disponibilidade = tempoTotalTrabalho > 0
-                ? Math.max(0, ((tempoTotalTrabalho - tempoParado) / tempoTotalTrabalho) * 100)
-                : 0;
-
-            const qualidade = (qtdBoa + qtdRefugo) > 0
-                ? (qtdBoa / (qtdBoa + qtdRefugo)) * 100
-                : 0;
-
-            const performance = 90; // Valor de exemplo. (Precisaria cruzar qtdBoa com a meta/velocidade esperada para ser real)
-
-            const oeeGeral = (disponibilidade / 100) * (performance / 100) * (qualidade / 100) * 100;
-
-            return {
-                disponibilidade: disponibilidade.toFixed(1),
-                performance: performance.toFixed(1),
-                qualidade: qualidade.toFixed(1),
-                oee_consolidado: oeeGeral.toFixed(1)
-            };
-        }
-        catch (error) {
-            console.error('Erro ao buscar OEE geral:', error);
-            throw new Error('Erro ao buscar OEE geral');
         }
     }
 

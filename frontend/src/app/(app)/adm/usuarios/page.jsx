@@ -3,10 +3,6 @@
 import { useState, useEffect } from 'react';
 
 import TableListagens from "@/components/table";
-import DataTableWithPaginationDemo from '@/components/shadcn-studio/data-table/data-table-11';
-
-import Header from '@/components/ui/headerHome';
-
 import { useUsuarios } from "@/hooks/useUsuarios";
 import {
   Dialog,
@@ -311,7 +307,6 @@ export default function Usuarios() {
             </div>
           )}
         </div>
-
       </section>
     </main>
   );

@@ -1,5 +1,6 @@
 "use client"
 
+
 import { OPAtivasKPIWidget } from "@/features/ordens/OPAtivasKPIWidget";
 import { OPAtrasadasKPIWidget } from "@/features/ordens/OPAtrasadasKPIWidget";
 import { OPPecasBoasKPIWidget } from "@/features/ordens/OPPecasBoasKPIWidget";
@@ -9,23 +10,18 @@ import { OPTopRefugoWidget } from "@/features/ordens/OPTopRefugoWidget";
 import { OPCargaSetorWidget } from "@/features/ordens/OPCargaSetorWidget";
 import { OPStatusWidget } from "@/features/ordens/OPStatusWidget";
 import { OPConcluidasDiaWidget } from "@/features/ordens/OPConcluidasDiaWidget";
-
 import { useState, useEffect } from "react";
-
 import { useOps } from "@/hooks/useOps";
-
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, ArrowDown, Flame, Loader2, MoveHorizontal, Pencil, Plus, EyeIcon, Trash2, Search } from 'lucide-react';
 import TableListagens from "@/components/table";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
 import Link from "next/link";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
@@ -33,12 +29,29 @@ import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 
+
+const dadosOriginais = [
+  { id: 1, nome: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status_op: 'Produzindo', progresso: '25%' },
+  { id: 2, nome: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status_op: 'Setup', progresso: '35%' },
+  { id: 3, nome: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status_op: 'Parada', progresso: '55%' },
+  { id: 4, nome: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status_op: 'Setup', progresso: '85%' },
+  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+  { id: 6, nome: 'Carol Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+  { id: 7, nome: 'Guilherme Santos', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+  { id: 8, nome: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Concluída', progresso: '15%' },
+  { id: 9, nome: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+];
+
+
+
+
 const opsFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
   { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
   { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Crítica", "Alta", "Média", "Baixa"] },
   { id: "progresso", label: "Progresso", type: "number-range" }
 ];
+
 
 const colunasOrdemProd = [
   {
@@ -48,9 +61,9 @@ const colunasOrdemProd = [
     className: "w-1/7"
   },
   {
-    id: "produto",
-    key: "produto",
-    label: "Produto",
+    id: "nome",
+    key: "nome",
+    label: "Nome",
     className: "w-1/5"
   },
   {
@@ -82,6 +95,7 @@ const colunasOrdemProd = [
         }
       };
 
+
       const item = config[valor] || { icon: null };
       return (
         <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
@@ -110,7 +124,7 @@ const colunasOrdemProd = [
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm"
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
@@ -125,10 +139,10 @@ const colunasOrdemProd = [
           className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
         }
       };
-
-      const estilo = config[valor] || { variant: "outline", className: "" };
+      const item = config[valor] || { icon: null };
       return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+        <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+          {item.icon}
           {valor}
         </Badge>
       );
@@ -138,22 +152,27 @@ const colunasOrdemProd = [
     id: "progresso",
     key: "progresso",
     label: "Progresso",
+    className: "text-center"
   },
 ];
+
 
 export default function OrdensDeProducao() {
   const { ops, loading, error, refresh } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
 
+
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(ops);
   }, [ops]);
 
+
   //lógica de ordenação
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
+
 
     dadosCopiados.sort((a, b) => {
       if (criterio === 'id_asc') return a.id - b.id;
@@ -163,11 +182,14 @@ export default function OrdensDeProducao() {
       return 0;
     });
 
+
     setDados(dadosCopiados);
   };
 
+
   const aplicarFiltros = (filtrosSelecionados) => {
     let dadosFiltrados = [...ops]; // usa o estado da API, não array estático
+
 
     //filtro por status
     if (filtrosSelecionados.status_op && filtrosSelecionados.status_op.length > 0) {
@@ -176,12 +198,14 @@ export default function OrdensDeProducao() {
       );
     }
 
+
     //filtro por setor
     if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(op =>
         filtrosSelecionados.setor.includes(op.setor)
       );
     }
+
 
     //filtro por prioridade
     if (filtrosSelecionados.prioridade?.length) {
@@ -190,6 +214,7 @@ export default function OrdensDeProducao() {
       );
     }
 
+
     //filtro por progresso (intervalo)
     if (filtrosSelecionados.progresso) {
       const { min, max } = filtrosSelecionados.progresso;
@@ -197,8 +222,10 @@ export default function OrdensDeProducao() {
       if (max !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso <= max);
     }
 
+
     setDados(dadosFiltrados);
   };
+
 
   const opcoesOrdenacao = [
     { label: 'ID Crescente', value: 'id_asc' },
@@ -207,15 +234,20 @@ export default function OrdensDeProducao() {
     { label: 'Progresso Decrescente', value: 'progresso_desc' },
   ];
 
+
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((op) => {
-    const termo = busca.toLowerCase();
-    return (
-      op.produto.toLowerCase().includes(termo) ||
-      op.id.toString().includes(termo) ||
-      op.codigo_lote?.toLowerCase().includes(termo)
-    );
-  });
+  const termo = (busca || "").toLowerCase();
+
+  const nome = op?.nome?.toLowerCase() || "";
+  const id = op?.id?.toString() || "";
+
+  return (
+    nome.includes(termo) ||
+    id.includes(termo)
+  );
+});
+
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
@@ -229,15 +261,18 @@ export default function OrdensDeProducao() {
     );
   }
 
+
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
+
 
         {/* TÍTULO */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
             Ordens de Produção
           </h1>
+
 
           {/* Modal de Criação de OP */}
           <div className="modal_cadastro">
@@ -253,6 +288,7 @@ export default function OrdensDeProducao() {
           </div>
         </div>
 
+
         {/* SEÇÃO 1: Graphs */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
@@ -261,6 +297,7 @@ export default function OrdensDeProducao() {
           <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
         </section>
 
+
         {/* SEÇÃO 2: Graphs */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget /></div>
@@ -268,15 +305,18 @@ export default function OrdensDeProducao() {
           <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget /></div>
         </section>
 
+
         {/* SEÇÃO 3: Graphs */}
         <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget /></div>
           <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget /></div>
         </section>
 
+
+        {/* Tabela sem filtros ainda */}
         <section id="listagem_ops">
           <div className="flex items-center py-8 gap-5">
-            <h1 className="text-4xl w-[125] font-semibold">OPs</h1>
+            <h1 className="text-4xl w-125 font-semibold">OPs</h1>
             <hr className="bg-black flex-1 h-1" />
           </div>
 
@@ -286,11 +326,13 @@ export default function OrdensDeProducao() {
               <input
                 type="search"
                 className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id, produto ou lote..."
+                placeholder="Busque por id, nome ou lote..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+              <button className="outline-none cursor-pointer mr-2">
+                <Search />
+              </button>
             </div>
           </div>
 
@@ -326,7 +368,10 @@ export default function OrdensDeProducao() {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
                       <Pencil className="mr-2 h-4 w-4 text-primary" />
                       Editar OP
                     </DropdownMenuItem>
@@ -338,13 +383,20 @@ export default function OrdensDeProducao() {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
                       <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
                       Excluir
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <FormExclusaoOp opId={op.id} idMaquina={op.id_maquina} onExclusaoSucesso={refresh} />
+                    <FormExclusaoOp
+                      opId={op.id}
+                      idMaquina={op.id_maquina}
+                      onExclusaoSucesso={refresh}
+                    />
                   </DialogContent>
                 </Dialog>
               </>
@@ -354,4 +406,4 @@ export default function OrdensDeProducao() {
       </div>
     </main>
   );
-}
+} 

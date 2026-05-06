@@ -1,7 +1,7 @@
-// frontend/lib/api.js
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export async function apiFetch(rota, opcoes = {}) {
+
   const token = localStorage.getItem("token")
 
   const res = await fetch(`${API_URL}${rota}`, {
@@ -20,7 +20,12 @@ export async function apiFetch(rota, opcoes = {}) {
     return
   }
 
-  return res
+  if (!res.ok) {
+    const erroDados = await res.json().catch(() => ({}));
+    throw new Error(erroDados.message || "Erro na requisição");
+  }
+
+  return await res.json();
 }
 
 //o que deve ter em toda página que fará um fetch 

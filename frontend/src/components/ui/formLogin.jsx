@@ -12,7 +12,7 @@ export default function LoginForm() {
     const router = useRouter()
 
     const [open, setOpen] = useState(false);
-    const [identificador, setIdentificador] = useState("");
+    const [id, setId] = useState("");
     const [senha, setSenha] = useState("");
     const [carregando, setCarregando] = useState(false)
     const [erro, setErro] = useState("")
@@ -21,11 +21,12 @@ export default function LoginForm() {
         setCarregando(true)
         setErro("")
 
+
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ identificador, senha })
+                body: JSON.stringify({ id, senha })
             })
 
             const data = await res.json()
@@ -35,13 +36,15 @@ export default function LoginForm() {
                 return
             }
 
+
             //guarda o token no localstorage e o middleware le o header Autorization
-            localStorage.setItem("token", data.token)
+            localStorage.setItem("token", data.dados.token)
+
 
             //redireciona pelo tipo que vem no token
-            if (data.tipo === "Adm") router.push("/adm")
-            if (data.tipo === "Gestor") router.push("/gestor")
-            if (data.tipo === "Operario") router.push("/operador")
+            if (data.dados.tipo === "Adm") router.push("/adm")
+            if (data.dados.tipo === "Gestor") router.push("/gestor")
+            if (data.dados.tipo === "Operario") router.push("/operador")
 
         } catch (error) {
             setErro("Erro de conexão com o servidor")
@@ -65,12 +68,12 @@ export default function LoginForm() {
                 </div>
 
                 {/* FORM */}
-                <form>
+                <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
                             <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
                             <Input className="h-9" placeholder="Ex: 11.111.-11"
-                                value={identificador} onChange={(e) => setIdentificador(e.target.value)} />
+                                value={id} onChange={(e) => setId(e.target.value)} />
                         </div>
 
                         <div className="grid gap-3">
@@ -105,7 +108,7 @@ export default function LoginForm() {
 
                     {/* BUTTON LOGIN */}
                     <Button id="btn_login"
-                        onClick={handleLogin}
+                    type="submit"
                         disabled={carregando}
                         className="cursor-pointer py-3 w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-semibold rounded-lg">
                         {carregando ? "Entrando..." : "Entrar"}

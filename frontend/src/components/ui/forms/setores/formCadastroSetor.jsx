@@ -2,33 +2,39 @@
 
 import { useState } from "react";
 import { Plus, X as XIcon, ChevronDown } from "lucide-react";
-import {
-    DialogTitle
-} from "@/components/ui/dialog";
+import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { setorCrudService } from "@/services/setorCrudService"; // Importar o serviço
 
-export default function FormCadastroSetor() {
-    //estados da maquina
+export default function FormCadastroSetor({ onCadastroSucesso }) {
+    // estados das informações básicas
+    const [nomeSetor, setNomeSetor] = useState("");          // backend: nome_setor
+    const [localizacao, setLocalizacao] = useState("");      // backend: localizacao
+
+    // estados da máquina
     const [maquinaSelecionada, setMaquinaSelecionada] = useState("");
-    const [listaMaquinas, setListaMaquinas] = useState([]);
-    //estados da equipe
+    const [listaMaquinas, setListaMaquinas] = useState([]);  // ids_maquinas — backend: ids_maquinas (array)
+
+    // estados da equipe
     const [usuarioSelecionado, setUsuarioSelecionado] = useState("");
     const [funcaoSelecionada, setFuncaoSelecionada] = useState("");
     const [listaEquipe, setListaEquipe] = useState([]);
 
-    //funções para adicionar e remover máquinas
+    // funções para adicionar e remover máquinas
     const adicionarMaquina = (e) => {
-        e.preventDefault(); //evita recarregar a página ao clicar no botão
-        if (maquinaSelecionada && !listaMaquinas.includes(maquinaSelecionada)) {
-            setListaMaquinas([...listaMaquinas, maquinaSelecionada]);
-            setMaquinaSelecionada(""); //reseta o select
+        e.preventDefault(); // evita recarregar a página ao clicar no botão
+        if (maquinaSelecionada && !listaMaquinas.find(m => m.value === maquinaSelecionada)) {
+            const opcao = OPCOES_MAQUINAS.find(o => o.value === maquinaSelecionada);
+            setListaMaquinas([...listaMaquinas, opcao]);
+            setMaquinaSelecionada(""); // reseta o select
         }
     };
-    const removerMaquina = (nomeMaquina) => {
-        setListaMaquinas(listaMaquinas.filter((m) => m !== nomeMaquina));
+    const removerMaquina = (value) => {
+        setListaMaquinas(listaMaquinas.filter((m) => m.value !== value));
     };
 
-    //funções para adicionar e remover colaboradores
+    // funções para adicionar e remover colaboradores
     const adicionarColaborador = (e) => {
         e.preventDefault();
         if (usuarioSelecionado && funcaoSelecionada) {
@@ -36,13 +42,51 @@ export default function FormCadastroSetor() {
                 ...listaEquipe,
                 { usuario: usuarioSelecionado, funcao: funcaoSelecionada }
             ]);
-            setUsuarioSelecionado(""); //reseta os selects
+            setUsuarioSelecionado(""); // reseta os selects
             setFuncaoSelecionada("");
         }
     };
     const removerColaborador = (indexParaRemover) => {
         setListaEquipe(listaEquipe.filter((_, index) => index !== indexParaRemover));
     };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            // infos gerais setor — campos: nome_setor, localizacao
+            const novoSetor = await setorCrudService.create({
+                nome_setor: nomeSetor,   // backend: nome_setor
+                localizacao: localizacao // backend: localizacao
+            });
+
+            // máquinas se houver — ids_maquinas (array), id do setor na URL
+            if (listaMaquinas.length > 0) {
+                await setorCrudService.associarMaquinas(
+                    novoSetor.id,
+                    listaMaquinas.map(m => m.value)
+                );
+            }
+
+            // gestor se houver — id_gestor no body, id do setor na URL
+            const gestor = listaEquipe.find(m => m.funcao === "Gestor");
+            if (gestor) {
+                await setorCrudService.associarGestor(novoSetor.id, gestor.id_usuario);
+            }
+
+            toast.success("Setor criado com sucesso!");
+            // limpar formulário
+            setNomeSetor("");
+            setLocalizacao("");
+            setListaMaquinas([]);
+            setListaEquipe([]);
+            if (onCadastroSucesso) onCadastroSucesso();
+        } catch (error) {
+            console.error("Erro ao criar setor:", error);
+            toast.error("Erro ao criar setor.");
+        }
+    };
+
     return (
         <>
             <div className="flex items-center">
@@ -52,9 +96,9 @@ export default function FormCadastroSetor() {
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
-            <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
 
-                {/* infos básicas */}
+                {/* infos gerais — nome_setor e localizacao */}
                 <div>
                     <h2 className="text-2xl font-semibold text-black mb-4">1. Informações Básicas</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -62,6 +106,8 @@ export default function FormCadastroSetor() {
                             <label className="block text-xl font-medium text-gray-700 mb-1">Nome do Setor</label>
                             <input
                                 type="text"
+                                value={nomeSetor}
+                                onChange={(e) => setNomeSetor(e.target.value)}
                                 placeholder="Usinagem Pesada"
                                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 placeholder-gray-300 outline-none shadow-sm text-lg"
                             />
@@ -70,6 +116,8 @@ export default function FormCadastroSetor() {
                             <label className="block text-xl font-medium text-gray-700 mb-1">Localização Física</label>
                             <input
                                 type="text"
+                                value={localizacao}
+                                onChange={(e) => setLocalizacao(e.target.value)}
                                 placeholder="Galpão B - Corredor 3"
                                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 placeholder-gray-300 outline-none shadow-sm text-lg"
                             />
@@ -79,7 +127,7 @@ export default function FormCadastroSetor() {
 
                 <Separator className="bg-gray-200" />
 
-                {/* máquinas do setor */}
+                {/* máquinas do setor — ids_maquinas (array) */}
                 <div>
                     <h2 className="text-2xl font-semibold text-black">2. Máquinas do Setor</h2>
                     <p className="text-xl text-[#545454] font-medium mb-4">Vincule os equipamentos que operarão nesse setor.</p>
@@ -92,9 +140,10 @@ export default function FormCadastroSetor() {
                                 className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
                             >
                                 <option value="" disabled>Selecione</option>
-                                <option value="THAK-2">THAK-2</option>
-                                <option value="Torno CNC 100">Torno CNC 100</option>
-                                <option value="Fresa Universal">Fresa Universal</option>
+                                {/* id_maquina — número — backend: ids_maquinas */}
+                                <option value="1">THAK-2</option>
+                                <option value="2">Torno CNC 100</option>
+                                <option value="3">Fresa Universal</option>
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                                 <ChevronDown className="h-4 w-4" />
@@ -109,13 +158,13 @@ export default function FormCadastroSetor() {
                         </button>
                     </div>
 
-                    {/* tags das máquinas ja adicionadas */}
+                    {/* tags das máquinas já adicionadas */}
                     <div className="flex flex-wrap gap-2 mt-4">
-                        {listaMaquinas.map((maquina, index) => (
-                            <div key={index} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                <span>{maquina}</span>
+                        {listaMaquinas.map((maquina) => (
+                            <div key={maquina.value} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                <span>{maquina.label}</span>
                                 <button
-                                    onClick={(e) => { e.preventDefault(); removerMaquina(maquina); }}
+                                    onClick={(e) => { e.preventDefault(); removerMaquina(maquina.value); }}
                                     className="text-gray-500 focus:outline-none"
                                 >
                                     <XIcon className="h-4 w-4" />
@@ -127,7 +176,7 @@ export default function FormCadastroSetor() {
 
                 <Separator className="bg-gray-200" />
 
-                {/* equipe e responsabilidades */}
+                {/* equipe e responsabilidades — id_gestor */}
                 <div>
                     <h2 className="text-2xl font-semibold text-black">3. Equipe e Responsabilidades</h2>
                     <p className="text-xl text-[#545454] font-medium mb-4">Adicione os colaboradores e defina suas responsabilidades.</p>
@@ -178,7 +227,7 @@ export default function FormCadastroSetor() {
                         </button>
                     </div>
 
-                    {/*tags dos usuarios ja adicionados */}
+                    {/* tags dos usuários já adicionados */}
                     {listaEquipe.length > 0 && (
                         <div className="mt-6">
                             <h4 className="text-xl font-medium text-black mb-3">Colaboradores Vinculados:</h4>
@@ -200,12 +249,11 @@ export default function FormCadastroSetor() {
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg ">
+                    <button type="submit" className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg">
                         Criar
                     </button>
                 </div>
-
             </form>
         </>
-    )
-} 
+    );
+}

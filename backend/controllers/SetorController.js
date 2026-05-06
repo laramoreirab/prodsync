@@ -255,39 +255,6 @@ class SetorController {
         }
     }
 
-    // GET /setores/dashboard/oee
-    // Retorna o OEE calculado (disponibilidade, performance, qualidade e oee) para cada setor.
-    // Usado pelo gráfico mockOEEPorSetor e pela tabela mockSetores (campo oeeMedio).
-    // Resposta: [{ id_setor, setor, oee, disponibilidade, performance, qualidade }]
-    static async obterOeePorSetor(req, res) {
-        try {
-            const dados = await SetorModel.obterOeePorSetor(req.user.id_empresa);
-            return res.status(200).json({ sucesso: true, dados });
-        } catch (error) {
-            console.error('Erro ao obter OEE por setor:', error);
-            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
-        }
-    }
-
-    // GET /setores/dashboard/critico
-    // Retorna o setor com o pior OEE (setor crítico).
-    // Usado pelo card mockOEECritico.
-    // Resposta: { id_setor, setor, oee, disponibilidade, performance, qualidade }
-    static async obterSetorCritico(req, res) {
-        try {
-            const dados = await SetorModel.obterSetorCritico(req.user.id_empresa);
-
-            if (!dados) {
-                return res.status(404).json({ sucesso: false, erro: 'Nenhum setor encontrado' });
-            }
-
-            return res.status(200).json({ sucesso: true, dados });
-        } catch (error) {
-            console.error('Erro ao obter setor critico:', error);
-            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
-        }
-    }
-
 }
 
 export default SetorController;

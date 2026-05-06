@@ -28,15 +28,16 @@ import Image from "next/image";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 
 
 const colunasMaquina = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
-  { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'status',
-    key: 'status',
-    label: 'Status',
+    id: 'tipo',
+    key: 'tipoEvento',
+    label: 'Tipo',
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
@@ -61,32 +62,12 @@ const colunasMaquina = [
   { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  {
-    id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
-          {valor}
-        </Badge>
-      );
-    }
-  },
-  {
-    id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="destructive" className="font-semibold text-sm border-none">
-          {valor}
-        </Badge>
-      );
-    }
-  },
 ];
 
 const colunasApontamento = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
-  { id: 'op', key: 'op', label: 'OP' },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
+  { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
   {
     id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
     icone: (valor) => {
@@ -111,10 +92,10 @@ const colunasApontamento = [
 ];
 
 const dadosOriginais = [
-  { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta', produzido: '15', refugo: '2' },
-  { id: 2, maquina: 'Máquina B', status: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva', produzido: '10', refugo: '5' },
-  { id: 3, maquina: 'Máquina C', status: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros', produzido: '20', refugo: '1' },
-  { id: 4, maquina: 'Máquina D', status: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica', produzido: '5', refugo: '8' },
+  { id: 1,  tipoEvento: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta' },
+  { id: 2,  tipoEvento: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva' },
+  { id: 3,  tipoEvento: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros' },
+  { id: 4,  tipoEvento: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica' },
 ];
 
 export default function MaquinaDetalhePage({ params }) {
@@ -189,7 +170,7 @@ export default function MaquinaDetalhePage({ params }) {
 
   //filtros para eventos
   const eventosFilter = [
-    { id: "status", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+    { id: "tipoEvento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
     // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
   ];
@@ -198,9 +179,9 @@ export default function MaquinaDetalhePage({ params }) {
     let dadosFiltrados = [...dadosOriginais];
 
     // filtro por status
-    if (filtrosSelecionados.status?.length) {
+    if (filtrosSelecionados.tipoEvento?.length) {
       dadosFiltrados = dadosFiltrados.filter(evento =>
-        filtrosSelecionados.status.includes(evento.status)
+        filtrosSelecionados.tipoEvento.includes(evento.tipoEvento)
       );
     }
 
@@ -227,7 +208,7 @@ export default function MaquinaDetalhePage({ params }) {
     const termo = buscaEvento.toLowerCase();
 
     return (
-      (evento.maquina?.toLowerCase() || "").includes(termo) ||
+      (evento.status?.toLowerCase() || "").includes(termo) ||
       evento.id?.toString().includes(termo)
     );
   });
@@ -284,6 +265,7 @@ export default function MaquinaDetalhePage({ params }) {
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
     let dadosFiltrados = [...dadosApontamento];
 
+    //filtro por produzido
     if (filtrosSelecionados.produzido) {
       if (filtrosSelecionados.produzido.min != null) {
         dadosFiltrados = dadosFiltrados.filter(a =>
@@ -298,6 +280,7 @@ export default function MaquinaDetalhePage({ params }) {
       }
     }
 
+    //filtro por refugo
     if (filtrosSelecionados.refugo) {
       if (filtrosSelecionados.refugo.min != null) {
         dadosFiltrados = dadosFiltrados.filter(a =>
@@ -312,6 +295,7 @@ export default function MaquinaDetalhePage({ params }) {
       }
     }
 
+    //filtro por data
     if (filtrosSelecionados.data) {
       if (filtrosSelecionados.data.start) {
         dadosFiltrados = dadosFiltrados.filter(a =>
@@ -446,11 +430,12 @@ export default function MaquinaDetalhePage({ params }) {
           </div>
         </section>
 
+        {/* Listagem */}
         {/* Listagem de Eventos */}
         <section id="listagem_eventos">
           <div>
             <div className="flex items-center justify-between gap-5 mt-8 mb-8">
-              <h1 className="text-4xl w-[125] font-semibold">Histórico de Eventos da Máquina</h1>
+              <h1 className="text-4xl font-semibold">Histórico de Eventos da Máquina</h1>
               <Dialog>
                 <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
                   <Plus size={28} className="text-white cursor-pointer" />
@@ -507,7 +492,9 @@ export default function MaquinaDetalhePage({ params }) {
                         Solicitar Justificativa
                       </DropdownMenuItem>
                     </DialogTrigger>
-                    <DialogContent />
+                    <DialogContent>
+                      <ModalSucessNotificacao />
+                    </DialogContent>
                   </Dialog>
 
                   <Dialog>
@@ -517,7 +504,9 @@ export default function MaquinaDetalhePage({ params }) {
                         Editar Evento
                       </DropdownMenuItem>
                     </DialogTrigger>
-                    <DialogContent />
+                    <DialogContent>
+                      <FormEdicaoEvento />
+                    </DialogContent>
                   </Dialog>
                 </>
               )}
@@ -527,7 +516,7 @@ export default function MaquinaDetalhePage({ params }) {
 
           {/* Listagem de Apontamentos */}
           <div>
-            <h1 className="text-4xl w-[125] font-semibold mb-3">Histórico de Apontamentos da Máquina</h1>
+            <h1 className="text-4xl font-semibold mb-3">Histórico de Apontamentos da Máquina</h1>
 
             {/* Busca */}
             <div className="flex searchbar">
@@ -565,14 +554,13 @@ export default function MaquinaDetalhePage({ params }) {
               acoesDropdown={(apontamento) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`ordemDeProducao/${apontamento.op}`}>
+                    <Link href={`/adm/ordemDeProducao/${apontamento.op}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver OP relacionada
                     </Link>
                   </DropdownMenuItem>
                 </>
               )}
-
             />
           </div>
         </section >

@@ -1,5 +1,6 @@
 "use client"
 
+
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
 import {
@@ -11,6 +12,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
+
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Loader2 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
@@ -21,6 +23,7 @@ import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"
 
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -29,7 +32,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+
 import { Label } from "@/components/ui/label"
+
 
 import {
   Select,
@@ -41,12 +46,14 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea";
 
+
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
 } from "@/components/ui/tabs";
+
 
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
@@ -58,9 +65,9 @@ const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'tipo',
-    key: 'tipo',
-    label: 'Tipo',
+    id: 'status',
+    key: 'status',
+    label: 'Status',
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
@@ -82,9 +89,18 @@ const colunasEventos = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data' },
+  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
+];
+
+
+const dadosOriginais = [
+  { id: 1, maquina: 'Máquina A', status: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true },
+  { id: 2, maquina: 'Máquina B', status: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false },
+  { id: 3, maquina: 'Máquina C', status: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true },
+  { id: 4, maquina: 'Máquina D', status: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true },
+  { id: 5, maquina: 'Máquina E', status: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true },
 ];
 
 const historicoEventosFilter = [
@@ -92,6 +108,7 @@ const historicoEventosFilter = [
   { id: "data", label: "Data", type: "date-range" },
   // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
 ];
+
 
 const opcoesOrdenacao = [
   { label: 'ID Crescente', value: 'id_asc' },
@@ -108,6 +125,7 @@ export default function HistoricoEventos() {
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
 
+
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(eventos);
@@ -115,6 +133,7 @@ export default function HistoricoEventos() {
 
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
+
 
     dadosCopiados.sort((a, b) => {
       if (criterio === 'id_asc') return a.id - b.id;
@@ -135,8 +154,10 @@ export default function HistoricoEventos() {
       return 0;
     });
 
+
     setDados(dadosCopiados);
   };
+
 
   const aplicarFiltros = (filtrosSelecionados) => {
     let dadosFiltrados = [...eventos]; // usa o estado da API
@@ -184,15 +205,18 @@ export default function HistoricoEventos() {
     );
   });
 
+
   const paradasJustificadas = useMemo(
     () => dadosExibidos.filter(d => d.justificada === true),
     [dadosExibidos]
   );
 
+
   const paradasNaoJustificadas = useMemo(
     () => dadosExibidos.filter(d => d.justificada === false),
     [dadosExibidos]
   );
+
 
   const modalJustificativa = (
     <DialogContent>
@@ -267,6 +291,7 @@ export default function HistoricoEventos() {
           </div>
         </div>
 
+
         {/* SEÇÃO DOS GRÁFICOS */}
         <section className="py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -280,6 +305,7 @@ export default function HistoricoEventos() {
             </div>
           </div>
         </section>
+
 
         {/* Listagem */}
         <div className="flex items-center gap-5">
@@ -297,6 +323,7 @@ export default function HistoricoEventos() {
               <SelectValue placeholder="Selecione o filtro" />
             </SelectTrigger>
 
+
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="todos">Todos</SelectItem>
@@ -305,6 +332,7 @@ export default function HistoricoEventos() {
               </SelectGroup>
             </SelectContent>
           </Select>
+
 
           {/* Telas maiores */}
           <div className="flex">
@@ -332,6 +360,7 @@ export default function HistoricoEventos() {
             </div>
           </div>
 
+
           <div className="row_ord_fil_cont flex items-center justify-between mt-2">
             <p>{dadosExibidos.length} eventos encontrados</p>
 
@@ -348,8 +377,9 @@ export default function HistoricoEventos() {
             </div>
           </div>
 
+
           {/* Tab todos */}
-          <TabsContent value="todos">
+          <TabsContent value="todos" className="text-md">
             {dadosExibidos.length > 0 ? (
               <TableListagens
                 data={dadosExibidos}
@@ -363,6 +393,7 @@ export default function HistoricoEventos() {
               <EmptyState busca={busca} />
             )}
           </TabsContent>
+
 
           {/* Tab paradas justificadas */}
           <TabsContent value="justificadas">
@@ -379,6 +410,7 @@ export default function HistoricoEventos() {
               <EmptyState busca="Paradas Justificadas" />
             )}
           </TabsContent>
+
 
           {/* Tab paradas não justificadas */}
           <TabsContent value="nao-justificadas">
@@ -401,6 +433,7 @@ export default function HistoricoEventos() {
   );
 }
 
+
 function EmptyState({ busca }) {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-gray-500">
@@ -410,3 +443,4 @@ function EmptyState({ busca }) {
     </div>
   );
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { OEEPorSetorWidget } from "@/features/setores/OEEPorSetorWidget";
 import { RefugoPorSetorWidget } from "@/features/setores/RefugoPorSetorWidget";
 import { OEECriticoWidget } from "@/features/setores/OEECriticoWidget";
@@ -11,198 +11,93 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
 } from "@/components/ui/dialog";
-import { Plus, Search, EyeIcon, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
-import DropdownMenuItem from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
+import { useSetores } from "@/hooks/useSetores";
 import TableListagens from "@/components/table";
 import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
 import FormExclusaoSetor from '@/components/ui/forms/setores/formExclusaoSetor';
 import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
 import Link from "next/link";
-import { DialogClose, DialogDescription, DialogFooter, DialogHeader } from "@/components/ui/dialog";
-import Button from "@/components/ui/button";
-
 
 const setoresFilter = [
-  {
-    id: "setor",
-    label: "Setor",
-    type: "checkbox",
-    options: ["Roscas", "Engrenagens"],
-  }, //backend que vai enviar as options posteriormente
-  { id: "oeeMedioSetor", label: "OEE Médio", type: "number-range" },
-  { id: "qtdMaquinasSetor", label: "Qtd. de Máquinas", type: "number-range" },
-  {
-    id: "qtdOperadoresSetor",
-    label: "Qtd. de Operadores",
-    type: "number-range",
-  },
+  { id: "nome_setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens", "Brocas"] },
+  { id: "qtd_de_maquinas", label: "Qtd. de Máquinas", type: "number-range" },
+  { id: "qtd_de_operadores", label: "Qtd. de Operadores", type: "number-range" },
 ];
 
-const dadosOriginais = [
-  {
-    setor: "roscas",
-    gestor: "Luiz Mariz",
-    oee_medio: "76%",
-    qtd_de_maquinas: 67,
-    qtd_de_operadores: 60,
-  },
-  {
-    setor: "engrenagens",
-    gestor: "Luiza Mariza",
-    oee_medio: "78%",
-    qtd_de_maquinas: 60,
-    qtd_de_operadores: 58,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
-  {
-    setor: "brocas",
-    gestor: "Estevão Ferreira",
-    oee_medio: "77%",
-    qtd_de_maquinas: 50,
-    qtd_de_operadores: 34,
-  },
+const colunasSetores = [
+  { id: "nome_setor", key: "nome_setor", label: "Setor", className: "w-1/7" },
+  { id: "gestor", key: "gestor", label: "Gestor", className: "w-1/5" },
+  { id: "oee_medio", key: "oee_medio", label: "OEE Médio", className: "w-45" },
+  { id: "qtd_de_maquinas", key: "qtd_de_maquinas", label: "Qtd. de Máquinas", className: "w-1/5" },
+  { id: "qtd_de_operadores", key: "qtd_de_operadores", label: "Qtd. de Operadores" },
 ];
 
 export default function PageSetores() {
-  //estado que vai para a tela (começa com todos os dados)
-  const [dados, setDados] = useState(dadosOriginais);
+  const { setores, loading, error, refresh } = useSetores();
+  const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
 
-  const getDadosBase = () => dadosOriginais;
+  //sincronizar dados da API com estado local
+  useEffect(() => {
+    setDados(setores);
+  }, [setores]);
 
   //lógica de ordenação
   const handleSort = (criterio) => {
-    const base = [...dados]; // estado atual (já filtrado)
+    const dadosCopiados = [...dados];
+    const parseOEE = (valor) => parseFloat(String(valor).replace("%", ""));
 
-    const parseOEE = (v) => parseFloat(v.replace("%", ""));
-
-    base.sort((a, b) => {
+    dadosCopiados.sort((a, b) => {
       switch (criterio) {
-        case "nome":
-          return a.setor.localeCompare(b.setor);
-
-        case "oee_asc":
-          return parseOEE(a.oee_medio) - parseOEE(b.oee_medio);
-
-        case "oee_desc":
-          return parseOEE(b.oee_medio) - parseOEE(a.oee_medio);
-
-        case "qtdMaquinas_asc":
-          return a.qtd_de_maquinas - b.qtd_de_maquinas;
-
-        case "qtdMaquinas_desc":
-          return b.qtd_de_maquinas - a.qtd_de_maquinas;
-
-        case "qtdOperadores_asc":
-          return a.qtd_de_operadores - b.qtd_de_operadores;
-
-        case "qtdOperadores_desc":
-          return b.qtd_de_operadores - a.qtd_de_operadores;
-
-        default:
-          return 0;
+        case "nome": return a.nome_setor.localeCompare(b.nome_setor);
+        case "oee_asc": return parseOEE(a.oee_medio) - parseOEE(b.oee_medio);
+        case "oee_desc": return parseOEE(b.oee_medio) - parseOEE(a.oee_medio);
+        case "qtdMaquinas_asc": return a.qtd_de_maquinas - b.qtd_de_maquinas;
+        case "qtdMaquinas_desc": return b.qtd_de_maquinas - a.qtd_de_maquinas;
+        case "qtdOperadores_asc": return a.qtd_de_operadores - b.qtd_de_operadores;
+        case "qtdOperadores_desc": return b.qtd_de_operadores - a.qtd_de_operadores;
+        default: return 0;
       }
     });
 
-    setDados(base);
+    setDados(dadosCopiados);
   };
 
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosOriginais];
+    let dadosFiltrados = [...setores]; // usa o estado da API, não array estático
 
-    // setor
-    if (filtrosSelecionados.setor?.length) {
+    //filtro por setor
+    if (filtrosSelecionados.nome_setor && filtrosSelecionados.nome_setor.length > 0) {
       dadosFiltrados = dadosFiltrados.filter((item) =>
-        filtrosSelecionados.setor.some(
-          (f) => f.toLowerCase() === item.setor.toLowerCase()
+        filtrosSelecionados.nome_setor.some(
+          (f) => f.toLowerCase() === item.nome_setor.toLowerCase()
         )
       );
     }
 
-    // OEE
-    if (filtrosSelecionados.oeeMedioSetor) {
-      const { min = 0, max = 100 } = filtrosSelecionados.oeeMedioSetor;
-
-      dadosFiltrados = dadosFiltrados.filter((item) => {
-        const valor = parseFloat(item.oee_medio.replace("%", ""));
-        return valor >= min && valor <= max;
-      });
-    }
-
-    // máquinas
-    if (filtrosSelecionados.qtdMaquinasSetor) {
-      const { min = 0, max = Infinity } = filtrosSelecionados.qtdMaquinasSetor;
-
-      dadosFiltrados = dadosFiltrados.filter((item) =>
-        item.qtd_de_maquinas >= min && item.qtd_de_maquinas <= max
+    //filtro por qtd de máquinas
+    if (filtrosSelecionados.qtd_de_maquinas) {
+      const { min, max } = filtrosSelecionados.qtd_de_maquinas;
+      dadosFiltrados = dadosFiltrados.filter(
+        (item) => item.qtd_de_maquinas >= (min || 0) && item.qtd_de_maquinas <= (max || Infinity)
       );
     }
 
-    // operadores
-    if (filtrosSelecionados.qtdOperadoresSetor) {
-      const { min = 0, max = Infinity } = filtrosSelecionados.qtdOperadoresSetor;
-
-      dadosFiltrados = dadosFiltrados.filter((item) =>
-        item.qtd_de_operadores >= min && item.qtd_de_operadores <= max
+    //filtro por qtd de operadores
+    if (filtrosSelecionados.qtd_de_operadores) {
+      const { min, max } = filtrosSelecionados.qtd_de_operadores;
+      dadosFiltrados = dadosFiltrados.filter(
+        (item) => item.qtd_de_operadores >= (min || 0) && item.qtd_de_operadores <= (max || Infinity)
       );
     }
 
@@ -219,37 +114,26 @@ export default function PageSetores() {
     { label: "Qtd. Operadores Decrescente", value: "qtdOperadores_desc" },
   ];
 
-  const colunasSetores = [
-    { id: "setor", key: "setor", label: "Setor", className: "w-1/7" },
-    { id: "gestor", key: "gestor", label: "Gestor", className: "w-1/5" },
-    {
-      id: "oee_medio",
-      key: "oee_medio",
-      label: "OEE Médio",
-      className: "w-45",
-    },
-    {
-      id: "qtd_de_maquinas",
-      key: "qtd_de_maquinas",
-      label: "Qtd. de Máquinas",
-      className: "w-1/5",
-    },
-    {
-      id: "qtd_de_operadores",
-      key: "qtd_de_operadores",
-      label: "Qtd. de Operadores",
-    },
-  ];
-
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((setor) => {
     const termo = busca.toLowerCase();
-
     return (
-      setor.setor.toLowerCase().includes(termo) ||
-      setor.gestor.toLowerCase().includes(termo)
+      setor.nome_setor.toLowerCase().includes(termo) ||
+      setor.gestor?.toLowerCase().includes(termo)
     );
   });
+
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando setores...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
@@ -264,7 +148,7 @@ export default function PageSetores() {
               </h1>
             </div>
 
-            {/* Modal de Criar Setor*/}
+            {/* Modal de Criar Setor */}
             <Dialog>
               <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
                 <Plus className="mr-2" />
@@ -272,7 +156,7 @@ export default function PageSetores() {
               </DialogTrigger>
 
               <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <FormCadastroSetor />
+                <FormCadastroSetor onCadastroSucesso={refresh} />
               </DialogContent>
             </Dialog>
           </div>
@@ -283,29 +167,22 @@ export default function PageSetores() {
       <div className="flex flex-col gap-4 p-4">
         {/* SEÇÃO 1 */}
         <section className="grid grid-cols-1 sm:grid-cols-6 gap-4">
-          {/* KPI 1 */}
           <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-30">
             <SetorTotalWidget />
           </div>
-
-          {/* KPI 2  */}
           <div className="sm:col-span-1 bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col items-center justify-center min-h-30">
             <OperadoresMediaWidget />
           </div>
-
-          {/* OEE POR SETOR */}
           <div className="sm:col-span-4 bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
             <OEEPorSetorWidget />
           </div>
         </section>
 
-        {/* SEÇÃO 2 — Gráficos Principais (Refugo e Gauge) */}
-
+        {/* SEÇÃO 2 */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2 bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
             <RefugoPorSetorWidget />
           </div>
-
           <div className="md:col-span-1 bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
             <OEECriticoWidget />
           </div>
@@ -314,11 +191,10 @@ export default function PageSetores() {
 
       <section className="listagem_setores">
         <div className="flex items-center p-8 gap-5">
-          <h1 className="text-4xl w-[125] font-semibold">
-            Listagem de Setores
-          </h1>
+          <h1 className="text-4xl w-[125] font-semibold">Listagem de Setores</h1>
           <hr className="bg-black flex-1 h-1" />
         </div>
+
         {/* Busca */}
         <div className="flex px-8 searchbar">
           <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
@@ -335,7 +211,7 @@ export default function PageSetores() {
           </div>
         </div>
 
-        {/* Linha de quantidade total de setores e filtrar e ordenar funcional */}
+        {/* Linha de quantidade total de setores e filtrar e ordenar */}
         <div className="row_ord_fil_cont flex items-center justify-between px-8 mt-3">
           <p>{dadosExibidos.length} setores encontrados.</p>
 
@@ -345,7 +221,6 @@ export default function PageSetores() {
               options={opcoesOrdenacao}
               onSortChange={handleSort}
             />
-
             <FilterDropdown
               filtersConfig={setoresFilter}
               onApply={aplicarFiltros}
@@ -355,25 +230,10 @@ export default function PageSetores() {
 
         <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
           {dadosExibidos.length > 0 ? (
-            /* dados só renderizam a tabela se tiver resultado */
             <TableListagens
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
-              excluirLote={
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Excluir setor(es)?</DialogTitle>
-                    <DialogDescription>Essa ação não pode ser desfeita.</DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                    <Button className="bg-vermelho-vivido text-white" onClick={() => handleDelete(selecionados)}>
-                      Confirmar
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              }
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -390,8 +250,8 @@ export default function PageSetores() {
                         Editar
                       </DropdownMenuItem>
                     </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoSetor />
+                    <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
+                      <FormEdicaoSetor setorId={setor.id} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
@@ -403,15 +263,13 @@ export default function PageSetores() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoSetor />
+                      <FormExclusaoSetor setorId={setor.id} onExclusaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
-
                 </>
               )}
             />
           ) : (
-            /* se não tiver correspondência (length === 0), mostra apenas a div */
             <div className="flex flex-col items-center justify-center p-8 text-gray-500 w-full mt-4">
               <Search className="w-12 h-12 mb-4 text-gray-300" />
               <h2 className="text-xl font-semibold">Nenhum setor encontrado</h2>

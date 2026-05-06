@@ -25,9 +25,7 @@ import {
 import { EllipsisVertical, Pencil, Trash2, ChevronLeftIcon, ChevronRightIcon, BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 
-import { useState, useMemo } from 'react';
-
-// import { usePagination } from '@/hooks/use-pagination';
+import { useState, useMemo, useEffect } from 'react';
 
 import {
   useReactTable,
@@ -45,7 +43,7 @@ import {
 
 import { Checkbox } from './ui/checkbox';
 
-const TableListagens = ({ data, columns, enableSelection = false, excluirLote, editarLote, solicitarJustificativa, acoesDropdown }) => {
+const TableListagens = ({ data, columns, enableSelection = false, excluirLote, editarLote, solicitarJustificativa, onSelectedChange, acoesDropdown }) => {
   if (!data || !columns) return <p className="p-4">Nenhum dado disponível.</p>;
 
   const [rowSelection, setRowSelection] = useState({});
@@ -53,12 +51,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
     pageIndex: 0,
     pageSize: 10,
   });
-  const [sorting, setSorting] = useState([
-    {
-      id: 'id', /* ordenar coluna por padrão */
-      desc: false
-    }
-  ]);
+  const [sorting, setSorting] = useState([]);
 
   const table = useReactTable({
     data: data,
@@ -96,9 +89,13 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
+  useEffect(() => {
+    onSelectedChange?.(selectedRows.map(row => row.original));
+  }, [selectedRows.length]);
+
   const barraSelecionados = enableSelection && hasSelection && (excluirLote || editarLote || solicitarJustificativa);
- 
-  const handleBatchDelete = () => {
+
+  /* const handleBatchDelete = () => {
     const selectedData = selectedRows.map(row => row.original);
     onDeleteSelected?.(selectedData);
   };
@@ -106,7 +103,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   const handleBatchEdit = () => {
     const selectedData = selectedRows.map(row => row.original);
     onEditSelected?.(selectedData);
-  };
+  }; */
 
   return (
     <div className='w-full mb-5'>
@@ -136,7 +133,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
               </Dialog>
             )}
 
-             {solicitarJustificativa && (
+            {solicitarJustificativa && (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="h-8 border-primary text-primary hover:bg-primary/10">
@@ -168,7 +165,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         <Table className="overflow-auto">
 
           <TableHeader>
-            <TableRow className="font-semibold bg-muted/50">
+            <TableRow className="font-semibold bg-muted/50 h-14">
 
               {enableSelection && (
                 <TableHead className="w-12.5">
@@ -187,8 +184,10 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                 </TableHead>
               ))}
 
-              {/* Essa coluna deve ter em todos */}
-              <TableHead className='text-right'>Ações</TableHead>
+              {acoesDropdown && (
+                <TableHead className='text-right'>Ações</TableHead>
+              )}
+
             </TableRow>
           </TableHeader>
 
@@ -196,8 +195,8 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
             {table.getRowModel().rows.map((row, index) => (
               <TableRow
                 key={row.id || index}
-                className='font-medium'
-                data-state={row.getIsSelected() && "selected"} > {/* linhas selecioanada */}
+                className='font-medium h-14'
+                data-state={row.getIsSelected() ? "selected" : undefined} > {/* linhas selecioanada */}
 
                 {enableSelection && (
                   <TableCell>
@@ -221,21 +220,25 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                   </TableCell>
                 ))}
 
-                <TableCell className='text-right'>
-                  <div className="flex justify-end">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant='outline' className="border-none bg-transparent cursor-pointer">
-                          <EllipsisVertical />
-                        </Button>
-                      </DropdownMenuTrigger>
+                {acoesDropdown && (
+                  <TableCell className='text-right'>
+                    <div className="flex justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant='outline' className="border-none bg-transparent cursor-pointer">
+                            <EllipsisVertical />
+                          </Button>
+                        </DropdownMenuTrigger>
 
-                      <DropdownMenuContent align='end' className='max-w-62 w-auto font-semibold pr-2'>
-                        {acoesDropdown && acoesDropdown(row.original)}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
+                        <DropdownMenuContent align='end' className='max-w-62 w-auto font-semibold pr-2'>
+                          {acoesDropdown && acoesDropdown(row.original)}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                )}
+
+
 
               </TableRow>
             ))}
@@ -250,7 +253,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
             <PaginationItem className="flex items-center">
               <Button
-                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
+                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8 cursor-pointer'
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
                 aria-label='Página anterior'>
@@ -289,7 +292,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
             <PaginationItem className="flex items-center">
               <Button
-                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
+                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8 cursor-pointer'
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
                 aria-label='Vá para a próxima página'>

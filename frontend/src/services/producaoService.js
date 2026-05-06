@@ -1,6 +1,6 @@
 // // src/services/producaoService.js
 // // Aqui ficam as funções específicas de produção, que usam o apiFetch genérico do api.js. Elas também fazem a validação dos dados usando os schemas do zod.
-// import { apiFetch } from "./api";
+// import { apiFetch } from "@/lib/api";
 // import {
 //   ProducaoPorHoraArraySchema,
 //   ProducaoPorSetorArraySchema,
@@ -8,24 +8,24 @@
 
 // export const producaoService = {
 //   async getPorHora() {
-//     const data = await apiFetch("/producao/por_hora");
+//     const data = await apiFetch("/api/dashboard/producao-dia");
 //     return ProducaoPorHoraArraySchema.parse(data); 
 //   },
 
 //   async getPorSetor() {
-//     const data = await apiFetch("/producao/por_setor");
+//     const data = await apiFetch("/api/setores/obterProducaoPorSetor");
 //     return ProducaoPorSetorArraySchema.parse(data);
 //   },
 // };
 //   async getOEE() {
-//     const data = await apiFetch("/producao/OEE");
+//     const data = await apiFetch("/api/oee/geral");
 //     return OEESchema.parse(data);
 //   },
 // };
 
 
 //Mock para desenvolvimento sem backend
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api";
 import {
   OEESchema,
   ProducaoPorHoraArraySchema,
@@ -39,18 +39,18 @@ const USE_MOCK = true;
 export const producaoService = {
   async getPorHora() {
     if (USE_MOCK) return ProducaoPorHoraArraySchema.parse(mockProducaoPorHora);
-    const data = await apiFetch("/producao/por_hora");
+    const data = await apiFetch("/api/dashboard/producao-dia");
     return ProducaoPorHoraArraySchema.parse(data);
   },
 
   async getPorSetor() {
     if (USE_MOCK) return ProducaoPorSetorArraySchema.parse(mockProducaoPorSetor);
-    const data = await apiFetch("/producao/por_setor");
+    const data = await apiFetch("/api/setores/obterProducaoPorSetor");
     return ProducaoPorSetorArraySchema.parse(data);
   },
    async getOEE() {
     if (USE_MOCK) return OEESchema.parse(mockOEE);
-    const data = await apiFetch("/producao/oee");
+    const data = await apiFetch("/api/oee/geral");
     return OEESchema.parse(data);
   },
   
