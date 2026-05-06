@@ -17,7 +17,11 @@ router.get('/status/:status', MaquinaController.listarMaquinasPorStatus);
 router.get('/setor/:id_setor', MaquinaController.listarMaquinasPorSetor);
 
 router.get('/:id/top-motivos-parada', MaquinaController.obterTopMotivosParada);
-router.get('/:id/refugos', MaquinaController.obterRefugosMaquina);
+router.get('/:id/refugo_motivos', MaquinaController.obterRefugosMaquina);
+router.get('/:id/setup_motivos', MaquinaController.obterTopMotivosParada); // Usando top-motivos por enquanto como fallback
+router.get('/:id/oee', MaquinaController.obterResumoOeeMaquina);
+router.get('/:id/oee_evolucao', MaquinaController.obterEvolucaoOeeMaquina);
+router.get('/:id/velocidade', MaquinaController.obterVelocidadeMaquina);
 router.get('/:id/historico-eventos', MaquinaController.obterHistoricoEventosTabela);
 
 router.get('/:id', MaquinaController.buscarMaquinaPorId);
