@@ -44,7 +44,7 @@ export default function LoginForm() {
             //redireciona pelo tipo que vem no token
             if (data.dados.tipo === "Adm") router.push("/adm")
             if (data.dados.tipo === "Gestor") router.push("/gestor")
-            if (data.dados.tipo === "Operario") router.push("/operador")
+            if (data.dados.tipo === "Operador") router.push("/operador")
 
         } catch (error) {
             setErro("Erro de conexão com o servidor")
