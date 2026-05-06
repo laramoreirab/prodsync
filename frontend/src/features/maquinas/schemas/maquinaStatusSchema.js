@@ -44,4 +44,10 @@ export const MaquinaPorTurnoSchema = z.object({
   paradas:    z.number(),
   manutencao: z.number(),
 });
+
+export const ProducaoTotalSchema = z.object({
+  data:  z.string(),
+  total: z.number(),
+});
+export const ProducaoTotalArraySchema = z.array(ProducaoTotalSchema);
 export const MaquinaPorTurnoArraySchema = z.array(MaquinaPorTurnoSchema);

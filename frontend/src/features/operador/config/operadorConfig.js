@@ -34,3 +34,4 @@ export const produtividadeDiariaConfig = {
   produzido: { label: "Produzido:", color: "#00357a" },
   meta:      { label: "Sua Meta:", color: "#b0bfd8" },
 };
+

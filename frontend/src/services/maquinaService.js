@@ -16,6 +16,10 @@ import {
   mockMaquinasPorTurno,
 } from "./mockData";
 
+import { ProducaoTotalArraySchema } from "@features/maquinas/schemas/maquinaStatusSchema";
+import { mockProducaoTotal3Meses, mockProducaoTotal30Dias, mockProducaoTotal7Dias } from "./mockData";
+
+
 const USE_MOCK = true;
 
 export const maquinaStatusService = {
@@ -63,5 +67,19 @@ export const maquinasPorTurnoService = {
     if (USE_MOCK) return MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
     const data = await apiFetch("/maquinas/status_por_turno");
     return MaquinaPorTurnoArraySchema.parse(data);
+  },
+};
+
+const MOCK_POR_PERIODO = {
+  "3meses": mockProducaoTotal3Meses,
+  "30dias": mockProducaoTotal30Dias,
+  "7dias":  mockProducaoTotal7Dias,
+};
+
+export const producaoTotalService = {
+  async getProducaoTotal(periodo = "3meses") {
+    if (USE_MOCK) return ProducaoTotalArraySchema.parse(MOCK_POR_PERIODO[periodo]);
+    const data = await apiFetch(`/maquinas/producao_total?periodo=${periodo}`);
+    return ProducaoTotalArraySchema.parse(data);
   },
 };

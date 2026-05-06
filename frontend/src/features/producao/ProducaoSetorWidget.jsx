@@ -1,5 +1,3 @@
-// src/features/producao/ProducaoSetorWidget.jsx
-// Usa o hook e passa os dados para o componente de gráfico genérico. Ele é responsável apenas por lidar com o estado de loading e error, e passar os dados formatados para o gráfico.
 "use client";
 
 import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";

@@ -1,10 +1,8 @@
 "use client";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useOPEficiencia } from "./hooks/useOPEficiencia";
+import { eficienciaConfig } from "../operador/config/operadorConfig";
 
-const eficienciaConfig = {
-  value: { label: "Eficiência", color: "#00357a" },
-};
 
 export function OPEficienciaWidget() {
   const { data, loading, error } = useOPEficiencia();

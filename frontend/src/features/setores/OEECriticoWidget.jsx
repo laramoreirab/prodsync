@@ -27,9 +27,7 @@ export function OEECriticoWidget() {
             title={data.setor}
             data={[{ value: data.oee, fill: "#00357a" }]}
             size="lg"
-            config={{
-              value: { label: data.setor },
-            }}
+            config={oeeSetorConfig}
           />
 
         </div>

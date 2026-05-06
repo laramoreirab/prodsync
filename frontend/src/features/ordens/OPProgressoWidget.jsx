@@ -2,11 +2,7 @@
 
 import { useOPProgresso } from "./hooks/useOPProgresso";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
-
-const progressoConfig = {
-  produzidos: { label: "Produzidos", color: "#00357a" },
-  aProduzir:  { label: "A Produzir", color: "#b0bfd8" },
-};
+import { progressoConfig } from "@/features/ordens/config/ordensChartConfig"
 
 export function OPProgressoWidget({ opId }) {
   const { data, loading, error } = useOPProgresso(opId);

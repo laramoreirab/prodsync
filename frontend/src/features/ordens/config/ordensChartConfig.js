@@ -25,3 +25,8 @@ export const opConcluidasConfig = {
     color: "#00357a",
   },
 };
+
+export const progressoConfig = {
+  produzidos: { label: "Produzidos", color: "#00357a" },
+  aProduzir:  { label: "A Produzir", color: "#b0bfd8" },
+};

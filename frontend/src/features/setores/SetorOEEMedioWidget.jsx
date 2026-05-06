@@ -2,10 +2,7 @@
 
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useSetorOEEMedio } from "./hooks/useSetorOEEMedio";
-
-const oeeConfig = {
-  value: { label: "OEE", color: "#00357a" },
-};
+import {oeeConfig} from "@/features/setores/config/setoresChartConfig"
 
 export function SetorOEEMedioWidget({ setorId }) {
   const { data, loading, error } = useSetorOEEMedio(setorId);

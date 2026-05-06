@@ -47,4 +47,8 @@ export const setorProducaoMaquinaConfig = {
     color: "#00357a",
   },
 };
+
+ export const oeeConfig = {
+  value: { label: "OEE", color: "#00357a" },
+};
  
