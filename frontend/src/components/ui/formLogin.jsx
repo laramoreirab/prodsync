@@ -31,6 +31,8 @@ export default function LoginForm() {
 
             const data = await res.json()
 
+            console.log(data)
+
             if (!res.ok) {
                 setErro(data.mensagem)
                 return
@@ -38,7 +40,8 @@ export default function LoginForm() {
 
 
             //guarda o token no localstorage e o middleware le o header Autorization
-            localStorage.setItem("token", data.dados.token)
+            localStorage.setItem('token', data.dados.token);
+            console.log('ESTA SALVANDO NO LOCAL STORAGE');
 
 
             //redireciona pelo tipo que vem no token

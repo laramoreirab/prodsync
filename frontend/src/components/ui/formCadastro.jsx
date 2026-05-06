@@ -34,7 +34,7 @@ export default function RegisterForm() {
     setErros({});
     try {
       const data = await cadastroService.cadastrar(form);
-      if (data?.token) {
+      if (data.dados.token) {
       localStorage.setItem("token", data.dados.token);
       setOpen(true);
     } else {
