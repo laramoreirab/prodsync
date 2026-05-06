@@ -256,6 +256,7 @@ class MaquinaController {
     static async obterStatusGeralMaquinas(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
+            console.log(id_empresa)
             const dados = await MaquinaModel.obterStatusGeralMaquinas(id_empresa);
 
             return res.status(200).json({ sucesso: true, dados });

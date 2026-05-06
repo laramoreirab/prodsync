@@ -240,7 +240,7 @@ enum DiaSemana {
   Sabado
 }
 
-enum StatusOP{
+enum StatusOP {
   Parada
   Em_Andamento @map("Em Andamento")
   Setup
