@@ -40,4 +40,11 @@ export const setorProducaoSemanalConfig = {
     color: "#00357a",
   },
 };
+
+export const setorProducaoMaquinaConfig = {
+  qtd: {
+    label: "Peças produzidas:",
+    color: "#00357a",
+  },
+};
  

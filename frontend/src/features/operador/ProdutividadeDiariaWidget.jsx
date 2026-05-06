@@ -3,11 +3,12 @@ import { DonutChart } from "@/components/ui/charts/components/DonutChart";
 import { useProdutividadeDia } from "./hooks/useProdutividadeDia";
 import { produtividadeDiariaConfig } from "./config/operadorConfig";
 
-
 export function ProdutividadeDiariaWidget({ operadorId }) {
   const { data, loading, error } = useProdutividadeDia(operadorId);
+
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro.</p>;
+  if (!data)   return null;
 
   const chartData = [
     { name: "produzido", value: data.produzido },
