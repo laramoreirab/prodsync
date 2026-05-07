@@ -59,7 +59,7 @@ export const producaoService = {
 export const pecasPorMinutosService = {
   async getPecasPorMinuto(){
     if (USE_MOCK) return PecasPorMinutoSchema.parse(mockPecasPorMinuto);
-    const data = await apiFetch("/api/maquinas/obter-pecas-por-minuto");
+    const data = await apiFetch("/api/dashboard/pecas-por-minuto");
     return PecasPorMinutoSchema.parse(data.dados);
   }
 };

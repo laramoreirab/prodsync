@@ -149,7 +149,7 @@ class MotivoParadaModel {
         }
     }
 
-    static async buscarMotivosFrequentes(id_empresa, limite = 10, status = ['Parada', 'Manutencao']) {
+    static async buscarMotivosFrequentes(id_empresa, limite = 10, status = ['Parada', 'Setup']) {
         try {
             id_empresa = this.validarEmpresa(id_empresa);
 
