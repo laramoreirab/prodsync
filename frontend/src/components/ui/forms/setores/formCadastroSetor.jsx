@@ -5,7 +5,7 @@ import { Plus, X as XIcon, ChevronDown } from "lucide-react";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { setorCrudService } from "@/services/setorCrudService"; // Importar o serviço
+import { setorCrudService } from "@/services/setorCrudService";
 
 export default function FormCadastroSetor({ onCadastroSucesso }) {
     // estados das informações básicas
@@ -72,6 +72,15 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
             const gestor = listaEquipe.find(m => m.funcao === "Gestor");
             if (gestor) {
                 await setorCrudService.associarGestor(novoSetor.id, gestor.id_usuario);
+            }
+
+            //operadores quando o backend implementar o endpoint
+            const operadores = listaEquipe.filter(m => m.funcao === "Operador");
+            if (operadores.length > 0) {
+                await setorCrudService.associarOperadores(
+                    novoSetor.id,
+                    operadores.map(o => o.id_usuario)
+                );
             }
 
             toast.success("Setor criado com sucesso!");

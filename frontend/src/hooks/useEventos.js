@@ -1,4 +1,3 @@
-// src/hooks/useEventos.js
 import { useState, useEffect, useCallback } from 'react';
 import { eventosCrudService } from '@/services/eventosCrudService';
 
@@ -7,7 +6,7 @@ export function useEventos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Carregar todos os eventos
+  //carregar todos os eventos
   const fetchEventos = useCallback(async () => {
     setLoading(true);
     try {
@@ -26,7 +25,7 @@ export function useEventos() {
     fetchEventos();
   }, [fetchEventos]);
 
-  // Registrar novo evento
+  //registrar novo evento
   const registrarEvento = async (dados) => {
     try {
       const novo = await eventosCrudService.create(dados);
@@ -37,7 +36,7 @@ export function useEventos() {
     }
   };
 
-  // Justificar evento existente
+  //justificar evento existente
   const justificarEvento = async (dados) => {
     try {
       const atualizado = await eventosCrudService.justificar(dados);

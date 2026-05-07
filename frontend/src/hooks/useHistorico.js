@@ -47,16 +47,6 @@ export function useEventos() {
         }
     };
 
-    //deletar
-    const excluirEvento = async (id) => {
-        try {
-            await eventoCrudService.delete(id);
-            setEventos(prev => prev.filter(m => m.id !== id));
-        } catch (err) {
-            throw err;
-        }
-    };
-
     return {
         eventos,
         loading,
