@@ -317,7 +317,7 @@ class SetorModel {
                     id_setor: true,
                     nome_setor: true,
                     ordens_producao: {
-                        where: { status_op: 'Em Andamento' },
+                        where: { status_op: 'Em_Andamento' },
                         select: {
                             qtd_planejada: true,
                             apontamentos: {

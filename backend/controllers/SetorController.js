@@ -202,7 +202,7 @@ class SetorController {
     static async obterProducaoPorSetor(req, res) {
         try {
             const dados = await SetorModel.obterProducaoPorSetor(req.user.id_empresa);
-            return res.status(200).json({ sucesso: true, dados });
+            return res.status(200).json({ sucesso: true, dados});
         } catch (error) {
             console.error('Erro ao obter producao por setor:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
