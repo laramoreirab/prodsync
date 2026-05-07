@@ -297,7 +297,7 @@ class SetorModel {
     static async obterProducaoPorSetor(id_empresa) {
         try {
             const limites = await this.obterLimitesDiaIndustrial(id_empresa);
-
+            
             const agora = new Date();
             let inicioBusca = new Date(agora);
 
@@ -317,7 +317,7 @@ class SetorModel {
                     id_setor: true,
                     nome_setor: true,
                     ordens_producao: {
-                        where: { status_op: 'Em_Andamento' },
+                        where: { status_op: "Em_Andamento" },
                         select: {
                             qtd_planejada: true,
                             apontamentos: {

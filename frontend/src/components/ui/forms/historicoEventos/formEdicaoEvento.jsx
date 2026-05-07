@@ -66,7 +66,7 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
         );
     };
 
-    // Justificar evento existente — campos: id_evento, id_motivo_parada, observacao
+    //justificar evento existente — campos: id_evento, id_motivo_parada, observacao
     const handleSubmit = async (e) => {
         e.preventDefault();
 

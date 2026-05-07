@@ -1,4 +1,3 @@
-// src/mocks/eventosMock.js
 // Remova este arquivo e o USE_MOCK do service quando o backend estiver pronto
 
 export let eventosMock = [

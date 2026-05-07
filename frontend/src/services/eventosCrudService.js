@@ -1,4 +1,3 @@
-// src/services/eventosCrudService.js
 import { eventosMockService } from "@/mocks/eventosMock";
 
 // trocar para false quando o backend estiver pronto p integração!!

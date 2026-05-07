@@ -77,8 +77,8 @@ class DashboardModel {
             });
 
             return Object.entries(tendencia).map(([data, quantidade]) => ({
-                data,
-                refugos: quantidade
+                dia: data,
+                qtd: quantidade
             }));
         }
         catch (error) {
@@ -87,46 +87,119 @@ class DashboardModel {
         }
     }
 
-    // Média de paradas por dia e peças por minuto
-    static async buscarParadasEPPM(id_empresa) {
-        try {
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
+    // Média de paradas por dia
+static async mediaParadasPorDia(id_empresa) {
+    try {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
 
-            const [paradasHoje, producaoHoje] = await Promise.all([
-                prisma.historico_Eventos.count({
-                    where: {
-                        id_empresa: Number(id_empresa),
-                        status_atual: 'Parada',
-                        inicio: { gte: hoje }
-                    }
-                }),
-                prisma.apontamento.aggregate({
-                    where: {
-                        id_empresa: Number(id_empresa),
-                        data_hora_inicio: { gte: hoje }
+        const amanha = new Date(hoje);
+        amanha.setDate(amanha.getDate() + 1);
+
+        const dadosParadas = await prisma.historico_Eventos.aggregate({
+            where: {
+                id_empresa: Number(id_empresa),
+
+                id_motivo_parada: {
+                    not: null
+                },
+                OR: [
+                    {
+                        inicio: {
+                            gte: hoje,
+                            lt: amanha
+                        }
                     },
-                    _sum: { qtd_boa: true }
-                })
-            ]);
+                    {
+                        termino: {
+                            gte: hoje,
+                            lt: amanha
+                        }
+                    }
+                ]
+            },
 
-            const totalPecasHoje = producaoHoje._sum.qtd_boa || 0;
+            _sum: {
+                duracao: true
+            },
 
-            const agora = new Date();
-            const minutosPassados = Math.max(1, (agora.getTime() - hoje.getTime()) / 1000 / 60);
+            _count: {
+                id_evento: true
+            }
+        });
 
-            const pecasPorMinuto = totalPecasHoje / minutosPassados;
+        const totalDuracao = dadosParadas._sum.duracao || 0;
 
-            return {
-                media_paradas_dia: paradasHoje,
-                pecas_por_minuto: Math.round(pecasPorMinuto)
-            };
-        }
-        catch (error) {
-            console.error('Erro ao buscar paradas e EPPM:', error);
-            throw new Error('Erro ao buscar paradas e EPPM');
-        }
+        const quantidadeParadas =
+            dadosParadas._count.id_evento || 1;
+
+        const mediaDuracao =
+            totalDuracao / quantidadeParadas;
+
+        return {
+            titulo: 'Média de Paradas por Dia',
+            valor: `${(mediaDuracao / 60).toFixed(1)}h`
+        };
+
+    } catch (error) {
+        console.error('Erro ao buscar média de paradas:', error);
+        throw new Error('Erro ao buscar média de paradas');
     }
+}
+
+// Peças por minuto
+static async pecasPorMinuto(id_empresa) {
+    try {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+         const amanha = new Date(hoje);
+        amanha.setDate(amanha.getDate() + 1);
+
+        const producaoHoje = await prisma.apontamento.aggregate({
+            where: {
+                id_empresa: Number(id_empresa),
+                OR: [
+                    {
+                        data_hora_inicio: {
+                            gte: hoje,
+                            lt: amanha
+                        }
+                    },
+                    {
+                        data_hora_fim: {
+                            gte: hoje,
+                            lt: amanha
+                        }
+                    }
+                ]
+            },
+            _sum: {
+                qtd_boa: true
+            }
+        });
+
+        const totalPecasHoje = producaoHoje._sum.qtd_boa || 0;
+
+        const agora = new Date();
+
+        const minutosPassados = Math.max(
+            1,
+            (agora.getTime() - hoje.getTime()) / 1000 / 60
+        );
+
+        const pecasPorMinuto = totalPecasHoje / minutosPassados;
+
+        return {
+            titulo:'Peças por Minuto',
+            valor: `${Math.round(pecasPorMinuto)}`
+        };
+
+    } catch (error) {
+        console.error('Erro ao buscar peças por minuto:', error);
+        throw new Error('Erro ao buscar peças por minuto');
+    }
+}
 }
 
 export default DashboardModel;
