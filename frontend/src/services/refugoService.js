@@ -1,5 +1,5 @@
 
-// import { apiFetch } from "./api";
+// import { apiFetch } from "@/lib/api";
 // import {
 //   ProducaoPorHoraArraySchema,
 //   ProducaoPorSetorArraySchema,
@@ -15,7 +15,7 @@
 
 
 //Mock para desenvolvimento sem backend
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api";
 import {
   TendenciaRefugoArraySchema,
 } from "@features/refugo/schemas/refugoSchema";
