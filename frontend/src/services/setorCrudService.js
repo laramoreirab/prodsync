@@ -44,7 +44,7 @@ const apiService = {
     return await response.json();
   },
 
-  // Deletar setor — id vai na URL
+  // deletar setor — id vai na URL
   delete: async (id) => {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
@@ -74,6 +74,18 @@ const apiService = {
     if (!response.ok) throw new Error("Erro ao associar gestor");
     return await response.json();
   },
+
+  // a implementar no back!! por favor, descomentar este trecho após criação de endpoint no back para isso.
+  // // associar operador ao setor
+  // associarOperadores: async (id_setor, ids_operadores) => {
+  //   const response = await fetch(`${API_URL}/${id_setor}/operadores`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ ids_operadores }),
+  //   });
+  //   if (!response.ok) throw new Error("Erro ao associar operadores");
+  // //   return await response.json();
+  // },
 };
 
 //remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo

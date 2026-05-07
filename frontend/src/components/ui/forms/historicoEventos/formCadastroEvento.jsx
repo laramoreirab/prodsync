@@ -77,7 +77,9 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
             inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000Z` : null, // backend: inicio
             fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000Z` : null,               // backend: fim
             id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null,          // backend: id_motivo_parada
-            observacao,                                          // backend: observacao
+            observacao,
+            //é isso que falta no cadastro evento                                          // backend: observacao
+            ops_afetadas: opsSelecionadas,
         };
 
         try {
