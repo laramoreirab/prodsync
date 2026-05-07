@@ -27,19 +27,19 @@ export default function RegisterPage() {
   return (
     <>
       <Header navigationData={navigationData} />
-      <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-gray-100">
-
-        {/* ESQUERDA */}
-        <div className="hidden md:flex items-center justify-end relative">
-
+      <main className="min-h-[calc(100vh-80px)] grid grid-cols-1 md:grid-cols-2 bg-gray-100 overflow-hidden">
+  
+        <div className="hidden md:flex items-center justify-end pr-6 lg:pr-10 relative">
           <LeftCards />
         </div>
-
-        {/* DIREITA */}
-        <div className="flex items-center justify-start p-8 md:p-16">
-          <RegisterForm />
+  
+        <div className="flex items-center justify-start pl-4 lg:pl-10 p-8">
+          <div className="w-full max-w-md">
+            <RegisterForm />
+          </div>
         </div>
-      </div>
+        
+      </main>
     </>
   );
 }

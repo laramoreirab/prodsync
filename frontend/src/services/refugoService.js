@@ -21,7 +21,7 @@ import {
 } from "@features/refugo/schemas/refugoSchema";
 import { mockTendenciaRefugo } from "./mockData";
 
-const USE_MOCK = true; 
+const USE_MOCK = false; 
 export const refugoService = {
   async getTendenciaRefugo() {
     if (USE_MOCK) return TendenciaRefugoArraySchema.parse(mockTendenciaRefugo);

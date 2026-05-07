@@ -121,7 +121,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
           <div className="flex items-center gap-2">
             {/* Botão de edição em lote — só aparece se onEditSelected foi passado */}
-            {editarLote && (
+            {/* {editarLote && (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="h-8 bg-primary text-white">
@@ -131,7 +131,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                 </DialogTrigger>
                 {editarLote}
               </Dialog>
-            )}
+            )} */}
 
             {solicitarJustificativa && (
               <Dialog>

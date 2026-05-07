@@ -45,6 +45,7 @@ import {
 
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
 
 import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
@@ -140,16 +141,6 @@ export default function HistoricoEventos() {
     );
   });
 
-  const paradasJustificadas = useMemo(
-    () => dadosExibidos.filter(d => d.justificada === true),
-    [dadosExibidos]
-  );
-
-  const paradasNaoJustificadas = useMemo(
-    () => dadosExibidos.filter(d => d.justificada === false),
-    [dadosExibidos]
-  );
-
   const opcoesOrdenacao = [
     { label: 'Ordem Alfabética', value: 'nome' },
     { label: 'ID Crescente', value: 'id_asc' },
@@ -200,7 +191,7 @@ export default function HistoricoEventos() {
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full mt-8 pt-0 pb-10 space-y-4 px-8">
+      <div className="w-full pt-0 pb-10  px-8">
 
         <section>
           <div className="flex flex-wrap justify-between py-8">
@@ -209,14 +200,18 @@ export default function HistoricoEventos() {
                 Histórico de Eventos da Máquina
               </h1>
             </div>
-            {/* Modal de Cadastro */}
-            <div className="modal_cadastro">
+            {/* Modal de Justificar Evento */}
+            <div className="modal_justificativa">
               <Dialog>
-                <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                <DialogTrigger className="bg-secondary-foreground px-5 py-2 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                   <Pencil className="mr-2" />
                   Justificar
                 </DialogTrigger>
+                <DialogContent>
+                  <FormJustificativaEvento />
+                </DialogContent>
               </Dialog>
+
             </div>
           </div>
         </section>

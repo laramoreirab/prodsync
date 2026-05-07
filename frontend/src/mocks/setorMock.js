@@ -118,4 +118,11 @@ export const setorMockService = {
     setorMock[index].id_gestor = id_gestor;
     return { ...setorMock[index] };
   },
+
+  //associar operador ao steor
+  associarOperadores: async (id_setor, ids_operadores) => {
+    await delay();
+    // salva no mock quando implementar
+    return true;
+  },
 };

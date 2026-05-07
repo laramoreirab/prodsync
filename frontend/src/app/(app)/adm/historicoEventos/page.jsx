@@ -53,7 +53,7 @@ import {
 
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
-import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
@@ -65,14 +65,8 @@ const colunasEventos = [
     id: 'tipo', key: 'tipo', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
+        "Setup": {variant: "setup",},
+        "Parada": {variant: "parada"}
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -227,7 +221,7 @@ export default function HistoricoEventos() {
           </DropdownMenuItem>
         </DialogTrigger>
         <DialogContent>
-          <DetalhaeEvento />
+          <DetalhesEvento eventoId={row.id} />
         </DialogContent>
       </Dialog>
 

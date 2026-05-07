@@ -7,7 +7,7 @@ const mockTempoParadoProduzindo = [
   { name: "parado",     value: 38 },
 ];
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const eventosService = {
   async getParadasComparadas() {

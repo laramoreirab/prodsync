@@ -61,8 +61,8 @@ const colunasOrdemProd = [
     className: "w-1/7"
   },
   {
-    id: "nome",
-    key: "nome",
+    id: "codigo_lote",
+    key: "codigo_lote",
     label: "Nome",
     className: "w-1/5"
   },

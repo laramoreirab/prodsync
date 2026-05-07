@@ -19,7 +19,7 @@ import {
   mockOPCargaSetor,
   mockOPStatus,
   mockOPConcluidasDia,
-  mockOPProgresso,
+  mockUSE_MOCK,
   mockOPOEEDetalhe,
 } from "./mockData";
 

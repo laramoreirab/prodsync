@@ -1,4 +1,3 @@
-// src/mocks/eventosMock.js
 // Remova este arquivo e o USE_MOCK do service quando o backend estiver pronto
 
 export let eventosMock = [
@@ -9,8 +8,8 @@ export let eventosMock = [
     status_maquina: "Setup",
     setor_afetado: "Roscas",
     maquinas: [1],
-    inicio: "2024-03-26T14:08:00.000Z",
-    fim: null, // evento ativo
+    inicio: "2026-05-05T14:08:00.000Z",
+    fim: null,
     id_motivo_parada: 1,
     motivo: "Troca de Molde",
     observacao: "AAAAAAAAAAAAAAAAAAAAAAA",
@@ -25,8 +24,8 @@ export let eventosMock = [
     status_maquina: "Parada",
     setor_afetado: "Engrenagens",
     maquinas: [2],
-    inicio: "2024-03-26T13:09:00.000Z",
-    fim: "2024-03-26T13:40:00.000Z",
+    inicio: "2026-05-06T13:09:00.000Z",
+    fim: null,
     id_motivo_parada: null,
     motivo: "Aguardando Justificativa",
     observacao: "BBBBBBBBBBBBBBBBBBBBBBBB",
