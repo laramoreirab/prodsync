@@ -11,15 +11,15 @@ export const paradaService = {
   async getParadas() {
     if (USE_MOCK) return MotivosFrequentesArraySchema.parse(mockMotivosFrequentesParadas);
     const data = await apiFetch("/api/maquinas/status");
-    return MaquinaStatusArraySchema.parse(data);
+    return MaquinaStatusArraySchema.parse(data.dados);
   },
 };
 
 export const paradasPorDiaService = {
   async getParadasDia() {
     if (USE_MOCK) return MediaParadasDiaArraychema.parse(mockMediaParadasDia);
-    const data = await apiFetch("/maquinas/parada_dia");
-    return MediaParadasDiaArraychema.parse(data);
+    const data = await apiFetch("/api/dashboard/media-paradas-por-dia");
+    return MediaParadasDiaArraychema.parse(data.dados);
   }
 }
 
