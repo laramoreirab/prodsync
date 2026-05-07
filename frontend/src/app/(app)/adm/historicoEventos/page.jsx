@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/dialog";
 
 
-import { Plus, Search, Pencil, Clock4, EyeIcon, BellRing, Loader2 } from "lucide-react";
+import { Plus, Search, Pencil, EyeIcon, BellRing, Loader2 } from "lucide-react";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+
 import { useState, useMemo, useEffect } from "react";
 
 import { useEventos } from "@/hooks/useEventos";
@@ -60,10 +62,7 @@ const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
-    id: 'tipo',
-    key: 'tipo',
-    label: 'Tipo',
-    className: 'text-center justify-center',
+    id: 'tipo', key: 'tipo', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
         "Setup": {
@@ -85,7 +84,12 @@ const colunasEventos = [
     }
   },
   { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
-  { id: 'duracao', key: 'duracao', label: 'Duração' },
+  {
+    id: 'duracao', key: 'duracao', label: 'Duração',
+    icone: (valor, row) => (
+    <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+  )
+  },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
   { id: 'observacao', key: 'observacao', label: 'Observação' },
 ];
