@@ -205,7 +205,7 @@ export default function HistoricoEventos() {
             {/* Modal de Justificar Evento */}
             <div className="modal_justificativa">
               <Dialog>
-                <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                <DialogTrigger className="bg-secondary-foreground px-5 py-2 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                   <Pencil className="mr-2" />
                   Justificar
                 </DialogTrigger>
