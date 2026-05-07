@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authMiddleware } from '../middlewares/authMiddleware.js'
+import { adminMiddleware, authMiddleware } from '../middlewares/authMiddleware.js'
 import SetorController from '../controllers/SetorController.js'
 
 const router = Router()

@@ -5,7 +5,7 @@ export async function apiFetch(rota, opcoes = {}) {
   const token = localStorage.getItem("token")
 
 
-  const res = await fetch(`${API_URL}${rota}`, {
+  const res = await fetch(`${API_URL}${rota}`,{
     ...opcoes,
     headers: {
       "Content-Type":  "application/json",
