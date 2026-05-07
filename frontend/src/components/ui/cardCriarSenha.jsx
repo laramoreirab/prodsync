@@ -56,9 +56,9 @@ export default function CriarSenha() {
                 setErro(data.mensagem || "Erro ao validar usuário");
                 return;
             }
-            if (data.token) {
-                localStorage.setItem("token", data.token,);
-                localStorage.setItem("tipo", data.tipo,);
+            if (data.dados.token){
+                localStorage.setItem("token", data.dados.token,);
+                localStorage.setItem("tipo", data.dados.tipo,);
                 setStep(2);
             }
 

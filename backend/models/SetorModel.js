@@ -317,7 +317,7 @@ class SetorModel {
                     id_setor: true,
                     nome_setor: true,
                     ordens_producao: {
-                        where: { status_op: 'Em Andamento' },
+                        where: { status_op: 'Em_Andamento' },
                         select: {
                             qtd_planejada: true,
                             apontamentos: {
@@ -344,18 +344,18 @@ class SetorModel {
                     totalProduzido += produzidoNaOP;
                 });
 
-                let porcentagem = 0;
-                if (totalPlanejado > 0) {
-                    porcentagem = (totalProduzido / totalPlanejado) * 100;
-                }
+                // let porcentagem = 0;
+                // if (totalPlanejado > 0) {
+                //     porcentagem = (totalProduzido / totalPlanejado) * 100;
+                // }
 
                 return {
                     setor: setor.nome_setor,
-                    porcentagem: Number(Math.min(porcentagem, 100).toFixed(1))
+                    qtd: totalProduzido
                 };
             });
 
-            return resultado.sort((a, b) => b.porcentagem - a.porcentagem);
+            return resultado
 
         } catch (error) {
             console.error('Erro ao calcular produção por setor:', error);

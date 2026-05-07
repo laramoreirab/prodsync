@@ -19,7 +19,7 @@ import {
   mockProducaoMediaSetor,
 } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const qtdUsuariosPerfilService = {
   async getQtdPorPerfil() {

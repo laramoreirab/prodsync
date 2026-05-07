@@ -5,12 +5,12 @@ import { mockMotivosFrequentesParadas } from "./mockData";
 import {MediaParadasDiaArraychema} from "@/features/paradas/schemas/paradasSchema";
 import { mockMediaParadasDia } from "./mockData";
 
-const USE_MOCK = true; 
+const USE_MOCK = false; 
 
 export const paradaService = {
   async getParadas() {
     if (USE_MOCK) return MotivosFrequentesArraySchema.parse(mockMotivosFrequentesParadas);
-    const data = await apiFetch("/maquinas/status");
+    const data = await apiFetch("/api/maquinas/status");
     return MaquinaStatusArraySchema.parse(data);
   },
 };
