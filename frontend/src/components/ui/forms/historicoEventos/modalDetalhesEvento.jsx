@@ -4,7 +4,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { eventosCrudService } from '@/services/eventosCrudService';
 
@@ -83,58 +83,90 @@ export default function DetalhesEvento({ eventoId }) {
             <Separator className="my-2" />
 
             <div className="px-2 pb-8 pt-4 flex flex-col gap-6">
+                
                 {/* Informações do Evento */}
                 <div className="flex flex-col">
                     <h1 className="text-2xl font-bold text-black">Detalhes do Evento</h1>
 
                     {/* Tipo */}
-                    <div className="flex flex-col w-full gap-2 mt-2 mb-6 cursor-not-allowed">
-                         <div className="flex items-center">
+                    <div className="flex flex-col w-full gap-2 mt-2 mb-6 cursor-text">
+                        <div className="flex items-center">
                             <p className="text-xl font-semibold text-black mr-2">Evento:</p>
-                            
-                        <Badge 
-                        variant={tipoEvento === 'Parada' ? 'parada' : tipoEvento === 'Setup' ? 'setup' : 'outline'} 
-                        className="px-4 py-1.5 text-xl"
-                        >
-                        </Badge>                        
+                            <Badge variant={tipoEvento === 'Parada' ? 'parada' : tipoEvento === 'Setup' ? 'setup' : 'outline'}
+                                className="px-3 text-lg" >
+                                {tipoEvento}
+                            </Badge>
                         </div>
+
+                        {/* <div className="flex items-center">
+                            <p className="text-xl font-semibold text-black mr-2">Data:</p>
+                            <p className="text-xl font-medium text-[#7c7c81]"> 24/10/25 (14:30 - 16:30)</p>
+                        </div> */}
+
+                        <div className="flex items-center">
+                            <span className="text-xl font-semibold text-black">Setor:</span>
+
+                            <div className="flex">
+                                {setoresSelecionados.map(setor => (
+                                    <span key={setor} className="text-[#333333] font-medium px-3 text-xl">
+                                        {setor}
+                                    </span>
+                                ))}
+                            </div>
+
+                        </div>
+
+
+                        {/* Máquinas */}
+                        <div className="flex flex-col gap-1">
+                            <span className="text-xl font-semibold text-black">Máquina(s) Afetada(s): </span>
+
+                            <div className="flex flex-wrap gap-2">
+                                {nomesMaquinas.map(maquinas => (
+                                    <span key={maquinas} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md text-[15px]">
+                                        {maquinas}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Data */}
+                        <div className="flex flex-col gap-2">
+                            <span className="text-xl font-semibold text-black">Período do Evento</span>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-base text-gray-400">Início</span>
+                                    <span className="text-xl text-gray-800">
+                                        {inicioData && inicioHora
+                                            ? `${inicioData} às ${inicioHora}`
+                                            : <span className="text-gray-400 italic">Não informado</span>
+                                        }
+                                    </span>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-base text-gray-400">Fim</span>
+                                    <span className="text-xl text-gray-800">
+                                        {fimData && fimHora
+                                            ? `${fimData} às ${fimHora}`
+                                            : <span className="text-[#7c7c81]">Ativo</span>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
+
+
 
                     {/* Setor */}
-                    <div className="flex flex-col gap-1">
-                        <span className="text-lg font-medium text-gray-500">Setor Afetado</span>
-                        {setoresSelecionados.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {setoresSelecionados.map(s => (
-                                    <span key={s} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md text-[15px]">
-                                        {s}
-                                    </span>
-                                ))}
-                            </div>
-                        ) : (
-                            <span className="text-gray-400 italic text-xl">Não informado</span>
-                        )}
-                    </div>
 
-                    {/* Máquinas */}
-                    <div className="flex flex-col gap-1">
-                        <span className="text-lg font-medium text-gray-500">Máquina(s) Afetada(s)</span>
-                        {nomesMaquinas.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {nomesMaquinas.map(nome => (
-                                    <span key={nome} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md text-[15px]">
-                                        {nome}
-                                    </span>
-                                ))}
-                            </div>
-                        ) : (
-                            <span className="text-gray-400 italic text-xl">Não informado</span>
-                        )}
-                    </div>
+
+
 
                     {/* OPs */}
                     {opsSelecionadas.length > 0 && (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col">
                             <span className="text-lg font-medium text-gray-500">OP(s) Afetada(s)</span>
                             <div className="flex flex-wrap gap-2">
                                 {opsSelecionadas.map(op => (
@@ -146,30 +178,7 @@ export default function DetalhesEvento({ eventoId }) {
                         </div>
                     )}
 
-                    {/* Período */}
-                    <div className="flex flex-col gap-2">
-                        <span className="text-lg font-medium text-gray-500">Período do Evento</span>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-base text-gray-400">Início</span>
-                                <span className="text-xl text-gray-800">
-                                    {inicioData && inicioHora
-                                        ? `${inicioData} às ${inicioHora}`
-                                        : <span className="text-gray-400 italic">Não informado</span>
-                                    }
-                                </span>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <span className="text-base text-gray-400">Fim</span>
-                                <span className="text-xl text-gray-800">
-                                    {fimData && fimHora
-                                        ? `${fimData} às ${fimHora}`
-                                        : <span className="text-gray-400 italic">Não informado</span>
-                                    }
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
 
                 <Separator className="bg-gray-100" />

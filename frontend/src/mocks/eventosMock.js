@@ -7,7 +7,7 @@ export let eventosMock = [
     tipo: "Setup",
     status_maquina: "Setup",
     setor_afetado: "Roscas",
-    maquinas: [1],
+    maquinas: [1, 2, 3],
     inicio: "2026-05-05T14:08:00.000Z",
     fim: null,
     id_motivo_parada: 1,
