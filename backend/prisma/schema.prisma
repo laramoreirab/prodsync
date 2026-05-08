@@ -40,9 +40,10 @@ model Usuarios {
   imagem_perfil   String?          @db.VarChar(255)
   apontamentos    Apontamento[]
   escalas         EscalaTrabalho[]
-  logs            Logs[]
-  setores_geridos Setor_Gestor[]
-  empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  logs              Logs[]
+  setores_geridos   Setor_Gestor[]
+  maquinas_operadas Maquinas[]
+  empresa           Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
 }
 
 model Setores {
@@ -53,6 +54,7 @@ model Setores {
   escalas         EscalaTrabalho[]
   maquinas        Maquinas[]
   gestores        Setor_Gestor[]
+  turnos          Turno[]
   empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   ordens_producao OrdemProducao[]  @relation("OrdemProducaoToSetores")
 }
@@ -76,12 +78,18 @@ model Maquinas {
   id_categoria      Int
   data_ativacao     DateTime?           @db.Date
   ativo             Boolean             @default(true)
+  capacidade        String?             @db.VarChar(100)
+  status            String?             @db.VarChar(50)
+  data_aquisicao    DateTime?           @db.Date
+  id_operador       Int?
+  imagem            String?             @db.VarChar(255)
   apontamentos      Apontamento[]
   escala_trabalho   EscalaTrabalho[]
   historico_eventos Historico_Eventos[]
   categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
+  operador          Usuarios?           @relation(fields: [id_operador], references: [id_usuario])
   ordens_producao   OrdemProducao[]
 }
 
@@ -99,6 +107,7 @@ model Setor_Gestor {
 model Turno {
   id_turno          Int                 @id @default(autoincrement())
   id_empresa        Int
+  id_setor          Int?
   nome_turno        String              @db.VarChar(50)
   hora_inicio       DateTime            @db.Time(6)
   hora_fim          DateTime            @db.Time(6)
@@ -107,6 +116,7 @@ model Turno {
   escalas           EscalaTrabalho[]
   historico_eventos Historico_Eventos[]
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  setor             Setores?            @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
 }
 
 model EscalaTrabalho {

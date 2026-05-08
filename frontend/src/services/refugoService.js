@@ -1,5 +1,5 @@
 
-// import { apiFetch } from "./api";
+// import { apiFetch } from "@/lib/api";
 // import {
 //   ProducaoPorHoraArraySchema,
 //   ProducaoPorSetorArraySchema,
@@ -21,7 +21,7 @@ import {
 } from "@features/refugo/schemas/refugoSchema";
 import { mockTendenciaRefugo } from "./mockData";
 
-const USE_MOCK = false; 
+const USE_MOCK = false;
 export const refugoService = {
   async getTendenciaRefugo() {
     if (USE_MOCK) return TendenciaRefugoArraySchema.parse(mockTendenciaRefugo);
