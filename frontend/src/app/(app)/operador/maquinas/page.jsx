@@ -39,7 +39,7 @@ export default function MaquinaDetalhePage({ params }) {
                 Criar Apontamento
               </DialogTrigger>
               <DialogContent>
-                <FormCriarApontamento />
+                <FormCriarApontamento id_maquina={maquinaId} />
               </DialogContent>
             </Dialog>
           </div>
@@ -69,8 +69,8 @@ export default function MaquinaDetalhePage({ params }) {
           </div>
         </section>
 
-        {/* Gráficos */}
-        {/* SEÇÃO 1: Refugo + Setup */}
+        {/* Gráficos
+        SEÇÃO 1: Refugo + Setup
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">
             <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
@@ -80,12 +80,12 @@ export default function MaquinaDetalhePage({ params }) {
           </div>
         </section>
 
-        {/* SEÇÃO 2: OEE Gauges */}
+        SEÇÃO 2: OEE Gauges
         <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
-          {/* <OEEMaquinaWidget maquinaId={maquinaId} /> */}
+        <OEEMaquinaWidget maquinaId={maquinaId} /> 
         </section>
 
-        {/* SEÇÃO 3: Evolução OEE + Velocidade */}
+        SEÇÃO 3: Evolução OEE + Velocidade 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">
             <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
@@ -93,7 +93,7 @@ export default function MaquinaDetalhePage({ params }) {
           <div className="bg-white border rounded-xl p-4 shadow-sm">
             <VelocidadeMaquinaWidget maquinaId={maquinaId} />
           </div>
-        </section>
+        </section> */}
 
       </div>
     </main>
