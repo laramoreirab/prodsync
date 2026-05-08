@@ -6,7 +6,7 @@ class TurnoController {
     static async criarTurno(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { nome_turno, hora_inicio, hora_fim, dia_semana } = req.body;
+            const { nome_turno, hora_inicio, hora_fim, dia_semana, id_setor } = req.body;
 
             if (!nome_turno || !hora_inicio || !hora_fim || !dia_semana) {
                 return res.status(400).json({ sucesso: false, erro: 'Preencha todos os campos obrigatórios.' });
@@ -21,7 +21,8 @@ class TurnoController {
                 hora_inicio: new Date(hora_inicio),
                 hora_fim: new Date(hora_fim),
                 dia_semana,
-                id_empresa
+                id_empresa,
+                id_setor
             };
 
             const turno = await TurnoModel.criarTurno(dadosTurno);
@@ -34,13 +35,13 @@ class TurnoController {
         }
     }
 
-    // Obtém todos os turnos de uma empresa
+    // Obtém todos os turnos de uma empresa ou setor
     static async obterTurnosPorEmpresa(req, res) {
         try {
-            // Seguro: pega o ID direto do token de login
             const id_empresa = req.user.id_empresa;
+            const { id_setor } = req.query;
 
-            const turnos = await TurnoModel.obterTurnosPorEmpresa(id_empresa);
+            const turnos = await TurnoModel.obterTurnosPorEmpresa(id_empresa, id_setor);
             res.status(200).json({ sucesso: true, dados: turnos });
         } catch (error) {
             console.error('Erro ao obter turnos:', error);
@@ -104,16 +105,16 @@ class TurnoController {
         }
     }
 
-    // Obtém o turno atual com base na hora atual e ID da empresa
+    // Obtém o turno atual com base na hora atual e ID da empresa/setor
     static async obterTurnoAtual(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { hora_atual, dia_semana } = req.query;
+            const { hora_atual, dia_semana, id_setor } = req.query;
 
             if (!hora_atual) return res.status(400).json({ sucesso: false, erro: 'A hora atual é obrigatória' });
             if (!dia_semana) return res.status(400).json({ sucesso: false, erro: 'O dia da semana é obrigatório' });
 
-            const turnoAtual = await TurnoModel.obterTurnoAtual(id_empresa, hora_atual, dia_semana);
+            const turnoAtual = await TurnoModel.obterTurnoAtual(id_empresa, hora_atual, dia_semana, id_setor);
 
             if (!turnoAtual) {
                 return res.status(404).json({ sucesso: false, erro: 'Nenhum turno em andamento neste horário e dia' });
