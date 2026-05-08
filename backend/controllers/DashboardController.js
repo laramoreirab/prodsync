@@ -27,14 +27,25 @@ class DashboardController {
         }
     }
 
-    // GET /api/dashboard/paradas-ppm
-    static async paradasEPPM(req, res) {
+    // GET /api/dashboard/media-paradas-por-dia
+    static async mediaParadasPorDia(req, res) {
         try {
             const id_empresa = req.user.id_empresa
-            const dados = await DashboardModel.buscarParadasEPPM(id_empresa)
+            const dados = await DashboardModel.mediaParadasPorDia(id_empresa)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            console.error('Erro nos KPIs de Paradas e PPM:', error)
+            console.error('Erro nos KPIs de Média de Parada por Dia:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+    // GET /api/dashboard/pecas-por-minuto
+    static async pecasPorMinuto(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa
+            const dados = await DashboardModel.pecasPorMinuto(id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro nos KPIs de Peças por Minuto:', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
