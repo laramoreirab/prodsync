@@ -108,7 +108,7 @@ export default function OrdensDeProducao() {
           },
           "Setup": {
             variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+            className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
           },
           "Parada": {
             variant: "destructive",
@@ -120,7 +120,7 @@ export default function OrdensDeProducao() {
           },
           "Aguardando Início": {
             variant: "outline",
-            className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
+            className: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)] text-sm font-semibold border-none"
           }
         };
 
@@ -167,10 +167,10 @@ export default function OrdensDeProducao() {
 
         {/*SEÇÃO 1: Graphs*/}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4"><OPAtrasadasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4"><OPPecasBoasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget /></div>
         </section>
 
         {/* SEÇÃO 2: Graphs*/}

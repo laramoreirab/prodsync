@@ -16,7 +16,7 @@ export function VelocimetroWidget({ operadorId }) {
       <p className="text-sm font-semibold text-black self-start">Velocímetro</p>
       <p className="text-xs text-gray-400 font-semibold mt-1 self-start">*Atualizado em tempo real</p>
       <GaugeSemicircular
-        data={[{ value: pct, fill: "#00357a" }]}
+        data={[{ value: pct, fill: "var(--chart-primary)" }]}
         size="lg"
         config={{ value: { label: `${data.atual} peças por hora` } }}
       />

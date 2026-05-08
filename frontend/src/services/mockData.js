@@ -485,3 +485,169 @@ export const mockProducaoPorMaquinaSetor = [
   { setor: "THAK-005", qtd: 40 },
   { setor: "THAK-008", qtd: 25 },
 ];
+
+// Dados adicionais para deixar os dashboards mockados mais completos.
+mockProducaoPorSetor.push(
+  { setor: "Usinagem", qtd: 285 },
+  { setor: "Montagem", qtd: 260 },
+  { setor: "Soldagem", qtd: 198 },
+  { setor: "Embalagens", qtd: 172 }
+);
+
+mockProducaoPorHora.push(
+  { hora: "07h", pcs: 58 },
+  { hora: "09h", pcs: 80 },
+  { hora: "11h", pcs: 76 },
+  { hora: "13h", pcs: 70 },
+  { hora: "15h", pcs: 91 },
+  { hora: "17h", pcs: 74 }
+);
+
+mockMotivosFrequentesParadas.push(
+  { motivo: "Troca de Ferramenta", qtd: 38 },
+  { motivo: "Ajuste de Parametros", qtd: 32 },
+  { motivo: "Setup de Linha", qtd: 27 }
+);
+
+mockSetores.push(
+  { id: 10, setor: "Usinagem", gestor: "Marina Lopes", oeeMedio: 84, qtdMaquinas: 24, qtdOperadores: 22 },
+  { id: 11, setor: "Corte CNC", gestor: "Andre Martins", oeeMedio: 62, qtdMaquinas: 16, qtdOperadores: 14 },
+  { id: 12, setor: "Pintura", gestor: "Bruna Tavares", oeeMedio: 71, qtdMaquinas: 11, qtdOperadores: 13 }
+);
+
+mockRefugoPorSetor.push(
+  { setor: "Montagem", refugo: 45 },
+  { setor: "Soldagem", refugo: 52 },
+  { setor: "Pintura", refugo: 38 }
+);
+
+mockTopMotivosTempo.push(
+  { motivo: "Troca de Ferramenta", tempo: "38m", minutos: 38 },
+  { motivo: "Ajuste de Parametros", tempo: "32m", minutos: 32 }
+);
+
+mockQtdUsuariosPorSetor.push(
+  { setor: "Usinagem", qtd: 48 },
+  { setor: "Montagem", qtd: 42 },
+  { setor: "Soldagem", qtd: 31 },
+  { setor: "Embalagens", qtd: 26 }
+);
+
+mockTopOperadores.push(
+  { setor: "Camila", media: 46 },
+  { setor: "Rafael", media: 37 },
+  { setor: "Bianca", media: 34 }
+);
+
+mockRotatividade.unshift(
+  { mes: "Jan", novos: 10, desligados: 4 },
+  { mes: "Fev", novos: 12, desligados: 5 },
+  { mes: "Mar", novos: 16, desligados: 8 }
+);
+mockRotatividade.push(
+  { mes: "Jul", novos: 21, desligados: 9 },
+  { mes: "Ago", novos: 19, desligados: 7 }
+);
+
+mockOPTopRefugo.push(
+  { op: "#4521 (Valv)", refugo: 22 },
+  { op: "#4534 (Turb)", refugo: 18 },
+  { op: "#4540 (Ros)", refugo: 11 }
+);
+
+mockOPCargaSetor.push(
+  { setor: "Soldagem", carga: 6 },
+  { setor: "Pintura", carga: 3 },
+  { setor: "Embalagens", carga: 5 }
+);
+
+mockPecasPorDia.push({ dia: "Dom", qtd: 38 });
+
+mockEficienciaMaquina.push(
+  { dia: "Sex", eficiencia: 78 },
+  { dia: "Sab", eficiencia: 66 },
+  { dia: "Dom", eficiencia: 52 }
+);
+
+mockSetorTopOperadores.push(
+  { operador: "Camila", qtd: 74 },
+  { operador: "Rafael", qtd: 68 },
+  { operador: "Bianca", qtd: 56 }
+);
+
+mockSetorMotivosParada.push(
+  { motivo: "Troca de Ferramenta", qtd: 24 },
+  { motivo: "Ajuste de Parametros", qtd: 19 }
+);
+
+Object.assign(mockAndonFactoryStatusMaquinas, {
+  emProducao: 24,
+  emSetup: 6,
+  emParada: 4,
+});
+
+export const mockAndonFactoryRanking = [
+  { setor: "Engrenagens", produtividade: 95 },
+  { setor: "Usinagem", produtividade: 89 },
+  { setor: "Montagem", produtividade: 84 },
+  { setor: "Soldagem", produtividade: 78 },
+  { setor: "Pintura", produtividade: 72 },
+  { setor: "Embalagens", produtividade: 68 },
+];
+
+export const mockAndonSectorRanking = [
+  { setor: "THAK-9879", produtividade: 95 },
+  { setor: "THAK-9878", produtividade: 80 },
+  { setor: "THAK-9877", produtividade: 70 },
+  { setor: "THAK-9876", produtividade: 55 },
+  { setor: "THAK-9875", produtividade: 49 },
+];
+
+export const mockAndonFactorySections = [
+  {
+    id: "usinagem",
+    titulo: "Usinagem",
+    maquinas: [
+      { id: "m-001", codigo: "THAK-9879", status: "emProducao", operador: "Marcos Lima", detalheLabel: "OP atual", detalheValor: "OP-4491", metaTurno: "420 pcs", metaDia: "1.260 pcs", oee: 91, tempoStatus: "02h 15m" },
+      { id: "m-002", codigo: "THAK-9878", status: "emSetup", operador: "Camila Rocha", detalheLabel: "Setup", detalheValor: "Troca de ferramenta", metaTurno: "360 pcs", metaDia: "1.080 pcs", oee: 64, tempoStatus: "00h 42m" },
+      { id: "m-003", codigo: "THAK-9877", status: "emParada", operador: "Rafael Souza", detalheLabel: "Motivo", detalheValor: "Falta de material", metaTurno: "390 pcs", metaDia: "1.170 pcs", oee: 38, tempoStatus: "01h 08m" },
+    ],
+  },
+  {
+    id: "montagem",
+    titulo: "Montagem",
+    maquinas: [
+      { id: "m-004", codigo: "THAK-9821", status: "emProducao", operador: "Bianca Alves", detalheLabel: "OP atual", detalheValor: "OP-4521", metaTurno: "510 pcs", metaDia: "1.530 pcs", oee: 88, tempoStatus: "03h 04m" },
+      { id: "m-005", codigo: "THAK-9822", status: "emProducao", operador: "Joana Costa", detalheLabel: "OP atual", detalheValor: "OP-4534", metaTurno: "480 pcs", metaDia: "1.440 pcs", oee: 82, tempoStatus: "01h 55m" },
+      { id: "m-006", codigo: "THAK-9823", status: "emSetup", operador: "Antonio Reis", detalheLabel: "Setup", detalheValor: "Ajuste de gabarito", metaTurno: "450 pcs", metaDia: "1.350 pcs", oee: 59, tempoStatus: "00h 31m" },
+    ],
+  },
+  {
+    id: "soldagem",
+    titulo: "Soldagem",
+    maquinas: [
+      { id: "m-007", codigo: "THAK-9760", status: "emProducao", operador: "Maria Nunes", detalheLabel: "OP atual", detalheValor: "OP-4540", metaTurno: "300 pcs", metaDia: "900 pcs", oee: 76, tempoStatus: "02h 44m" },
+      { id: "m-008", codigo: "THAK-9761", status: "emParada", operador: "Mauro Pinto", detalheLabel: "Motivo", detalheValor: "Manutencao corretiva", metaTurno: "320 pcs", metaDia: "960 pcs", oee: 41, tempoStatus: "00h 56m" },
+    ],
+  },
+];
+
+export const mockAndonSectorSections = [
+  {
+    id: "linha-a",
+    titulo: "Linha A",
+    maquinas: [
+      { id: "s-001", codigo: "THAK-9879", status: "emProducao", operador: "Marcos Lima", detalheLabel: "OP atual", detalheValor: "OP-4491", metaTurno: "420 pcs", metaDia: "1.260 pcs", oee: 91, tempoStatus: "02h 15m" },
+      { id: "s-002", codigo: "THAK-9878", status: "emSetup", operador: "Camila Rocha", detalheLabel: "Setup", detalheValor: "Troca de ferramenta", metaTurno: "360 pcs", metaDia: "1.080 pcs", oee: 64, tempoStatus: "00h 42m" },
+      { id: "s-003", codigo: "THAK-9877", status: "emProducao", operador: "Rafael Souza", detalheLabel: "OP atual", detalheValor: "OP-4521", metaTurno: "390 pcs", metaDia: "1.170 pcs", oee: 78, tempoStatus: "01h 08m" },
+    ],
+  },
+  {
+    id: "linha-b",
+    titulo: "Linha B",
+    maquinas: [
+      { id: "s-004", codigo: "THAK-9876", status: "emParada", operador: "Bianca Alves", detalheLabel: "Motivo", detalheValor: "Falta de material", metaTurno: "330 pcs", metaDia: "990 pcs", oee: 35, tempoStatus: "01h 18m" },
+      { id: "s-005", codigo: "THAK-9875", status: "emProducao", operador: "Joana Costa", detalheLabel: "OP atual", detalheValor: "OP-4534", metaTurno: "370 pcs", metaDia: "1.110 pcs", oee: 74, tempoStatus: "02h 01m" },
+    ],
+  },
+];

@@ -56,8 +56,13 @@ function TableFooter({
 
 function TableRow({
   className,
+  children,
   ...props
 }) {
+  const filteredChildren = React.Children.toArray(children).filter(
+    (child) => !(typeof child === "string" && /^\s*$/.test(child))
+  );
+
   return (
     <tr
       data-slot="table-row"
@@ -65,7 +70,10 @@ function TableRow({
         "border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
-      {...props} />
+      {...props}
+    >
+      {filteredChildren}
+    </tr>
   );
 }
 

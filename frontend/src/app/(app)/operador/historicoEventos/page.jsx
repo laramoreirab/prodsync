@@ -60,7 +60,7 @@ const colunasEventos = [
       const config = {
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
@@ -226,7 +226,7 @@ export default function HistoricoEventos() {
         <section>
           {/* Busca */}
           <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]">
               <input
                 type="search"
                 className="p-2 w-full outline-none bg-transparent"

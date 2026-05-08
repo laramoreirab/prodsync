@@ -17,7 +17,7 @@ export default function FormEdicaoSetor() {
                     <DialogTitle className="text-3xl text-white">Editar Setor</DialogTitle>
                 </div>
             </div>
-            <Separator className="m-2 bg-[#a6a6a6]" />
+            <Separator className="m-2 bg-[var(--border-soft)]" />
             <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
 
             </form>

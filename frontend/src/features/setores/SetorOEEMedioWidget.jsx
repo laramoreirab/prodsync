@@ -22,7 +22,7 @@ export function SetorOEEMedioWidget({ setorId }) {
       <div className="flex items-center justify-center py-2">
         <GaugeSemicircular
           title={data.setor}
-          data={[{ value: data.oee, fill: "#00357a" }]}
+          data={[{ value: data.oee, fill: "var(--chart-primary)" }]}
           size="lg"
           config={oeeConfig}
         />

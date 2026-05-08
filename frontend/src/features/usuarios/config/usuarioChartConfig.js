@@ -1,29 +1,29 @@
 export const qtdUsuariosPerfilConfig = {
-  gestores:   { label: "Gestores:",   color: "#00357a" },
-  operadores: { label: "Operadores:", color: "#212e4b" },
+  gestores:   { label: "Gestores:",   color: "var(--chart-primary)" },
+  operadores: { label: "Operadores:", color: "var(--chart-secondary)" },
 };
 
 export const qtdUsuariosSetorConfig = {
-  qtd: { label: "Usuários:", color: "#7d95c6" },
+  qtd: { label: "Usuários:", color: "var(--chart-accent)" },
 };
 
 export const topOperadoresConfig = {
-  media: { label: "Peças Produzidas:", color: "#4a7ff7" },
+  media: { label: "Peças Produzidas:", color: "var(--chart-vivid)" },
 };
 
 export const tempoSessaoConfig = {
-  horas: { label: "Tempo (h):", color: "#00357a" },
+  horas: { label: "Tempo (h):", color: "var(--chart-primary)" },
 };
 
 export const rotatividadeConfig = {
-  novos:      { label: "Novos:",      color: "#00357a" },
-  desligados: { label: "Desligados:", color: "#212e4b" },
+  novos:      { label: "Novos:",      color: "var(--chart-primary)" },
+  desligados: { label: "Desligados:", color: "var(--chart-secondary)" },
 };
 
 export const cumprimentoMetaConfig = {
-  media: { label: "Máquinas/usuário:", color: "#00357a" },
+  media: { label: "Máquinas/usuário:", color: "var(--chart-primary)" },
 };
 
 export const producaoMediaConfig = {
-  media: { label: "Peças/dia:", color: "#4a7ff7" },
+  media: { label: "Peças/dia:", color: "var(--chart-vivid)" },
 };

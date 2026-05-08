@@ -21,11 +21,11 @@ export default function FormExclusaoUsuario() {
             <Separator className="my-2" />
             <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className='w-full flex flex-col items-center justify-center gap-3'>
-                    <TriangleAlert className='text-[#00357a] w-30 h-30' />
+                    <TriangleAlert className='text-[var(--chart-primary)] w-30 h-30' />
                     <h2 className='font-bold text-2xl text-center '>
                         Você tem certeza que deseja <br />excluir este usuário?
                     </h2>
-                    <p className='text-center font-medium text-[#7c7c81]'>
+                    <p className='text-center font-medium text-[var(--text-soft)]'>
                         As informações serão excluídas <b>PERMANENTEMENTE</b> <br /> e não poderão ser restauradas após excluí-las!
                     </p>
                 </div>
@@ -35,7 +35,7 @@ export default function FormExclusaoUsuario() {
                     <DialogClose asChild>
                         <button
                             type="button"
-                            className='border py-3 px-4 rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
+                            className='border py-3 px-4 rounded-lg outline-none text-base font-bold text-[var(--text-soft)] hover:bg-gray-50 disabled:opacity-50'
                         >
                             Cancelar
                         </button>
@@ -43,7 +43,7 @@ export default function FormExclusaoUsuario() {
                     <button
                         type="submit"
 
-                        className='py-3 px-5 bg-[#b30000] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
+                        className='py-3 px-5 bg-[var(--vermelho-vivido)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
                     >
                         Excluir
                     </button>

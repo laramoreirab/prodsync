@@ -57,7 +57,7 @@ const colunasMaquinas = [
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
@@ -83,7 +83,7 @@ const colunasMaquinas = [
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
@@ -279,7 +279,7 @@ export default function Maquinas() {
 
         {/* Busca */}
         <div className="flex px-8 searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]">
             <input
               type="search"
               className="p-2 w-full outline-none bg-transparent"

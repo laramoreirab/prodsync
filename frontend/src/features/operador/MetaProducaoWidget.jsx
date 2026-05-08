@@ -19,22 +19,27 @@ if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-
   ];
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="text-left">
+    <div className="h-full w-full min-h-0 flex flex-col">
+      <header>
         <p className="text-sm font-semibold text-black">Meta da Produção</p>
-        <p className="text-xs text-gray-400 font-semibold">*Atualizado em tempo real</p>
-      </div>
+        <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
+      </header>
       {/* Container central do gráfico */}
-      <div className="flex flex-col items-center">
-        <CustomPieChart data={chartData} config={metaConfig}>
-          <div className="flex flex-col items-center pb-4">
-            <span className="text-3xl font-bold text-black">{data.completo}%</span>
-            <span className="text-xs text-gray-400 font-semibold">Completo</span>
+      <div className="mt-2 flex min-h-0 flex-1 flex-col items-center justify-center">
+        <CustomPieChart
+          data={chartData}
+          config={metaConfig}
+          chartClassName="h-[220px] w-full sm:h-[260px] md:h-[300px]"
+          showLabels={false}
+        >
+          <div className="flex flex-col items-center justify-center">
+            <span className="text-3xl font-bold text-black text-center">{data.completo}%</span>
+            <span className="text-xs text-gray-400 font-semibold text-center">Completo</span>
           </div>
         </CustomPieChart>
 
         {/* Legenda das cores */}
-        <div className="flex gap-4 mt-2">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2">
           {Object.entries(metaConfig).map(([key, item]) => (
             <div key={key} className="flex items-center gap-1.5">
               <div 

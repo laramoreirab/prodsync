@@ -22,7 +22,7 @@ const colunasOP = [
       const config = {
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",

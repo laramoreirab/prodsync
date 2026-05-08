@@ -3,7 +3,7 @@ import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 import { useOEEMaquina } from "./hooks/useOEEMaquina";
 
 const config = {
-  oee: { label: "OEE", color: "#00357a" },
+  oee: { label: "OEE", color: "var(--chart-primary)" },
 };
 
 export function OEEMaquinaWidget({ operadorId }) {  // <- adiciona prop

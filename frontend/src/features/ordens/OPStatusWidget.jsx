@@ -1,35 +1,27 @@
 "use client";
 
-import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
+import { ChartWidgetShell, CustomPieChart } from "@/components/ui/charts/components";
 import { useOPStatus } from "./hooks/useOPStatus";
 import { opStatusConfig } from "./config/ordensChartConfig";
 
 export function OPStatusWidget() {
   const { data, loading, error } = useOPStatus();
 
-   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
- if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
- if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
- if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
- 
   return (
-    <div className="p-5 h-full">
-      <header>
-        <p className="text-sm font-semibold text-black">
-          Status das Ops
-        </p>
-        <p className="text-xs text-gray-400 font-semibold mt-1">
-          *Atualizado em tempo real
-        </p>
-      </header>
-
-      <div className="mt-2">
-        <CustomPieChart
-          data={data}
-          config={opStatusConfig}
-          dataKey="value"
-        />
-      </div>
-    </div>
+    <ChartWidgetShell
+      title="Status das Ops"
+      loading={loading}
+      error={error}
+      empty={!data || (Array.isArray(data) && data.length === 0)}
+      className="p-5"
+    >
+      <CustomPieChart
+        data={data}
+        config={opStatusConfig}
+        dataKey="value"
+        chartSize="compact"
+        compact
+      />
+    </ChartWidgetShell>
   );
 }

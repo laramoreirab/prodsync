@@ -91,7 +91,7 @@ export default function FormEdicaoUsuario() {
                                     alt="Preview"
                                     className="w-32 h-32 object-cover rounded-lg mb-2 border"
                                 />
-                                <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
+                                <div className="flex items-center bg-[var(--info-bg)] text-[var(--info-text)] px-3 py-2 rounded-md w-full">
                                     <File className="w-4 h-4 mr-2 shrink-0" />
                                     <span className="text-sm truncate">{fotoPerfil.nome}</span>
                                 </div>
@@ -201,7 +201,7 @@ export default function FormEdicaoUsuario() {
                     )}
 
                     <div className="flex justify-center mt-4">
-                        <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                        <button type="submit" className="bg-[var(--button-primary)] text-xl text-white font-semibold py-3 px-10 rounded-lg">
                             Editar
                         </button>
                     </div>

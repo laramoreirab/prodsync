@@ -93,7 +93,7 @@ export default function RegisterForm() {
         <Button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full h-11 bg-[#212e4b] hover:bg-slate-800 text-white text-sm font-medium rounded-lg"
+          className="w-full h-11 bg-[var(--chart-secondary)] hover:bg-slate-800 text-white text-sm font-medium rounded-lg"
         >
           {loading ? "Criando conta..." : "Criar conta"}
         </Button>

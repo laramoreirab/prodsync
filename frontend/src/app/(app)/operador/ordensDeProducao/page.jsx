@@ -89,7 +89,7 @@ export default function OrdensDeProducao() {
           },
           "Setup": {
             variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+            className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
           },
           "Parada": {
             variant: "destructive",
@@ -101,7 +101,7 @@ export default function OrdensDeProducao() {
           },
           "Aguardando Início": {
             variant: "outline",
-            className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
+            className: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)] text-sm font-semibold border-none"
           }
         };
 

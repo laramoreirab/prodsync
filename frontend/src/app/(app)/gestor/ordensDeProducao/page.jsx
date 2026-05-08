@@ -25,7 +25,7 @@ export default function OrdensDeProducaoGestor() {
           <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
             Ordens de Produção
           </h1>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-xl bg-[var(--secondary-foreground)] hover:bg-[#004aad] text-white text-sm font-medium transition-colors shadow-lg">
+          <button className="flex items-center gap-2 h-10 px-4 rounded-xl bg-[var(--secondary-foreground)] hover:bg-[var(--azul-cobalto)] text-white text-sm font-medium transition-colors shadow-lg">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -35,10 +35,10 @@ export default function OrdensDeProducaoGestor() {
         </div>
 
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4"><OPAtrasadasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4"><OPPecasBoasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget /></div>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">

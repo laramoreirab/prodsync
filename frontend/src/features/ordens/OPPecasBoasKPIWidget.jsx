@@ -1,5 +1,5 @@
 "use client";
-import { KPI } from "@/components/ui/charts/components";
+import { KPIRetangulo } from "@/components/ui/charts/components";
 import { useOPPecasBoas } from "./hooks/useOPPecasBoas";
 
 export function OPPecasBoasKPIWidget() {
@@ -10,5 +10,5 @@ export function OPPecasBoasKPIWidget() {
  if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
  
-  return <KPI title={data?.titulo} value={data?.valor} />;
+  return <KPIRetangulo title={data?.titulo} value={data?.valor} />;
 }

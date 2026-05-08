@@ -3,8 +3,8 @@ import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useQualidade } from "./hooks/useQualidade";
 
 const config = {
-  pecasBoas: { label: "Peças Boas:", color: "#00357a" },
-  refugo:    { label: "Refugo:",     color: "#7d95c6" },
+  pecasBoas: { label: "Peças Boas:", color: "var(--chart-primary)" },
+  refugo:    { label: "Refugo:",     color: "var(--chart-accent)" },
 };
 
 export function QualidadeWidget({ operadorId }) {

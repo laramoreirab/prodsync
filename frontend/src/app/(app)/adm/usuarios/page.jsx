@@ -277,15 +277,15 @@ export default function Usuarios() {
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          <div className="border rounded-xl p-4">
+          <div className="border rounded-xl p-4 bg-white">
             <QtdUsuariosWidget />
           </div>
 
-          <div className="border rounded-xl p-4">
+          <div className="border rounded-xl p-4 bg-white">
             <QtdUsuariosPorSetorWidget />
           </div>
 
-          <div className="border rounded-xl p-4">
+          <div className="border rounded-xl p-4 bg-white">
             <TopOperadoresWidget />
           </div>
 
@@ -296,11 +296,11 @@ export default function Usuarios() {
       <section className=" p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <div className="border rounded-xl p-6">
+          <div className="border rounded-xl p-6 bg-white">
             <TempoSessaoWidget />
           </div>
 
-          <div className="border rounded-xl p-4">
+          <div className="border rounded-xl p-4 bg-white">
             <RotatividadeWidget />
           </div>
 
@@ -311,11 +311,11 @@ export default function Usuarios() {
       <section className=" p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <div className="border rounded-xl p-4">
+          <div className="border rounded-xl p-4 bg-white">
             <CumprimentoMetaSetorWidget />
           </div>
 
-          <div className="border rounded-xl p-4">
+          <div className="border rounded-xl p-4 bg-white">
             <ProducaoMediaSetorWidget />
           </div>
 
@@ -333,7 +333,7 @@ export default function Usuarios() {
 
         {/* Busca */}
         <div className="flex searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]">
             <input
               type="search"
               className="p-2 w-full outline-none bg-transparent"

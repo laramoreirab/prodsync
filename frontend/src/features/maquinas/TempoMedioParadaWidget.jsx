@@ -1,33 +1,26 @@
 "use client";
 
-import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
+import { BarVerticalBase, ChartWidgetShell } from "@/components/ui/charts/components";
 import { useTempoMedioParada } from "./hooks/useTempoMedioParada";
 import { tempoMedioParadaConfig } from "./config/maquinaChartConfig";
 
 export function TempoMedioParadaWidget() {
   const { data, loading, error } = useTempoMedioParada();
 
-  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
-if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
-if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
   return (
-    <div>
-      <p className="text-sm font-semibold text-black">
-        Tempo médio de parada das máquinas por setor
-      </p>
-      <p className="text-xs text-gray-400 font-semibold mt-1">
-        *Atualizado em tempo real
-      </p>
-
-      <div className="mt-2">
-        <BarVerticalBase
-          data={data}
-          config={tempoMedioParadaConfig}
-          xKey="setor"
-          yKey="minutos"
-        />
-      </div>
-    </div>
+    <ChartWidgetShell
+      title="Tempo médio de parada das máquinas por setor"
+      loading={loading}
+      error={error}
+      empty={!data || (Array.isArray(data) && data.length === 0)}
+    >
+      <BarVerticalBase
+        data={data}
+        config={tempoMedioParadaConfig}
+        xKey="setor"
+        yKey="minutos"
+        chartSize="default"
+      />
+    </ChartWidgetShell>
   );
 }

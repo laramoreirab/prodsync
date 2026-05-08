@@ -38,7 +38,7 @@ export function BarComValorETopo({ data, config, title }) {
             dataKey={labelKey}
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12, fill: "hsl(var(--secondary-foreground))" }}
+            tick={{ fontSize: 12, fill: "var(--secondary-foreground)" }}
           />
           <YAxis hide />
           <ChartTooltip
