@@ -10,8 +10,9 @@ const USE_MOCK = false;
 export const paradaService = {
   async getParadas() {
     if (USE_MOCK) return MotivosFrequentesArraySchema.parse(mockMotivosFrequentesParadas);
-    const data = await apiFetch("/api/maquinas/status");
-    return MaquinaStatusArraySchema.parse(data.dados);
+    const data = await apiFetch("/api/dashboard/top-motivos-parada");
+    console.log("ARRAY DO MOTIVOS FREQUENTES", data.dados)
+    return MotivosFrequentesArraySchema.parse(data.dados);
   },
 };
 

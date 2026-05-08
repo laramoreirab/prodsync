@@ -29,8 +29,8 @@ export const maquinaStatusService = {
 export const maquinaAtivaPorTurnoService = {
   async getMaquinaAtivaPorTurnoService() {
     if (USE_MOCK) return MaquinaAtivaPorTurnoSchema.parse(mockMaquinaAtivaPorTurno);
-    const data = await apiFetch("/maquinas/ativa_por_turno");
-    return MaquinaAtivaPorTurnoSchema.parse(data);
+    const data = await apiFetch("/api/turnos/kpis/turno-atual")
+    return MaquinaAtivaPorTurnoSchema.parse(data.dados.cards.maquinasAtivas);
   },
 };
 

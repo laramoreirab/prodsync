@@ -522,10 +522,10 @@ class MaquinaModel {
 
             return {
                 titulo: 'Pecas por Minuto',
-                valor: String(pecasPorMinuto),
-                pecas_por_minuto: pecasPorMinuto,
-                total_pecas: totais.pecas,
-                tempo_producao_minutos: Number(totais.minutos.toFixed(1))
+                valor: String(pecasPorMinuto)
+                // pecas_por_minuto: pecasPorMinuto,
+                // total_pecas: totais.pecas,
+                // tempo_producao_minutos: Number(totais.minutos.toFixed(1))
             };
         } catch (error) {
             console.error('Erro ao obter pecas por minuto:', error);

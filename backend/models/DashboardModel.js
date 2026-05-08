@@ -88,118 +88,120 @@ class DashboardModel {
     }
 
     // Média de paradas por dia
-static async mediaParadasPorDia(id_empresa) {
-    try {
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
+    static async mediaParadasPorDia(id_empresa) {
+        try {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
 
-        const amanha = new Date(hoje);
-        amanha.setDate(amanha.getDate() + 1);
+            const amanha = new Date(hoje);
+            amanha.setDate(amanha.getDate() + 1);
 
-        const dadosParadas = await prisma.historico_Eventos.aggregate({
-            where: {
-                id_empresa: Number(id_empresa),
+            const dadosParadas = await prisma.historico_Eventos.aggregate({
+                where: {
+                    id_empresa: Number(id_empresa),
 
-                id_motivo_parada: {
-                    not: null
+                    id_motivo_parada: {
+                        not: null
+                    },
+                    OR: [
+                        {
+                            inicio: {
+                                gte: hoje,
+                                lt: amanha
+                            }
+                        },
+                        {
+                            termino: {
+                                gte: hoje,
+                                lt: amanha
+                            }
+                        }
+                    ]
                 },
-                OR: [
-                    {
-                        inicio: {
-                            gte: hoje,
-                            lt: amanha
-                        }
-                    },
-                    {
-                        termino: {
-                            gte: hoje,
-                            lt: amanha
-                        }
-                    }
-                ]
-            },
 
-            _sum: {
-                duracao: true
-            },
+                _sum: {
+                    duracao: true
+                },
 
-            _count: {
-                id_evento: true
-            }
-        });
+                _count: {
+                    id_evento: true
+                }
+            });
 
-        const totalDuracao = dadosParadas._sum.duracao || 0;
+            const totalDuracao = dadosParadas._sum.duracao || 0;
 
-        const quantidadeParadas =
-            dadosParadas._count.id_evento || 1;
+            const quantidadeParadas =
+                dadosParadas._count.id_evento || 1;
 
-        const mediaDuracao =
-            totalDuracao / quantidadeParadas;
+            const mediaDuracao =
+                totalDuracao / quantidadeParadas;
 
-        return {
-            titulo: 'Média de Paradas por Dia',
-            valor: `${(mediaDuracao / 60).toFixed(1)}h`
-        };
+            return {
+                titulo: 'Média de Paradas por Dia',
+                valor: `${(mediaDuracao / 60).toFixed(1)}h`
+            };
 
-    } catch (error) {
-        console.error('Erro ao buscar média de paradas:', error);
-        throw new Error('Erro ao buscar média de paradas');
+        } catch (error) {
+            console.error('Erro ao buscar média de paradas:', error);
+            throw new Error('Erro ao buscar média de paradas');
+        }
     }
-}
 
-// Peças por minuto
-static async pecasPorMinuto(id_empresa) {
-    try {
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-
-         const amanha = new Date(hoje);
-        amanha.setDate(amanha.getDate() + 1);
-
-        const producaoHoje = await prisma.apontamento.aggregate({
-            where: {
-                id_empresa: Number(id_empresa),
-                OR: [
-                    {
-                        data_hora_inicio: {
-                            gte: hoje,
-                            lt: amanha
-                        }
-                    },
-                    {
-                        data_hora_fim: {
-                            gte: hoje,
-                            lt: amanha
-                        }
+    // Top 3 motivos de parada mais frequentes na fábrica
+    static async top3MotivosParadaGeral(id_empresa) {
+        try {
+            // 1. Agrupa os eventos pelo ID do motivo e conta as ocorrências
+            const motivosAgrupados = await prisma.historico_Eventos.groupBy({
+                by: ['id_motivo_parada'],
+                where: {
+                    id_empresa,
+                    id_motivo_parada: { not: null }, // Garante que apenas eventos com motivo entrem
+                    status_atual: { in: ['Parada', 'Setup'] } // Foca nos estados de interesse
+                },
+                _count: {
+                    id_motivo_parada: true
+                },
+                orderBy: {
+                    _count: {
+                        id_motivo_parada: 'desc' // Ordena pelos mais frequentes
                     }
-                ]
-            },
-            _sum: {
-                qtd_boa: true
+                },
+                take: 3 // Pega apenas os 3 primeiros
+            });
+
+            if (motivosAgrupados.length === 0) {
+                return Array(3).fill({
+                    motivo: "Sem dados",
+                    qtd: 0
+                });
             }
-        });
 
-        const totalPecasHoje = producaoHoje._sum.qtd_boa || 0;
+            // 2. Busca as descrições dos motivos encontrados
+            const idsMotivos = motivosAgrupados.map(m => m.id_motivo_parada);
+            const motivosInfo = await prisma.motivos_parada.findMany({
+                where: {
+                    id_empresa,
+                    id_motivo: { in: idsMotivos }
+                },
+                select: {
+                    id_motivo: true,
+                    descricao: true
+                }
+            });
 
-        const agora = new Date();
+            // 3. Cria um mapa para busca rápida da descrição pelo ID
+            const motivosMap = new Map(motivosInfo.map(m => [m.id_motivo, m.descricao]));
 
-        const minutosPassados = Math.max(
-            1,
-            (agora.getTime() - hoje.getTime()) / 1000 / 60
-        );
-
-        const pecasPorMinuto = totalPecasHoje / minutosPassados;
-
-        return {
-            titulo:'Peças por Minuto',
-            valor: `${Math.round(pecasPorMinuto)}`
-        };
-
-    } catch (error) {
-        console.error('Erro ao buscar peças por minuto:', error);
-        throw new Error('Erro ao buscar peças por minuto');
+            // 4. Formata o retorno final
+            return motivosAgrupados.map(item => ({
+                motivo: motivosMap.get(item.id_motivo_parada) ?? 'Sem motivo informado',
+                qtd: item._count.id_motivo_parada
+            }));
+        } catch (error) {
+            console.error('Erro ao obter top 3 motivos de parada geral:', error);
+            throw error;
+        }
     }
-}
 }
 
 export default DashboardModel;
