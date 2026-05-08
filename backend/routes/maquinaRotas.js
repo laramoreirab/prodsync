@@ -13,6 +13,7 @@ router.post('/', MaquinaController.criarMaquina);
 router.get('/dashboard/status-geral', MaquinaController.obterStatusGeralMaquinas);
 router.get('/dashboard/taxa-cumprimento-meta-setor', MaquinaController.taxaCumprimentoMetaPorSetor);
 router.get('/dashboard/obter-pecas-por-minuto', MaquinaController.obterPecasPorMinuto)
+router.get('/dashboard/obter-tempo-parada-maquinas', MaquinaController.obterMediaParadasPorDia)
 
 router.get('/status/:status', MaquinaController.listarMaquinasPorStatus);
 router.get('/setor/:id_setor', MaquinaController.listarMaquinasPorSetor);

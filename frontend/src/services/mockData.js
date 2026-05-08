@@ -152,9 +152,9 @@ export const mockProducaoDefeitos = [
 ];
 
 export const mockMaquinasPorTurno = [
-  { turno: "Manhã", ativas: 80, paradas: 12, manutencao: 8  },
-  { turno: "Tarde", ativas: 72, paradas: 18, manutencao: 10 },
-  { turno: "Noite", ativas: 65, paradas: 20, manutencao: 15 },
+  { turno: "Manhã", ativas: 80, paradas: 12, setup: 8  },
+  { turno: "Tarde", ativas: 72, paradas: 18, setup: 10 },
+  { turno: "Noite", ativas: 65, paradas: 20, setup: 15 },
 ];
 
 // ProducaoTotal — três datasets para os filtros de período

@@ -42,6 +42,6 @@ export const MaquinaPorTurnoSchema = z.object({
   turno:      z.string(),
   ativas:     z.number(),
   paradas:    z.number(),
-  manutencao: z.number(),
+  setup: z.number(),
 });
 export const MaquinaPorTurnoArraySchema = z.array(MaquinaPorTurnoSchema);

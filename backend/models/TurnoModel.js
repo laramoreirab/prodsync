@@ -402,60 +402,76 @@ class TurnoModel {
     }
 
     static async obterStatusMaquinasPorTurno(id_empresa) {
-        try {
-            const turnos = await prisma.turno.findMany({
-                where: { id_empresa },
-                include: {
-                    escalas: {
-                        include: {
-                            maquina: {
-                                select: {
-                                    id_maquina: true,
-                                    status_atual: true,
-                                    ativo: true
-                                }
+    try {
+        const turnos = await prisma.turno.findMany({
+            where: { id_empresa },
+            include: {
+                escalas: {
+                    include: {
+                        maquina: {
+                            select: {
+                                id_maquina: true,
+                                status_atual: true,
+                                ativo: true
                             }
                         }
                     }
-                },
-                orderBy: {
-                    id_turno: 'asc'
                 }
-            });
+            }
+        });
 
-            return turnos.map(turno => {
-                const maquinasUnicas = new Map();
+        // 1. Criamos um objeto para agrupar tudo pelo nome do turno
+        const mapaTurnos = {};
 
-                for (const escala of turno.escalas) {
-                    if (escala.maquina?.ativo) {
-                        maquinasUnicas.set(escala.maquina.id_maquina, escala.maquina.status_atual);
-                    }
-                }
+        turnos.forEach(turno => {
+            const nomeTurno = turno.nome_turno; // Ex: "Manhã", "Tarde", "Noite"
 
-                const contadores = {
-                    ativas: 0,
-                    paradas: 0,
-                    manutencao: 0
+            // Se o turno ainda não existe no mapa, inicializa com um Map de máquinas
+            if (!mapaTurnos[nomeTurno]) {
+                mapaTurnos[nomeTurno] = { 
+                    turno: nomeTurno, 
+                    maquinasUnicas: new Map() 
                 };
+            }
 
-                for (const status of maquinasUnicas.values()) {
-                    if (status === 'Produzindo') contadores.ativas += 1;
-                    else if (status === 'Manutencao') contadores.manutencao += 1;
-                    else contadores.paradas += 1;
+            // 2. Extrai as máquinas de todas as escalas daquele turno e guarda no Map global do turno
+            for (const escala of turno.escalas) {
+                if (escala.maquina?.ativo) {
+                    // O Map garante que se a máquina aparecer em duas escalas do mesmo turno, ela conta só uma vez
+                    mapaTurnos[nomeTurno].maquinasUnicas.set(
+                        escala.maquina.id_maquina, 
+                        escala.maquina.status_atual
+                    );
                 }
+            }
+        });
 
-                return {
-                    id_turno: turno.id_turno,
-                    turno: turno.nome_turno,
-                    dia_semana: turno.dia_semana,
-                    ...contadores
-                };
-            });
-        } catch (error) {
-            console.error('Erro ao obter status de maquinas por turno:', error);
-            throw error;
-        }
+        // 3. Agora transformamos o objeto agrupado no formato de array final (igual ao seu mock)
+        const resultadoFinal = Object.values(mapaTurnos).map(grupo => {
+            let ativas = 0, paradas = 0, setup = 0;
+
+            // Percorre as máquinas únicas daquele turno específico e soma os status
+            for (const status of grupo.maquinasUnicas.values()) {
+                if (status === 'Produzindo') ativas += 1;
+                else if (status === 'Setup') setup += 1;
+                else paradas += 1; // Tudo que não for Produzindo ou Setup, cai em parada
+            }
+
+            return {
+                turno: String(grupo.turno),
+                ativas,
+                paradas,
+                setup
+            };
+        });
+
+        return resultadoFinal;
+
+    } catch (error) {
+        console.error('Erro ao obter status de maquinas por turno:', error);
+        throw error;
     }
+}
 
     // Gráfico 1: Produção Timeline - Produção ao longo do tempo durante um turno
     static async obterProducaoTimeline(id_turno) {
