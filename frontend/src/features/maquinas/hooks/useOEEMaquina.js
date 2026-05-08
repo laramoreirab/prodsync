@@ -1,12 +1,29 @@
+// "use client";
+// import { useCallback } from "react";
+// import { useChartData } from "@/hooks/useChartData";
+// import { oeeMaquinaService } from "@services/maquinaDetalheService";
+
+// export function useOEEMaquina(maquinaId) {
+//   const fetcher = useCallback(
+//     () => oeeMaquinaService.getOEE(maquinaId),
+//     [maquinaId]
+//   );
+//   return useChartData(fetcher);
+// }
+
 "use client";
 import { useCallback } from "react";
 import { useChartData } from "@/hooks/useChartData";
-import { oeeMaquinaService } from "@services/maquinaDetalheService";
+import { oeeMaquinaService } from "@services/operadorService";
 
-export function useOEEMaquina(maquinaId) {
+export function useOEEMaquina(operadorId) {
   const fetcher = useCallback(
-    () => oeeMaquinaService.getOEE(maquinaId),
-    [maquinaId]
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return oeeMaquinaService.getOEEMaquina(operadorId);
+    },
+    [operadorId]
   );
-  return useChartData(fetcher);
+  const result = useChartData(fetcher);
+  return result;
 }

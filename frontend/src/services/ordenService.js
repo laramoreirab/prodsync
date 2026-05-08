@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api"
 import {
   OPKPISchema,
   OPEficienciaSchema,
@@ -19,7 +19,7 @@ import {
   mockOPCargaSetor,
   mockOPStatus,
   mockOPConcluidasDia,
-  mockOPProgresso,
+  mockUSE_MOCK,
   mockOPOEEDetalhe,
 } from "./mockData";
 

@@ -1,14 +1,16 @@
 "use client";
+import { useCallback } from "react";
 import { useChartData } from "@/hooks/useChartData";
 import { velocimetroService } from "@services/operadorService";
-import { getUserFromToken } from "@/lib/auth";
-import { useCallback } from "react";
-export function useVelocimetro() {
-const { id_usuario } = getUserFromToken() ?? {};
-const fetcher = useCallback(
-    () => velocimetroService.getVelocimetro(id_usuario),
-    [id_usuario]
+
+export function useVelocimetro(operadorId) {
+  const fetcher = useCallback(
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return velocimetroService.getVelocimetro(operadorId);
+    },
+    [operadorId]
   );
+
   return useChartData(fetcher);
 }
-

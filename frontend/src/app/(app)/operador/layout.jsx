@@ -6,7 +6,7 @@ export default function AdminLayout({ children }) {
     <div data-app-shell className="min-h-screen w-full bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat dark:bg-[#0b1020] dark:bg-none">
       <Header showSidebarTrigger />
 
-      <div className="flex w-full gap-4 px-4 pb-8 pt-24 sm:px-6 lg:px-8">
+      <div className="flex w-full gap-4 px-4 pb-8 pt-20 sm:px-6 lg:px-8">
         <AppSidebar />
         <main className="min-w-0 flex-1">
           {children}

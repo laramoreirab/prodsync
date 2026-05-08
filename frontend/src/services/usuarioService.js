@@ -1,5 +1,5 @@
-// src/services/usuarioService.js
-import { apiFetch } from "./api";
+// import { apiFetch } from "./api";
+
 import {
   QtdUsuariosPorPerfilArraySchema,
   QtdUsuariosPorSetorArraySchema,
@@ -19,7 +19,7 @@ import {
   mockProducaoMediaSetor,
 } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const qtdUsuariosPerfilService = {
   async getQtdPorPerfil() {

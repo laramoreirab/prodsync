@@ -1,20 +1,36 @@
 "use client";
 
-import React from 'react';
-import { KPI } from "@/components/ui/charts/components";
-import { ProdutividadeDiariaWidget } from "@/features/operador/ProdutividadeDiariaWidget";
-import { EficienciaMaquinaWidget }   from "@/features/operador/EficienciaMaquinaWidget";
-import { ProducaoPorHoraOperadorWidget } from "@/features/operador/ProducaoPorHoraOperadorWidget";
-import { QualidadeWidget }           from "@/features/operador/QualidadeWidget";
-import { VelocimetroWidget }         from "@/features/operador/VelocimetroWidget";
-import { OEEMaquinaWidget} from "@/features/operador/OEEMaquinaWidget";
+import React, { useState, useEffect } from "react";
+import { ProdutividadeDiariaWidget }       from "@/features/operador/ProdutividadeDiariaWidget";
+import { EficienciaMaquinaWidget }         from "@/features/operador/EficienciaMaquinaWidget";
+import { ProducaoPorHoraOperadorWidget }   from "@/features/operador/ProducaoPorHoraOperadorWidget";
+import { QualidadeWidget }                 from "@/features/operador/QualidadeWidget";
+import { VelocimetroWidget }               from "@/features/operador/VelocimetroWidget";
+import { OEEMaquinaWidget }                from "@/features/operador/OEEMaquinaWidget";
 
-const OPERADOR_ID = 1; // virá do token JWT futuramente
+import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+
 
 export default function DashboardGeralOperador() {
+  const [operadorId, setOperadorId] = useState(null);
+
+
+  // Lê o token só no cliente, após a hidratação
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_usuario) setOperadorId(payload.id_usuario);
+    } catch {
+      // token ausente ou malformado
+    }
+  }, []);
+
+
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      
+
       {/* Título da Tela */}
       <section className="p-8">
         <div className="title_tela">
@@ -24,25 +40,23 @@ export default function DashboardGeralOperador() {
         </div>
       </section>
 
-      {/* SEÇÃO 1: Meta | Produtividade | OEE */}
+      {/* SEÇÃO 1: OEE | Produtividade | Eficiência */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Meta KPI */}
-          <div className="bg-white border rounded-xl p-4 flex flex-col h-full">
-            {/* <MetaKPIWidget operadorId={OPERADOR_ID} /> */}
-            {/* ta dando erro no token, vou deixar pra depois, mas a ideia é essa: */} 
 
+          {/* OEE da Máquina */}
+          <div className="bg-white border rounded-xl p-4">
+            {/* <OEEMaquinaWidget operadorId={operadorId} /> */}
           </div>
 
           {/* Produtividade Diária */}
           <div className="bg-white border rounded-xl p-4">
-            <ProdutividadeDiariaWidget operadorId={OPERADOR_ID} />
+            {/* <ProdutividadeDiariaWidget operadorId={operadorId} /> */}
           </div>
 
-          {/* Eficiência Máquina (OEE) */}
+          {/* Eficiência por dia */}
           <div className="bg-white border rounded-xl p-4">
-            <OEEMaquinaWidget />
+            {/* <EficienciaMaquinaWidget operadorId={operadorId} /> */}
           </div>
 
         </div>
@@ -51,20 +65,17 @@ export default function DashboardGeralOperador() {
       {/* SEÇÃO 2: Produção por Hora | Qualidade | Velocímetro */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Produção por Hora */}
+
           <div className="bg-white border rounded-xl p-4">
-            <ProducaoPorHoraOperadorWidget operadorId={OPERADOR_ID} />
+            {/* <ProducaoPorHoraOperadorWidget operadorId={operadorId} /> */}
           </div>
 
-          {/* Qualidade */}
           <div className="bg-white border rounded-xl p-4">
-            <QualidadeWidget operadorId={OPERADOR_ID} />
+            {/* <QualidadeWidget operadorId={operadorId} /> */}
           </div>
 
-          {/* Velocímetro */}
           <div className="bg-white border rounded-xl p-4">
-            <VelocimetroWidget operadorId={OPERADOR_ID} />
+            {/* <VelocimetroWidget operadorId={operadorId} /> */}
           </div>
 
         </div>

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon } from "lucide-react";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
-import React, { useState } from 'react';
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, Loader2 } from "lucide-react";
+import FilterDropdown from "@/components/ui/filterDropdown";
+import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import React, { useState, useEffect } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import {
   Dialog,
@@ -16,8 +16,6 @@ import {
 import FormCadastroMaquina from "@/components/ui/forms/maquinas/formCadastroMaquina";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
-import { useEffect } from 'react';
-import { Loader2 } from "lucide-react";
 //Widget imports - Dashboard
 import { MaquinaStatusDonutWidget } from "@/features/maquinas/MaquinaStatusDonutWidget";
 import { MaquinasPorSetorWidget } from "@/features/maquinas/MaquinasPorSetorWidget";
@@ -25,8 +23,6 @@ import { TempoMedioParadaWidget } from "@/features/maquinas/TempoMedioParadaWidg
 import { ProducaoDefeitosWidget } from "@/features/maquinas/ProducaoDefeitosWidget";
 import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidget";
 import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
-
-
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
@@ -117,7 +113,7 @@ export default function Maquinas() {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'nome') return a.nome.localeCompare(b.nomeMaquina);
+      if (criterio === 'nome') return a.nome.localeCompare(b.nome);
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
       if (criterio === 'setor') return a.id_setor.localeCompare(b.id_setor);
@@ -175,11 +171,6 @@ export default function Maquinas() {
       maq.id.toString().includes(termo)
     );
   });
-
-  //ações da tabela
-  const abrirModalExclusao = (maquina) => {
-    setMaquinaSelecionada(maquina);
-  };
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {

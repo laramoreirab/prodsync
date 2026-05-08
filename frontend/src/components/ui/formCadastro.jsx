@@ -34,8 +34,8 @@ export default function RegisterForm() {
     setErros({});
     try {
       const data = await cadastroService.cadastrar(form);
-      if (data?.token) {
-      localStorage.setItem("token", data.token);
+      if (data.dados.token) {
+      localStorage.setItem("token", data.dados.token);
       setOpen(true);
     } else {
       // Caso o backend retorne 200 mas sem token por algum motivo
@@ -67,7 +67,7 @@ export default function RegisterForm() {
 
   return (
     <>
-      <div className="w-full max-w-[600px] space-y-5 ml-0 md:ml-4 pt-16">
+      <div className="w-full max-w-[600px] space-y-5 ml-0 md:ml-4 pt-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Bem-vindo ao ProdSync!</h1>
           <p className="text-md text-muted-foreground">

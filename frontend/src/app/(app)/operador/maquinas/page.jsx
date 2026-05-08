@@ -1,78 +1,101 @@
-"use client";
+"use client"
 
-import { MaquinaOEEWidget } from "@/features/operador/MaquinaOEEWidget";
+import { MotivoRefugoMaquinaWidget } from "@/features/maquinas/MotivoRefugoMaquinaWidget";
+import { MotivoSetupMaquinaWidget } from "@/features/maquinas/MotivoSetupMaquinaWidget";
+import { OEEMaquinaWidget } from "@/features/maquinas/OEEMaquinaWidget";
+import { OEEEvolucaoMaquinaWidget } from "@/features/maquinas/OEEEvolucaoMaquinaWidget";
+import { VelocidadeMaquinaWidget } from "@/features/maquinas/VelocidadeMaquinaWidget";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from "@/components/ui/dialog";
+import FormCriarApontamento from "@/components/ui/forms/maquinas/criarApontamento";
 
-// Mock temporário — virá do service depois
-const mockMetas = {
-  metaDia:      200,
-  metaDiaTotal: 500,
-  metaTotal:    1200,
-  metaTotalMax: 5000,
-};
+import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
 
-function MetaCard({ label, atual, total }) {
+import { use } from "react";
+import Image from "next/image";
+
+export default function MaquinaDetalhePage({ params }) {
+  const { id } = use(params);
+  const maquinaId = Number(id);
+
   return (
-    <div className="bg-white border rounded-xl p-6 flex flex-col gap-2">
-      <p className="text-sm font-semibold text-gray-500">{label}</p>
-      <div className="flex items-end gap-1">
-        <span className="text-6xl font-bold text-black">{atual}</span>
-        <span className="text-2xl text-gray-400 mb-1">/{total}</span>
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+      <div className="w-full mt-8 pb-10 px-8 space-y-4">
+
+        <section id="infos_op" className="flex flex-col">
+          <div className="flex justify-between items-center">
+            <div className="bg-white px-5 pb-3 rounded-tl-4xl rounded-tr-4xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a]">
+              <h1 className="text-3xl font-bold uppercase text-[#212e4b] pb-0 inline-block px-6 py-4">
+                THAK-1234
+              </h1>
+            </div>
+
+            <Dialog>
+              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                <Plus className="mr-2" />
+                Criar Apontamento
+              </DialogTrigger>
+              <DialogContent>
+                <FormCriarApontamento id_maquina={maquinaId} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="flex gap-8 mt-5">
+            <div className="bg-white rounded-xl p-13  ">
+              <Image src="/demo_maq.png" alt="Demo Maquina" className="rounded-xl" width={150} height={150} />
+            </div>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">ID:</p>
+                <p className="text-xl font-medium text-black">00000</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Série:</p>
+                <p className="text-xl font-medium text-black">SX-900</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
+                <p className="text-xl font-medium text-black">40 peças/h </p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Status:</p>
+                <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">Parada</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Gráficos
+        SEÇÃO 1: Refugo + Setup
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
+          </div>
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <MotivoSetupMaquinaWidget maquinaId={maquinaId} />
+          </div>
+        </section>
+
+        SEÇÃO 2: OEE Gauges
+        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+        <OEEMaquinaWidget maquinaId={maquinaId} /> 
+        </section>
+
+        SEÇÃO 3: Evolução OEE + Velocidade 
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
+          </div>
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <VelocidadeMaquinaWidget maquinaId={maquinaId} />
+          </div>
+        </section> */}
+
       </div>
-    </div>
-  );
-}
-
-export default function MaquinaPage() {
-  const { metaDia, metaDiaTotal, metaTotal, metaTotalMax } = mockMetas;
-
-  function handleSetup() {
-    // abrir modal de setup
-    alert("Registrar Setup");
-  }
-
-  function handleParada() {
-    // abrir modal de parada
-    alert("Registrar Parada");
-  }
-
-  return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">
-
-      {/* OEE + Status */}
-      <section className="bg-white border rounded-xl p-6">
-        <MaquinaOEEWidget />
-      </section>
-
-      {/* Metas */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <MetaCard
-          label="Meta do Dia"
-          atual={metaDia}
-          total={metaDiaTotal}
-        />
-        <MetaCard
-          label="Meta Total"
-          atual={metaTotal}
-          total={metaTotalMax}
-        />
-      </section>
-
-      {/* Botões de ação */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button
-          onClick={handleSetup}
-          className="w-full py-4 rounded-xl bg-[#ffd51e] text-black text-xl font-bold hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          Registrar SetUp
-        </button>
-        <button
-          onClick={handleParada}
-          className="w-full py-4 rounded-xl bg-[#b30000] text-white text-xl font-bold hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          Registrar Parada
-        </button>
-      </section>
-
-    </div>
+    </main>
   );
 }

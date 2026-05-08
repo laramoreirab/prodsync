@@ -148,19 +148,20 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
                 </div>
 
                 {openSections[filter.id] && (
-                  <div className="flex flex-col gap-3 px-3 pb-3">
-                    {filter.type === "checkbox" &&
-                      filter.options.map((opt) => (
-                        <label key={opt} className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={(filterValues[filter.id] || []).includes(opt)}
-                            onChange={() => handleCheckbox(filter.id, opt)}
-                            className="size-4 cursor-pointer rounded border-[#c3c7c8] accent-[#00357a]"
-                          />
-                          <span className="text-sm text-[#23304c]">{opt}</span>
-                        </label>
-                      ))}
+                  <div className="px-3 pb-3 flex flex-col gap-3">
+                    
+                    {/*caso 1: checkbox */}
+                    {filter.type === "checkbox" && filter.options.map((opt) => (
+                      <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={(filterValues[filter.id] || []).includes(opt)}
+                          onChange={() => handleCheckbox(filter.id, opt)}
+                          className="w-4 h-4 rounded accent-blue-900 border-gray-300 text-secondary-foreground cursor-pointer"
+                        />
+                        <span className="text-sm text-gray-700">{opt}</span>
+                      </label>
+                    ))}
 
                     {filter.type === "date-range" && (
                       <>

@@ -1,14 +1,19 @@
 "use client";
+import { useCallback, useState, useEffect } from "react";
 import { useChartData } from "@/hooks/useChartData";
 import { oeeMaquinaService } from "@services/operadorService";
-import { getUserFromToken } from "@/lib/auth";
-import { useCallback } from "react";
 
-export function useOEEMaquina() {
-  const { id_usuario } = getUserFromToken() ?? {};
+export function useOEEMaquina(operadorId) {  
+if (loading) return <p>Carregando...</p>;
+if (error)  
+  return 
+   <p>Erro.</p>;
   const fetcher = useCallback(
-    () => oeeMaquinaService.getOEEMaquina(id_usuario),
-    [id_usuario]
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return oeeMaquinaService.getOEEMaquina(operadorId);
+    },
+    [operadorId]
   );
   return useChartData(fetcher);
 }

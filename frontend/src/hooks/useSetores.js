@@ -1,106 +1,69 @@
-import { useState, useCallback } from 'react';
-import { setorService } from '@/services/setorService';
+import { useState, useEffect, useCallback } from 'react';
+import { setorCrudService } from '@/services/setorCrudService';
 
-export const useSetores = () => {
+export function useSetores() {
   const [setores, setSetores] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [setorEmEdicaoId, setSetorEmEdicaoId] = useState(null); // Se tiver ID, estamos editando
-  const [nomeSetor, setNomeSetor] = useState("");
-  const [localizacao, setLocalizacao] = useState("");
-  const [maquinaAtual, setMaquinaAtual] = useState("");
-  const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]);
-  const [usuarioAtual, setUsuarioAtual] = useState("");
-  const [funcaoAtual, setFuncaoAtual] = useState("");
-  const [equipeSelecionada, setEquipeSelecionada] = useState([]);
-
-
- //criar
-  const submeterSetor = async () => {
-    const payload = {
-      nome: nomeSetor,
-      localizacao: localizacao,
-      maquinas: maquinasSelecionadas,
-      equipe: equipeSelecionada
-    };
-
+  //carregar todos os setores
+  const fetchSetores = useCallback(async () => {
+    setLoading(true);
     try {
-      if (setorEmEdicaoId) {
-        await setorService.editarSetor(setorEmEdicaoId, payload);
-        alert("Setor atualizado!");
-      } else {
-            await setorService.criarSetor(payload);
-            alert("Setor criado!");
-      }
-      limparFormulario();
-      carregarSetores(); 
-      return true;
-    } catch (error) {
-      return false;
+      const data = await setorCrudService.getAll();
+      setSetores(data);
+      setError(null);
+    } catch (err) {
+      setError('Falha ao carregar setores');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSetores();
+  }, [fetchSetores]);
+
+  //criar
+  const criarSetor = async (dados) => {
+    try {
+      const novo = await setorCrudService.create(dados);
+      setSetores(prev => [...prev, novo]);
+      return novo;
+    } catch (err) {
+      throw err;
     }
   };
 
-  // excluir
+  //editar
+  const editarSetor = async (id, dados) => {
+    try {
+      const atualizado = await setorCrudService.update(id, dados);
+      setSetores(prev => prev.map(s => s.id === id ? atualizado : s));
+      return atualizado;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  //deletar
   const excluirSetor = async (id) => {
-    if (!confirm("Tem certeza que deseja excluir este setor?")) return;
-    
     try {
-      await setorService.excluirSetor(id);
-      carregarSetores(); // Atualiza a lista após deletar
-    } catch (error) {
-      alert("Erro ao excluir setor.");
+      await setorCrudService.delete(id);
+      setSetores(prev => prev.filter(s => s.id !== id));
+    } catch (err) {
+      throw err;
     }
   };
 
-    const prepararEdicao = (setor) => {
-    setSetorEmEdicaoId(setor.id);
-    setNomeSetor(setor.nome);
-    setLocalizacao(setor.localizacao);
-    setMaquinasSelecionadas(setor.maquinas || []);
-    setEquipeSelecionada(setor.equipe || []);
+  return {
+    setores,
+    loading,
+    error,
+    refresh: fetchSetores,
+    criarSetor,
+    editarSetor,
+    excluirSetor,
   };
-
-
-  const handleAdicionarMaquina = () => {
-    if (maquinaAtual && !maquinasSelecionadas.includes(maquinaAtual)) {
-      setMaquinasSelecionadas([...maquinasSelecionadas, maquinaAtual]);
-      setMaquinaAtual(""); 
-    }
-  };
-
-  const handleRemoverMaquina = (maquina) => setMaquinasSelecionadas(m => m.filter(item => item !== maquina));
-
-  const handleAdicionarMembro = () => {
-    if (usuarioAtual && funcaoAtual) {
-      setEquipeSelecionada([...equipeSelecionada, { usuario: usuarioAtual, funcao: funcaoAtual }]);
-      setUsuarioAtual(""); setFuncaoAtual("");
-    }
-  };
-
-  const handleRemoverMembro = (usuario) => setEquipeSelecionada(e => e.filter(m => m.usuario !== usuario));
-
-  const limparFormulario = () => {
-    setSetorEmEdicaoId(null);
-    setNomeSetor("");
-    setLocalizacao("");
-    setMaquinasSelecionadas([]);
-    setEquipeSelecionada([]);
-  };
-
-  return {    
-    // para formulário
-    nomeSetor, setNomeSetor,
-    localizacao, setLocalizacao,
-    maquinaAtual, setMaquinaAtual,
-    maquinasSelecionadas,
-    usuarioAtual, setUsuarioAtual,
-    funcaoAtual, setFuncaoAtual,
-    equipeSelecionada,
-    setorEmEdicaoId,
-
-    // ações
-    handleAdicionarMaquina, handleRemoverMaquina,
-    handleAdicionarMembro, handleRemoverMembro,
-    submeterSetor, prepararEdicao, limparFormulario
-  };
-};
+}

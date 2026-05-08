@@ -31,6 +31,8 @@ export default function LoginForm() {
 
             const data = await res.json()
 
+            console.log(data)
+
             if (!res.ok) {
                 setErro(data.mensagem)
                 return
@@ -38,13 +40,14 @@ export default function LoginForm() {
 
 
             //guarda o token no localstorage e o middleware le o header Autorization
-            localStorage.setItem("token", data.dados.token)
+            localStorage.setItem('token', data.dados.token);
+            console.log('ESTA SALVANDO NO LOCAL STORAGE');
 
 
             //redireciona pelo tipo que vem no token
             if (data.dados.tipo === "Adm") router.push("/adm")
             if (data.dados.tipo === "Gestor") router.push("/gestor")
-            if (data.dados.tipo === "Operario") router.push("/operador")
+            if (data.dados.tipo === "Operador") router.push("/operador")
 
         } catch (error) {
             setErro("Erro de conexão com o servidor")

@@ -1,4 +1,4 @@
-// hooks/useSetores.js
+// hooks/useSetoresData.js
 "use client";
 import { useChartData } from "@/hooks/useChartData";
 import { setorService } from "@services/setorService";
