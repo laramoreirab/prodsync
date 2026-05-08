@@ -11,12 +11,13 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Info } from "lucide-react";
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Info, Loader2 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
 import { useEventos } from "@/hooks/useEventos";
 
 import Link from "next/link";
+import { useEventos } from "@/hooks/useEventos";
 
 //imports da listagem
 import TableListagens from "@/components/table";
@@ -86,21 +87,12 @@ const colunasEventos = [
   { id: 'observacao', key: 'observacao', label: 'Observação', className: 'pl-5' },
 ];
 
-const dadosOriginais = [
-  { evento: 'Setup', data: '26/03 (14:08 - Ativo)', duracao: '20:08', motivo: 'Motivo 1', justificada: true, observacao: 'Observação 1' },
-  { evento: 'Parada', data: '26/03 (13:09 - 13:40)', duracao: '13:09', motivo: 'Aguardando Justificativa', justificada: false, observacao: 'Observação 2' },
-  { evento: 'Setup', data: '26/03 (06:30 - 19:06)', duracao: '06:30', motivo: 'Troca de Molde', justificada: true, observacao: 'Observação 3' },
-  { evento: 'Parada', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Tal justificativa', justificada: true, observacao: 'Observação 4' },
-  { evento: 'Setup', data: '26/03 (14:10 - 14:45)', duracao: '00:35', motivo: 'Limpeza', justificada: true, observacao: 'Observação 5' },
-];
-
 export default function HistoricoEventos() {
-  const { eventos, loading, error, refresh } = useEventos();
+  const { eventos, loading, error } = useEventos();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
 
-  //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(eventos);
   }, [eventos]);
@@ -131,12 +123,19 @@ export default function HistoricoEventos() {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'nome') return a.nome.localeCompare(b.nome);
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'turno') return a.turno.localeCompare(b.turno);
-      if (criterio === 'funcao') return a.funcao.localeCompare(b.funcao);
-      if (criterio === 'eventos') return a.eventos.localeCompare(b.eventos);
+      if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === 'duracao_asc') {
+        const [horasA, minutosA] = a.duracao.split(':').map(Number);
+        const [horasB, minutosB] = b.duracao.split(':').map(Number);
+        return (horasA * 60 + minutosA) - (horasB * 60 + minutosB);
+      }
+      if (criterio === 'duracao_desc') {
+        const [horasA, minutosA] = a.duracao.split(':').map(Number);
+        const [horasB, minutosB] = b.duracao.split(':').map(Number);
+        return (horasB * 60 + minutosB) - (horasA * 60 + minutosA);
+      }
+
       return 0;
     });
 
@@ -146,163 +145,170 @@ export default function HistoricoEventos() {
   const dadosExibidos = dados.filter((eventos) => {
     const termo = busca.toLowerCase();
     return (
-      eventos.motivo.toLowerCase().includes(termo) ||
-      eventos.gestor.toString().includes(termo)
+      eventos.tipo.toLowerCase().includes(termo)
     );
   });
 
   const opcoesOrdenacao = [
-    { label: 'Ordem Alfabética', value: 'nome' },
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'eventos', value: 'eventos' }
+    { label: 'Data Crescente', value: 'data_asc' },
+    { label: 'Data Decrescente', value: 'data_desc' },
+    { label: 'Duração Crescente', value: 'duracao_asc' },
+    { label: 'Duração Decrescente', value: 'duracao_desc' }
   ];
 
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...historicoEventos];
+    let dadosFiltrados = [...eventos];
 
-    //filtro por evento
-    if (filtrosSelecionados.evento && filtrosSelecionados.evento.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq =>
-        filtrosSelecionados.evento.includes(maq.evento)
+    //filtro por tipo
+    if (filtrosSelecionados.tipo && filtrosSelecionados.tipo.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter(item =>
+        filtrosSelecionados.tipo.includes(item.tipo)
       );
     }
 
-    if (filtrosSelecionados.eventos && filtrosSelecionados.eventos.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq =>
-        filtrosSelecionados.eventos.includes(maq.eventos)
-      );
-    }
-
-    //filtro por data (dia, literalmente, não é data de dados)
+    //filtro por data
     if (filtrosSelecionados.data) {
       if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(maq =>
-          new Date(maq.data) >= new Date(filtrosSelecionados.data.start)
+        const dataInicio = new Date(filtrosSelecionados.data.start);
+        dadosFiltrados = dadosFiltrados.filter(item =>
+          new Date(item.data) >= dataInicio
         );
       }
       if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(maq =>
-          new Date(maq.data) <= new Date(filtrosSelecionados.data.end)
+        const dataFim = new Date(filtrosSelecionados.data.end);
+        dadosFiltrados = dadosFiltrados.filter(item =>
+          new Date(item.data) <= dataFim
         );
       }
     }
 
     setDados(dadosFiltrados);
-  };
+  }
 
-  const historicoEventosFilter = [
-    { id: "eventos", label: "eventos", type: "checkbox", options: ["Roscas", "Engrenagens"] },
-    { id: "evento", label: "evento", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
-    { id: "data", label: "Parada", type: "date-range" }
-  ];
+    const historicoEventosFilter = [
+      { id: "tipo", label: "Tipo de Evento", type: "checkbox", options: ["Parada", "Setup"] },
+      { id: "data", label: "Data", type: "date-range" },
+      // {id:"duracao", label:"Duração", type: "time-max"}  --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+    ];
 
 
-
-  return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full pt-0 pb-10  px-8">
-
-        <section>
-          <div className="flex flex-wrap justify-between py-8">
-            <div className="title_tela">
-              <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-                Histórico de Eventos da Máquina
-              </h1>
-            </div>
-            {/* Modal de Justificar Evento */}
-            <div className="modal_justificativa">
-              <Dialog>
-                <DialogTrigger className="bg-secondary-foreground px-5 py-2 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                  <Pencil className="mr-2" />
-                  Justificar
-                </DialogTrigger>
-                <DialogContent>
-                  <FormJustificativaEvento />
-                </DialogContent>
-              </Dialog>
-
-            </div>
+    //tela de carregamento enquanto busca os dados da API
+    if (loading) {
+      return (
+        <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+            <p className="text-lg text-gray-600 font-medium">Carregando eventos...</p>
           </div>
-        </section>
+        </main>
+      );
+    }
 
-        <section>
-          {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+        <div className="w-full pt-0 pb-10  px-8">
 
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosExibidos.length} eventos encontrados</p>
-
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacao}
-                onSortChange={handleSort}
-              />
-
-              <FilterDropdown
-                filtersConfig={historicoEventosFilter}
-                onApply={aplicarFiltros}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col flex-1 items-center w-full mt-4">
-            {dadosExibidos.length > 0 ? (
-
-              <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                data={dadosExibidos} columns={colunasEventos}
-                acoesDropdown={(maquina) => (
-                  <>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                          Ver Detalhes
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DetalhaeEvento />
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                )}
-              />
-            ) : (
-              //caso não encontre nada correspondente
-              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
-                <p>Não encontramos nenhum evento "{busca}".</p>
+          <section>
+            <div className="flex flex-wrap justify-between py-8">
+              <div className="title_tela">
+                <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+                  Histórico de Eventos da Máquina
+                </h1>
               </div>
-            )}
-          </div>
-        </section>
+              {/* Modal de Justificar Evento */}
+              <div className="modal_justificativa">
+                <Dialog>
+                  <DialogTrigger className="bg-secondary-foreground px-5 py-2 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                    <Pencil className="mr-2" />
+                    Justificar
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormJustificativaEvento />
+                  </DialogContent>
+                </Dialog>
 
+              </div>
+            </div>
+          </section>
+
+          <section>
+            {/* Busca */}
+            <div className="flex searchbar">
+              <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+                <input
+                  type="search"
+                  className="p-2 w-full outline-none bg-transparent"
+                  placeholder="Busque por tipo de evento..."
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                />
+                <button className="outline-none cursor-pointer mr-2"><Search /></button>
+              </div>
+            </div>
+
+            <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+              <p>{dadosExibidos.length} eventos encontrados</p>
+
+              <div className="flex items-center gap-4">
+                <OrdenarDropdown
+                  label="Ordenar por"
+                  options={opcoesOrdenacao}
+                  onSortChange={handleSort}
+                />
+
+                <FilterDropdown
+                  filtersConfig={historicoEventosFilter}
+                  onApply={aplicarFiltros}
+                />
+              </div>
+            </div>
+
+
+            <div className="flex flex-col flex-1 items-center w-full mt-4">
+              {dadosExibidos.length > 0 ? (
+
+                <TableListagens
+                  /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+                  data={dadosExibidos} columns={colunasEventos}
+                  acoesDropdown={(maquina) => (
+                    <>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                            <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                            Ver Detalhes
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DetalhaeEvento />
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                />
+              ) : (
+                //caso não encontre nada correspondente
+                <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+                  <Search className="w-12 h-12 mb-4 text-gray-300" />
+                  <h2 className="text-xl font-semibold text-gray-500">Nenhum evento encontrado</h2>
+                  <p>Não encontramos nenhum evento com esse termo ou filtro.</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+        </div>
+      </main>
+    );
+  }
+
+  function EmptyState({ busca }) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+        <Search className="w-12 h-12 mb-4 text-gray-300" />
+        <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
+        <p>Não encontramos nenhum evento "{busca}".</p>
       </div>
-    </main>
-  );
-}
-
-function EmptyState({ busca }) {
-  return (
-    <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-      <Search className="w-12 h-12 mb-4 text-gray-300" />
-      <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
-      <p>Não encontramos nenhum evento "{busca}".</p>
-    </div>
-  );
-}
+    );
+  }

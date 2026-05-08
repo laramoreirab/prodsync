@@ -6,12 +6,14 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-
+import { useState, useEffect } from "react";
+import { useOps } from "@/hooks/useOps";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, ArrowDown, Flame, MoveHorizontal, Pencil, Plus, EyeIcon, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowDown, Flame, MoveHorizontal, Pencil, Plus, Search, Loader2, EyeIcon, Trash2 } from 'lucide-react';
 import TableListagens from "@/components/table";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
 import Link from "next/link";
 
 const dadosOriginais = [
@@ -25,6 +27,13 @@ const dadosOriginais = [
   { id: 8, nome: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status: 'Concluída', progresso: '15%' },
   { id: 9, nome: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
 ];
+
+const opsFilter = [
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
+  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Crítica", "Alta", "Média", "Baixa"] },
+  { id: "progresso", label: "Progresso", type: "number-range" }
+];
+
 
 export default function OrdensDeProducao() {
 
@@ -75,7 +84,7 @@ export default function OrdensDeProducao() {
     },
     {
       id: "status",
-      key: "status",
+      key: "status_op",
       label: 'Status',
       className: "text-center",
       icone: (valor) => {
@@ -118,33 +127,198 @@ export default function OrdensDeProducao() {
     },
   ];
 
+  const { ops, loading, error, refresh } = useOps();
+  const [dados, setDados] = useState([]);
+  const [busca, setBusca] = useState("");
+  
+  useEffect(() => {
+    setDados(ops);
+  }, [ops]);
+
+
+  //lógica de ordenação
+  const handleSort = (criterio) => {
+    const dadosCopiados = [...dados];
+
+
+    dadosCopiados.sort((a, b) => {
+      if (criterio === 'id_asc') return a.id - b.id;
+      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'progresso_asc') return a.progresso - b.progresso;
+      if (criterio === 'progresso_desc') return b.progresso - a.progresso;
+      return 0;
+    });
+
+
+    setDados(dadosCopiados);
+  };
+
+
+  const aplicarFiltros = (filtrosSelecionados) => {
+    let dadosFiltrados = [...ops]; // usa o estado da API, não array estático
+
+
+    //filtro por status
+    if (filtrosSelecionados.status_op && filtrosSelecionados.status_op.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter(op =>
+        filtrosSelecionados.status_op.includes(op.status_op)
+      );
+    }
+
+    //filtro por prioridade
+    if (filtrosSelecionados.prioridade?.length) {
+      dadosFiltrados = dadosFiltrados.filter(op =>
+        filtrosSelecionados.prioridade.includes(op.prioridade)
+      );
+    }
+
+    //filtro por progresso (intervalo)
+    if (filtrosSelecionados.progresso) {
+      const { min, max } = filtrosSelecionados.progresso;
+      if (min !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso >= min);
+      if (max !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso <= max);
+    }
+
+
+    setDados(dadosFiltrados);
+  };
+
+
+
+  const opcoesOrdenacao = [
+    { label: 'ID Crescente', value: 'id_asc' },
+    { label: 'ID Decrescente', value: 'id_desc' },
+    { label: 'Progresso Crescente', value: 'progresso_asc' },
+    { label: 'Progresso Decrescente', value: 'progresso_desc' },
+  ];
+
+
+  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
+  const dadosExibidos = dados.filter((op) => {
+    const termo = (busca || "").toLowerCase();
+
+    const nome = op?.nome?.toLowerCase() || "";
+    const id = op?.id?.toString() || "";
+
+    return (
+      nome.includes(termo) ||
+      id.includes(termo)
+    );
+  });
+
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando ordens de produção...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         {/* TÍTULO */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold mb-4">
             Ordens de Produção
           </h1>
         </div>
 
-        {/*SEÇÃO 1: Graphs*/}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4">Aguardando Início</div>
-          {/* <div className="bg-white border rounded-xl p-4">Em andamento <OPProgressoWidget /></div> */}
-          <div className="bg-white border rounded-xl p-4">Concluídas</div>
+        {/*SEÇÃO 1: KPIS*/}
+        <div className="grid grid-cols-5 gap-6 w-full">
 
-          {/* Quadro prioridades */}
-          <div className="bg-white border rounded-xl p-4">
-            <div>
-              {dadosOriginais.prioridade}
-            </div>
-            <div>
+          <div className="col-span-1 bg-[#efefef] p-5 flex flex-col gap-15 rounded-lg shadow-sm h-60">
+            <h1 className="text-[#545454] text-lg text-center font-semibold align-text-top">Aguardando Início</h1>
 
-            </div>
+            <span className="text-black text-center text-4xl font-bold">2</span>
 
           </div>
+
+          <div className="col-span-1 bg-[#effff5] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
+            <h1 className="text-[#369948] text-lg text-center font-semibold">Em Andamento</h1>
+            <span className="text-black text-4xl text-center font-bold">3</span>
+          </div>
+
+          <div className="col-span-1 bg-[#e8f0ff] p-6 flex flex-col gap-15 rounded-lg shadow-sm">
+            <h1 className="text-[#00357a] text-lg text-center font-semibold">Concluídas</h1>
+            <span className="text-black text-4xl text-center font-bold">4</span>
+          </div>
+
+
+          <div className="col-span-2 bg-white border border-gray-100 shadow-sm p-4 rounded-lg flex flex-col justify-between gap-2">
+
+            {/* Aqui */}
+
+          </div>
+        </div>
+
+        <section id="listagem_ops">
+          <div className="flex items-center py-8 gap-5">
+            <h1 className="text-4xl font-semibold">OPs</h1>
+            <hr className="bg-black flex-1 h-1" />
+          </div>
+
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por id, nome ou lote..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2">
+                <Search />
+              </button>
+            </div>
+          </div>
+
+          <div className="row_ord_fil_cont flex items-center py-3 justify-between mt-3">
+            <p>{dadosExibidos.length} OPs encontradas</p>
+
+            <div className="flex items-center gap-4">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacao}
+                onSortChange={handleSort}
+              />
+              <FilterDropdown
+                filtersConfig={opsFilter}
+                onApply={aplicarFiltros}
+              />
+            </div>
+          </div>
+
+          {/* Tabela */}
+          {dadosExibidos.length > 0 ? (
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosExibidos}
+              columns={colunasOrdemProd}
+              acoesDropdown={(ordemProd) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`ordensDeProducao/${ordemProd.id}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
+              <Search className="w-12 h-12 text-gray-300 mb-3" />
+              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
+              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
+            </div>
+          )}
         </section>
 
         {/* Tabela sem filtros ainda */}
