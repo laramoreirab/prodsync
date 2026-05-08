@@ -59,7 +59,7 @@ export const producaoService = {
 export const pecasPorMinutosService = {
   async getPecasPorMinuto(){
     if (USE_MOCK) return PecasPorMinutoSchema.parse(mockPecasPorMinuto);
-    const data = await apiFetch("/api/dashboard/pecas-por-minuto");
+    const data = await apiFetch("/api/maquinas/dashboard/obter-pecas-por-minuto");
     return PecasPorMinutoSchema.parse(data.dados);
   }
 };
@@ -67,7 +67,7 @@ export const pecasPorMinutosService = {
 export const producaoPorTurnoLotesService = {
   async getProducaoPorTurnoLotes(){
     if (USE_MOCK) return ProducaoPorTurnoLotesSchema.parse(mockProducaoPorTurnoLotes);
-    const data = await apiFetch("/producao/producao_por_turno_lote");
-    return ProducaoPorTurnoLotesSchema.parse(data);
+    const data = await apiFetch("/api/turnos/kpis/turno-atual");
+    return ProducaoPorTurnoLotesSchema.parse(data.dados.cards.producaoLotes);
   }
 };

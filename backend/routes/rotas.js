@@ -5,6 +5,7 @@ import maquinaRotas from './maquinaRotas.js'
 import oeeRotas from './oeeRotas.js'
 import dashboardRotas from './dashboardRotas.js'
 import setorRotas from './setorRotas.js'
+import turnoRotas from './turnoRotas.js'
 
 const router = Router()
 
@@ -14,6 +15,7 @@ router.use('/maquinas', maquinaRotas)
 router.use('/oee', oeeRotas)
 router.use('/dashboard', dashboardRotas)
 router.use('/setores', setorRotas)
+router.use('/turnos', turnoRotas)
 
 
 export default router
