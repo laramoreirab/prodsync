@@ -2,32 +2,43 @@ import TurnoModel from '../models/TurnoModel.js';
 
 class TurnoController {
 
-    // Cria um novo turno
+    // Cria um novo turno (suporta múltiplos dias)
     static async criarTurno(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { nome_turno, hora_inicio, hora_fim, dia_semana, id_setor } = req.body;
+            const { nome_turno, hora_inicio, hora_fim, dias_semana, id_setor } = req.body;
 
-            if (!nome_turno || !hora_inicio || !hora_fim || !dia_semana) {
+            if (!nome_turno || !hora_inicio || !hora_fim || !dias_semana) {
                 return res.status(400).json({ sucesso: false, erro: 'Preencha todos os campos obrigatórios.' });
             }
 
-            if (isNaN(new Date(hora_inicio).getTime()) || isNaN(new Date(hora_fim).getTime())) {
-                return res.status(400).json({ sucesso: false, erro: 'Formato de hora inválido.' });
+            // Normalizar horas (o front envia apenas HH:mm)
+            const baseDate = new Date();
+            const [hInicio, mInicio] = hora_inicio.split(':');
+            const [hFim, mFim] = hora_fim.split(':');
+            
+            const dataInicio = new Date(baseDate.setHours(hInicio, mInicio, 0, 0));
+            const dataFim = new Date(baseDate.setHours(hFim, mFim, 0, 0));
+
+            const diasArray = Array.isArray(dias_semana) ? dias_semana : [dias_semana];
+            
+            const resultados = [];
+            for (const dia of diasArray) {
+                // Normalizar o nome do dia (removendo acentos para bater com o Enum do Prisma)
+                const diaNormalizado = dia.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace("Terca", "Terca").replace("Sabado", "Sabado");
+                
+                const dadosTurno = {
+                    nome_turno,
+                    hora_inicio: dataInicio,
+                    hora_fim: dataFim,
+                    dia_semana: diaNormalizado,
+                    id_empresa,
+                    id_setor: id_setor ? parseInt(id_setor) : null
+                };
+                resultados.push(await TurnoModel.criarTurno(dadosTurno));
             }
 
-            const dadosTurno = {
-                nome_turno,
-                hora_inicio: new Date(hora_inicio),
-                hora_fim: new Date(hora_fim),
-                dia_semana,
-                id_empresa,
-                id_setor
-            };
-
-            const turno = await TurnoModel.criarTurno(dadosTurno);
-
-            return res.status(201).json({ sucesso: true, dados: turno });
+            return res.status(201).json({ sucesso: true, dados: resultados });
 
         } catch (error) {
             console.error('Erro ao criar turno:', error);
