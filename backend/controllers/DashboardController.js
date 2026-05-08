@@ -38,14 +38,14 @@ class DashboardController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
-    // GET /api/dashboard/pecas-por-minuto
-    static async pecasPorMinuto(req, res) {
+    // GET /api/dashboard/top-motivos-parada
+    static async top3MotivosParadaGeral(req, res) {
         try {
             const id_empresa = req.user.id_empresa
-            const dados = await DashboardModel.pecasPorMinuto(id_empresa)
+            const dados = await DashboardModel.top3MotivosParadaGeral(id_empresa)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            console.error('Erro nos KPIs de Peças por Minuto:', error)
+            console.error('Erro no gráfico TOP 3 Motivos de Parada da fábrica:', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
