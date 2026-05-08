@@ -57,7 +57,7 @@ export let eventosMock = [
     setor_afetado: "Engrenagens",
     maquinas: [4],
     inicio: "2024-03-26T14:10:00.000Z",
-    fim: "2024-03-26T14:45:00.000Z",
+    fim: "2024-03-30T14:45:00.000Z",
     id_motivo_parada: 3,
     motivo: "Falta de Material",
     observacao: "Aguardando reposição",

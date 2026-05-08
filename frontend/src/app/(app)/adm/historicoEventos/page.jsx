@@ -15,6 +15,7 @@ import {
 
 import { Plus, Search, Pencil, EyeIcon, BellRing, Loader2 } from "lucide-react";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
 
 import { useState, useMemo, useEffect } from "react";
 
@@ -65,8 +66,8 @@ const colunasEventos = [
     id: 'tipo', key: 'tipo', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Setup": {variant: "setup",},
-        "Parada": {variant: "parada"}
+        "Setup": { variant: "setup", },
+        "Parada": { variant: "parada" }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -77,12 +78,19 @@ const colunasEventos = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
+  {
+    id: 'data',
+    key: 'data',
+    label: 'Data (Início - Fim)',
+    icone: (valor, row) => (
+      <DataEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
   {
     id: 'duracao', key: 'duracao', label: 'Duração',
     icone: (valor, row) => (
-    <DuracaoEvento inicio={row.inicio} fim={row.fim} />
-  )
+      <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+    )
   },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
   { id: 'observacao', key: 'observacao', label: 'Observação' },

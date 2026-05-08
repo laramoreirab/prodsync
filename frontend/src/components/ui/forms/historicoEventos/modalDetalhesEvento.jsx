@@ -82,129 +82,94 @@ export default function DetalhesEvento({ eventoId }) {
 
             <Separator className="my-2" />
 
-            <div className="px-2 pb-8 pt-4 flex flex-col gap-6">
-                
+            <div className=" flex flex-col cursor-text">
                 {/* Informações do Evento */}
-                <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold text-black">Detalhes do Evento</h1>
 
-                    {/* Tipo */}
-                    <div className="flex flex-col w-full gap-2 mt-2 mb-6 cursor-text">
+                <div className="flex flex-col">
+
+
+                    <div className="flex flex-col w-full gap-4 px-2 pb-8 pt-4 cursor-text">
+
+                        {/* Status */}
                         <div className="flex items-center">
-                            <p className="text-xl font-semibold text-black mr-2">Evento:</p>
+                            <p className="text-xl font-semibold text-black mr-1">Evento:</p>
                             <Badge variant={tipoEvento === 'Parada' ? 'parada' : tipoEvento === 'Setup' ? 'setup' : 'outline'}
                                 className="px-3 text-lg" >
                                 {tipoEvento}
                             </Badge>
                         </div>
 
-                        {/* <div className="flex items-center">
-                            <p className="text-xl font-semibold text-black mr-2">Data:</p>
-                            <p className="text-xl font-medium text-[#7c7c81]"> 24/10/25 (14:30 - 16:30)</p>
-                        </div> */}
-
+                        {/* Setor */}
                         <div className="flex items-center">
                             <span className="text-xl font-semibold text-black">Setor:</span>
-
                             <div className="flex">
                                 {setoresSelecionados.map(setor => (
-                                    <span key={setor} className="text-[#333333] font-medium px-3 text-xl">
+                                    <span key={setor} className="text-[#333333] font-medium px-1 text-xl">
                                         {setor}
                                     </span>
                                 ))}
                             </div>
-
                         </div>
 
 
                         {/* Máquinas */}
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1.5">
                             <span className="text-xl font-semibold text-black">Máquina(s) Afetada(s): </span>
 
                             <div className="flex flex-wrap gap-2">
                                 {nomesMaquinas.map(maquinas => (
-                                    <span key={maquinas} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md text-[15px]">
+                                    <span key={maquinas} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
                                         {maquinas}
                                     </span>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Data */}
-                        <div className="flex flex-col gap-2">
-                            <span className="text-xl font-semibold text-black">Período do Evento</span>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-base text-gray-400">Início</span>
-                                    <span className="text-xl text-gray-800">
-                                        {inicioData && inicioHora
-                                            ? `${inicioData} às ${inicioHora}`
-                                            : <span className="text-gray-400 italic">Não informado</span>
-                                        }
-                                    </span>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-base text-gray-400">Fim</span>
-                                    <span className="text-xl text-gray-800">
-                                        {fimData && fimHora
-                                            ? `${fimData} às ${fimHora}`
-                                            : <span className="text-[#7c7c81]">Ativo</span>
-                                        }
-                                    </span>
-                                </div>
+                        {/* Início */}
+                        <div className="flex items-center gap-1">
+                            <span className="text-xl font-semibold text-black">Data Início: </span>
+                            <div className="flex">
+                                <span className="text-xl text-[#333333]">
+                                    {inicioData} às {inicioHora}
+                                </span>
                             </div>
+                        </div>
+
+                        {/* Fim */}
+                        <div className="flex items-center gap-1">
+                            <span className="text-lg font-semibold text-black">Data Fim:</span>
+                            <span className="text-xl text-[#333333]">
+                                {fimData && fimHora
+                                    ? `${fimData} às ${fimHora}`
+                                    : <span>Ativo</span>
+                                }
+                            </span>
+                        </div>
+
+                        {/* Motivo */}
+                        <div className="flex items-center gap-1">
+                            <span className="text-xl font-semibold text-black">Motivo: </span>
+                            <span className="text-xl font-medium text-[#333333]">
+                                {nomeMotivo || <span className="text-xl font-medium text-[#333333]">Não justificado</span>}
+                            </span>
+                        </div>
+
+                        {/* Observação */}
+                        <div className="flex flex-col gap-1">
+                            <span className="text-xl font-semibold text-black">Observação:</span>
+                            {observacao ? (
+                                <p className="text-[#333333] font-medium text-xl">
+                                    {observacao}
+                                </p>
+                            ) : (
+                                <span className="text-xl font-medium text-[#333333]">Sem observação</span>
+                            )}
                         </div>
 
                     </div>
 
-
-
-                    {/* Setor */}
-
-
-
-
-                    {/* OPs */}
-                    {opsSelecionadas.length > 0 && (
-                        <div className="flex flex-col">
-                            <span className="text-lg font-medium text-gray-500">OP(s) Afetada(s)</span>
-                            <div className="flex flex-wrap gap-2">
-                                {opsSelecionadas.map(op => (
-                                    <span key={op} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md text-[15px]">
-                                        {op}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-
                 </div>
 
-                <Separator className="bg-gray-100" />
-
-                {/* Justificativa */}
-                <div className="flex flex-col gap-4">
-                    <h2 className="text-2xl font-semibold text-black">Justificativa</h2>
-
-                    <div className="flex flex-col gap-1">
-                        <span className="text-lg font-medium text-gray-500">Motivo Principal</span>
-                        <span className="text-xl text-gray-800">
-                            {nomeMotivo || <span className="text-gray-400 italic">Não justificado</span>}
-                        </span>
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <span className="text-lg font-medium text-gray-500">Observação</span>
-                        {observacao ? (
-                            <p className="text-xl text-gray-800 bg-gray-50 border border-gray-200 rounded-md p-3 whitespace-pre-wrap">
-                                {observacao}
-                            </p>
-                        ) : (
-                            <span className="text-gray-400 italic text-xl">Sem observação</span>
-                        )}
-                    </div>
-                </div>
 
             </div>
         </>
