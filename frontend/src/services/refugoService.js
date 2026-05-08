@@ -15,7 +15,7 @@
 
 
 //Mock para desenvolvimento sem backend
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api.js";
 import {
   TendenciaRefugoArraySchema,
 } from "@features/refugo/schemas/refugoSchema";
@@ -25,8 +25,8 @@ const USE_MOCK = false;
 export const refugoService = {
   async getTendenciaRefugo() {
     if (USE_MOCK) return TendenciaRefugoArraySchema.parse(mockTendenciaRefugo);
-    const data = await apiFetch("/refugo/tendencias");
-    return TendenciaRefugoArraySchema.parse(data);
+    const data = await apiFetch("/api/dashboard/tendencia-refugo");
+    return TendenciaRefugoArraySchema.parse(data.dados);
   },
 
 };
