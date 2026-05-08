@@ -60,7 +60,7 @@ import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoE
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 
 const colunasEventos = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-25 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
     id: 'tipo', key: 'tipo', label: 'Tipo', className: 'text-center justify-center',
@@ -403,7 +403,7 @@ export default function HistoricoEventos() {
 
 
           {/* Tab paradas justificadas */}
-          <TabsContent value="justificadas">
+          <TabsContent value="justificadas" className="text-md">
             {paradasJustificadas.length > 0 ? (
               <TableListagens
                 data={paradasJustificadas}
@@ -420,7 +420,7 @@ export default function HistoricoEventos() {
 
 
           {/* Tab paradas não justificadas */}
-          <TabsContent value="nao-justificadas">
+          <TabsContent value="nao-justificadas" className="text-md">
             {paradasNaoJustificadas.length > 0 ? (
               <TableListagens
                 data={paradasNaoJustificadas}

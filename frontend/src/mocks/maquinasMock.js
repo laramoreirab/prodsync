@@ -12,6 +12,8 @@ export let maquinasMock = [
     operador: "João",
     imagemUrl: null,
     ultimaParada: "2024-01-10T00:00:00.000Z",
+    inicio: "2025-01-06T09:30:00.000Z",
+    fim: null,
   },
   {
     id: 2,
@@ -26,6 +28,8 @@ export let maquinasMock = [
     operador: "João",
     imagemUrl: null,
     ultimaParada: "2024-02-05T00:00:00.000Z",
+    inicio: "2025-01-06T09:30:00.000Z",
+    fim: null,
   },
   {
     id: 3,
@@ -40,6 +44,8 @@ export let maquinasMock = [
     operador: "João",
     imagemUrl: null,
     ultimaParada: "2024-03-18T00:00:00.000Z",
+    inicio: "2025-01-06T09:30:00.000Z",
+    fim: null,
   },
   {
     id: 4,
@@ -54,6 +60,8 @@ export let maquinasMock = [
     operador: "João",
     imagemUrl: null,
     ultimaParada: "2024-04-01T00:00:00.000Z",
+    inicio: "2025-03-26T08:00:00.000Z",
+    fim: "2025-03-26T09:00:00.000Z",
   },
   {
     id: 5,
@@ -67,7 +75,9 @@ export let maquinasMock = [
     dataAquisicao: "2023-06-05T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    ultimaParada: "2024-05-12T00:00:00.000Z"
+    ultimaParada: "2024-05-12T00:00:00.000Z",
+    inicio: "2025-03-26T08:00:00.000Z",
+    fim: "2025-03-26T09:00:00.000Z",
   },
 ];
 
