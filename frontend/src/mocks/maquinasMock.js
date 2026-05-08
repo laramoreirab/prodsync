@@ -11,7 +11,7 @@ export let maquinasMock = [
     dataAquisicao: "2021-03-15T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
-    ultimaParada: "2024-01-10T00:00:00.000Z",
+    ultimaParada: "2024-01-20T21:00:00.000Z",
     inicio: "2025-01-06T09:30:00.000Z",
     fim: null,
   },
@@ -59,6 +59,13 @@ export let maquinasMock = [
     dataAquisicao: "2022-01-10T00:00:00.000Z",
     operador: "João",
     imagemUrl: null,
+    historico_eventos: [
+      {
+        id_evento: 11,
+        termino: null, // Caso o evento ainda não tenha terminado
+        status_atual: "Produzindo"
+      }
+    ],
     ultimaParada: "2024-04-01T00:00:00.000Z",
     inicio: "2025-03-26T08:00:00.000Z",
     fim: "2025-03-26T09:00:00.000Z",

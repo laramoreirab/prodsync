@@ -1,14 +1,22 @@
 
 "use client";
-import { use } from "react";
+import { use, useEffect, useState } from "react";
+import { useOps } from "@/hooks/useOps";
 
 import TableListagens from "@/components/table";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
 import { Badge } from "@/components/ui/badge";
-import { BellRing, Pencil } from "lucide-react";
+import { BellRing, Pencil, EyeIcon } from "lucide-react";
+
+
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { OPProgressoWidget }  from "@/features/ordens/OPProgressoWidget";
+import { OPProgressoWidget } from "@/features/ordens/OPProgressoWidget";
 import { OPOEEDetalheWidget } from "@/features/ordens/OPOEEDetalheWidget";
+
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+
 
 const colunasOP = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
@@ -37,14 +45,33 @@ const colunasOP = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
-  { id: 'duracao', key: 'duracao', label: 'Duração', className: 'text-center justify-center' },
+  {
+    id: 'data',
+    key: 'data',
+    label: 'Data (Início - Fim)',
+    icone: (valor, row) => (
+      <DataEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
+  {
+    id: 'duracao', key: 'duracao', label: 'Duração',
+    icone: (valor, row) => (
+      <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
+  { id: 'observacao', key: 'observacao', label: 'Observação' }
 ];
 
 
 export default function OPDetalhePage({ params }) {
+  const { ordemProd, loading, error, refresh } = useOps();
   const opId = use(params);
+  const [dados, setDados] = useState([]);
+
+  useEffect(() => {
+    setDados(ordemProd);
+  }, [ordemProd]);
 
   const dadosOP = [
     { id: 1, status: 'Parada', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', motivo: 'Troca de ferramenta' },
@@ -58,42 +85,48 @@ export default function OPDetalhePage({ params }) {
   ];
 
   const colunasApontamento = [
-      { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-      { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
-      {
-        id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
-        icone: (valor) => {
-          return (
-            <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
-              {valor}
-            </Badge>
-          );
-        }
-      },
-      {
-        id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-        icone: (valor) => {
-          return (
-            <Badge variant="destructive" className="font-semibold text-sm border-none">
-              {valor}
-            </Badge>
-          );
-        }
-      },
-      { id: 'observacao', key: 'observacao', label: 'Observação' },
-    ];
-  
-    const dadosApontamento = [
-      { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
-      { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
-      { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-      { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-      { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
-      { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
-      { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
-      { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
-    ];
-  
+    { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+    {
+      id: 'data',
+      key: 'data',
+      label: 'Data (Início - Fim)',
+      icone: (valor, row) => (
+        <DataEvento inicio={row.inicio} fim={row.fim} />
+      )
+    }, {
+      id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
+      icone: (valor) => {
+        return (
+          <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+            {valor}
+          </Badge>
+        );
+      }
+    },
+    {
+      id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
+      icone: (valor) => {
+        return (
+          <Badge variant="destructive" className="font-semibold text-sm border-none">
+            {valor}
+          </Badge>
+        );
+      }
+    },
+    { id: 'observacao', key: 'observacao', label: 'Observação' },
+  ];
+
+  const dadosApontamento = [
+    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
+    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
+    { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
+    { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
+    { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
+    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
+    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
+    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
+  ];
+
 
 
   return (
@@ -132,10 +165,20 @@ export default function OPDetalhePage({ params }) {
             /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
             data={dadosOP}
             columns={colunasOP}
-            enableSelection={true}
-            onEditSelected={(rows) => handleEditBatch(rows)}
             acoesDropdown={(apontamento) => (
               <>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                      Ver Detalhes
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DetalhesEvento eventoId={apontamento.id} />
+                  </DialogContent>
+                </Dialog>
+
                 <Dialog>
                   <DialogTrigger asChild>
                     <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -165,7 +208,7 @@ export default function OPDetalhePage({ params }) {
             /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
             data={dadosApontamento}
             columns={colunasApontamento}
-           
+
           />
         </section>
 

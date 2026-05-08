@@ -27,7 +27,7 @@ import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { DataUltimaParada } from "@/components/ui/dataFim";
+import { DataUltimaParada } from "@/components/ui/dataUltimaParada";
 
 
 
@@ -72,9 +72,15 @@ const colunasMaquinas = [
   },
   {
     id: 'ultimaParada', key: 'ultimaParada', label: 'Última parada',
-    icone: (valor, row) => (
-      <DataUltimaParada ultimaParada={row.ultimaParada} />
-    )
+    icone: (valor, row) => {
+      const eventos = row.historico_eventos;
+
+      const ultimaParada = (eventos && eventos.length > 0)
+        ? eventos[0].termino
+        : null;
+
+      return <DataUltimaParada ultimaParada={ultimaParada} />;
+    }
   },
 ];
 

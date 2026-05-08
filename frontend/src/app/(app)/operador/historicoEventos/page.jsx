@@ -13,12 +13,16 @@ import {
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Info } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+
+import { useEventos } from "@/hooks/useEventos";
+
 import Link from "next/link";
 
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"
+
 
 import {
   DropdownMenuItem,
@@ -51,8 +55,8 @@ import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhes
 
 const colunasEventos = [
   {
-    id: 'evento',
-    key: 'evento',
+    id: 'tipo',
+    key: 'tipo',
     label: 'Evento',
     className: 'text-center justify-center',
     icone: (valor) => {
@@ -79,7 +83,7 @@ const colunasEventos = [
   { id: 'data', key: 'data', label: 'Data(Início - Fim)', className: 'pl-20 w-1/5' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  { id: 'observacao', key: 'observacao', label: 'Observação', className: 'text-right' },
+  { id: 'observacao', key: 'observacao', label: 'Observação', className: 'pl-5' },
 ];
 
 const dadosOriginais = [
@@ -91,9 +95,15 @@ const dadosOriginais = [
 ];
 
 export default function HistoricoEventos() {
-  const [dados, setDados] = useState(dadosOriginais);
+  const { eventos, loading, error, refresh } = useEventos();
+  const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
+
+  //sincronizar dados da API com estado local
+  useEffect(() => {
+    setDados(eventos);
+  }, [eventos]);
 
   const handleEdit = (rows) => {
     console.log("Editar:", rows);

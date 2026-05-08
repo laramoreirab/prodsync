@@ -8,12 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { eventosCrudService } from '@/services/eventosCrudService';
 
-const OPCOES_MAQUINA = [
-    { label: "Injetora 1", value: 1 },
-    { label: "Injetora 2", value: 2 },
-    { label: "Torno CNC", value: 3 },
-];
-
 const OPCOES_MOTIVO = [
     { label: "Falta de Energia", value: 1 },
     { label: "Manutenção Preventiva", value: 2 },
@@ -22,15 +16,15 @@ const OPCOES_MOTIVO = [
     { label: "Outros", value: 5 },
 ];
 
-
 export default function DetalhesEvento({ eventoId }) {
     // const [loading, setLoading] = useState(true);
+    const [dadosEvento, setDadosEvento] = useState(null)
 
     const [tipoEvento, setTipoEvento] = useState('');
-    const [setoresSelecionados, setSetoresSelecionados] = useState([]);
     const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]);
+    const [setoresSelecionados, setSetoresSelecionados] = useState([]);
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
-    const [idMotivoPrincipal, setIdMotivoPrincipal] = useState('');
+    const [idMotivoPrincipal, setIdMotivoPrincipal] = useState([]);
     const [observacao, setObservacao] = useState('');
     const [inicioData, setInicioData] = useState('');
     const [inicioHora, setInicioHora] = useState('');
@@ -43,10 +37,12 @@ export default function DetalhesEvento({ eventoId }) {
             try {
                 const dados = await eventosCrudService.getById(eventoId);
                 setTipoEvento(dados.status_maquina || '');
+                setMaquinasSelecionadas(dados.maquina ? [dados.maquina] : []);
                 setSetoresSelecionados(dados.setor_afetado ? [dados.setor_afetado] : []);
-                setMaquinasSelecionadas(dados.maquinas || []);
+                setOpsSelecionadas(dados.op_afetada ? [dados.op_afetada] : []);
                 setIdMotivoPrincipal(dados.id_motivo_parada || '');
                 setObservacao(dados.observacao || '');
+                setDadosEvento(dados);
                 if (dados.inicio) {
                     setInicioData(dados.inicio.split('T')[0]);
                     setInicioHora(dados.inicio.split('T')[1]?.slice(0, 5) || '');
@@ -65,9 +61,6 @@ export default function DetalhesEvento({ eventoId }) {
 
     // helpers de exibição
     const nomeMotivo = OPCOES_MOTIVO.find(m => m.value === Number(idMotivoPrincipal))?.label;
-    const nomesMaquinas = maquinasSelecionadas
-        .map(id => OPCOES_MAQUINA.find(o => o.value === id)?.label)
-        .filter(Boolean);
 
     return (
         <>
@@ -117,10 +110,24 @@ export default function DetalhesEvento({ eventoId }) {
                             <span className="text-xl font-semibold text-black">Máquina(s) Afetada(s): </span>
 
                             <div className="flex flex-wrap gap-2">
-                                {nomesMaquinas.map(maquinas => (
-                                    <span key={maquinas} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                        {maquinas}
+                                {maquinasSelecionadas.map((maquina, index) => (
+                                    <span key={index} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                        {maquina}
                                     </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Ordens de Produção */}
+                        <div className="flex flex-col">
+                            <span className="text-xl font-semibold text-black">OP(s) Afetada(s): </span>
+                            <div className="flex flex-wrap gap-2">
+                                {opsSelecionadas.map(op => (
+                                    <ul>
+                                        <li key={op} className="text-[#333333] font-medium text-lg pt-1.5">
+                                            {op}
+                                        </li>
+                                    </ul>
                                 ))}
                             </div>
                         </div>

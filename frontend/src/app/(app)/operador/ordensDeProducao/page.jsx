@@ -165,10 +165,6 @@ export default function OrdensDeProducao() {
               </>
             )}
           />
-
-
-
-
         </section>
 
       </div>
