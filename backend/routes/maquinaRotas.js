@@ -2,13 +2,14 @@ import { Router } from 'express';
 import MaquinaController from '../controllers/MaquinaController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js';
+import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
 
 const router = Router();
 
 router.use(authMiddleware);
 
 router.get('/', paginacaoMiddleware, MaquinaController.listarMaquinas);
-router.post('/', MaquinaController.criarMaquina);
+router.post('/', uploadImagens.single('imagem'), handleUploadError, MaquinaController.criarMaquina);
 
 router.get('/dashboard/status-geral', MaquinaController.obterStatusGeralMaquinas);
 router.get('/dashboard/taxa-cumprimento-meta-setor', MaquinaController.taxaCumprimentoMetaPorSetor);
@@ -26,7 +27,7 @@ router.get('/:id/velocidade', MaquinaController.obterVelocidadeMaquina);
 router.get('/:id/historico-eventos', MaquinaController.obterHistoricoEventosTabela);
 
 router.get('/:id', MaquinaController.buscarMaquinaPorId);
-router.put('/:id', MaquinaController.atualizarMaquina);
+router.put('/:id', uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
 router.put('/:id/status', MaquinaController.atualizarStatus);
 router.delete('/:id', MaquinaController.deletarMaquina);
 
