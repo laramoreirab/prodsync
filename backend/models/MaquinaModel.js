@@ -65,20 +65,25 @@ class MaquinaModel {
     }
 
     // Cria uma nova máquina
-    static async criarMaquina(id_empresa, id_setor, id_categoria, nome, serie) {
+    static async criarMaquina(id_empresa, id_setor, id_categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem) {
         try {
             const maquina = await prisma.maquinas.create({
                 data: {
-                    id_empresa,
-                    id_setor,
-                    id_categoria,
-                    nome,
-                    serie
+                    id_empresa: id_empresa,
+                    id_setor: id_setor ? parseInt(id_setor) : null,
+                    id_categoria: parseInt(id_categoria),
+                    nome: nome,
+                    serie: serie,
+                    capacidade: capacidade,
+                    status: status,
+                    data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
+                    id_operador: id_operador ? parseInt(id_operador) : null,
+                    imagem: imagem
                 }
             });
             return maquina;
         } catch (error) {
-            console.error('Erro ao criar máquina: ', error);
+            console.error('Erro ao criar máquina:', error);
             throw error;
         }
     }
@@ -101,18 +106,30 @@ class MaquinaModel {
     }
 
     // Atualiza dados cadastrais
-    static async atualizarDados(id_maquina, id_empresa, nome, serie) {
+    static async atualizarDados(id_maquina, id_empresa, dados) {
         try {
+            const dataUpdate = {
+                nome: dados.nome,
+                serie: dados.serie,
+                id_setor: dados.id_setor ? parseInt(dados.id_setor) : undefined,
+                id_categoria: dados.id_categoria ? parseInt(dados.id_categoria) : undefined,
+                capacidade: dados.capacidade,
+                status: dados.status,
+                data_aquisicao: dados.data_aquisicao ? new Date(dados.data_aquisicao) : undefined,
+                id_operador: dados.id_operador ? parseInt(dados.id_operador) : undefined,
+            };
+
+            if (dados.imagem) {
+                dataUpdate.imagem = dados.imagem;
+            }
+
             const atualizarMaquina = await prisma.maquinas.updateMany({
                 where: {
                     id_maquina: id_maquina,
                     id_empresa: id_empresa,
                     ativo: true
                 },
-                data: {
-                    nome,
-                    serie
-                }
+                data: dataUpdate
             });
             if (atualizarMaquina.count === 0) {
                 throw new Error('Máquina não encontrada ou não pertence à empresa');

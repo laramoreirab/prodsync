@@ -1,7 +1,7 @@
 import { setorMockService } from "@/mocks/setorMock";
 
 // trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const API_URL = "/api/setores";
 
@@ -75,17 +75,16 @@ const apiService = {
     return await response.json();
   },
 
-  // a implementar no back!! por favor, descomentar este trecho após criação de endpoint no back para isso.
-  // // associar operador ao setor
-  // associarOperadores: async (id_setor, ids_operadores) => {
-  //   const response = await fetch(`${API_URL}/${id_setor}/operadores`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ ids_operadores }),
-  //   });
-  //   if (!response.ok) throw new Error("Erro ao associar operadores");
-  // //   return await response.json();
-  // },
+  // associar operador ao setor
+  associarOperadores: async (id_setor, ids_operadores) => {
+    const response = await fetch(`${API_URL}/${id_setor}/operadores`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids_operadores }),
+    });
+    if (!response.ok) throw new Error("Erro ao associar operadores");
+    return await response.json();
+  },
 };
 
 //remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo

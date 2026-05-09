@@ -197,6 +197,64 @@ class SetorController {
         }
     }
 
+    // Associar operadores ao setor
+    static async associarOperadores(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const { ids_operadores } = req.body;
+            const id_empresa = req.user.id_empresa;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor inválido' });
+            if (!Array.isArray(ids_operadores)) return res.status(400).json({ sucesso: false, erro: 'Forneça um array com os IDs dos operadores' });
+
+            const resultado = await SetorModel.associarOperadores(id_setor, ids_operadores, id_empresa);
+            res.status(201).json({ sucesso: true, dados: resultado });
+        } catch (error) {
+            console.error('Erro ao associar operadores:', error);
+            if (error.message && (error.message.includes('não encontrado') || error.message.includes('não são operadores'))) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // Remover operador do setor
+    static async removerOperador(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const { id_operador } = req.body;
+            const id_empresa = req.user.id_empresa;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor inválido' });
+            if (!id_operador || isNaN(id_operador)) return res.status(400).json({ sucesso: false, erro: 'ID de operador inválido' });
+
+            await SetorModel.removerOperador(id_setor, id_operador, id_empresa);
+            res.status(200).json({ sucesso: true, mensagem: 'Operador removido do setor com sucesso' });
+        } catch (error) {
+            console.error('Erro ao remover operador:', error);
+            if (error.message.includes('não encontrada')) {
+                return res.status(404).json({ sucesso: false, erro: error.message });
+            }
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    // Listar operadores do setor
+    static async listarOperadoresDoSetor(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const id_empresa = req.user.id_empresa;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor inválido' });
+
+            const operadores = await SetorModel.listarOperadoresDoSetor(id_setor, id_empresa);
+            res.status(200).json({ sucesso: true, dados: operadores });
+        } catch (error) {
+            console.error('Erro ao listar operadores:', error);
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
     // ------------------------ Dashboards ----------------------- //
 
     static async obterProducaoPorSetor(req, res) {

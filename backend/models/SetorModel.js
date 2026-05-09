@@ -228,6 +228,85 @@ class SetorModel {
         }
     }
 
+    // Associa operadores a um setor atualizando suas escalas de trabalho
+    static async associarOperadores(id_setor, ids_operadores, id_empresa) {
+        try {
+            const setor = await prisma.setores.findFirst({
+                where: { id_setor, id_empresa }
+            });
+
+            if (!setor) {
+                throw new Error('Setor não encontrado ou não pertence à empresa');
+            }
+
+            // Atualiza o id_setor em todas as escalas de trabalho dos operadores selecionados
+            const resultado = await prisma.escalaTrabalho.updateMany({
+                where: {
+                    id_operador: { in: ids_operadores },
+                    id_empresa: id_empresa
+                },
+                data: {
+                    id_setor: id_setor
+                }
+            });
+
+            return resultado;
+        } catch (error) {
+            console.error('Erro ao associar operadores ao setor:', error);
+            throw error;
+        }
+    }
+
+    // Remove a associação de um operador com um setor deletando sua escala correspondente
+    static async removerOperador(id_setor, id_operador, id_empresa) {
+        try {
+            // Como id_setor é obrigatório na EscalaTrabalho, remover o operador do setor implica em remover sua escala de trabalho vinculada a este setor.
+            return await prisma.escalaTrabalho.deleteMany({
+                where: {
+                    id_setor,
+                    id_operador,
+                    id_empresa
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao remover operador do setor:', error);
+            throw error;
+        }
+    }
+
+    // Lista operadores de um setor via EscalaTrabalho
+    static async listarOperadoresDoSetor(id_setor, id_empresa) {
+        try {
+            const escalas = await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_setor,
+                    id_empresa
+                },
+                include: {
+                    operador: {
+                        select: { id_usuario: true, nome: true, email: true, tipo: true }
+                    }
+                }
+            });
+            
+            // Retornar apenas os operadores únicos
+            const operadoresUnicos = [];
+            const idsVistos = new Set();
+            
+            for (const escala of escalas) {
+                if (!idsVistos.has(escala.id_operador)) {
+                    operadoresUnicos.push(escala.operador);
+                    idsVistos.add(escala.id_operador);
+                }
+            }
+            
+            return operadoresUnicos;
+        } catch (error) {
+            console.error('Erro ao listar operadores do setor:', error);
+            throw error;
+        }
+    }
+
     // Lista setores de um gestor
     static async listarSetoresDoGestor(id_gestor, id_empresa) {
         try {
