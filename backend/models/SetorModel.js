@@ -455,7 +455,7 @@ class SetorModel {
             });
 
             return setores.map(setor => ({
-                id_setor: setor.id_setor,
+                // id_setor: setor.id_setor,
                 setor: setor.nome_setor,
                 qtd: setor.maquinas.length
             })).sort((a, b) => b.qtd - a.qtd);
@@ -499,11 +499,11 @@ class SetorModel {
             const setoresPorId = new Map(setores.map(setor => [setor.id_setor, setor.nome_setor]));
 
             return paradas.map(parada => ({
-                id_setor: parada.setor_afetado,
+                // id_setor: parada.setor_afetado,
                 setor: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
                 minutos: Number((parada._avg.duracao ?? 0).toFixed(1)),
-                tempo_total_minutos: parada._sum.duracao ?? 0,
-                total_eventos: parada._count.id_evento
+                // tempo_total_minutos: parada._sum.duracao ?? 0,
+                // total_eventos: parada._count.id_evento
             })).sort((a, b) => b.minutos - a.minutos);
         } catch (error) {
             console.error('Erro ao obter tempo medio de parada por setor:', error);
@@ -557,12 +557,12 @@ class SetorModel {
                 const defeito = total > 0 ? Number(((setor.defeitos / total) * 100).toFixed(1)) : 0;
 
                 return {
-                    id_setor: setor.id_setor,
+                    // id_setor: setor.id_setor,
                     setor: setor.setor,
                     produzidas,
                     defeito,
-                    total_produzido: total,
-                    total_refugo: setor.defeitos
+                    // total_produzido: total,
+                    // total_refugo: setor.defeitos
                 };
             }).sort((a, b) => b.total_refugo - a.total_refugo);
         } catch (error) {
