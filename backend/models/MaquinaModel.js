@@ -385,7 +385,7 @@ class MaquinaModel {
         }
     }
 
-    static async obterProducaoTotalMaquinas(id_empresa, dias = 7) {
+    static async obterProducaoTotalMaquinas(id_empresa, dias) {
         try {
             const quantidadeDias = Number(dias) || 7;
             const chavesDias = this.criarMapaUltimosDias(quantidadeDias);
@@ -413,8 +413,6 @@ class MaquinaModel {
                 {
                     data: dia,
                     total: 0,
-                    produzidas: 0,
-                    refugo: 0
                 }
             ]));
 

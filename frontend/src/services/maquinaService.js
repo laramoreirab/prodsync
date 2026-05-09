@@ -62,7 +62,6 @@ export const maquinasPorTurnoService = {
   async getMaquinasPorTurno() {
     if (USE_MOCK) return MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
     const data = await apiFetch("/api/turnos/status-maquinas-por-turno");
-    console.log(data)
     return MaquinaPorTurnoArraySchema.parse(data.dados);
   },
 };

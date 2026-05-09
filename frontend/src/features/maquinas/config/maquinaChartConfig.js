@@ -2,7 +2,7 @@
 export const maquinaStatusConfig = {
   ativa:  { label: "Máquinas ativas:",     color: "#004aad" },
   parada: { label: "Máquinas paradas:",    color: "#00357a" },
-  setup:  { label: "Em Manutenção:",       color: "#122f60" },
+  setup:  { label: "Máquinas Setup:",       color: "#122f60" },
 };
 
 // Quantidade de máquinas por setor (BarHorizontal)
@@ -31,7 +31,7 @@ export const producaoDefeitosConfig = {
 export const maquinasTurnoConfig = {
   ativas:     { label: "Ativas:",        color: "#004aad" },
   paradas:    { label: "Paradas:",       color: "#7d95c6" },
-  manutencao: { label: "Em Manutenção:", color: "#122f60" },
+  manutencao: { label: "Setup:", color: "#122f60" },
 };
 
 // Produção total (AreaChart)
