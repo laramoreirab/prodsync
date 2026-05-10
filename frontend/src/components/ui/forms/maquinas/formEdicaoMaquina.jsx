@@ -6,6 +6,8 @@ import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { maquinaCrudService } from '@/services/maquinaCrudService';
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/api';
 
 export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
     const [arquivo, setArquivo] = useState(null);
@@ -21,10 +23,49 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
     const [serie, setSerie] = useState('');
     // campos pendentes pro backend adicionar:
     const [idSetor, setIdSetor] = useState('');
-    const [idCategoria, setIdCategoria] = useState('');
+    const [categoria, setCategoria] = useState('');
     const [capacidade, setCapacidade] = useState('');
     const [status, setStatus] = useState('');
     const [operador, setOperador] = useState('');
+    const [setores, setSetores] = useState([]);
+    const [operadores, setOperadores] = useState([]);
+
+    useEffect(() => {
+        async function carregarSetores() {
+            try {
+                const dados = await setorCrudService.getAll();
+                setSetores(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar setores.");
+            }
+
+        }
+
+        carregarSetores();
+    }, []);
+
+
+
+    useEffect(() => {
+        async function carregar() {
+            try {
+                if (!idSetor) {
+                    setOperadores([]);
+                    return;
+                }
+
+                const options = { method: "GET" };
+                const dados = await apiFetch(`/api/usuarios/operadores/${idSetor}`, options)
+                setOperadores(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar operadores atrelados ao Setor");
+            }
+        }
+
+        carregar();
+    }, [idSetor]);
 
     const handleUploadClick = () => {
         fileInputRef.current.click();
@@ -63,16 +104,16 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 setSerie(dados.serie || '');
                 // campos pendentes pro backend adicionar:
                 setIdSetor(dados.id_setor || '');
-                setIdCategoria(dados.id_categoria || '');
+                setCategoria(dados.categoria || '');
                 setCapacidade(dados.capacidade || '');
                 setStatus(dados.status || '');
                 setOperador(dados.operador || '');
 
                 // Se a máquina já tiver uma imagem no banco, você pode configurar o preview aqui
-                if (dados.imagemUrl) {
+                if (dados.imagem) {
                     setArquivo({
                         nome: 'Imagem atual',
-                        preview: dados.imagemUrl,
+                        preview: dados.imagem,
                         raw: null
                     });
                 }
@@ -99,10 +140,10 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
         formData.append('serie', serie);
         // campos pendentes pro backend adicionar:
         formData.append('id_setor', idSetor);
-        formData.append('id_categoria', idCategoria);
+        formData.append('categoria', categoria);
         formData.append('capacidade', capacidade);
-        formData.append('status', status);
-        formData.append('operador', operador);
+        formData.append('status_atual', status);
+        formData.append('id_operador', operador);
 
         // Só anexa a imagem se o usuário tiver selecionado um novo arquivo
         if (arquivo && arquivo.raw) {
@@ -216,7 +257,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                             disabled
                             id="dataAquisicao"
                             type="date"
-                            value={maquinaCompleta?.dataAquisicao ? maquinaCompleta.dataAquisicao.split('T')[0] : ''}
+                            value={maquinaCompleta?.data_aquisicao ? maquinaCompleta.data_aquisicao.split('T')[0] : ''}
                             className="border rounded-md p-2.5 outline-none bg-gray-100 cursor-not-allowed opacity-70"
                         />
                     </div>
@@ -225,28 +266,34 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                     <div className="flex flex-col gap-1">
                         <label className="text-md text-cinza-escuro">Setor</label>
                         <select
-                            id="id_setor"
-                            value={idSetor}
-                            onChange={(e) => setIdSetor(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none bg-white"
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="1">Engrenagens</option>
-                            <option value="2">Roscas</option>
-                        </select>
+                                id="id_setor"
+                                className="border rounded-md p-2.5 outline-none bg-white"
+                                value={idSetor}
+                                onChange={(e) => {setIdSetor(e.target.value);  setOperador('');}}
+                            >
+                                <option value="">Selecione...</option>
+                                 {setores.map((setor) => (
+
+                                    <option
+                                        key={setor.id_setor}
+                                        value={setor.id_setor}
+                                    >
+                                        {setor.nome_setor}
+                                    </option>
+                                ))}
+                            </select>
                     </div>
 
                     <div className="flex flex-col gap-1">
                         <label className="text-md text-cinza-escuro">Tipo de Máquina</label>
-                        <select
-                            id="id_categoria"
-                            value={idCategoria}
-                            onChange={(e) => setIdCategoria(e.target.value)}
+                        <input
+                            id="categoria"
+                            type="text"
+                            value={categoria}
+                            onChange={(e) => setCategoria(e.target.value)}
                             className="border rounded-md p-2.5 outline-none bg-white"
                         >
-                            <option value="">Selecione...</option>
-                            <option value="1">Tipo A</option>
-                        </select>
+                        </input>
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -271,7 +318,6 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                             <option value="">Selecione...</option>
                             <option value="Produzindo">Produzindo</option>
                             <option value="Parada">Parada</option>
-                            <option value="Manutencao">Manutenção</option>
                             <option value="Setup">Setup</option>
                         </select>
                     </div>
@@ -279,14 +325,22 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                     <div className="flex flex-col gap-1 col-span-2">
                         <label className="text-md text-cinza-escuro">Operador</label>
                         <select
-                            id="operador"
-                            value={operador}
-                            onChange={(e) => setOperador(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none bg-white"
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="João">João</option>
-                        </select>
+                                id="operador"
+                                className="border rounded-md p-2.5 outline-none bg-white"
+                                value={operador}
+                                onChange={(e) => setOperador(e.target.value)}
+                                 disabled={!idSetor}
+                            >
+                                <option value="">Selecione...</option>
+                                {operadores.map((operador) => (
+                                    <option
+                                        key={operador.id_operador}
+                                        value={operador.id_operador}
+                                    >
+                                        {operador.nome}
+                                    </option>
+                                ))}
+                            </select>
                     </div>
                 </div>
 

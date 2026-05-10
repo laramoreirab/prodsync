@@ -32,7 +32,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         async function carregarSetores() {
             try {
                 const dados = await setorCrudService.getAll();
-                setSetores(dados);
+                setSetores(dados.dados);
             } catch (error) {
                 console.log(error)
                 toast.error("Erro ao carregar setores.");
@@ -52,10 +52,10 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                     setOperadores([]);
                     return;
                 }
-
                 const options = { method: "GET" };
                 const dados = await apiFetch(`/api/usuarios/operadores/${idSetor}`, options)
-                setOperadores(dados);
+                console.log(dados)
+                setOperadores(dados.dados);
             } catch (error) {
                 console.log(error)
                 toast.error("Erro ao carregar operadores atrelados ao Setor");
@@ -63,7 +63,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         }
 
         carregar();
-    }, []);
+    }, [idSetor]);
 
     //abre a seleção de arquivos
     const handleUploadClick = () => {
@@ -218,7 +218,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                         key={setor.id_setor}
                                         value={setor.id_setor}
                                     >
-                                        {setor.nome}
+                                        {setor.nome_setor}
                                     </option>
 
                                 ))}

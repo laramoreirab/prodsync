@@ -11,7 +11,7 @@ export function useMaquinas() {
     setLoading(true);
     try {
       const data = await maquinaCrudService.getAll();
-      setMaquinas(data);
+      setMaquinas(data.dados);
       setError(null);
     } catch (err) {
       setError('Falha ao carregar máquinas');
@@ -40,7 +40,7 @@ export function useMaquinas() {
   const editarMaquina = async (id, dados) => {
     try {
       const atualizada = await maquinaCrudService.update(id, dados);
-      setMaquinas(prev => prev.map(m => m.id === id ? atualizada : m));
+      setMaquinas(prev => prev.map(m => m.id_maquina === id ? atualizada : m));
       return atualizada;
     } catch (err) {
       throw err;
@@ -51,7 +51,7 @@ export function useMaquinas() {
   const excluirMaquina = async (id) => {
     try {
       await maquinaCrudService.delete(id);
-      setMaquinas(prev => prev.filter(m => m.id !== id));
+      setMaquinas(prev =>  prev.filter(m => String(m.id_maquina) !== String(id)))
     } catch (err) {
       throw err;
     }

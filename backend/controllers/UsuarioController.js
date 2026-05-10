@@ -32,7 +32,7 @@ class UsuarioController {
         try {
             const id_empresa = req.user.id_empresa
             const id_setor = req.params.id_setor
-            dados = await UsuarioModel.listarOperadoresPorSetor(id_empresa, id_setor)
+            const dados = await UsuarioModel.listarOperadoresPorSetor(id_empresa, id_setor)
             return res.status(200).json({dados})
         } catch (error) {
               console.error('Erro ao listar operadores:', error);

@@ -11,17 +11,12 @@ const API_URL = "/api/maquinas";
   export const maquinaCrudService = {
   getAll: async () => {
     const options = { method: "GET" };
-    const response = await apiFetch(`${API_URL}/`, options);
-    
-    if (!response.ok) throw new Error("Erro ao buscar máquinas");
-    return await response;
+    return await apiFetch(`${API_URL}/`);
   },
 
   getById: async (id) => {
     const options = { method: "GET" };
-    const response = await fetch(`${API_URL}/${id}`,options);
-    if (!response.ok) throw new Error("Erro ao buscar detalhes da máquina");
-    return await response.json();
+    return await apiFetch(`${API_URL}/${id}`,options);
   },
 
   create: async (dados) => {
@@ -32,9 +27,7 @@ const API_URL = "/api/maquinas";
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
-    const response = await apiFetch(`${API_URL}/criarMaquina`, options);
-    if (!response.ok) throw new Error("Erro ao cadastrar máquina");
-    return await response.json();
+    return await apiFetch(`${API_URL}/criarMaquina`, options);
   },
 
   update: async (id, dados) => {
@@ -45,15 +38,11 @@ const API_URL = "/api/maquinas";
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
-    const response = await apiFetch(`${API_URL}/${id}`, options);
-    if (!response.ok) throw new Error("Erro ao atualizar máquina");
-    return await response.json();
+    return await apiFetch(`${API_URL}/${id}`, options);
   },
 
   delete: async (id) => {
-    const response = await apiFetch(`${API_URL}/${id}`, { method: "DELETE" });
-    if (!response.ok) throw new Error("Erro ao excluir máquina");
-    return true;
+    return await apiFetch(`${API_URL}/${id}`, { method: "DELETE" });
   },
 };
 
