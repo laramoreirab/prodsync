@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, Upload, File } from "lucide-react";
 import {
     DialogContent,
@@ -6,7 +6,10 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { maquinaCrudService } from '@/services/maquinaCrudService'; 
+import { maquinaCrudService } from '@/services/maquinaCrudService';
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/api';
+
 
 export default function FormCadastroMaquina({ onCadastroSucesso }) {
     const [arquivo, setArquivo] = useState(null);
@@ -14,14 +17,53 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
 
     //estados para os campos do form
     const [nome, setNome] = useState('');
-    const [idSetor, setIdSetor] = useState('');      
-    const [idCategoria, setIdCategoria] = useState(''); 
+    const [idSetor, setIdSetor] = useState('');
+    const [categoria, setCategoria] = useState('');
     const [serie, setSerie] = useState('');
     // campos pendentes pro backend adicionar:
     const [capacidade, setCapacidade] = useState('');
     const [status, setStatus] = useState('');
     const [dataAquisicao, setDataAquisicao] = useState('');
     const [operador, setOperador] = useState('');
+    const [setores, setSetores] = useState([]);
+    const [operadores, setOperadores] = useState([]);
+
+    useEffect(() => {
+        async function carregarSetores() {
+            try {
+                const dados = await setorCrudService.getAll();
+                setSetores(dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar setores.");
+            }
+
+        }
+
+        carregarSetores();
+    }, []);
+
+
+
+    useEffect(() => {
+        async function carregar() {
+            try {
+                if (!idSetor) {
+                    setOperadores([]);
+                    return;
+                }
+
+                const options = { method: "GET" };
+                const dados = await apiFetch(`/api/usuarios/operadores/${idSetor}`, options)
+                setOperadores(dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar operadores atrelados ao Setor");
+            }
+        }
+
+        carregar();
+    }, []);
 
     //abre a seleção de arquivos
     const handleUploadClick = () => {
@@ -54,32 +96,35 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         const formData = new FormData();
         //formData.append('campo', value)
         formData.append('nome', nome);
-        formData.append('id_setor', idSetor);        
-        formData.append('id_categoria', idCategoria);
+        formData.append('id_setor', idSetor);
+        formData.append('categoria', categoria);
         formData.append('serie', serie);
         // campos pendentes pro backend adicionar:
         formData.append('capacidade', capacidade);
         formData.append('status', status);
-        formData.append('dataAquisicao', dataAquisicao);
-        formData.append('operador', operador);
+        formData.append('data_aquisicao', dataAquisicao);
+        formData.append('id_operador', operador);
 
         if (arquivo && arquivo.raw) {
             formData.append('imagem', arquivo.raw);
         }
-
         try {
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
             await maquinaCrudService.create(formData);
             toast.success("Máquina cadastrada com sucesso!");
             //limpar formulário ou fecha modal
             setNome('');
             setIdSetor('');
-            setIdCategoria('');
+            setCategoria('');
             setSerie('');
             setCapacidade('');
             setStatus('');
             setDataAquisicao('');
             setOperador('');
             setArquivo(null);
+            setOperadores([]);
             if (onCadastroSucesso) {
                 onCadastroSucesso();
             }
@@ -164,25 +209,33 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                 id="id_setor"
                                 className="border rounded-md p-2.5 outline-none bg-white"
                                 value={idSetor}
-                                onChange={(e) => setIdSetor(e.target.value)}
+                                onChange={(e) => {setIdSetor(e.target.value);  setOperador('');}}
                             >
                                 <option value="">Selecione...</option>
-                                <option value="1">Engrenagens</option>
-                                <option value="2">Roscas</option>
+                                 {setores.map((setor) => (
+
+                                    <option
+                                        key={setor.id_setor}
+                                        value={setor.id_setor}
+                                    >
+                                        {setor.nome}
+                                    </option>
+
+                                ))}
                             </select>
                         </div>
 
                         <div className="flex flex-col gap-1">
                             <label className="text-md text-cinza-escuro">Tipo de Máquina</label>
-                            <select
-                                id="id_categoria"
+                            <input
+                                id="categoria"
+                                type="text"
+                                placeholder=""
                                 className="border rounded-md p-2.5 outline-none bg-white"
-                                value={idCategoria}
-                                onChange={(e) => setIdCategoria(e.target.value)}
+                                value={categoria}
+                                onChange={(e) => setCategoria(e.target.value)}
                             >
-                                <option value="">Selecione...</option>
-                                <option value="1">Tipo A</option>
-                            </select>
+                            </input>
                         </div>
 
                         {/* campos pendentes pro backend adicionar */}
@@ -219,7 +272,6 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                 <option value="">Selecione...</option>
                                 <option value="Produzindo">Produzindo</option>
                                 <option value="Parada">Parada</option>
-                                <option value="Manutencao">Manutenção</option>
                                 <option value="Setup">Setup</option>
                             </select>
                         </div>
@@ -231,9 +283,19 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                 className="border rounded-md p-2.5 outline-none bg-white"
                                 value={operador}
                                 onChange={(e) => setOperador(e.target.value)}
+                                 disabled={!idSetor}
                             >
                                 <option value="">Selecione...</option>
-                                <option value="João">João</option>
+                                {operadores.map((operador) => (
+
+                                    <option
+                                        key={operador.id_operador}
+                                        value={operador.id_operador}
+                                    >
+                                        {operador.nome}
+                                    </option>
+
+                                ))}
                             </select>
                         </div>
                     </div>

@@ -28,6 +28,22 @@ class UsuarioController {
         }
     }
 
+    static async listarOperadoresporSetor(req,res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_setor = req.params.id_setor
+            dados = await UsuarioModel.listarOperadoresPorSetor(id_empresa, id_setor)
+            return res.status(200).json({dados})
+        } catch (error) {
+              console.error('Erro ao listar operadores:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível listar os operadores'
+            });
+        }
+    }
+
     //GET api/usuarios - busca de usuário por id 
     static async buscarPorId(req, res) {
         try {

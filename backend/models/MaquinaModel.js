@@ -65,13 +65,13 @@ class MaquinaModel {
     }
 
     // Cria uma nova máquina
-    static async criarMaquina(id_empresa, id_setor, id_categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem) {
+    static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem) {
         try {
             const maquina = await prisma.maquinas.create({
                 data: {
                     id_empresa: id_empresa,
                     id_setor: id_setor ? parseInt(id_setor) : null,
-                    id_categoria: parseInt(id_categoria),
+                    categoria: categoria,
                     nome: nome,
                     serie: serie,
                     capacidade: capacidade,

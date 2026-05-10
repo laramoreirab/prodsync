@@ -65,7 +65,6 @@ model Categoria_Maquina {
   nome         String     @db.VarChar(100)
   descricao    String?
   empresa      Empresas   @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  maquinas     Maquinas[]
 }
 
 model Maquinas {
@@ -75,7 +74,7 @@ model Maquinas {
   serie             String?             @unique @db.VarChar(50)
   status_atual      StatusMaquina       @default(Parada)
   id_setor          Int?
-  id_categoria      Int
+  categoria         String?             @db.VarChar(100)
   data_ativacao     DateTime?           @db.Date
   ativo             Boolean             @default(true)
   capacidade        String?             @db.VarChar(100)
@@ -86,7 +85,6 @@ model Maquinas {
   apontamentos      Apontamento[]
   escala_trabalho   EscalaTrabalho[]
   historico_eventos Historico_Eventos[]
-  categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
   operador          Usuarios?           @relation(fields: [id_operador], references: [id_usuario])

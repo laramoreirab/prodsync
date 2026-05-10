@@ -73,11 +73,11 @@ class MaquinaController {
     // POST /maquinas - Criar nova máquina
     static async criarMaquina(req, res) {
         try {
-            const { id_setor, id_categoria, nome, serie, capacidade, status, data_aquisicao, id_operador } = req.body;
+            const { id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
             const erros = [];
 
-            if (!id_categoria || isNaN(id_categoria)) erros.push({ campo: 'id_categoria', mensagem: 'Inválido' });
+            if (!categoria || categoria.trim().length < 2) erros.push({ campo: 'categoria', mensagem: 'Deve ter pelo menos 2 caracteres' });
             if (!nome || nome.trim().length < 2) erros.push({ campo: 'nome', mensagem: 'Deve ter pelo menos 2 caracteres' });
 
             if (erros.length > 0) {
@@ -89,7 +89,7 @@ class MaquinaController {
             const imagem = req.file ? req.file.filename : null;
 
             const maquina = await MaquinaModel.criarMaquina(
-                id_empresa, id_setor, id_categoria, nome.trim(), serie?.trim(), 
+                id_empresa, id_setor, categoria, nome.trim(), serie?.trim(), 
                 capacidade?.trim(), status?.trim(), data_aquisicao, id_operador, imagem
             );
 
