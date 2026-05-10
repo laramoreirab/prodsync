@@ -1,7 +1,7 @@
 import { maquinasMockService } from "@/mocks/maquinasMock";
 
 // trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const API_URL = "/api/maquinas";
 
