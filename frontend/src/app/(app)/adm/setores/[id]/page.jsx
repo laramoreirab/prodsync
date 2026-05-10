@@ -7,7 +7,7 @@ import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidge
 import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
 import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
 import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ import FormCadastroMaquina from "@/components/ui/forms/maquinas/formCadastroMaqu
 import FormCadastroUsuario from "@/components/ui/forms/usuarios/formCadastroUsuario";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import turnoCrudService from "@/services/turnoCrudService";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
@@ -80,29 +81,21 @@ export default function SetorEspecificoPage({ params }) {
   const { id } = use(params);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
   const [buscaUsuarios, setBuscaUsuarios] = useState("");
+  const [turnos, setTurnos] = useState([]);
 
-  const dadosExibidos = [
-    { nome: "Luiz Mariz", id: 1, funcao: "Gestor", turno: "Manhã", oee_medio: "60%" },
-    { nome: "Ana Silva", id: 2, funcao: "Operador", turno: "Manhã", oee_medio: "72%" },
-    { nome: "Carlos Souza", id: 3, funcao: "Operador", turno: "Tarde", oee_medio: "65%" },
-    { nome: "Beatriz Lima", id: 4, funcao: "Operador", turno: "Noite", oee_medio: "58%" },
-    { nome: "Ricardo Alves", id: 5, funcao: "Gestor", turno: "Manhã", oee_medio: "80%" },
-    { nome: "Mariana Costa", id: 6, funcao: "Operador", turno: "Tarde", oee_medio: "74%" },
-    { nome: "João Pereira", id: 7, funcao: "Operador", turno: "Noite", oee_medio: "62%" },
-    { nome: "Fernanda Dias", id: 8, funcao: "Operador", turno: "Manhã", oee_medio: "69%" },
-    { nome: "Paulo Santos", id: 9, funcao: "Gestor", turno: "Tarde", oee_medio: "77%" },
-    { nome: "Juliana Rocha", id: 10, funcao: "Operador", turno: "Noite", oee_medio: "55%" },
-    { nome: "Marcos Vinícius", id: 11, funcao: "Operador", turno: "Manhã", oee_medio: "81%" },
-    { nome: "Sofia Oliveira", id: 12, funcao: "Operador", turno: "Tarde", oee_medio: "66%" },
-    { nome: "André Machado", id: 13, funcao: "Gestor", turno: "Noite", oee_medio: "70%" },
-    { nome: "Camila Borges", id: 14, funcao: "Operador", turno: "Manhã", oee_medio: "73%" },
-    { nome: "Tiago Mendes", id: 15, funcao: "Operador", turno: "Tarde", oee_medio: "64%" },
-    { nome: "Elena Martins", id: 16, funcao: "Operador", turno: "Noite", oee_medio: "59%" },
-    { nome: "Rafael Lima", id: 17, funcao: "Gestor", turno: "Manhã", oee_medio: "85%" },
-    { nome: "Vanessa Gomes", id: 18, funcao: "Operador", turno: "Tarde", oee_medio: "68%" },
-    { nome: "Gabriel Farias", id: 19, funcao: "Operador", turno: "Noite", oee_medio: "61%" },
-    { nome: "Patrícia Melo", id: 20, funcao: "Gestor", turno: "Manhã", oee_medio: "79%" }
-  ];
+  useEffect(() => {
+    const carregarTurnos = async () => {
+      try {
+        const response = await turnoCrudService.getBySetor(id);
+        if (response.sucesso) setTurnos(response.dados);
+      } catch (error) {
+        console.error("Erro ao carregar turnos:", error);
+      }
+    };
+    carregarTurnos();
+  }, [id]);
+
+  const dadosExibidos = []; // TODO: Integrar listagem real de usuários do setor
   const dadosMaquina = [
     {
       nome: "Injetora 01",
@@ -266,9 +259,15 @@ export default function SetorEspecificoPage({ params }) {
               <div className="flex">
                 <p>Turnos:</p>
                 <ul className="list-disc list-inside ml-4">
-                  <li>Manhã (Segunda a Sexta): 06:00 - 14:00</li>
-                  <li>Tarde (Segunda a Sexta): 14:00 - 22:00</li>
-                  <li>Noite (Segunda a Sexta): 22:00 - 06:00</li>
+                  {turnos.length > 0 ? (
+                    turnos.map((t) => (
+                      <li key={t.id_turno}>
+                        {t.nome_turno} ({t.dia_semana}): {new Date(t.hora_inicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(t.hora_fim).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500 italic">Nenhum turno cadastrado para este setor</li>
+                  )}
                 </ul>
               </div>
               <p>Localização: Galpão Sul - Bloco A</p>
@@ -283,7 +282,12 @@ export default function SetorEspecificoPage({ params }) {
               Criar Turno
             </DialogTrigger>
             <DialogContent>
-              <FormCriacaoTurno />
+              <FormCriacaoTurno onSuccess={() => {
+                // Recarregar turnos após criação
+                turnoCrudService.getBySetor(id).then(res => {
+                  if (res.sucesso) setTurnos(res.dados);
+                });
+              }} />
             </DialogContent>
           </Dialog>
         </div>
