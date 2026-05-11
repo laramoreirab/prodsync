@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { maquinaCrudService } from '@/services/maquinaCrudService';
 
-export default function FormExclusaoMaquina({ maquinaId, onExclusaoSucesso }) {
+export default function FormExclusaoMaquina({ maquinaId,  onExcluir }) {
     const [carregando, setCarregando] = useState(false);
     
     const handleSubmit = async (e) => {
@@ -16,11 +16,8 @@ export default function FormExclusaoMaquina({ maquinaId, onExclusaoSucesso }) {
         setCarregando(true);
         
         try {
-            await maquinaCrudService.delete(maquinaId);
+            await onExcluir(maquinaId);
             toast.success("Máquina excluída com sucesso!");
-            if (onExclusaoSucesso) {
-                onExclusaoSucesso();
-            }
         } catch (error) {
             console.error("Erro ao excluir máquina:", error);
             toast.error("Erro ao excluir a máquina.");

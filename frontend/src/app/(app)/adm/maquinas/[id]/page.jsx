@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { DataEvento } from "@/components/ui/dataEvento";
 
-import { BellRing, Pencil, EyeIcon, ChevronDown, Trash2, Flame, Plus, Search } from "lucide-react";
+import { BellRing, Pencil, EyeIcon, ChevronDown, Trash2, Flame, Plus, Search, Loader2 } from "lucide-react";
 
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
@@ -26,13 +26,17 @@ import {
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
-import Image from "next/image";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
+<<<<<<< HEAD
+import { maquinaCrudService } from "@/services/maquinaCrudService";
+import { apiFetch } from "@/lib/api";
+=======
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+>>>>>>> 53862615b22109e060ff2d1684ae3748b096ba90
 
 
 const colunasMaquina = [
@@ -124,11 +128,90 @@ const dadosOriginais = [
 export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
   const maquinaId = Number(id);
+  const [maquina, setMaquina] = useState(null);
   const [dados, setDados] = useState([]);
+  const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
+  const [todosEventos, setTodosEventos] = useState([]);
+  const [todosApontamentos, setTodosApontamentos] = useState([]);
+  const [loadingMaquina, setLoadingMaquina] = useState(true);
+
+  const imagemMaquina = (() => {
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
+    if (!maquina?.imagem) return "/demo_maq.png";
+    const imagem = String(maquina.imagem).replaceAll("\\", "/");
+    if (imagem.startsWith("http")) return imagem;
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+    const nomeArquivo = imagem.split("/").pop();
+    return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+  })();
+
+  const formatarData = (valor) => {
+    if (!valor) return "-";
+    return new Date(valor).toLocaleDateString("pt-BR");
+  };
+
+  const formatarPeriodo = (inicio, fim) => {
+    if (!inicio) return "-";
+    const dataInicio = new Date(inicio);
+    const dataFim = fim ? new Date(fim) : null;
+    const data = dataInicio.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+    const horaInicio = dataInicio.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    const horaFim = dataFim ? dataFim.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--";
+    return `${data} (${horaInicio} - ${horaFim})`;
+  };
+
+  const formatarDuracao = (minutos) => {
+    const total = Number(minutos) || 0;
+    const horas = Math.floor(total / 60);
+    const mins = Math.round(total % 60);
+    return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  };
 
   useEffect(() => {
-    setDados(dadosOriginais);
-  }, []);
+    async function carregarMaquina() {
+      setLoadingMaquina(true);
+      try {
+        const [respostaMaquina, respostaHistorico] = await Promise.all([
+          maquinaCrudService.getById(maquinaId),
+          apiFetch(`/api/maquinas/${maquinaId}/historico-eventos`),
+        ]);
+
+        setMaquina(respostaMaquina.dados || respostaMaquina);
+        const historico = respostaHistorico.dados || [];
+        const eventos = historico
+          .filter((item) => item.tipo !== "Producao")
+          .map((item) => ({
+            ...item,
+            tipoEvento: item.tipo,
+            data: formatarPeriodo(item.inicio, item.fim),
+            duracao: formatarDuracao(item.duracao_minutos),
+            motivo: item.motivo || "-",
+          }));
+        const apontamentos = historico
+          .filter((item) => item.tipo === "Producao")
+          .map((item) => ({
+            ...item,
+            op: item.ordem_producao?.codigo_lote || item.ordem_producao?.id_ordem || "-",
+            data: formatarPeriodo(item.inicio, item.fim),
+            duracao: formatarDuracao(item.duracao_minutos),
+            produzido: String(item.produzido || 0),
+            refugo: String(item.refugo || 0),
+            observacao: item.motivo || "-",
+          }));
+
+        setTodosEventos(eventos);
+        setDados(eventos);
+        setTodosApontamentos(apontamentos);
+        setDadosApontamentoState(apontamentos);
+      } finally {
+        setLoadingMaquina(false);
+      }
+    }
+
+    if (maquinaId) {
+      carregarMaquina();
+    }
+  }, [maquinaId]);
 
   const [buscaEvento, setBuscaEvento] = useState("");
   const [buscaApontamento, setBuscaApontamento] = useState("");
@@ -199,7 +282,7 @@ export default function MaquinaDetalhePage({ params }) {
   ];
 
   const aplicarFiltrosEventos = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosOriginais];
+    let dadosFiltrados = [...todosEventos];
 
     // filtro por status
     if (filtrosSelecionados.tipoEvento?.length) {
@@ -231,18 +314,13 @@ export default function MaquinaDetalhePage({ params }) {
     const termo = buscaEvento.toLowerCase();
 
     return (
-      (evento.status?.toLowerCase() || "").includes(termo) ||
+      (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
+      (evento.motivo?.toLowerCase() || "").includes(termo) ||
       evento.id?.toString().includes(termo)
     );
   });
 
   // -------------------------------------------------------------------------------------------------- Apontamentos  --------------------------------------------------------------------------------------------------
-  const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
-  useEffect(() => {
-    setDados(dadosOriginais);
-    setDadosApontamentoState(dadosApontamento);
-  }, []);
-
   const opcoesOrdenacaoApontamento = [
     { label: 'ID Crescente', value: 'id_asc' },
     { label: 'ID Decrescente', value: 'id_desc' },
@@ -286,7 +364,7 @@ export default function MaquinaDetalhePage({ params }) {
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosApontamento];
+    let dadosFiltrados = [...todosApontamentos];
 
     //filtro por produzido
     if (filtrosSelecionados.produzido) {
@@ -341,11 +419,21 @@ export default function MaquinaDetalhePage({ params }) {
     const termo = buscaApontamento.toLowerCase();
 
     return (
-      (a.op?.toLowerCase() || "").includes(termo) ||
+      String(a.op || "").toLowerCase().includes(termo) ||
       a.id?.toString().includes(termo)
     );
   });
 
+  if (loadingMaquina) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando máquina...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
@@ -360,7 +448,7 @@ export default function MaquinaDetalhePage({ params }) {
           <div className="flex justify-between items-center">
             <div className="bg-white px-5 pb-3 rounded-tl-4xl rounded-tr-4xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a]">
               <h1 className="text-3xl font-bold uppercase text-[#212e4b] pb-0 inline-block px-6 py-4">
-                THAK-1234
+                {maquina?.nome || `Máquina ${maquinaId}`}
               </h1>
             </div>
 
@@ -370,7 +458,7 @@ export default function MaquinaDetalhePage({ params }) {
                   <Pencil size={36} className="mr-1" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormEdicaoMaquina />
+                  <FormEdicaoMaquina maquinaId={maquinaId} />
                 </DialogContent>
               </Dialog>
 
@@ -379,46 +467,53 @@ export default function MaquinaDetalhePage({ params }) {
                   <Trash2 className=" w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormExclusaoMaquina />
+                  <FormExclusaoMaquina maquinaId={maquinaId} onExcluir={maquinaCrudService.delete} />
                 </DialogContent>
               </Dialog>
             </div>
           </div>
           <div className="flex gap-8 mt-5">
             <div className="bg-white rounded-xl p-13  ">
-              <Image src="/demo_maq.png" alt="Demo Maquina" className="rounded-xl" width={150} height={150} />
+              <img
+                src={imagemMaquina}
+                alt={maquina?.nome || "Máquina"}
+                className="rounded-xl w-[150px] h-[150px] object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/demo_maq.png";
+                }}
+              />
             </div>
             <div className="flex flex-col gap-6">
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                <p className="text-xl font-medium text-black">00000</p>
+                <p className="text-xl font-medium text-black">{maquina?.id_maquina || maquinaId}</p>
               </div>
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">Série:</p>
-                <p className="text-xl font-medium text-black">SX-900</p>
+                <p className="text-xl font-medium text-black">{maquina?.serie || "-"}</p>
               </div>
               <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                <p className="text-xl font-medium text-black">00000</p>
+                <p className="text-xl font-semibold text-black mr-2">Setor:</p>
+                <p className="text-xl font-medium text-black">{maquina?.id_setor || "-"}</p>
               </div>
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">Status:</p>
-                <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">Parada</p>
+                <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">{maquina?.status_atual || maquina?.status || "-"}</p>
               </div>
             </div>
 
             <div className="flex flex-col gap-6">
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">Operador:</p>
-                <p className="text-xl font-medium text-black">Estevão Ferreira</p>
+                <p className="text-xl font-medium text-black">{maquina?.id_operador || "-"}</p>
               </div>
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">Data de Aquisição:</p>
-                <p className="text-xl font-medium text-black">13/09/2025</p>
+                <p className="text-xl font-medium text-black">{formatarData(maquina?.data_aquisicao)}</p>
               </div>
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
-                <p className="text-xl font-medium text-black">40 peças/h</p>
+                <p className="text-xl font-medium text-black">{maquina?.capacidade || "-"}</p>
               </div>
 
             </div>
