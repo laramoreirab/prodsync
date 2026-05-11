@@ -197,11 +197,9 @@ export default function OrdensDeProducao() {
   const dadosExibidos = dados.filter((op) => {
     const termo = (busca || "").toLowerCase();
 
-    const nome = op?.nome?.toLowerCase() || "";
     const id = op?.id?.toString() || "";
 
     return (
-      nome.includes(termo) ||
       id.includes(termo)
     );
   });
@@ -269,7 +267,7 @@ export default function OrdensDeProducao() {
               <input
                 type="search"
                 className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id, nome ou lote..."
+                placeholder="Busque por id..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />

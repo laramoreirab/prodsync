@@ -21,6 +21,7 @@ import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"
 
+
 import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
@@ -80,7 +81,7 @@ const colunasEventos = [
   { id: 'data', key: 'data', label: 'Data(Início - Fim)', className: 'pl-20 w-1/5' },
   { id: 'duracao', key: 'duracao', label: 'Duração' },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  { id: 'observacao', key: 'observacao', label: 'Observação', className: 'text-right' },
+  { id: 'observacao', key: 'observacao', label: 'Observação', className: 'pl-5' },
 ];
 
 export default function HistoricoEventos() {
@@ -90,6 +91,7 @@ export default function HistoricoEventos() {
   const [selecionados, setSelecionados] = useState([]);
   const [justificativaAberta, setJustificativaAberta] = useState(false);
 
+  //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(eventos);
   }, [eventos]);
@@ -240,7 +242,7 @@ export default function HistoricoEventos() {
             <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
               <input
                 type="search"
-                className="p-2 w-full outline-none bg-transparent"
+                className="p-2 w-full outline-none font-medium bg-transparent"
                 placeholder="Busque por tipo de evento..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
