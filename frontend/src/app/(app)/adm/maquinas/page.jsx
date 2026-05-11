@@ -38,7 +38,7 @@ const maquinasFilter = [
 ];
 
 const colunasMaquinas = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
+  { id: 'id_maquina', key: 'id_maquina', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'nome', key: 'nome', label: 'Nome' },
   { id: 'setor', key: 'id_setor', label: 'Setor' },
   {
@@ -93,6 +93,7 @@ export default function Maquinas() {
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(maquinas);
+    console.log(maquinas)
   }, [maquinas]);
 
   //lógica de ordenação
@@ -101,8 +102,8 @@ export default function Maquinas() {
 
     dadosCopiados.sort((a, b) => {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'id_asc') return a.id_maquina - b.id_maquina;
+      if (criterio === 'id_desc') return b.id_maquina - a.id_maquina;
       if (criterio === 'setor') return a.id_setor.localeCompare(b.id_setor);
       return 0;
     });
@@ -155,7 +156,7 @@ export default function Maquinas() {
     const termo = busca.toLowerCase();
     return (
       maq.nome.toLowerCase().includes(termo) ||
-      maq.id.toString().includes(termo)
+      maq.id_maquina.toString().includes(termo)
     );
   });
 
@@ -302,7 +303,7 @@ export default function Maquinas() {
                 <>
 
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`maquinas/${maquina.id}`}>
+                    <Link href={`maquinas/${maquina.id_maquina}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver Detalhes
                     </Link>
@@ -316,7 +317,7 @@ export default function Maquinas() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormEdicaoMaquina />
+                      <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
@@ -328,7 +329,10 @@ export default function Maquinas() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoMaquina />
+                      <FormExclusaoMaquina
+                        maquinaId={maquina.id_maquina}
+                        onExcluir={excluirMaquina}
+                      />
                     </DialogContent>
                   </Dialog>
 

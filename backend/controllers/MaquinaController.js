@@ -73,11 +73,11 @@ class MaquinaController {
     // POST /maquinas - Criar nova máquina
     static async criarMaquina(req, res) {
         try {
-            const { id_setor, id_categoria, nome, serie, capacidade, status, data_aquisicao, id_operador } = req.body;
+            const { id_setor, categoria, nome, serie, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
             const erros = [];
 
-            if (!id_categoria || isNaN(id_categoria)) erros.push({ campo: 'id_categoria', mensagem: 'Inválido' });
+            if (!categoria || categoria.trim().length < 2) erros.push({ campo: 'categoria', mensagem: 'Deve ter pelo menos 2 caracteres' });
             if (!nome || nome.trim().length < 2) erros.push({ campo: 'nome', mensagem: 'Deve ter pelo menos 2 caracteres' });
 
             if (erros.length > 0) {
@@ -86,11 +86,11 @@ class MaquinaController {
                 return res.status(400).json({ sucesso: false, erro: 'Dados inválidos', detalhes: erros });
             }
 
-            const imagem = req.file ? req.file.filename : null;
+            const imagem = req.file ? `/uploads/imagens/${req.file.filename}` : null;
 
             const maquina = await MaquinaModel.criarMaquina(
-                id_empresa, id_setor, id_categoria, nome.trim(), serie?.trim(), 
-                capacidade?.trim(), status?.trim(), data_aquisicao, id_operador, imagem
+                id_empresa, id_setor, categoria, nome.trim(), serie?.trim(), 
+                capacidade?.trim(), (status_atual || status)?.trim(), data_aquisicao, id_operador, imagem
             );
 
             res.status(201).json({ sucesso: true, mensagem: 'Máquina criada com sucesso!', dados: maquina });
@@ -106,7 +106,7 @@ class MaquinaController {
     static async atualizarMaquina(req, res) {
         try {
             const { id } = req.params;
-            const { nome, serie, id_setor, id_categoria, capacidade, status, data_aquisicao, id_operador } = req.body;
+            const { nome, serie, id_setor, id_categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
 
             if (!id || isNaN(id)) return res.status(400).json({ sucesso: false, erro: 'ID inválido' });
@@ -123,32 +123,20 @@ class MaquinaController {
                 id_setor,
                 id_categoria,
                 capacidade: capacidade?.trim(),
-                status: status?.trim(),
+                status: (status_atual || status)?.trim(),
                 data_aquisicao,
                 id_operador
             };
 
             if (req.file) {
-                dadosUpdate.imagem = req.file.filename;
+                dadosUpdate.imagem = `/uploads/imagens/${req.file.filename}`;
                 // Remover imagem antiga se existir
                 if (maquinaExistente.imagem) {
                     removerArquivoAntigo(maquinaExistente.imagem);
                 }
             }
 
-            await MaquinaModel.atualizarDados(
-                parseInt(id), 
-                id_empresa, 
-                dadosUpdate.nome, 
-                dadosUpdate.serie, 
-                dadosUpdate.id_setor, 
-                dadosUpdate.id_categoria, 
-                dadosUpdate.capacidade, 
-                dadosUpdate.status, 
-                dadosUpdate.data_aquisicao, 
-                dadosUpdate.id_operador, 
-                dadosUpdate.imagem
-            );
+            await MaquinaModel.atualizarDados(parseInt(id), id_empresa, dadosUpdate);
 
             res.status(200).json({ sucesso: true, mensagem: 'Máquina atualizada com sucesso!' });
 
