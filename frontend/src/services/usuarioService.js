@@ -1,5 +1,5 @@
-// import { apiFetch } from "./api";
-
+// src/services/usuarioService.js
+import { apiFetch } from "@/lib/api";
 import {
   QtdUsuariosPorPerfilArraySchema,
   QtdUsuariosPorSetorArraySchema,
