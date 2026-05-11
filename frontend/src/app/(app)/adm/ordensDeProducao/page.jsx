@@ -61,8 +61,8 @@ const colunasOrdemProd = [
     className: "w-1/7"
   },
   {
-    id: "nome",
-    key: "nome",
+    id: "codigo_lote",
+    key: "codigo_lote",
     label: "Nome",
     className: "w-1/5"
   },
@@ -124,17 +124,17 @@ const colunasOrdemProd = [
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm border-none"
         },
         "Parada": {
           variant: "destructive",
-          className: "font-semibold text-sm border-none"
+          className: "bg-vermelho-vivido/10 text-vermelho-vivido font-semibold text-sm border-none"
         },
         "Concluída": {
           variant: "outline",
           className: "bg-blue-500/10 text-blue-600 text-sm font-semibold border-none"
         },
-        "Aguardando": {
+        "Aguardando Início": {
           variant: "outline",
           className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
         }
@@ -237,16 +237,16 @@ export default function OrdensDeProducao() {
 
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((op) => {
-  const termo = (busca || "").toLowerCase();
+    const termo = (busca || "").toLowerCase();
 
-  const nome = op?.nome?.toLowerCase() || "";
-  const id = op?.id?.toString() || "";
+    const nome = op?.nome?.toLowerCase() || "";
+    const id = op?.id?.toString() || "";
 
-  return (
-    nome.includes(termo) ||
-    id.includes(termo)
-  );
-});
+    return (
+      nome.includes(termo) ||
+      id.includes(termo)
+    );
+  });
 
 
   //tela de carregamento enquanto busca os dados da API

@@ -83,7 +83,7 @@ export let opMock = [
     data_inicio: "2024-03-05T08:00:00.000Z",
     data_fim: "2024-03-09T17:00:00.000Z",
     observacao_op: "",
-    status_op: "Aguardando",
+    status_op: "Aguardando Início",
     progresso: 0,
   },
 ];
@@ -124,7 +124,7 @@ export const opMockService = {
       data_inicio: dados.data_inicio,
       data_fim: dados.data_fim,
       observacao_op: dados.observacao_op || "",
-      status_op: "Aguardando",
+      status_op: "Aguardando Início",
       progresso: 0,
     };
     opMock.push(nova);

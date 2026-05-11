@@ -33,12 +33,12 @@ export function AndonBoardPage({ scope = "factory" }) {
         </div>
       </div>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_320px]">
-        <div className="rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
+      <section className="grid gap-4 xl:grid-cols-4">
+        <div className="xl:col-span-2 rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
           <AndonStatusWidget scope={scope} title={content.statusTitle} />
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
+        <div className="xl:col-span-2 rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
           <AndonRankingWidget scope={scope} />
         </div>
       </section>
@@ -57,12 +57,12 @@ export function AndonBoardPage({ scope = "factory" }) {
 
       {!loading && !error
         ? sections.map((section, index) => (
-            <AndonSectionMarquee
-              key={section.id}
-              reverse={scope === "factory" && index % 2 === 1}
-              section={section}
-            />
-          ))
+          <AndonSectionMarquee
+            key={section.id}
+            reverse={scope === "factory" && index % 2 === 1}
+            section={section}
+          />
+        ))
         : null}
     </div>
   );

@@ -42,10 +42,17 @@ const colunasSetores = [
   { id: "qtd_de_operadores", key: "qtd_de_operadores", label: "Qtd. de Operadores" },
 ];
 
+const modalExclusao = (
+  <DialogContent>
+    <FormExclusaoSetor />
+  </DialogContent>
+);
+
 export default function PageSetores() {
   const { setores, loading, error, refresh } = useSetores();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
 
   //sincronizar dados da API com estado local
   useEffect(() => {
@@ -234,6 +241,8 @@ export default function PageSetores() {
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
+              onSelectedChange={setSelecionados}
+              excluirLote={modalExclusao}
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">

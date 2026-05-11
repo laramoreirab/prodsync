@@ -8,6 +8,9 @@ import { QualidadeWidget }                 from "@/features/operador/QualidadeWi
 import { VelocimetroWidget }               from "@/features/operador/VelocimetroWidget";
 import { OEEMaquinaWidget }                from "@/features/operador/OEEMaquinaWidget";
 
+import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+
+
 export default function DashboardGeralOperador() {
   const [operadorId, setOperadorId] = useState(null);
 
@@ -43,17 +46,17 @@ export default function DashboardGeralOperador() {
 
           {/* OEE da Máquina */}
           <div className="bg-white border rounded-xl p-4">
-            <OEEMaquinaWidget operadorId={operadorId} />
+            {/* <OEEMaquinaWidget operadorId={operadorId} /> */}
           </div>
 
           {/* Produtividade Diária */}
           <div className="bg-white border rounded-xl p-4">
-            <ProdutividadeDiariaWidget operadorId={operadorId} />
+            {/* <ProdutividadeDiariaWidget operadorId={operadorId} /> */}
           </div>
 
           {/* Eficiência por dia */}
           <div className="bg-white border rounded-xl p-4">
-            <EficienciaMaquinaWidget operadorId={operadorId} />
+            {/* <EficienciaMaquinaWidget operadorId={operadorId} /> */}
           </div>
 
         </div>
@@ -64,15 +67,15 @@ export default function DashboardGeralOperador() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           <div className="bg-white border rounded-xl p-4">
-            <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+            {/* <ProducaoPorHoraOperadorWidget operadorId={operadorId} /> */}
           </div>
 
           <div className="bg-white border rounded-xl p-4">
-            <QualidadeWidget operadorId={operadorId} />
+            {/* <QualidadeWidget operadorId={operadorId} /> */}
           </div>
 
           <div className="bg-white border rounded-xl p-4">
-            <VelocimetroWidget operadorId={operadorId} />
+            {/* <VelocimetroWidget operadorId={operadorId} /> */}
           </div>
 
         </div>

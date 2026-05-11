@@ -27,6 +27,7 @@ import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DataUltimaParada } from "@/components/ui/dataUltimaParada";
 
 
 
@@ -71,28 +72,14 @@ const colunasMaquinas = [
   },
   {
     id: 'ultimaParada', key: 'ultimaParada', label: 'Última parada',
-    icone: (valor) => {
-      const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
-        },
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
-      };
+    icone: (valor, row) => {
+      const eventos = row.historico_eventos;
 
-      const estilo = config[valor] || { variant: "outline", className: "" };
-      return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
-          {valor}
-        </Badge>
-      )
+      const ultimaParada = (eventos && eventos.length > 0)
+        ? eventos[0].termino
+        : null;
+
+      return <DataUltimaParada ultimaParada={ultimaParada} />;
     }
   },
 ];

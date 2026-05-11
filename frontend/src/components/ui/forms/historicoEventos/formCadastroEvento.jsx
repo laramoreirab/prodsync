@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import {
+    Dialog,
+    DialogContent,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, CheckCircle2, ChevronDown, X, Calendar, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { eventosCrudService } from '@/services/eventosCrudService'; // Importar o serviço
+import FormCriarMotivo from './formCriarMotivo';
 
 const OPCOES_SETOR = ["Roscas", "Engrenagens", "Usinagem"];
 const OPCOES_MAQUINA = [
@@ -14,16 +18,29 @@ const OPCOES_MAQUINA = [
     { label: "Torno CNC", value: 3 },
 ];
 const OPCOES_OP = ["#000000 (Injetora 1)", "#000001 (Injetora 2)"];
-// id_motivo_parada — número — backend: id_motivo_parada
-const OPCOES_MOTIVO = [
+
+//lista estática para não quebrar a tela enquanto o back não vem
+const OPCOES_MOTIVO_INICIAL = [
     { label: "Falta de Energia", value: 1 },
     { label: "Manutenção Preventiva", value: 2 },
     { label: "Manutenção Corretiva", value: 3 },
     { label: "Falta de Material", value: 4 },
-    { label: "Outros", value: 5 },
 ];
 
 export default function FormCadastroEvento({ onCadastroSucesso }) {
+    // id_motivo_parada — número — backend: id_motivo_parada
+    const [opcoesMotivo, setOpcoesMotivo] = useState(OPCOES_MOTIVO_INICIAL);
+    const [isModalAberto, setIsModalAberto] = useState(false);
+
+    // Função que será passada para o filho avisar que acabou
+    const atualizarListaMotivos = () => {
+        console.log("Motivo criado! Preparado para buscar do backend...");
+        // por favor, descomente esse trecho depois que a integração for implementada e exclua a linha de cima
+        //fetch('/api/motivos')
+        //  .then(res => res.json())
+        //  .then(data => setOpcoesMotivo(data))
+    };
+
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
 
     const [setoresSelecionados, setSetoresSelecionados] = useState([]); // setor_afetado — backend: setor_afetado
@@ -74,8 +91,8 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
             status_maquina: tipoEvento,                          // backend: status_maquina
             setor_afetado: setoresSelecionados[0] || "",         // backend: setor_afetado
             maquinas: maquinasSelecionadas,                      // backend: maquinas 
-            inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000Z` : null, // backend: inicio
-            fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000Z` : null,               // backend: fim
+            inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000` : null, // backend: inicio
+            fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000` : null,               // backend: fim
             id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null,          // backend: id_motivo_parada
             observacao,
             //é isso que falta no cadastro evento                                          // backend: observacao
@@ -336,21 +353,42 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
                     <label className="text-2xl font-semibold text-black">6. Justificativa</label>
 
                     <div className="space-y-3">
-                        <div>
-                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
-                            <div className="relative">
-                                <select
-                                    value={idMotivoPrincipal}
-                                    onChange={(e) => setIdMotivoPrincipal(e.target.value)}
-                                    className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
-                                >
-                                    <option value="" disabled>Selecione o motivo</option>
-                                    {OPCOES_MOTIVO.map((motivo) => (
-                                        <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <div className="grid grid-cols-6 gap-3 items-end">
+                            <div className="flex flex-col gap-2 col-span-4">
+                                <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
+                                <div className="relative">
+                                    <select
+                                        value={idMotivoPrincipal}
+                                        onChange={(e) => setIdMotivoPrincipal(e.target.value)}
+                                        className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
+                                    >
+                                        <option value="" disabled>Selecione o motivo</option>
+                                        {/* mapeando do estado */}
+                                        {opcoesMotivo.map((motivo) => (
+                                            <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                </div>
                             </div>
+                            <div className="col-span-2">
+                                <Dialog open={isModalAberto} onOpenChange={setIsModalAberto}>
+                                    <DialogTrigger asChild>
+                                        <button type="button" className="w-full text-xl font-semibold flex justify-center px-4 shadow-md text-white items-center py-3 bg-[#7d95c6] rounded-md">
+                                            <Plus className='mr-2'/>
+                                            Criar Motivo
+                                        </button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        {/* prop será engatilhada pelo filho ao salvar */}
+                                        <FormCriarMotivo onCriadoSucesso={() => {
+                                            atualizarListaMotivos();
+                                            setIsModalAberto(false);
+                                        }} />
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+
                         </div>
                         <div>
                             <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Observação (Opcional):</span>
