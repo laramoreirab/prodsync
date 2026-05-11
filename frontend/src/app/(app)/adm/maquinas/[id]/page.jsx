@@ -9,6 +9,8 @@ import { VelocidadeMaquinaWidget } from "@/features/maquinas/VelocidadeMaquinaWi
 
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
 
 import { BellRing, Pencil, EyeIcon, ChevronDown, Trash2, Flame, Plus, Search } from "lucide-react";
 
@@ -30,6 +32,7 @@ import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
 
 const colunasMaquina = [
@@ -59,15 +62,35 @@ const colunasMaquina = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
-  { id: 'duracao', key: 'duracao', label: 'Duração' },
+  {
+    id: 'data',
+    key: 'data',
+    label: 'Data (Início - Fim)',
+    icone: (valor, row) => (
+      <DataEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
+  {
+    id: 'duracao', key: 'duracao', label: 'Duração',
+    icone: (valor, row) => (
+      <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
 ];
 
 const colunasApontamento = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
+  {
+    id: 'data',
+    key: 'data',
+    label: 'Data (Início - Fim)',
+    className: 'pl-10',
+    icone: (valor, row) => (
+      <DataEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
   {
     id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
     icone: (valor) => {
@@ -92,10 +115,10 @@ const colunasApontamento = [
 ];
 
 const dadosOriginais = [
-  { id: 1,  tipoEvento: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta' },
-  { id: 2,  tipoEvento: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva' },
-  { id: 3,  tipoEvento: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros' },
-  { id: 4,  tipoEvento: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica' },
+  { id: 1, tipoEvento: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta', inicio: "2025-03-26T08:00:00.000Z", fim: null },
+  { id: 2, tipoEvento: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva', inicio: "2025-01-06T09:30:00.000Z", fim: "2025-01-06T10:15:00.000Z" },
+  { id: 3, tipoEvento: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z" },
+  { id: 4, tipoEvento: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica', inicio: "2025-09-30T11:00:00.000Z", fim: "2025-09-30T12:00:00.000Z" },
 ];
 
 export default function MaquinaDetalhePage({ params }) {
@@ -119,11 +142,11 @@ export default function MaquinaDetalhePage({ params }) {
   };
 
   const dadosApontamento = [
-    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
-    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
-    { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-    { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-    { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
+    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta', inicio: "2025-03-26T08:00:00.000Z", fim: null },
+    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva', inicio: "2025-03-26T08:00:00.000Z", fim: null },
+    { id: 3, op: '5678', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
+    { id: 4, op: '9012', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
+    { id: 5, op: '1223', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
     { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
     { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
     { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
@@ -485,6 +508,18 @@ export default function MaquinaDetalhePage({ params }) {
               data={dadosExibidos} columns={colunasMaquina}
               acoesDropdown={(maquina) => (
                 <>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={maquina.id} />
+                    </DialogContent>
+                  </Dialog>
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">

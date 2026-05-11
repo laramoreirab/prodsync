@@ -6,7 +6,7 @@ export function useOps() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  //carrecar todas as OPs
+  //carregar todas as OPs
   const fetchOps = useCallback(async () => {
     setLoading(true);
     try {
