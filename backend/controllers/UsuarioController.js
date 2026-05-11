@@ -547,5 +547,35 @@ class UsuarioController {
         }
     }
 
+    static async getOEE(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.oeeOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar OEE do operador' });
+        }
+    }
+
+    static async getOEEMaquina(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.oeeMaquinaOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar OEE da máquina' });
+        }
+    }
+
+    static async getOEEMaquinaDetalhes(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.oeeMaquinaDetalhesOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar detalhes do OEE da máquina' });
+        }
+    }
+
 }
 export default UsuarioController

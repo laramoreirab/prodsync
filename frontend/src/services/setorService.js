@@ -33,7 +33,7 @@ import {
     mockSetorMotivosParada,
   } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const setorService = {
   async getSetores() {
