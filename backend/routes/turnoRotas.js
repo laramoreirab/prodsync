@@ -12,20 +12,8 @@ router.post('/criarTurno', adminMiddleware, TurnoController.criarTurno)
 // Obter todos os turnos da empresa
 router.get('/listarTurnos',TurnoController.obterTurnosPorEmpresa)
 
-// Obter turno por ID
-router.get('/:id_turno',TurnoController.obterTurnoPorId)
-
-// Atualizar turno
-router.put('/:id_turno',adminMiddleware,TurnoController.atualizarTurno)
-
-// Deletar turno
-router.delete('/:id_turno',adminMiddleware,TurnoController.deletarTurno)
-
 // Obter turno atual
 router.get('/turno/atual',TurnoController.obterTurnoAtual)
-
-// Listar operadores de um turno
-router.get('/:id_turno/operadores',TurnoController.listarOperadoresTurno)
 
 // Verificar conflito de horário
 router.get('/operadores/:id_operador/conflito',TurnoController.verificarConflitoTurno)
@@ -35,19 +23,34 @@ router.get('/operadores/:id_operador/conflito',TurnoController.verificarConflito
 // KPIs do turno atual
 router.get('/kpis/turno-atual',TurnoController.obterKpisTurnoAtual)
 
+// Status de máquinas por turno
+router.get('/status-maquinas-por-turno',TurnoController.obterStatusMaquinasPorTurno)
+
+// Comparativo entre turnos
+router.get('/comparativo/producao',TurnoController.obterComparativoTurnos)
+
 // KPIs de um turno específico
 router.get('/kpis/:idTurno',TurnoController.obterKpisTurno)
 
-// Status de máquinas por turno
-router.get('/status-maquinas',TurnoController.obterStatusMaquinasPorTurno)
+// Obter turno por ID
+router.get('/:id_turno',TurnoController.obterTurnoPorId)
+
+// Atualizar turno
+router.put('/:id_turno',adminMiddleware,TurnoController.atualizarTurno)
+
+// Deletar turno
+router.delete('/:id_turno',adminMiddleware,TurnoController.deletarTurno)
+
+
+// Listar operadores de um turno
+router.get('/:id_turno/operadores',TurnoController.listarOperadoresTurno)
+
 
 // --------- GRÁFICOS -------
 
 // Timeline de produção
 router.get('/:idTurno/producao-timeline',TurnoController.obterProducaoTimeline)
 
-// Comparativo entre turnos
-router.get('/comparativo/producao',TurnoController.obterComparativoTurnos)
 
 // Distribuição de máquinas
 router.get('/:idTurno/distribuicao-maquinas',TurnoController.obterDistribuicaoMaquinas)

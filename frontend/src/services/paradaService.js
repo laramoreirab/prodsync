@@ -24,7 +24,7 @@ export const paradasPorDiaService = {
   }
 }
 
-// import { apiFetch } from "./api";
+// import { apiFetch } from "@/lib/api";
 // import {
 //MaquinaStatusSchema
 // } from "@features/maquinas/schemas/maquinaSchema";

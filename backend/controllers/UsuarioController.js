@@ -28,10 +28,26 @@ class UsuarioController {
         }
     }
 
+    static async listarOperadoresporSetor(req,res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_setor = req.params.id_setor
+            const dados = await UsuarioModel.listarOperadoresPorSetor(id_empresa, id_setor)
+            return res.status(200).json({dados})
+        } catch (error) {
+              console.error('Erro ao listar operadores:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível listar os operadores'
+            });
+        }
+    }
+
     //GET api/usuarios - busca de usuário por id 
     static async buscarPorId(req, res) {
         try {
-            const id_usuario = req.params;
+            const id_usuario = req.user.id_usuario;
             const id_empresa = req.user.id_empresa;
             // Validação básica do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -218,8 +234,7 @@ class UsuarioController {
     static async atualizarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const id_usuario = req.params;
-            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const { id_usuario, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -313,7 +328,7 @@ class UsuarioController {
     //DELETE api/usuarios - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
-            const id_usuario  = req.params
+            const { id_usuario } = req.body
             const id_empresa = req.user.id_empresa;
 
             // Validação do ID
@@ -364,7 +379,7 @@ class UsuarioController {
     static async uploadImagem(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const  id_usuario  = req.params;
+            const { id_usuario } = req.body;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -473,25 +488,78 @@ class UsuarioController {
 
     // ------------------------------------Dashboard da página específica de usuário----------------------------------------------------------------
 
-    static async metaProducao(req, res){
+    static async metaProducao(req, res) {
         try {
-            const { id_usuario, id_maquina } = req.body
+            const id_usuario = parseInt(req.params.id) || req.body.id_usuario || req.user.id_usuario;
+            const id_maquina = req.body.id_maquina; // Pode vir do body ou ser buscado se necessário
             const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-             console.error('Erro no gráfico Meta de Produção', error)
+            console.error('Erro no gráfico Meta de Produção', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
 
-    static async tempoParadoTempoProduzindoUsuario(req, res){
+    static async tempoParadoTempoProduzindoUsuario(req, res) {
         try {
-            const { id_maquina } = req.body
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const id_maquina = req.body.id_maquina;
             const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo da máquina do operador', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    // --------------- Operador --------------------- //
+    static async getProducaoPorHora(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.producaoPorHoraOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar produção por hora' });
+        }
+    }
+
+    static async getProdutividadeDia(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.produtividadeDiaOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar produtividade do dia' });
+        }
+    }
+
+    static async getQualidade(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.qualidadeOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar qualidade' });
+        }
+    }
+
+    static async getVelocimetro(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.velocimetroOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar velocímetro' });
+        }
+    }
+
+    static async getPecasPorDia(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.pecasPorDiaOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar peças por dia' });
         }
     }
 

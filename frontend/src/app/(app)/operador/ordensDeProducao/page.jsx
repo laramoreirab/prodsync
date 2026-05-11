@@ -197,11 +197,9 @@ export default function OrdensDeProducao() {
   const dadosExibidos = dados.filter((op) => {
     const termo = (busca || "").toLowerCase();
 
-    const nome = op?.nome?.toLowerCase() || "";
     const id = op?.id?.toString() || "";
 
     return (
-      nome.includes(termo) ||
       id.includes(termo)
     );
   });
@@ -269,7 +267,7 @@ export default function OrdensDeProducao() {
               <input
                 type="search"
                 className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id, nome ou lote..."
+                placeholder="Busque por id..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
@@ -320,27 +318,6 @@ export default function OrdensDeProducao() {
             </div>
           )}
         </section>
-
-        {/* Tabela sem filtros ainda */}
-        <section>
-          <h1>Historico de Eventos da OP</h1>
-          <TableListagens
-            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-            data={dadosOriginais}
-            columns={colunasOrdemProd}
-            acoesDropdown={(ordemProd) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`ordensDeProducao/${ordemProd.id}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver Detalhes
-                  </Link>
-                </DropdownMenuItem>
-              </>
-            )}
-          />
-        </section>
-
       </div>
     </main>
   );

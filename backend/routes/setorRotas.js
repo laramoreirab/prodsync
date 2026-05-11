@@ -27,5 +27,9 @@ router.post('/:id_setor/gestores', SetorController.associarGestor)
 router.delete('/:id_setor/gestores', SetorController.removerGestor)
 router.get('/:id_setor/gestores', SetorController.listarGestoresDoSetor)
 
+router.post('/:id_setor/operadores', SetorController.associarOperadores)
+router.delete('/:id_setor/operadores', SetorController.removerOperador)
+router.get('/:id_setor/operadores', SetorController.listarOperadoresDoSetor)
+
 
 export default router
