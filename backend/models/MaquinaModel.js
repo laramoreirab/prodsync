@@ -76,6 +76,7 @@ class MaquinaModel {
                     serie: serie,
                     capacidade: capacidade,
                     status: status,
+                    status_atual: status || undefined,
                     data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
                     id_operador: id_operador ? parseInt(id_operador) : null,
                     imagem: imagem
@@ -115,6 +116,7 @@ class MaquinaModel {
                 id_categoria: dados.id_categoria ? parseInt(dados.id_categoria) : undefined,
                 capacidade: dados.capacidade,
                 status: dados.status,
+                status_atual: dados.status || undefined,
                 data_aquisicao: dados.data_aquisicao ? new Date(dados.data_aquisicao) : undefined,
                 id_operador: dados.id_operador ? parseInt(dados.id_operador) : undefined,
             };
@@ -566,7 +568,7 @@ class MaquinaModel {
                         id_maquina,
                         id_empresa,
                         status_op: {
-                            in: ['Produzindo', 'Setup', 'Aguardando']
+                            in: ['Em_Andamento', 'Setup', 'Aguardando']
                         }
                     },
                     orderBy: {

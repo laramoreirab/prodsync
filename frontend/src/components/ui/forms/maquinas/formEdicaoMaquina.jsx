@@ -95,7 +95,8 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
         const buscarDadosDaMaquina = async () => {
             setCarregando(true);
             try {
-                const dados = await maquinaCrudService.getById(maquinaId);
+                const resposta = await maquinaCrudService.getById(maquinaId);
+                const dados = resposta.dados || resposta;
 
                 setMaquinaCompleta(dados);
 
@@ -106,8 +107,8 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 setIdSetor(dados.id_setor || '');
                 setCategoria(dados.categoria || '');
                 setCapacidade(dados.capacidade || '');
-                setStatus(dados.status || '');
-                setOperador(dados.operador || '');
+                setStatus(dados.status_atual || dados.status || '');
+                setOperador(dados.id_operador || '');
 
                 // Se a máquina já tiver uma imagem no banco, você pode configurar o preview aqui
                 if (dados.imagem) {

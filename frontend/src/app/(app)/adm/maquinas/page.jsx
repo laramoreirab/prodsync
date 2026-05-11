@@ -330,7 +330,7 @@ export default function Maquinas() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormEdicaoMaquina maquinaId={maquina.id_maquina} />
+                      <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 

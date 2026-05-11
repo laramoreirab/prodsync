@@ -27,6 +27,9 @@ const API_URL = "/api/maquinas";
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
+    if (dados instanceof FormData && dados.has("status")) {
+      dados.set("status_atual", dados.get("status"));
+    }
     return await apiFetch(`${API_URL}/criarMaquina`, options);
   },
 

@@ -6,16 +6,24 @@ export function useMaquinas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  //carregar dados
+  // carregar dados
   const fetchMaquinas = useCallback(async () => {
     setLoading(true);
+
     try {
       const data = await maquinaCrudService.getAll();
-      setMaquinas(data.dados);
+
+      const maquinasNormalizadas = (data.dados || []).map((maquina) => ({
+        ...maquina,
+        status: maquina.status_atual || maquina.status || '',
+      }));
+      setMaquinas(maquinasNormalizadas);
       setError(null);
+
     } catch (err) {
-      setError('Falha ao carregar máquinas');
       console.error(err);
+      setError('Falha ao carregar máquinas');
+
     } finally {
       setLoading(false);
     }
@@ -25,33 +33,42 @@ export function useMaquinas() {
     fetchMaquinas();
   }, [fetchMaquinas]);
 
-  //criar
+  // criar
   const cadastrarMaquina = async (dados) => {
     try {
-      const nova = await maquinaCrudService.create(dados);
-      setMaquinas(prev => [...prev, nova]);
-      return nova;
+      await maquinaCrudService.create(dados);
+
+      // refetch completo
+      await fetchMaquinas();
+
     } catch (err) {
       throw err;
     }
   };
 
-  //editar
+  // editar
   const editarMaquina = async (id, dados) => {
     try {
-      const atualizada = await maquinaCrudService.update(id, dados);
-      setMaquinas(prev => prev.map(m => m.id_maquina === id ? atualizada : m));
-      return atualizada;
+      await maquinaCrudService.update(id, dados);
+
+      // refetch completo
+      await fetchMaquinas();
+
     } catch (err) {
       throw err;
     }
   };
 
-  //deletar
+  // deletar
   const excluirMaquina = async (id) => {
     try {
       await maquinaCrudService.delete(id);
-      setMaquinas(prev =>  prev.filter(m => String(m.id_maquina) !== String(id)))
+
+      // delete pode continuar otimista
+      setMaquinas(prev =>
+        prev.filter(m => String(m.id_maquina) !== String(id))
+      );
+
     } catch (err) {
       throw err;
     }
