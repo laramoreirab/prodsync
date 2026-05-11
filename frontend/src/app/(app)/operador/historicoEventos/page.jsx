@@ -84,10 +84,11 @@ const colunasEventos = [
 ];
 
 export default function HistoricoEventos() {
-  const { eventos, loading, error } = useEventos();
+  const { eventos, loading, error, refresh } = useEventos();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
+  const [justificativaAberta, setJustificativaAberta] = useState(false);
 
   useEffect(() => {
     setDados(eventos);
@@ -141,7 +142,7 @@ export default function HistoricoEventos() {
   const dadosExibidos = dados.filter((eventos) => {
     const termo = busca.toLowerCase();
     return (
-      eventos.tipo.toLowerCase().includes(termo)
+      eventos.tipo.toLowerCase().includes(termo) // ← só filtra por tipo
     );
   });
 
@@ -181,130 +182,125 @@ export default function HistoricoEventos() {
     setDados(dadosFiltrados);
   }
 
-    const historicoEventosFilter = [
-      { id: "tipo", label: "Tipo de Evento", type: "checkbox", options: ["Parada", "Setup"] },
-      { id: "data", label: "Data", type: "date-range" },
-      // {id:"duracao", label:"Duração", type: "time-max"}  --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
-    ];
+  const historicoEventosFilter = [
+    { id: "tipo", label: "Tipo de Evento", type: "checkbox", options: ["Parada", "Setup"] },
+    { id: "data", label: "Data", type: "date-range" },
+    // {id:"duracao", label:"Duração", type: "time-max"}  --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+  ];
 
 
-    //tela de carregamento enquanto busca os dados da API
-    if (loading) {
-      return (
-        <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-            <p className="text-lg text-gray-600 font-medium">Carregando eventos...</p>
-          </div>
-        </main>
-      );
-    }
-
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
     return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-        <div className="w-full pt-0 pb-10  px-8">
-
-          <section>
-            <div className="flex flex-wrap justify-between py-8">
-              <div className="title_tela">
-                <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-                  Histórico de Eventos da Máquina
-                </h1>
-              </div>
-              {/* Modal de Justificar Evento */}
-              <div className="modal_justificativa">
-                <Dialog>
-                  <DialogTrigger className="bg-secondary-foreground px-5 py-2 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                    <Pencil className="mr-2" />
-                    Justificar
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormJustificativaEvento />
-                  </DialogContent>
-                </Dialog>
-
-              </div>
-            </div>
-          </section>
-
-          <section>
-            {/* Busca */}
-            <div className="flex searchbar">
-              <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-                <input
-                  type="search"
-                  className="p-2 w-full outline-none bg-transparent"
-                  placeholder="Busque por tipo de evento..."
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                />
-                <button className="outline-none cursor-pointer mr-2"><Search /></button>
-              </div>
-            </div>
-
-            <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-              <p>{dadosExibidos.length} eventos encontrados</p>
-
-              <div className="flex items-center gap-4">
-                <OrdenarDropdown
-                  label="Ordenar por"
-                  options={opcoesOrdenacao}
-                  onSortChange={handleSort}
-                />
-
-                <FilterDropdown
-                  filtersConfig={historicoEventosFilter}
-                  onApply={aplicarFiltros}
-                />
-              </div>
-            </div>
-
-
-            <div className="flex flex-col flex-1 items-center w-full mt-4">
-              {dadosExibidos.length > 0 ? (
-
-                <TableListagens
-                  /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                  data={dadosExibidos} columns={colunasEventos}
-                  acoesDropdown={(maquina) => (
-                    <>
-
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                            <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                            Ver Detalhes
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DetalhaeEvento />
-                        </DialogContent>
-                      </Dialog>
-                    </>
-                  )}
-                />
-              ) : (
-                //caso não encontre nada correspondente
-                <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                  <Search className="w-12 h-12 mb-4 text-gray-300" />
-                  <h2 className="text-xl font-semibold text-gray-500">Nenhum evento encontrado</h2>
-                  <p>Não encontramos nenhum evento com esse termo ou filtro.</p>
-                </div>
-              )}
-            </div>
-          </section>
-
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando eventos...</p>
         </div>
       </main>
     );
   }
 
-  function EmptyState({ busca }) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-        <Search className="w-12 h-12 mb-4 text-gray-300" />
-        <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
-        <p>Não encontramos nenhum evento "{busca}".</p>
+  return (
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+      <div className="w-full pt-0 pb-10  px-8">
+
+        <section>
+          <div className="flex flex-wrap justify-between py-8">
+            <div className="title_tela">
+              <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+                Histórico de Eventos da Máquina
+              </h1>
+            </div>
+            {/* Modal de Justificar Evento */}
+            <div className="modal_justificativa">
+              <Dialog open={justificativaAberta} onOpenChange={setJustificativaAberta}>
+                <DialogTrigger
+                  onClick={() => setJustificativaAberta(true)}
+                  className="bg-secondary-foreground px-5 py-2 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
+                >
+                  <Pencil className="mr-2" />
+                  Justificar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormJustificativaEvento onFechar={() => {
+                    setJustificativaAberta(false);
+                    refresh();
+                  }} />
+                </DialogContent>
+              </Dialog>
+
+            </div>
+          </div>
+        </section>
+
+        <section>
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por tipo de evento..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            </div>
+          </div>
+
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosExibidos.length} eventos encontrados</p>
+
+            <div className="flex items-center gap-4">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacao}
+                onSortChange={handleSort}
+              />
+
+              <FilterDropdown
+                filtersConfig={historicoEventosFilter}
+                onApply={aplicarFiltros}
+              />
+            </div>
+          </div>
+
+
+          <div className="flex flex-col flex-1 items-center w-full mt-4">
+            {dadosExibidos.length > 0 ? (
+
+              <TableListagens
+                data={dadosExibidos} columns={colunasEventos}
+                acoesDropdown={(maquina) => (
+                  <>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DetalhaeEvento />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              //caso não encontre nada correspondente
+              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+                <Search className="w-12 h-12 mb-4 text-gray-300" />
+                <h2 className="text-xl font-semibold text-gray-500">Nenhum evento encontrado</h2>
+                <p>Não encontramos nenhum evento com esse termo ou filtro.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
       </div>
-    );
-  }
+    </main>
+  );
+}
