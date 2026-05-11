@@ -8,6 +8,7 @@ export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
  
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar evolução.</p>;
+
  
   return (
     <div>
