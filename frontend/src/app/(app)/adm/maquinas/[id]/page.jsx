@@ -31,12 +31,9 @@ import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
-<<<<<<< HEAD
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
-=======
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
->>>>>>> 53862615b22109e060ff2d1684ae3748b096ba90
 
 
 const colunasMaquina = [
@@ -134,6 +131,7 @@ export default function MaquinaDetalhePage({ params }) {
   const [todosEventos, setTodosEventos] = useState([]);
   const [todosApontamentos, setTodosApontamentos] = useState([]);
   const [loadingMaquina, setLoadingMaquina] = useState(true);
+  const [velocidade, setVelocidade] = useState("")
 
   const imagemMaquina = (() => {
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
@@ -212,6 +210,26 @@ export default function MaquinaDetalhePage({ params }) {
       carregarMaquina();
     }
   }, [maquinaId]);
+
+   useEffect(() => {
+          async function carregar() {
+              try {
+                  if (!maquinaId) {
+                      setVelocidade("");
+                      return;
+                  }
+                  const options = { method: "GET" };
+                  const dados = await apiFetch(`/api/maquinas/${maquinaId}/velocidade`, options)
+                  console.log(dados)
+                  setVelocidade(dados.dados);
+              } catch (error) {
+                  console.log(error)
+                  toast.error("Erro ao carregar velocidade média da máquina");
+              }
+          }
+  
+          carregar();
+      }, [maquinaId]);
 
   const [buscaEvento, setBuscaEvento] = useState("");
   const [buscaApontamento, setBuscaApontamento] = useState("");
@@ -513,7 +531,7 @@ export default function MaquinaDetalhePage({ params }) {
               </div>
               <div className="flex items-center">
                 <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
-                <p className="text-xl font-medium text-black">{maquina?.capacidade || "-"}</p>
+                <p className="text-xl font-medium text-black">{ velocidade.velocidade_atual ||"-"}</p>
               </div>
 
             </div>
