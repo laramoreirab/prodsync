@@ -375,7 +375,7 @@ export default function MaquinasGestor() {
               <div className="flex flex-col items-center justify-center p-8 text-gray-500">
                 <Search className="w-12 h-12 mb-4 text-gray-300" />
                 <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                <p>Não encontramos nenhuma máquina "{busca}".</p>
+                <p>Não encontramos nenhuma máquina com o filtro ou busca.</p>
               </div>
             )}
           </div>

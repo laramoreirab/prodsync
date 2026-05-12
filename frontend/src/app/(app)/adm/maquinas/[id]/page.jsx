@@ -474,7 +474,7 @@ export default function MaquinaDetalhePage({ params }) {
               <img
                 src={imagemMaquina}
                 alt={maquina?.nome || "Máquina"}
-                className="rounded-xl w-[150px] h-[150px] object-cover"
+                className="rounded-xl w-37.5 h-37.5 object-cover"
                 onError={(e) => {
                   e.currentTarget.src = "/demo_maq.png";
                 }}
@@ -518,7 +518,7 @@ export default function MaquinaDetalhePage({ params }) {
         </section>
 
 
-        {/* Gráficos */}
+        {/* Gráficos */}  
         <h1 className="font-bold text-3xl mt-5">Produção</h1>
         {/* SEÇÃO 1: Refugo + Setup */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">

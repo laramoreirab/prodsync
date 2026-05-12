@@ -6,8 +6,9 @@ import { OEEMaquinaWidget } from "@/features/maquinas/OEEMaquinaWidget";
 import { OEEEvolucaoMaquinaWidget } from "@/features/maquinas/OEEEvolucaoMaquinaWidget";
 import { VelocidadeMaquinaWidget } from "@/features/maquinas/VelocidadeMaquinaWidget";
 
-import { use, useState } from "react";
-import { Plus, Loader2, Search } from "lucide-react";
+import { use, useState, useEffect } from "react";
+import { Plus, Loader2, Search, ChevronDown, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
@@ -18,6 +19,12 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
+import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
+import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
+import { maquinaCrudService } from "@/services/maquinaCrudService";
+import { apiFetch } from "@/lib/api";
 
 const colunasMaquina = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
@@ -108,6 +115,85 @@ export default function MaquinaDetalheGestor({ params }) {
   const [todosEventos, setTodosEventos] = useState([]);
   const [todosApontamentos, setTodosApontamentos] = useState([]);
   const [loadingMaquina, setLoadingMaquina] = useState(true);
+
+
+  const imagemMaquina = (() => {
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
+    if (!maquina?.imagem) return "/demo_maq.png";
+    const imagem = String(maquina.imagem).replaceAll("\\", "/");
+    if (imagem.startsWith("http")) return imagem;
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+    const nomeArquivo = imagem.split("/").pop();
+    return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+  })();
+
+  const formatarData = (valor) => {
+    if (!valor) return "-";
+    return new Date(valor).toLocaleDateString("pt-BR");
+  };
+
+  const formatarPeriodo = (inicio, fim) => {
+    if (!inicio) return "-";
+    const dataInicio = new Date(inicio);
+    const dataFim = fim ? new Date(fim) : null;
+    const data = dataInicio.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+    const horaInicio = dataInicio.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    const horaFim = dataFim ? dataFim.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--";
+    return `${data} (${horaInicio} - ${horaFim})`;
+  };
+
+  const formatarDuracao = (minutos) => {
+    const total = Number(minutos) || 0;
+    const horas = Math.floor(total / 60);
+    const mins = Math.round(total % 60);
+    return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    async function carregarMaquina() {
+      setLoadingMaquina(true);
+      try {
+        const [respostaMaquina, respostaHistorico] = await Promise.all([
+          maquinaCrudService.getById(maquinaId),
+          apiFetch(`/api/maquinas/${maquinaId}/historico-eventos`),
+        ]);
+
+        setMaquina(respostaMaquina.dados || respostaMaquina);
+        const historico = respostaHistorico.dados || [];
+        const eventos = historico
+          .filter((item) => item.tipo !== "Producao")
+          .map((item) => ({
+            ...item,
+            tipoEvento: item.tipo,
+            data: formatarPeriodo(item.inicio, item.fim),
+            duracao: formatarDuracao(item.duracao_minutos),
+            motivo: item.motivo || "-",
+          }));
+        const apontamentos = historico
+          .filter((item) => item.tipo === "Producao")
+          .map((item) => ({
+            ...item,
+            op: item.ordem_producao?.codigo_lote || item.ordem_producao?.id_ordem || "-",
+            data: formatarPeriodo(item.inicio, item.fim),
+            duracao: formatarDuracao(item.duracao_minutos),
+            produzido: String(item.produzido || 0),
+            refugo: String(item.refugo || 0),
+            observacao: item.motivo || "-",
+          }));
+
+        setTodosEventos(eventos);
+        setDados(eventos);
+        setTodosApontamentos(apontamentos);
+        setDadosApontamentoState(apontamentos);
+      } finally {
+        setLoadingMaquina(false);
+      }
+    }
+
+    if (maquinaId) {
+      carregarMaquina();
+    }
+  }, [maquinaId]);
 
   const [buscaEvento, setBuscaEvento] = useState("");
   const [buscaApontamento, setBuscaApontamento] = useState("");
@@ -320,27 +406,105 @@ export default function MaquinaDetalheGestor({ params }) {
     );
   });
 
-  /* if (loadingMaquina) {
-    return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando máquina...</p>
-        </div>
-      </main>
-    );
-  } */
+  // if (loadingMaquina) {
+  //   return (
+  //     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+  //       <div className="flex flex-col items-center">
+  //         <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+  //         <p className="text-lg text-gray-600 font-medium">Carregando máquina...</p>
+  //       </div>
+  //     </main>
+  //   );
+  // }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full p-8 space-y-4">
 
-        <div className="flex justify-start">
-          <h1 className="text-4xl font-semibold text-black pb-0 inline-block">
-            Máquina #{maquinaId}
-          </h1>
-        </div>
+        {/* Informações da Máquina */}
 
+        <Link className="flex items-center" href="/gestor/maquinas">
+          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
+          <p className="text-xl font-semibold text-gray-800">Voltar para Máquinas </p>
+        </Link>
+
+        <section id="infos_op" className="flex flex-col">
+          <div className="flex justify-between items-center">
+            <div className="bg-white px-5 pb-3 rounded-tl-4xl rounded-tr-4xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a]">
+              <h1 className="text-3xl font-bold uppercase text-[#212e4b] pb-0 inline-block px-6 py-4">
+                {maquina?.nome || `   ${maquinaId}`}
+              </h1>
+            </div>
+
+            <div className="flex space-x-2">
+              <Dialog>
+                <DialogTrigger className="text-[#122f60] cursor-pointer">
+                  <Pencil size={36} className="mr-1" />
+                </DialogTrigger>
+                <DialogContent>
+                  <FormEdicaoMaquina maquinaId={maquinaId} />
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger className="text-[#b30000] cursor-pointer">
+                  <Trash2 className=" w-9 h-9" />
+                </DialogTrigger>
+                <DialogContent>
+                  <FormExclusaoMaquina maquinaId={maquinaId} onExcluir={maquinaCrudService.delete} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          <div className="flex gap-8 mt-5">
+            <div className="bg-white rounded-xl p-13  ">
+              <img
+                src={imagemMaquina}
+                alt={maquina?.nome || "Máquina"}
+                className="rounded-xl w-37.5 h-37.5 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/demo_maq.png";
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">ID:</p>
+                <p className="text-xl font-medium text-black">{maquina?.id_maquina || maquinaId}</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Série:</p>
+                <p className="text-xl font-medium text-black">{maquina?.serie || "-"}</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Setor:</p>
+                <p className="text-xl font-medium text-black">{maquina?.id_setor || "-"}</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Status:</p>
+                <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">{maquina?.status_atual || maquina?.status || "-"}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Operador:</p>
+                <p className="text-xl font-medium text-black">{maquina?.id_operador || "-"}</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Data de Aquisição:</p>
+                <p className="text-xl font-medium text-black">{formatarData(maquina?.data_aquisicao)}</p>
+              </div>
+              <div className="flex items-center">
+                <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
+                <p className="text-xl font-medium text-black">{maquina?.capacidade || "-"}</p>
+              </div>
+
+            </div>
+          </div>
+        </section>
+        {/* Gráficos */}
+        <h1 className="font-semibold text-4xl mt-5">Produção</h1>
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">
             <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
@@ -350,9 +514,9 @@ export default function MaquinaDetalheGestor({ params }) {
           </div>
         </section>
 
-        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+        {/* <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
           <OEEMaquinaWidget maquinaId={maquinaId} />
-        </section>
+        </section> */}
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">
@@ -367,12 +531,12 @@ export default function MaquinaDetalheGestor({ params }) {
 
         <section id="listagem_eventos">
           <div>
-            <div className="flex items-center justify-between gap-5 mt-8 mb-8">
-              <h1 className="text-4xl font-semibold">Histórico de Eventos da Máquina</h1>
+            <div className="flex items-center justify-between gap-5 mt-8 mb-6">
+              <h1 className="text-4xl font-semibold mt-5">Histórico de Eventos da Máquina</h1>
               <Dialog>
-                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
+                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-2 rounded-md text-white font-semibold text-2xl gap-2">
                   <Plus size={28} className="text-white cursor-pointer" />
-                  Cadastrar
+                  Registrar
                 </DialogTrigger>
                 <DialogContent>
                   <FormCadastroEvento />
@@ -398,7 +562,7 @@ export default function MaquinaDetalheGestor({ params }) {
           <div className="row_ord_fil_cont flex items-center justify-between mt-3">
             <p>{dadosExibidos.length} eventos encontrados</p>
 
-            <div className="flex items-center gap-4 mb-3">
+            <div className="flex items-center gap-4">
               <OrdenarDropdown
                 label="Ordenar por"
                 options={opcoesOrdenacaoEventos}
@@ -414,7 +578,7 @@ export default function MaquinaDetalheGestor({ params }) {
 
           {/* Tabela */}
           <div>
-            {/* {dadosExibidos.length > 0 ? ( */}
+            {dadosExibidos.length > 0 ? (
               <TableListagens
                 /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
                 data={dadosExibidos} columns={colunasMaquina}
@@ -459,14 +623,14 @@ export default function MaquinaDetalheGestor({ params }) {
                 )}
 
               />
-            {/* ) : (
+            ) : (
               //caso não encontre nada correspondente
               <div className="flex flex-col items-center justify-center p-8 text-gray-500">
                 <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                <p>Não encontramos nenhum evento: "{buscaEvento}".</p>
+                <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
+                <p>Não encontramos nenhum evento com o termo ou filtro.</p>
               </div>
-            )} */}
+            )}
           </div>
         </section>
 
@@ -491,7 +655,7 @@ export default function MaquinaDetalheGestor({ params }) {
             <div className="row_ord_fil_cont flex items-center justify-between mt-3">
               <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
 
-              <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center gap-4">
                 <OrdenarDropdown
                   label="Ordenar por"
                   options={opcoesOrdenacaoApontamento}
@@ -505,9 +669,8 @@ export default function MaquinaDetalheGestor({ params }) {
               </div>
             </div>
 
-            {/* {dadosApontamentosFiltrados.length > 0 ? ( */}
+            {dadosApontamentosFiltrados.length > 0 ? (
               <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
                 data={dadosApontamentosFiltrados} columns={colunasApontamento}
                 acoesDropdown={(apontamento) => (
                   <>
@@ -520,13 +683,13 @@ export default function MaquinaDetalheGestor({ params }) {
                   </>
                 )}
               />
-            {/* ) : (
+            ) : (
               <div className="flex flex-col items-center justify-center p-8 text-gray-500">
                 <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                <p>Não encontramos nenhum apontamento "{buscaEvento}".</p>
+                <h2 className="text-xl font-semibold">Nenhum apontamento encontrado</h2>
+                <p>Não encontramos nenhum apontamento com o termo ou filtro.</p>
               </div>
-            )} */}
+            )}
           </div>
         </section>
 
