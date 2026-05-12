@@ -305,10 +305,24 @@ class SetorController {
     // Resposta: [{ id_setor, setor, qtdOperadores }]
     static async obterQuantidadeOperadoresPorSetor(req, res) {
         try {
-            const dados = await SetorModel.obterQuantidadeOperadoresPorSetor(req.user.id_empresa);
+            const dados = await SetorModel.obterMediaOperadoresPorSetor(req.user.id_empresa);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter quantidade de operadores por setor:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async totalDeSetores(req, res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const dados = await SetorModel.totalDeSetores(id_empresa)
+            return res.status(200).json({
+                sucesso: true,
+                dados
+            })
+        } catch (error) {
+            console.error('Erro ao obter quantidade de setores:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }

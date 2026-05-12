@@ -29,7 +29,7 @@ import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
 import Link from "next/link";
 
 const setoresFilter = [
-  { id: "nome_setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens", "Brocas"] },
+  { id: "nome_setor", label: "Setor", type: "checkbox", options: [] },
   { id: "qtd_de_maquinas", label: "Qtd. de Máquinas", type: "number-range" },
   { id: "qtd_de_operadores", label: "Qtd. de Operadores", type: "number-range" },
 ];
@@ -53,6 +53,11 @@ export default function PageSetores() {
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
+  const filtersConfig = setoresFilter.map((filter) =>
+    filter.id === "nome_setor"
+      ? { ...filter, options: setores.map((setor) => setor.nome_setor).filter(Boolean) }
+      : filter
+  );
 
   //sincronizar dados da API com estado local
   useEffect(() => {
@@ -229,7 +234,7 @@ export default function PageSetores() {
               onSortChange={handleSort}
             />
             <FilterDropdown
-              filtersConfig={setoresFilter}
+              filtersConfig={filtersConfig}
               onApply={aplicarFiltros}
             />
           </div>
@@ -246,7 +251,7 @@ export default function PageSetores() {
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`setores/${setor.id}`}>
+                    <Link href={`setores/${setor.id_setor}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver Detalhes
                     </Link>
@@ -260,7 +265,7 @@ export default function PageSetores() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                      <FormEdicaoSetor setorId={setor.id} onEdicaoSucesso={refresh} />
+                      <FormEdicaoSetor setorId={setor.id_setor} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
@@ -272,7 +277,7 @@ export default function PageSetores() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoSetor setorId={setor.id} onExclusaoSucesso={refresh} />
+                      <FormExclusaoSetor setorId={setor.id_setor} onExclusaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
                 </>

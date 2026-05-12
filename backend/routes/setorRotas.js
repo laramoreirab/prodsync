@@ -13,6 +13,8 @@ router.get('/obterTempoMedioParadaPorSetor', SetorController.obterTempoMedioPara
 router.get('/obterProducaoDefeitosPorSetor', SetorController.obterProducaoDefeitosPorSetor)
 router.get('/obterQuantidadeOperadoresPorSetor', SetorController.obterQuantidadeOperadoresPorSetor)
 
+router.get('/totalSetores', SetorController.totalDeSetores)
+
 router.post('/criarSetor', SetorController.criarSetor)
 router.post('/:id_setor/maquinas', SetorController.associarMaquinas)
 

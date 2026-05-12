@@ -43,6 +43,27 @@ class UsuarioModel {
         }
     };
 
+    static async listarSemAdms(id_empresa) {
+        try {
+            const resposta = await prisma.usuarios.findMany({
+                where: {
+                    id_empresa: id_empresa,
+                    tipo: {
+                        not: 'Adm'
+                    }
+                },
+                select: {
+                    id_usuario: true,
+                    nome: true,
+                }
+            })
+            return resposta
+        } catch (error) {
+            console.error('Erro ao listar usuários sem administradores no banco:', error);
+            throw error;
+        }
+    }
+
     static async listarOperadoresPorSetor(id_empresa, id_setor) {
         try {
             const operadores = await prisma.escalaTrabalho.findMany({

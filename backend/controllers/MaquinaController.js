@@ -73,7 +73,7 @@ class MaquinaController {
     // POST /maquinas - Criar nova máquina
     static async criarMaquina(req, res) {
         try {
-            const { id_setor, categoria, nome, serie, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
+            const { id_setor, categoria, nome, serie, capacidade, status, status_atual = null, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
             const erros = [];
 

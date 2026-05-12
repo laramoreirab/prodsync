@@ -76,7 +76,7 @@ class MaquinaModel {
                     serie: serie,
                     capacidade: capacidade,
                     status: status,
-                    status_atual: status || undefined,
+                    status_atual: undefined,
                     data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
                     id_operador: id_operador ? parseInt(id_operador) : null,
                     imagem: imagem

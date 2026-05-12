@@ -288,18 +288,18 @@ class SetorModel {
                     }
                 }
             });
-            
+
             // Retornar apenas os operadores únicos
             const operadoresUnicos = [];
             const idsVistos = new Set();
-            
+
             for (const escala of escalas) {
                 if (!idsVistos.has(escala.id_operador)) {
                     operadoresUnicos.push(escala.operador);
                     idsVistos.add(escala.id_operador);
                 }
             }
-            
+
             return operadoresUnicos;
         } catch (error) {
             console.error('Erro ao listar operadores do setor:', error);
@@ -376,7 +376,7 @@ class SetorModel {
     static async obterProducaoPorSetor(id_empresa) {
         try {
             const limites = await this.obterLimitesDiaIndustrial(id_empresa);
-            
+
             const agora = new Date();
             let inicioBusca = new Date(agora);
 
@@ -573,39 +573,33 @@ class SetorModel {
 
     // Quantidade de operadores escalados por setor
 
-    static async obterQuantidadeOperadoresPorSetor(id_empresa) {
+    static async obterMediaOperadoresPorSetor(id_empresa) {
         try {
-            // Busca setores da empresa com a contagem de operadores únicos na escala
-            const [escalasAgrupadas, setores] = await Promise.all([
-                prisma.escalaTrabalho.groupBy({
-                    by: ['id_setor'],
-                    where: { id_empresa },
-                    _count: {
-                        id_operador: true
-                    }
+            const [totalOperadoresEscalados, totalSetores] = await Promise.all([
+                // 1. Conta o total de registros na tabela de escalas para a empresa
+                prisma.escalaTrabalho.count({
+                    where: { id_empresa }
                 }),
-                prisma.setores.findMany({
-                    where: { id_empresa },
-                    select: { id_setor: true, nome_setor: true }
+                // 2. Conta quantos setores a empresa possui no total
+                prisma.setores.count({
+                    where: { id_empresa }
                 })
             ]);
 
-            // Mapa id_setor → nome
-            const setoresPorId = new Map(setores.map(s => [s.id_setor, s.nome_setor]));
+            // Evita divisão por zero caso a empresa não tenha setores cadastrados
+            if (totalSetores === 0) return 0;
 
-            // Garante que setores sem nenhum operador escalado apareçam com qtd 0
-            const resultado = setores.map(setor => {
-                const escala = escalasAgrupadas.find(e => e.id_setor === setor.id_setor);
-                return {
-                    id_setor: setor.id_setor,
-                    setor: setor.nome_setor,
-                    qtdOperadores: escala?._count.id_operador ?? 0
-                };
-            });
+            // Calcula a média
+            const media = totalOperadoresEscalados / totalSetores;
 
-            return resultado.sort((a, b) => b.qtdOperadores - a.qtdOperadores);
+            // Retorna apenas o número (formatado com 1 casa decimal, por exemplo)
+            return {
+                titulo: "Número de operadores por setor (média)",
+                subtitulo: "Atualizado em tempo real",
+                valor: Number(media.toFixed(1))
+            }
         } catch (error) {
-            console.error('Erro ao obter quantidade de operadores por setor:', error);
+            console.error('Erro ao calcular média de operadores por setor:', error);
             throw error;
         }
     }
@@ -620,6 +614,25 @@ class SetorModel {
             return setores.sort((a, b) => a.oee - b.oee)[0];
         } catch (error) {
             console.error('Erro ao obter setor critico:', error);
+            throw error;
+        }
+    }
+
+    static async totalDeSetores(id_empresa) {
+        try {
+            const resposta = await prisma.setores.count({
+                where: {
+                    id_empresa: id_empresa
+                }
+            })
+            return {
+                titulo: "Número Total de Setores",
+                subtitulo: "Atualizado em tempo real",
+                valor: String(resposta)
+            }
+
+        } catch (error) {
+            console.error('Erro ao obter total de setores:', error);
             throw error;
         }
     }

@@ -5,6 +5,8 @@ import UsuarioController from '../controllers/UsuarioController.js'
 const router = Router()
 
 // Rotas de Dashboard do Operador
+router.get('/', authMiddleware, UsuarioController.listarUsuarios)
+router.get('/listarSemAdms', authMiddleware, UsuarioController.listarSemAdms)
 router.get('/operadores/:id_setor', authMiddleware, UsuarioController.listarOperadoresporSetor)
 router.get('/:id/producao_por_hora', authMiddleware, UsuarioController.getProducaoPorHora);
 router.get('/:id/produtividade_dia', authMiddleware, UsuarioController.getProdutividadeDia);

@@ -24,11 +24,12 @@ export const setorCrudService ={
   // criar setor
   // campos: nome_setor, localizacao
   create: async (dados) => {
-    return await apiFetch(`${API_URL}/criarSetor`, {
+    const response = await apiFetch(`${API_URL}/criarSetor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados),
     });
+    return response.dados || response;
   },
 
   // atualizar setor — id vai na URL
@@ -43,10 +44,9 @@ export const setorCrudService ={
 
   // deletar setor — id vai na URL
   delete: async (id) => {
-    const response = await apiFetch(`${API_URL}/${id}`, {
+    await apiFetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao excluir setor");
     return true;
   },
 
@@ -74,6 +74,18 @@ export const setorCrudService ={
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids_operadores }),
+    });
+  },
+
+  listarOperadores: async (id_setor) => {
+    return await apiFetch(`${API_URL}/${id_setor}/operadores`, {
+      method: "GET",
+    });
+  },
+
+  listarGestores: async (id_setor) => {
+    return await apiFetch(`${API_URL}/${id_setor}/gestores`, {
+      method: "GET",
     });
   },
 };

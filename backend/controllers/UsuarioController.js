@@ -28,6 +28,24 @@ class UsuarioController {
         }
     }
 
+    static async listarSemAdms(req, res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const dados = await UsuarioModel.listarSemAdms(id_empresa)
+            return res.status(200).json({
+                sucesso: true,
+                dados: dados
+            })
+        } catch (error) {
+             console.error('Erro ao listar usuários sem administradores:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível listar os usuário sem administradores'
+            });
+        }
+    }
+
     static async listarOperadoresporSetor(req,res){
         try {
             const id_empresa = req.user.id_empresa

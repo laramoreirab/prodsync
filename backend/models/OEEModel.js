@@ -281,7 +281,6 @@ class OEEModel {
                 const oee = await this.calcularOEESetor(setor.id_setor, id_empresa);
 
                 return {
-                    id_setor: setor.id_setor,
                     setor: setor.nome_setor,
                     oee: oee.oee
                 };
@@ -307,9 +306,8 @@ class OEEModel {
         const oee = await this.calcularOEESetor(id_setor, id_empresa);
 
         return {
-            id_setor: setor.id_setor,
-            nome_setor: setor.nome_setor,
-            ...oee
+            setor: setor.nome_setor,
+            oee: oee.oee
         };
     }
 
