@@ -10,9 +10,9 @@ const PERIODOS = [
   { label: "Últimos 7 dias",  key: "7dias"  },
 ];
 
-export function ProducaoTotalWidget() {
+export function ProducaoTotalWidget({ setorId }) {
   const [periodoKey, setPeriodoKey] = useState("3meses");
-  const { data, loading, error } = useProducaoTotal(periodoKey);
+  const { data, loading, error } = useProducaoTotal(periodoKey, setorId);
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;

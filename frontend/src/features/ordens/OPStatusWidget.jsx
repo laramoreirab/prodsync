@@ -4,8 +4,8 @@ import { ChartWidgetShell, CustomPieChart } from "@/components/ui/charts/compone
 import { useOPStatus } from "./hooks/useOPStatus";
 import { opStatusConfig } from "./config/ordensChartConfig";
 
-export function OPStatusWidget() {
-  const { data, loading, error } = useOPStatus();
+export function OPStatusWidget({ setorId = null }) {
+  const { data, loading, error } = useOPStatus(setorId);
 
   return (
     <ChartWidgetShell

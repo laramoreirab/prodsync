@@ -27,3 +27,17 @@ export const cumprimentoMetaConfig = {
 export const producaoMediaConfig = {
   media: { label: "Peças/dia:", color: "var(--chart-vivid)" },
 };
+
+export const turnosOperadoresConfig = {
+  Manhã: { label: "Manhã", color: "var(--chart-primary)" },
+  Tarde: { label: "Tarde", color: "var(--chart-secondary)" },
+  Noite: { label: "Noite", color: "var(--chart-accent)" },
+};
+
+export const taxaRefugoUsuarioConfig = {
+  taxa: { label: "Taxa de Refugo:", color: "var(--chart-vivid)" },
+};
+
+export const producaoMediaUsuarioConfig = {
+  media: { label: "Peças por operador:", color: "var(--chart-primary)" },
+};

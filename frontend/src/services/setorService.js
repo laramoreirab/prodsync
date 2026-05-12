@@ -5,16 +5,18 @@ import {
   OEEPorSetorArraySchema,
   RefugoPorSetorArraySchema,
   OEECriticoSchema,
+  SetorMaquinaStatusSchema,
+  SetorOEEMedioSchema,
+  SetorOEEEvolucaoArraySchema,
+  SetorOEEPanelSchema,
+  SetorTopOperadoresArraySchema,
+  SetorMotivosParadaArraySchema,
+  SetorProducaoSemanalArraySchema,
+  SetorProducaoMaquinaArraySchema,
 } from "@features/setores/schemas/setorSchema";
 import {
-    SetorMaquinaStatusSchema,
-    SetorOEEMedioSchema,
-    SetorOEEEvolucaoArraySchema,
-    SetorTopOperadoresArraySchema,
-    SetorMotivosParadaArraySchema,
-    SetorProducaoSemanalArraySchema,
-    SetorProducaoMaquinaArraySchema,
-  } from "@features/setores/schemas/setorSchema";
+  ProducaoPorHoraArraySchema,
+} from "@features/producao/schemas/producaoSchema";
 import {
   mockSetores,
   mockSetorTotalKPI,
@@ -23,15 +25,15 @@ import {
   mockRefugoPorSetor,
   mockOEECritico,
   mockSetorProducaoSemanal,
-  mockProducaoPorMaquinaSetor 
+  mockProducaoPorMaquinaSetor,
+  mockSetorProducaoDiaria,
+  mockSetorOEEPanel,
+  mockSetorMaquinaStatus,
+  mockSetorOEEMedio,
+  mockSetorOEEEvolucao,
+  mockSetorTopOperadores,
+  mockSetorMotivosParada,
 } from "./mockData";
- import {
-    mockSetorMaquinaStatus,
-    mockSetorOEEMedio,
-    mockSetorOEEEvolucao,
-    mockSetorTopOperadores,
-    mockSetorMotivosParada,
-  } from "./mockData";
 
 const USE_MOCK = true;
 
@@ -124,8 +126,25 @@ export const setorMotivosParadaService = {
 
 export const setorProducaoSemanalService = {
   async getProducaoSemanal(setorId) {
-if (USE_MOCK) return SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal);    const data = await apiFetch(`/setores/${setorId}/producao_semanal`);
-    return SetorProducaoSemanalArraySchema.parse(data); 
+    if (USE_MOCK) return SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal);
+    const data = await apiFetch(`/setores/${setorId}/producao_semanal`);
+    return SetorProducaoSemanalArraySchema.parse(data);
+  },
+};
+
+export const setorProducaoDiariaService = {
+  async getProducaoDiaria(setorId) {
+    if (USE_MOCK) return ProducaoPorHoraArraySchema.parse(mockSetorProducaoDiaria);
+    const data = await apiFetch(`/setores/${setorId}/producao_diaria`);
+    return ProducaoPorHoraArraySchema.parse(data);
+  },
+};
+
+export const setorOEEPanelService = {
+  async getOEEPanel(setorId) {
+    if (USE_MOCK) return SetorOEEPanelSchema.parse(mockSetorOEEPanel);
+    const data = await apiFetch(`/setores/${setorId}/oee_panel`);
+    return SetorOEEPanelSchema.parse(data);
   },
 };
 

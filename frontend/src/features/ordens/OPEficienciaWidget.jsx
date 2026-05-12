@@ -4,8 +4,8 @@ import { useOPEficiencia } from "./hooks/useOPEficiencia";
 import { eficienciaConfig } from "../operador/config/operadorConfig";
 
 
-export function OPEficienciaWidget() {
-  const { data, loading, error } = useOPEficiencia();
+export function OPEficienciaWidget({ setorId = null }) {
+  const { data, loading, error } = useOPEficiencia(setorId);
 
    if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
  if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;

@@ -1,7 +1,23 @@
+"use client";
+
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget }   from "@/features/eventos/TopMotivosTempoWidget";
+import { useEffect, useState } from "react";
 
 export default function HistoricoEventosGestor() {
+  const [setorId, setSetorId] = useState(null);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_setor) setSetorId(payload.id_setor);
+    } catch {
+      // token ausente ou malformado
+    }
+  }, []);
+
   return (
     <main
       className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
@@ -30,10 +46,10 @@ export default function HistoricoEventosGestor() {
         <section className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white border rounded-xl p-4 md:col-span-1">
-              <ParadasComparadasWidget />
+              <ParadasComparadasWidget setorId={setorId} />
             </div>
             <div className="bg-white border rounded-xl p-4 md:col-span-2">
-              <TopMotivosTempoWidget />
+              <TopMotivosTempoWidget setorId={setorId} />
             </div>
           </div>
         </section>

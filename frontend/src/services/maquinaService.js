@@ -23,9 +23,17 @@ import { mockProducaoTotal3Meses, mockProducaoTotal30Dias, mockProducaoTotal7Dia
 const USE_MOCK = true;
 
 export const maquinaStatusService = {
-  async getStatus() {
-    if (USE_MOCK) return MaquinaStatusArraySchema.parse(mockMaquinaStatus);
-    const data = await apiFetch("/api/maquinas/dashboard/status-geral");
+  async getStatus(setorId = null) {
+    if (USE_MOCK) {
+      const data = MaquinaStatusArraySchema.parse(mockMaquinaStatus);
+      // Se setorId for fornecido, filtra apenas máquinas do setor
+      if (setorId) {
+        return data.filter(item => item.setorId === setorId);
+      }
+      return data;
+    }
+    const url = setorId ? `/api/maquinas/dashboard/status-geral?setorId=${setorId}` : "/api/maquinas/dashboard/status-geral";
+    const data = await apiFetch(url);
     return MaquinaStatusArraySchema.parse(data);
   },
 };
@@ -39,33 +47,65 @@ export const maquinaAtivaPorTurnoService = {
 };
 
 export const qtdMaquinasPorSetorService = {
-  async getQtdPorSetor() {
-    if (USE_MOCK) return QtdMaquinaPorSetorArraySchema.parse(mockQtdMaquinasPorSetor);
-    const data = await apiFetch("/maquinas/quantidade_por_setor");
+  async getQtdPorSetor(setorId = null) {
+    if (USE_MOCK) {
+      const data = QtdMaquinaPorSetorArraySchema.parse(mockQtdMaquinasPorSetor);
+      // Se setorId for fornecido, filtra apenas o setor específico
+      if (setorId) {
+        return data.filter(item => item.id === setorId);
+      }
+      return data;
+    }
+    const url = setorId ? `/api/maquinas/quantidade_por_setor?setorId=${setorId}` : "/api/maquinas/quantidade_por_setor";
+    const data = await apiFetch(url);
     return QtdMaquinaPorSetorArraySchema.parse(data);
   },
 };
 
 export const tempoMedioParadaService = {
-  async getTempoMedio() {
-    if (USE_MOCK) return TempoMedioParadaArraySchema.parse(mockTempoMedioParada);
-    const data = await apiFetch("/maquinas/tempo_medio_parada");
+  async getTempoMedio(setorId = null) {
+    if (USE_MOCK) {
+      const data = TempoMedioParadaArraySchema.parse(mockTempoMedioParada);
+      // Se setorId for fornecido, filtra apenas dados do setor
+      if (setorId) {
+        return data.filter(item => item.setorId === setorId);
+      }
+      return data;
+    }
+    const url = setorId ? `/api/maquinas/tempo_medio_parada?setorId=${setorId}` : "/api/maquinas/tempo_medio_parada";
+    const data = await apiFetch(url);
     return TempoMedioParadaArraySchema.parse(data);
   },
 };
 
 export const producaoDefeitosService = {
-  async getProducaoDefeitos() {
-    if (USE_MOCK) return ProducaoDefeitoPorSetorArraySchema.parse(mockProducaoDefeitos);
-    const data = await apiFetch("/maquinas/producao_defeitos");
+  async getProducaoDefeitos(setorId = null) {
+    if (USE_MOCK) {
+      const data = ProducaoDefeitoPorSetorArraySchema.parse(mockProducaoDefeitos);
+      // Se setorId for fornecido, filtra apenas dados do setor
+      if (setorId) {
+        return data.filter(item => item.setorId === setorId);
+      }
+      return data;
+    }
+    const url = setorId ? `/api/maquinas/producao_defeitos?setorId=${setorId}` : "/api/maquinas/producao_defeitos";
+    const data = await apiFetch(url);
     return ProducaoDefeitoPorSetorArraySchema.parse(data);
   },
 };
 
 export const maquinasPorTurnoService = {
-  async getMaquinasPorTurno() {
-    if (USE_MOCK) return MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
-    const data = await apiFetch("/maquinas/status_por_turno");
+  async getMaquinasPorTurno(setorId = null) {
+    if (USE_MOCK) {
+      const data = MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
+      // Se setorId for fornecido, filtra apenas dados do setor
+      if (setorId) {
+        return data.filter(item => item.setorId === setorId);
+      }
+      return data;
+    }
+    const url = setorId ? `/api/maquinas/status_por_turno?setorId=${setorId}` : "/api/maquinas/status_por_turno";
+    const data = await apiFetch(url);
     return MaquinaPorTurnoArraySchema.parse(data);
   },
 };
@@ -77,9 +117,19 @@ const MOCK_POR_PERIODO = {
 };
 
 export const producaoTotalService = {
-  async getProducaoTotal(periodo = "3meses") {
-    if (USE_MOCK) return ProducaoTotalArraySchema.parse(MOCK_POR_PERIODO[periodo]);
-    const data = await apiFetch(`/maquinas/producao_total?periodo=${periodo}`);
+  async getProducaoTotal(periodo = "3meses", setorId = null) {
+    if (USE_MOCK) {
+      const data = ProducaoTotalArraySchema.parse(MOCK_POR_PERIODO[periodo]);
+      // Se setorId for fornecido, filtra apenas dados do setor
+      if (setorId) {
+        return data.filter(item => item.setorId === setorId);
+      }
+      return data;
+    }
+    const url = setorId
+      ? `/api/maquinas/producao_total?periodo=${periodo}&setorId=${setorId}`
+      : `/api/maquinas/producao_total?periodo=${periodo}`;
+    const data = await apiFetch(url);
     return ProducaoTotalArraySchema.parse(data);
   },
 };

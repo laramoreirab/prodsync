@@ -39,11 +39,13 @@ export function DonutChart({
             cy="50%"
             innerRadius="45%"
             outerRadius="78%"
-            label={compact ? false : ({ [nameKey]: name, [dataKey]: value }) => `${name} ${value}%`}
+            label={compact ? false : ({ [nameKey]: name, [dataKey]: value }) => `${name}: ${value}`}
           >
-            {data.map((entry) => (
-              <Cell key={entry[nameKey]} fill={`var(--color-${entry[nameKey]})`} />
-            ))}
+            {data.map((entry) => {
+              const entryKey = entry[nameKey];
+              const fillColor = config?.[entryKey]?.color ?? `var(--color-${entryKey})`;
+              return <Cell key={entryKey} fill={fillColor} />;
+            })}
           </Pie>
         </PieChart>
       </ChartContainer>

@@ -1,12 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SetorMaquinaStatusWidget }  from "@/features/setores/SetorMaquinaStatusWidget";
-import { SetorOEEMedioWidget }       from "@/features/setores/SetorOEEMedioWidget";
-import { SetorOEEEvolucaoWidget }    from "@/features/setores/SetorOEEEvolucaoWidget";
-import { SetorTopOperadoresWidget }  from "@/features/setores/SetorTopOperadoresWidget";
-import { SetorMotivosParadaWidget }  from "@/features/setores/SetorMotivosParadaWidget";
-import { SetorProducaoSemanalWidget} from "@/features/setores/SetorProducaoSemanalWidget";
+import { SetorProducaoDiariaWidget } from "@/features/setores/SetorProducaoDiariaWidget";
+import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
+import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
+import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
+import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
+import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaquinaWidget";
+import { SetorStatusDonutWidget } from "@/features/setores/SetorStatusDonutWidget";
+import { TendendiaRefugoWidget } from "@/features/refugo/TendenciaRefugoWidget";
+import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget";
+import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
+import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
+import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 
 export default function DashboardGeralGestor() {
   const [setorId, setSetorId] = useState(null);
@@ -20,41 +26,63 @@ export default function DashboardGeralGestor() {
     } catch {
       // token ausente ou malformado
     }
-    //O SETORID VEM PELO TOKEN
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">
-      <div className="mb-2 flex justify-start">
-        <h1 className="inline-block border-b-4 border-[var(--secondary-foreground)] pb-0 text-4xl font-semibold text-black">
-          Dashboard do Meu Setor
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-8 pb-10">
+      <header className="mb-4">
+        <h1 className="inline-block border-b-4 border-secondary-foreground pb-2 text-4xl font-semibold text-black">
+          Dashboard Geral do Setor
         </h1>
-      </div>
+      </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
-          <SetorMaquinaStatusWidget setorId={setorId} />
-        </div>
-        <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
-          <SetorOEEMedioWidget setorId={setorId} />
-        </div>
+      <section className="w-full bg-white border rounded-xl p-6 shadow-sm">
+        <SetorProducaoDiariaWidget setorId={setorId} />
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
-          <SetorProducaoSemanalWidget setorId={setorId} />
+      <section className="w-full bg-white border rounded-xl p-6 shadow-sm">
+        <SetorOEEMedioWidget setorId={setorId} />
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border rounded-xl p-6 shadow-sm">
+          <SetorOEEEvolucaoWidget setorId={setorId} />
         </div>
-        <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
+        <div className="bg-white border rounded-xl p-6 shadow-sm">
           <SetorTopOperadoresWidget setorId={setorId} />
         </div>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border rounded-xl p-6 shadow-sm">
+          <SetorProducaoMaquinaWidget setorId={setorId} />
+        </div>
+        <div className="bg-white border rounded-xl p-6 shadow-sm">
+          <SetorStatusDonutWidget setorId={setorId} />
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
           <SetorMotivosParadaWidget setorId={setorId} />
         </div>
-        <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
-          <SetorOEEEvolucaoWidget setorId={setorId} />
+        <div className="lg:col-span-3 bg-white border rounded-xl p-6 shadow-sm">
+          <TendendiaRefugoWidget setorId={setorId} />
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[150px]">
+          <MediaParadasDiaWidget />
+        </div>
+        <div className="bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[150px]">
+          <PecasPorMinutoWidget />
+        </div>
+        <div className="bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[150px]">
+          <MaquinaAtivaPorTurnoWidget />
+        </div>
+        <div className="bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center min-h-[150px]">
+          <ProducaoPorTurnoLotesWidget />
         </div>
       </section>
     </div>

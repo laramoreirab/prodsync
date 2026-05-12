@@ -4,12 +4,12 @@ import { BarVerticalBase, ChartWidgetShell } from "@/components/ui/charts/compon
 import { useTempoMedioParada } from "./hooks/useTempoMedioParada";
 import { tempoMedioParadaConfig } from "./config/maquinaChartConfig";
 
-export function TempoMedioParadaWidget() {
-  const { data, loading, error } = useTempoMedioParada();
+export function TempoMedioParadaWidget({ setorId }) {
+  const { data, loading, error } = useTempoMedioParada(setorId);
 
   return (
     <ChartWidgetShell
-      title="Tempo médio de parada das máquinas por setor"
+      title="Tempo médio de parada das máquinas"
       loading={loading}
       error={error}
       empty={!data || (Array.isArray(data) && data.length === 0)}
@@ -17,7 +17,7 @@ export function TempoMedioParadaWidget() {
       <BarVerticalBase
         data={data}
         config={tempoMedioParadaConfig}
-        xKey="setor"
+        xKey="maquina"
         yKey="minutos"
         chartSize="default"
       />

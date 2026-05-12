@@ -2,7 +2,7 @@
 
 import { useOPOEEDetalhe } from "./hooks/useOPOEEDetalhe";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
-import { metricasConfig} from "../producao/config/producaoChartConfig";
+import { oeeMetricasConfig } from "../producao/config/producaoChartConfig";
 
 
 
@@ -22,7 +22,7 @@ if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-
       </div>
 
       <div className="flex items-end justify-around gap-4 flex-wrap py-4">
-        {metricasConfig.map(({ key, label, color }) => (
+        {oeeMetricasConfig.map(({ key, label, color }) => (
           <div key={key} className="flex flex-col items-center">
             <GaugeSemicircular
               title={label}

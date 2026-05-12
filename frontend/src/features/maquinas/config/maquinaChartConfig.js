@@ -7,7 +7,7 @@ export const maquinaStatusConfig = {
 
 // Quantidade de máquinas por setor (BarHorizontal)
 export const qtdMaquinasPorSetorConfig = {
-  qtd: {
+  quantidade: {
     label: "Qtd. Máquinas:",
     color: "var(--chart-accent)",
   },

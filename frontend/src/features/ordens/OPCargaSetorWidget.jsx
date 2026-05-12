@@ -4,8 +4,8 @@ import { BarVerticalBase, ChartWidgetShell } from "@/components/ui/charts/compon
 import { useOPCargaSetor } from "./hooks/useOPCargaSetor";
 import { opCargaSetorConfig } from "./config/ordensChartConfig";
 
-export function OPCargaSetorWidget() {
-  const { data, loading, error } = useOPCargaSetor();
+export function OPCargaSetorWidget({ setorId = null }) {
+  const { data, loading, error } = useOPCargaSetor(setorId);
 
   return (
     <ChartWidgetShell

@@ -2,8 +2,8 @@
 import { KPIRetangulo } from "@/components/ui/charts/components";
 import { useOPAtrasadas } from "./hooks/useOPAtrasadas";
 
-export function OPAtrasadasKPIWidget() {
-  const { data, loading, error } = useOPAtrasadas();
+export function OPAtrasadasKPIWidget({ setorId = null }) {
+  const { data, loading, error } = useOPAtrasadas(setorId);
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
 if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;

@@ -2,9 +2,10 @@
 
 import { OPProgressoWidget }  from "@/features/ordens/OPProgressoWidget";
 import { OPOEEDetalheWidget } from "@/features/ordens/OPOEEDetalheWidget";
+import { use } from "react";
 
 export default function OPDetalheGestor({ params }) {
-  const opId = params.id;
+  const { id: opId } = use(params);
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">

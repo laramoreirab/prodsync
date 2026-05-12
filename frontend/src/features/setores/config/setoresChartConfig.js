@@ -9,7 +9,7 @@ export const oeeSetorConfig = {
 export const refugoSetorConfig = {
   refugo: {
     label: "Peças em Refugo:",
-    color: "var(--primary)",
+    color: "var(--chart-primary)",
   },
 };
 
@@ -41,11 +41,24 @@ export const setorProducaoSemanalConfig = {
   },
 };
 
+export const setorProducaoDiariaConfig = {
+  pcs: {
+    label: "Peças produzidas:",
+    color: "var(--chart-primary)",
+  },
+};
+
 export const setorProducaoMaquinaConfig = {
   qtd: {
     label: "Peças produzidas:",
     color: "var(--chart-primary)",
   },
+};
+
+export const setorStatusDonutConfig = {
+  Produzindo: { color: "var(--chart-primary)" },
+  Setup: { color: "var(--chart-secondary)" },
+  Paradas: { color: "var(--chart-accent)" },
 };
 
  export const oeeConfig = {

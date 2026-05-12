@@ -1,3 +1,5 @@
+"use client";
+
 import { OPAtivasKPIWidget }     from "@/features/ordens/OPAtivasKPIWidget";
 import { OPAtrasadasKPIWidget }  from "@/features/ordens/OPAtrasadasKPIWidget";
 import { OPPecasBoasKPIWidget }  from "@/features/ordens/OPPecasBoasKPIWidget";
@@ -7,8 +9,22 @@ import { OPTopRefugoWidget }     from "@/features/ordens/OPTopRefugoWidget";
 import { OPCargaSetorWidget }    from "@/features/ordens/OPCargaSetorWidget";
 import { OPStatusWidget }        from "@/features/ordens/OPStatusWidget";
 import { OPConcluidasDiaWidget } from "@/features/ordens/OPConcluidasDiaWidget";
+import { useEffect, useState } from "react";
 
 export default function OrdensDeProducaoGestor() {
+  const [setorId, setSetorId] = useState(null);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_setor) setSetorId(payload.id_setor);
+    } catch {
+      // token ausente ou malformado
+    }
+  }, []);
+
   return (
     <main
       className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
@@ -35,21 +51,21 @@ export default function OrdensDeProducaoGestor() {
         </div>
 
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget setorId={setorId} /></div>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget /></div>
-          <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget /></div>
-          <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget /></div>
+          <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget setorId={setorId} /></div>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget /></div>
-          <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget /></div>
+          <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget setorId={setorId} /></div>
         </section>
       </div>
     </main>
