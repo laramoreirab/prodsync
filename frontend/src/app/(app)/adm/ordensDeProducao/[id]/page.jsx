@@ -1,17 +1,21 @@
 ﻿"use client";
-
+import Link from "next/link"; import Image from "next/image";
 import { use, useState, useEffect } from "react";
+
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
-import { BellRing, Pencil, ChevronDown, Trash2, Flame, Plus, Search } from "lucide-react";
+import { BellRing, Pencil, ChevronDown, Trash2, Flame, Plus, Search, EyeIcon } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu";
-import Link from "next/link"; import Image from "next/image";
+
 import { OPProgressoWidget } from "@/features/ordens/OPProgressoWidget";
 import { OPOEEDetalheWidget } from "@/features/ordens/OPOEEDetalheWidget";
+
 import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
@@ -23,10 +27,6 @@ import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modal
 export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const opId = id;
-
-
-
-
 
   const [buscaApontamento, setBuscaApontamento] = useState("");
 
@@ -49,14 +49,8 @@ export default function OPDetalhePage({ params }) {
       className: 'text-center justify-center',
       icone: (valor) => {
         const config = {
-          "Setup": {
-            variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
-          },
-          "Parada": {
-            variant: "destructive",
-            className: "font-semibold text-sm border-none"
-          }
+          "Setup": { variant: "setup" },
+          "Parada": { variant: "parada" }
         };
 
         const estilo = config[valor] || { variant: "outline", className: "" };
@@ -472,8 +466,20 @@ export default function OPDetalhePage({ params }) {
               columns={colunasOP}
               enableSelection={true}
               onEditSelected={(rows) => handleEditBatch(rows)}
-              acoesDropdown={(apontamento) => (
+              acoesDropdown={(ordemProd) => (
                 <>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={ordermProd.op} />
+                    </DialogContent>
+                  </Dialog>
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
