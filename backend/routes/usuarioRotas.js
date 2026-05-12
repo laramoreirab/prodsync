@@ -15,6 +15,7 @@ router.get('/dashboard/rotatividadeUsuarios', authMiddleware, UsuarioController.
 router.get('/dashboard/producaoMediaPorSetor', authMiddleware, UsuarioController.producaoMediaPorDiaSetor)
 router.get('/dashboard/metaProducaoPorSetor', authMiddleware, UsuarioController.metaProducaoPorSetor)
 router.get('/criar', authMiddleware, UsuarioController.criarUsuario)
+router.get('/:id', authMiddleware, UsuarioController.buscarPorId)
 router.get('/:id/deletar', authMiddleware, UsuarioController.deletarUsuario)
 router.get('/:id/atualizar', authMiddleware, UsuarioController.atualizarUsuario)
 router.get('/operadores/:id_setor', authMiddleware, UsuarioController.listarOperadoresporSetor)

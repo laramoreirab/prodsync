@@ -480,7 +480,7 @@ class UsuarioModel {
                 where: { id_empresa },
                 select: {
                     qtd_boa: true,
-                    ordemProducao: {
+                    ordem_producao: {
                         select: {
                             qtd_planejada: true
                         }

@@ -11,7 +11,7 @@ export function useUsuarios() {
     setLoading(true);
     try {
       const data = await usuariosCrudService.getAll();
-      setUsuarios(data);
+      setUsuarios(data.dados);
       setError(null);
     } catch (err) {
       setError('Falha ao carregar usuários');

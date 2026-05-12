@@ -40,7 +40,7 @@ export const qtdUsuariosSetorService = {
 export const topOperadoresService = {
   async getTopOperadores() {
     if (USE_MOCK) return TopOperadoresArraySchema.parse(mockTopOperadores);
-    const data = await apiFetch("api/usuarios/dashboard/top5Operadores");
+    const data = await apiFetch("/api/usuarios/dashboard/top5Operadores");
     return TopOperadoresArraySchema.parse(data.dados);
   },
 };

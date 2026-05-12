@@ -65,7 +65,7 @@ class UsuarioController {
     //GET api/usuarios - busca de usuário por id 
     static async buscarPorId(req, res) {
         try {
-            const id_usuario = req.user.id_usuario;
+            const id_usuario = req.params.id;
             const id_empresa = req.user.id_empresa;
             // Validação básica do ID
             if (!id_usuario || isNaN(id_usuario)) {

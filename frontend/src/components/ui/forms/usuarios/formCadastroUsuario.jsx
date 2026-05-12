@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     Dialog,
     DialogTrigger,
@@ -16,6 +16,22 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [arquivoLote, setArquivoLote] = useState(null);
     const fileInputLoteRef = useRef(null);
     const fileInputFotoRef = useRef(null);
+    const [listaSetores, setListaSetores] = useEffect([])
+
+    useEffect(() => {
+            async function carregarSetores() {
+                try {
+                    const dados = await setorCrudService.getAll();
+                    setListaSetores(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar setores.");
+                }
+    
+            }
+    
+            carregarSetores();
+        }, []);
 
     const estadoInicialForm = {
         nome: "",
@@ -243,9 +259,17 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Roscas</option>
-                            <option value="2">Brocas</option>
-                        </select>
+                                 {listaSetores.map((setor) => (
+
+                                    <option
+                                        key={setor.id_setor}
+                                        value={setor.id_setor}
+                                    >
+                                        {setor.nome_setor}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
