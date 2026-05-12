@@ -100,7 +100,7 @@ class UsuarioController {
         }
     }
 
-    //POST api/usuarios - Criar novo usuário (apenas dmin)
+    //POST api/usuarios/criar - Criar novo usuário (apenas dmin)
     static async criarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
@@ -252,7 +252,8 @@ class UsuarioController {
     static async atualizarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { id_usuario, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const id_usuario = req.params.id
+            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -343,10 +344,10 @@ class UsuarioController {
         }
     }
 
-    //DELETE api/usuarios - Excluir funcionario 
+    //DELETE api/usuarios/:id/deletar - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
-            const { id_usuario } = req.body
+            const { id_usuario } = req.params.id
             const id_empresa = req.user.id_empresa;
 
             // Validação do ID
@@ -500,6 +501,15 @@ class UsuarioController {
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Rotatividade De Usuários:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+    static async metaProducaoPorSetor(req, res){
+        try {
+             const dados = await UsuarioModel.metaProducaoPorSetor(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+               console.error('Erro no gráfico Meta de Produção por Setor:', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
