@@ -155,18 +155,7 @@ export default function ProducaoOperadorPage({ params }) {
   });
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-
-
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         <Link className="flex items-center" href="/adm/usuarios">
@@ -309,7 +298,7 @@ export default function ProducaoOperadorPage({ params }) {
         {/* Listagem */}
         <div className="flex items-center gap-5">
           <h1 className="text-4xl w-[125] font-semibold">Histórico de Apontamentos Feitos pelo Usuário</h1>
-          
+
         </div>
         {/* Busca */}
         <div className="flex searchbar">
@@ -353,7 +342,7 @@ export default function ProducaoOperadorPage({ params }) {
                     <EyeIcon className="mr-2 h-4 w-4" />
                     Ver OP relacionada
                   </Link>
-                  
+
                 </DropdownMenuItem>
               </>
             )}

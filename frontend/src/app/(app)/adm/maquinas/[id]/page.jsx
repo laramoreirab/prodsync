@@ -31,13 +31,9 @@ import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
-<<<<<<< HEAD
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
-=======
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
->>>>>>> 53862615b22109e060ff2d1684ae3748b096ba90
-
 
 const colunasMaquina = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
@@ -81,6 +77,7 @@ const colunasMaquina = [
     )
   },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
+  { id: 'observacao', key: 'observacao', label: 'Observação' },
 ];
 
 const colunasApontamento = [
@@ -548,7 +545,6 @@ export default function MaquinaDetalhePage({ params }) {
           </div>
         </section>
 
-        {/* Listagem */}
         {/* Listagem de Eventos */}
         <section id="listagem_eventos">
           <div>
@@ -597,102 +593,126 @@ export default function MaquinaDetalhePage({ params }) {
             </div>
           </div>
 
+          {/* Tabela */}
           <div>
-            <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-              data={dadosExibidos} columns={colunasMaquina}
-              acoesDropdown={(maquina) => (
-                <>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                        Ver Detalhes
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DetalhesEvento eventoId={maquina.id} />
-                    </DialogContent>
-                  </Dialog>
+            {dadosExibidos.length > 0 ? (
+              <TableListagens
+                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+                data={dadosExibidos} columns={colunasMaquina}
+                acoesDropdown={(maquina) => (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DetalhesEvento eventoId={maquina.id} />
+                      </DialogContent>
+                    </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar Justificativa
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <ModalSucessNotificacao />
-                    </DialogContent>
-                  </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <BellRing className="mr-2 h-4 w-4" />
+                          Solicitar Justificativa
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <ModalSucessNotificacao />
+                      </DialogContent>
+                    </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar Evento
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoEvento />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar Evento
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoEvento />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
 
-            />
+              />
+            ) : (
+              //caso não encontre nada correspondente
+              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+                <Search className="w-12 h-12 mb-4 text-gray-300" />
+                <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
+                <p>Não encontramos nenhum evento: "{buscaEvento}".</p>
+              </div>
+            )}
           </div>
 
           {/* Listagem de Apontamentos */}
-          <div>
-            <h1 className="text-4xl font-semibold mb-3">Histórico de Apontamentos da Máquina</h1>
-
-            {/* Busca */}
-            <div className="flex searchbar">
-              <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-                <input
-                  type="search"
-                  className="p-2 w-full outline-none bg-transparent"
-                  placeholder="Busque por nome ou id..."
-                  value={buscaApontamento}
-                  onChange={(e) => setBuscaApontamento(e.target.value)}
-                />
-                <button className="outline-none cursor-pointer mr-2"><Search /></button>
+          <section>
+            <div>
+              <h1 className="text-4xl font-semibold mb-3">Histórico de Apontamentos da Máquina</h1>
+              {/* Busca */}
+              <div className="flex searchbar">
+                <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+                  <input
+                    type="search"
+                    className="p-2 w-full outline-none bg-transparent"
+                    placeholder="Busque por nome ou id..."
+                    value={buscaApontamento}
+                    onChange={(e) => setBuscaApontamento(e.target.value)}
+                  />
+                  <button className="outline-none cursor-pointer mr-2"><Search /></button>
+                </div>
               </div>
-            </div>
 
-            <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-              <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
+              <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+                <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
 
-              <div className="flex items-center gap-4 mb-3">
-                <OrdenarDropdown
-                  label="Ordenar por"
-                  options={opcoesOrdenacaoApontamento}
-                  onSortChange={handleSortApontamento}
-                />
+                <div className="flex items-center gap-4 mb-3">
+                  <OrdenarDropdown
+                    label="Ordenar por"
+                    options={opcoesOrdenacaoApontamento}
+                    onSortChange={handleSortApontamento}
+                  />
 
-                <FilterDropdown
-                  filtersConfig={apontamentoFilter}
-                  onApply={aplicarFiltrosApontamento}
-                />
+                  <FilterDropdown
+                    filtersConfig={apontamentoFilter}
+                    onApply={aplicarFiltrosApontamento}
+                  />
+                </div>
               </div>
-            </div>
-            <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-              data={dadosApontamentosFiltrados} columns={colunasApontamento}
-              acoesDropdown={(apontamento) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/ordemDeProducao/${apontamento.op}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver OP relacionada
-                    </Link>
-                  </DropdownMenuItem>
-                </>
+
+              {dadosApontamentosFiltrados.length > 0 ? (
+                <TableListagens
+                  /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+                  data={dadosApontamentosFiltrados} columns={colunasApontamento}
+                  acoesDropdown={(apontamento) => (
+                    <>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link href={`/adm/ordemDeProducao/${apontamento.op}`}>
+                          <EyeIcon className="mr-2 h-4 w-4" />
+                          Ver OP relacionada
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+                  <Search className="w-12 h-12 mb-4 text-gray-300" />
+                  <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
+                  <p>Não encontramos nenhum apontamento "{buscaEvento}".</p>
+                </div>
               )}
-            />
-          </div>
+
+
+            </div>
+          </section>
+
+
         </section >
 
       </div >
