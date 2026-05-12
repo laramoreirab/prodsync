@@ -22,6 +22,6 @@ export const opStatusConfig = {
 export const opConcluidasConfig = {
   total: {
     label: "OPs Concluídas:",
-    color: "#00357a",
+    color: "var(--color-op-concluidas)",
   },
 };
