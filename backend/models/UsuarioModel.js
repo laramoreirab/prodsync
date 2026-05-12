@@ -43,6 +43,35 @@ class UsuarioModel {
         }
     };
 
+    static async listarOperadoresPorSetor(id_empresa, id_setor) {
+        try {
+            const operadores = await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_empresa: id_empresa,
+                    id_setor: Number(id_setor)
+                },
+
+                select: {
+                    id_operador: true,
+
+                    operador: {
+                        select: {
+                            nome: true
+                        }
+                    }
+                }
+            });
+            const lista = operadores.map(item => ({
+                id_operador: item.id_operador,
+                nome: item.operador.nome
+            }));
+            return lista
+        } catch (error) {
+            console.error('Erro ao listar operadores:', error);
+            throw error;
+        }
+    }
+
     //buscar usuario por id
     static async buscarPorId(id, id_empresa) {
         try {
@@ -508,13 +537,13 @@ class UsuarioModel {
 
             for (const ap of apontamentos) {
                 if (!ap.data_hora_fim) continue  // ← pula se ainda não terminou
-              
-                const dia     = diasSemana[new Date(ap.data_hora_inicio).getDay()]
+
+                const dia = diasSemana[new Date(ap.data_hora_inicio).getDay()]
                 const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
-              
+
                 if (!agrupado[dia]) agrupado[dia] = { dia, tempo_produzido: 0, tempo_parado: 0 }
                 agrupado[dia].tempo_produzido += Math.round(minutos)
-              }
+            }
 
             for (const parada of paradas) {
                 const dia = diasSemana[new Date(parada.inicio).getDay()]

@@ -143,9 +143,10 @@ export const removerArquivoAntigo = async (nomeArquivo, tipo = 'imagem') => {
     try {
         if (!nomeArquivo) return;
 
+        const nomeNormalizado = path.basename(nomeArquivo);
         const caminhoArquivo = tipo === 'imagem'
-            ? path.join(uploadPathImagens, nomeArquivo)
-            : path.join(uploadPathArquivos, nomeArquivo);
+            ? path.join(uploadPathImagens, nomeNormalizado)
+            : path.join(uploadPathArquivos, nomeNormalizado);
 
         if (fs.existsSync(caminhoArquivo)) {
             fs.unlinkSync(caminhoArquivo);

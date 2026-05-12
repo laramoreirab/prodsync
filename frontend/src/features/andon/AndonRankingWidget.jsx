@@ -18,7 +18,7 @@ export function AndonRankingWidget({ scope = "factory", title = "Ranking de Prod
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-semibold text-slate-950">{title}</p>
+      <p className="text-md font-semibold text-slate-950">{title}</p>
       <BarHorizontal data={data} config={rankingConfig} />
     </div>
   );

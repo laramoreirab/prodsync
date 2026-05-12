@@ -1,93 +1,36 @@
-
-"use client";
+﻿"use client";
+import Link from "next/link"; import Image from "next/image";
 import { use, useState, useEffect } from "react";
+
 import TableListagens from "@/components/table";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
+
 import { Badge } from "@/components/ui/badge";
-import { BellRing, Pencil, ChevronDown, Trash2, Flame, Plus, Search } from "lucide-react";
+import { BellRing, Pencil, ChevronDown, Trash2, Flame, Plus, Search, EyeIcon } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu";
-import Link from "next/link"; import Image from "next/image";
+
 import { OPProgressoWidget } from "@/features/ordens/OPProgressoWidget";
 import { OPOEEDetalheWidget } from "@/features/ordens/OPOEEDetalheWidget";
+
 import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 
-const colunasOP = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-  {
-    id: 'status',
-    key: 'evento',
-    label: 'Status',
-    className: 'text-center justify-center',
-    icone: (valor) => {
-      const config = {
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
-      };
 
-      const estilo = config[valor] || { variant: "outline", className: "" };
-      return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
-          {valor}
-        </Badge>
-      );
-    }
-  },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
-  { id: 'duracao', key: 'duracao', label: 'Duração', className: 'text-center justify-center' },
-  { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  {
-    id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
-          {valor}
-        </Badge>
-      );
-    }
-  },
-  {
-    id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="destructive" className="font-semibold text-sm border-none">
-          {valor}
-        </Badge>
-      );
-    }
-  },
-];
 
 
 export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const opId = id;
 
-
-  const dadosOP = [
-    { id: 1, evento: 'Parada', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', motivo: 'Troca de ferramenta' },
-    { id: 2, evento: 'Setup', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', motivo: 'Manutenção corretiva' },
-    { id: 3, evento: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', motivo: 'Ajuste de parâmetros' },
-    { id: 4, evento: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', motivo: 'Refugo elevado devido a falta de aquecimento' },
-    { id: 5, evento: 'Setup', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', motivo: 'Retirada de amostras para o laboratório de qualidade' },
-    { id: 6, evento: 'Setup', data: '30/07 (17:00 - 18:00)', duracao: '01:30', produzido: '13', refugo: '6', motivo: 'Finalização de evento' },
-    { id: 7, evento: 'Parada', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', motivo: 'Falta de material' },
-    { id: 8, evento: 'Parada', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', motivo: 'Boa qualidade' },
-  ];
-
-  const [dadosEventos, setDadosEventos] = useState(dadosOP);
-  const [buscaEvento, setBuscaEvento] = useState("");
   const [buscaApontamento, setBuscaApontamento] = useState("");
 
 
@@ -100,16 +43,67 @@ export default function OPDetalhePage({ params }) {
   };
 
   // -------------------------------------------------------------------------------------------------- Eventos --------------------------------------------------------------------------------------------------
+  const colunasOP = [
+    { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+    {
+      id: 'status',
+      key: 'evento',
+      label: 'Status',
+      className: 'text-center justify-center',
+      icone: (valor) => {
+        const config = {
+          "Setup": { variant: "setup" },
+          "Parada": { variant: "parada" }
+        };
+
+        const estilo = config[valor] || { variant: "outline", className: "" };
+        return (
+          <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+            {valor}
+          </Badge>
+        );
+      }
+    },
+    {
+      id: 'data',
+      key: 'data',
+      label: 'Data (Início - Fim)',
+      icone: (valor, row) => (
+        <DataEvento inicio={row.inicio} fim={row.fim} />
+      )
+    },
+    {
+      id: 'duracao', key: 'duracao', label: 'Duração',
+      icone: (valor, row) => (
+        <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+      )
+    },
+    { id: 'motivo', key: 'motivo', label: 'Motivo' },
+  ];
+
+  const dadosOP = [
+    { id: 1, evento: 'Parada', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta' },
+    { id: 2, evento: 'Setup', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'ManutenÃ§Ã£o corretiva' },
+    { id: 3, evento: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parÃ¢metros' },
+    { id: 4, evento: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Refugo elevado devido a falta de aquecimento' },
+    { id: 5, evento: 'Setup', data: '28/03 (12:00 - 14:00)', duracao: '01:00', motivo: 'Retirada de amostras para o laboratÃ³rio de qualidade' },
+    { id: 6, evento: 'Setup', data: '30/07 (17:00 - 18:00)', duracao: '01:30', motivo: 'FinalizaÃ§Ã£o de evento' },
+    { id: 7, evento: 'Parada', data: '20/09 (16:00 - 19:00)', duracao: '01:00', motivo: 'Falta de material' },
+    { id: 8, evento: 'Parada', data: '20/09 (16:00 - 19:00)', duracao: '01:00', motivo: 'Boa qualidade' },
+  ];
+  const [dadosEventos, setDadosEventos] = useState(dadosOP);
+  const [buscaEvento, setBuscaEvento] = useState("");
+
   const opcoesOrdenacaoEventos = [
     { label: 'ID Crescente', value: 'id_asc' },
     { label: 'ID Decrescente', value: 'id_desc' },
     { label: 'Data Crescente', value: 'data_asc' },
     { label: 'Data Decrescente', value: 'data_desc' },
-    { label: 'Duração Crescente', value: 'duracao_asc' },
-    { label: 'Duração Decrescente', value: 'duracao_desc' }
+    { label: 'DuraÃ§Ã£o Crescente', value: 'duracao_asc' },
+    { label: 'DuraÃ§Ã£o Decrescente', value: 'duracao_desc' }
   ];
 
-  //lógica de ordenação de Eventos
+  //lÃ³gica de ordenaÃ§Ã£o de Eventos
   const handleSortEventos = (criterio) => {
     const copia = [...dadosEventos];
 
@@ -142,7 +136,7 @@ export default function OPDetalhePage({ params }) {
   const eventosFilter = [
     { id: "evento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
-    // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+    // {id:"duracao", label:"DuraÃ§Ã£o", type:"time-max"} --> nÃ£o funcionou, tentei de vÃ¡rias formas mas o filtro por duraÃ§Ã£o nÃ£o funcionou, entÃ£o deixei comentado por enquanto. quem quiser tentar implementar depois, fique Ã  vontade!
   ];
 
 
@@ -185,6 +179,49 @@ export default function OPDetalhePage({ params }) {
     });
 
   // -------------------------------------------------------------------------------------------------- Apontamentos  --------------------------------------------------------------------------------------------------
+  const colunasApontamento = [
+    { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+    {
+      id: 'data',
+      key: 'data',
+      label: 'Data (Início - Fim)',
+      icone: (valor, row) => (
+        <DataEvento inicio={row.inicio} fim={row.fim} />
+      )
+    }, {
+      id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
+      icone: (valor) => {
+        return (
+          <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+            {valor}
+          </Badge>
+        );
+      }
+    },
+    {
+      id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
+      icone: (valor) => {
+        return (
+          <Badge variant="destructive" className="font-semibold text-sm border-none">
+            {valor}
+          </Badge>
+        );
+      }
+    },
+    { id: 'observacao', key: 'observacao', label: 'Observação' },
+  ];
+
+  const dadosApontamento = [
+    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
+    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'ManutenÃ§Ã£o corretiva' },
+    { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parÃ¢metros' },
+    { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
+    { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratÃ³rio de qualidade' },
+    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'FinalizaÃ§Ã£o de OP' },
+    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
+    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
+  ];
+
   const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
 
   useEffect(() => {
@@ -200,7 +237,7 @@ export default function OPDetalhePage({ params }) {
     { label: 'Refugo Decrescente', value: 'refugo_desc' }
   ];
 
-  //lógica de ordenação de Apontamentos
+  //lÃ³gica de ordenaÃ§Ã£o de Apontamentos
   const handleSortApontamento = (criterio) => {
     const dadosCopiados = [...dadosApontamentoState];
 
@@ -286,42 +323,7 @@ export default function OPDetalhePage({ params }) {
     );
   });
 
-  const colunasApontamento = [
-    { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-    { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
-    {
-      id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
-      icone: (valor) => {
-        return (
-          <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
-            {valor}
-          </Badge>
-        );
-      }
-    },
-    {
-      id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-      icone: (valor) => {
-        return (
-          <Badge variant="destructive" className="font-semibold text-sm border-none">
-            {valor}
-          </Badge>
-        );
-      }
-    },
-    { id: 'observacao', key: 'observacao', label: 'Observação' },
-  ];
 
-  const dadosApontamento = [
-    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
-    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
-    { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-    { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-    { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
-    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
-    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
-    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
-  ];
 
 
 
@@ -333,12 +335,12 @@ export default function OPDetalhePage({ params }) {
 
           <Link className="flex items-center" href="/adm/ordensDeProducao">
             <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-            <p className="text-xl font-semibold text-gray-800">Voltar para Ordens de Produção </p>
+            <p className="text-xl font-semibold text-gray-800">Voltar para Ordens de ProduÃ§Ã£o </p>
           </Link>
 
           <section id="infos_op" className="flex flex-col">
             <div className="flex justify-between items-center">
-              <h1 className="text-4xl font-bold">Ordem de Produção #AAA550 </h1>
+              <h1 className="text-4xl font-bold">Ordem de ProduÃ§Ã£o #AAA550 </h1>
 
               <div className="flex space-x-2">
                 <Dialog>
@@ -362,15 +364,15 @@ export default function OPDetalhePage({ params }) {
             </div>
           </section>
 
-          {/* SEÇÃO 1: Info card + Progresso */}
+          {/* SEÃ‡ÃƒO 1: Info card + Progresso */}
           <section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
               <div className="md:col-span-2">
                 <div className="flex items-center">
                   <div className="flex gap-2 bg-white border rounded-xl shadow-sm w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4">
-                    <Image src="/demo_maq.png" className="rounded-lg" alt="Máquina" width={150} height={150} />
+                    <Image src="/demo_maq.png" className="rounded-lg" alt="MÃ¡quina" width={150} height={150} />
                     <p className="text-2xl">THAK-90334</p>
-                    <p className="text-[#7c7c81] text-2xl font-semibold">Meta: 300 peças</p>
+                    <p className="text-[#7c7c81] text-2xl font-semibold">Meta: 300 peÃ§as</p>
                   </div>
 
                   <div>
@@ -390,17 +392,17 @@ export default function OPDetalhePage({ params }) {
 
                         <p>
                           Prioridade:
-                          <Badge variant="outline" className="ml-2 border border-vermelho-vivido bg-transparent text-black text-sm font-medium"><Flame className="text-vermelho-vivido" />Crítica</Badge>
+                          <Badge variant="outline" className="ml-2 border border-vermelho-vivido bg-transparent text-black text-sm font-medium"><Flame className="text-vermelho-vivido" />CrÃ­tica</Badge>
                         </p>
 
                         <div className="flex">Operador:
                           <Link href="/adm/usuarios/1" className="font-medium hover:underline ml-2">
-                            João Silva
+                            JoÃ£o Silva
                           </Link>
                         </div>
 
                         <div className="flex">
-                          <p>Início:</p>
+                          <p>InÃ­cio:</p>
                           <p id="" className="text-2xl font-medium ml-2">
                             26/03/2024 08:00
                           </p>
@@ -425,7 +427,7 @@ export default function OPDetalhePage({ params }) {
             </div>
           </section>
 
-          {/* SEÇÃO 2: OEE Gauges */}
+          {/* SEÃ‡ÃƒO 2: OEE Gauges */}
           <section className="bg-white border rounded-xl p-6 shadow-sm">
             <OPOEEDetalheWidget opId={opId} />
           </section>
@@ -434,7 +436,7 @@ export default function OPDetalhePage({ params }) {
           {/* Listagem de Hist. Eventos da OP */}
           <section id="listagem_histEventos">
             <div className="flex items-center justify-between gap-5 mt-6 mb-3">
-              <h1 className="text-4xl w-[125] font-semibold">Histórico de Eventos da OP</h1>
+              <h1 className="text-4xl w-[125] font-semibold">HistÃ³rico de Eventos da OP</h1>
               <Dialog>
                 <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-2xl gap-2">
                   <Plus size={28} className="text-white cursor-pointer" />
@@ -480,13 +482,25 @@ export default function OPDetalhePage({ params }) {
 
             {/* Tabela */}
             <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              /* Dados e colunas a depender da pÃ¡gina [no momento estÃ¡ estÃ¡tico definido em um json, posteriormente serÃ¡ um get]  */
               data={dadosExibidos}
               columns={colunasOP}
               enableSelection={true}
               onEditSelected={(rows) => handleEditBatch(rows)}
-              acoesDropdown={(apontamento) => (
+              acoesDropdown={(ordemProd) => (
                 <>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={ordemProd.op} />
+                    </DialogContent>
+                  </Dialog>
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -495,7 +509,7 @@ export default function OPDetalhePage({ params }) {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <ModalSucessNotificacao  />
+                      <ModalSucessNotificacao />
                     </DialogContent>
                   </Dialog>
 
@@ -513,14 +527,14 @@ export default function OPDetalhePage({ params }) {
                 </>
               )}
             />
-            
+
           </section>
 
 
           {/* Listagem de Hist. Apontamentos da OP  */}
           <section id="listagem_histApontamentos">
             <div className="flex items-center justify-between gap-5 mt-5">
-              <h1 className="text-4xl w-[125] font-semibold">Histórico de Apontamentos da OP</h1>
+              <h1 className="text-4xl w-[125] font-semibold">HistÃ³rico de Apontamentos da OP</h1>
             </div>
             {/* Busca */}
             <div className="flex searchbar">
@@ -556,7 +570,7 @@ export default function OPDetalhePage({ params }) {
             {/* Tabela */}
             <div>
               <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+                /* Dados e colunas a depender da pÃ¡gina [no momento estÃ¡ estÃ¡tico definido em um json, posteriormente serÃ¡ um get]  */
                 data={dadosApontamentosFiltrados}
                 columns={colunasApontamento}
               />

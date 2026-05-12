@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/ui/topbar";
 import { SetorMaquinaStatusWidget } from "@/features/setores/SetorMaquinaStatusWidget";
 import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
 import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";

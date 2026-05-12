@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
+    Dialog,
+    DialogContent,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, CheckCircle2, ChevronDown, X, Calendar, Clock, Loader2 } from "lucide-react";
+import { Plus, CheckCircle2, ChevronDown, X, Calendar, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { eventosCrudService } from '@/services/eventosCrudService'; // Importar o serviço
+import FormCriarMotivo from './formCriarMotivo';
 
 const OPCOES_SETOR = ["Roscas", "Engrenagens", "Usinagem"];
 const OPCOES_MAQUINA = [
@@ -15,8 +19,28 @@ const OPCOES_MAQUINA = [
 ];
 const OPCOES_OP = ["#000000 (Injetora 1)", "#000001 (Injetora 2)"];
 
+//lista estática para não quebrar a tela enquanto o back não vem
+const OPCOES_MOTIVO_INICIAL = [
+    { label: "Falta de Energia", value: 1 },
+    { label: "Manutenção Preventiva", value: 2 },
+    { label: "Manutenção Corretiva", value: 3 },
+    { label: "Falta de Material", value: 4 },
+];
 
-export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
+export default function FormCadastroEventoGestor({ onCadastroSucesso }) {
+    // id_motivo_parada — número — backend: id_motivo_parada
+    const [opcoesMotivo, setOpcoesMotivo] = useState(OPCOES_MOTIVO_INICIAL);
+    const [isModalAberto, setIsModalAberto] = useState(false);
+
+    // Função que será passada para o filho avisar que acabou
+    const atualizarListaMotivos = () => {
+        console.log("Motivo criado! Preparado para buscar do backend...");
+        // por favor, descomente esse trecho depois que a integração for implementada e exclua a linha de cima
+        //fetch('/api/motivos')
+        //  .then(res => res.json())
+        //  .then(data => setOpcoesMotivo(data))
+    };
+
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
 
     const [setoresSelecionados, setSetoresSelecionados] = useState([]); // setor_afetado — backend: setor_afetado
@@ -24,14 +48,7 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
     const [idMotivoPrincipal, setIdMotivoPrincipal] = useState(""); // id_motivo_parada — backend: id_motivo_parada
     const [observacao, setObservacao] = useState(""); // observacao — backend: observacao
-    // id_motivo_parada — número — backend: id_motivo_parada
-    const [opcoesMotivo, setOpcoesMotivo] = useState([
-        { label: "Falta de Energia", value: 1 },
-        { label: "Manutenção Preventiva", value: 2 },
-        { label: "Manutenção Corretiva", value: 3 },
-        { label: "Falta de Material", value: 4 },
-        { label: "Outros", value: 5 },
-    ]);
+
     // período do evento
     const [inicioData, setInicioData] = useState(""); // inicio — backend: inicio
     const [inicioHora, setInicioHora] = useState("");
@@ -66,68 +83,56 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
         );
     };
 
-    //justificar evento existente — campos: id_evento, id_motivo_parada, observacao
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // monta o payload conforme o controller
         const payload = {
-            id_evento: eventoId, // backend: id_evento
-            id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null, // backend: id_motivo_parada
-            observacao, // backend: observacao
+            status_maquina: tipoEvento,                          // backend: status_maquina
+            setor_afetado: setoresSelecionados[0] || "",         // backend: setor_afetado
+            maquinas: maquinasSelecionadas,                      // backend: maquinas 
+            inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000` : null, // backend: inicio
+            fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000` : null,               // backend: fim
+            id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null,          // backend: id_motivo_parada
+            observacao,
+            //é isso que falta no cadastro evento                                          // backend: observacao
+            ops_afetadas: opsSelecionadas,
         };
 
         try {
-            await eventosCrudService.justificar(payload);
-            toast.success("Evento atualizado com sucesso!");
-            if (onEdicaoSucesso) onEdicaoSucesso();
+            await eventosCrudService.create(payload);
+            toast.success("Evento registrado com sucesso!");
+            // limpar formulário
+            setTipoEvento('Parada');
+            setSetoresSelecionados([]);
+            setMaquinasSelecionadas([]);
+            setOpsSelecionadas([]);
+            setIdMotivoPrincipal("");
+            setObservacao("");
+            setInicioData("");
+            setInicioHora("");
+            setFimData("");
+            setFimHora("");
+            if (onCadastroSucesso) onCadastroSucesso();
         } catch (error) {
-            console.error("Erro ao atualizar evento:", error);
-            toast.error("Erro ao atualizar evento.");
+            console.error("Erro ao registrar evento:", error);
+            toast.error("Erro ao registrar evento.");
         }
     };
-
-    useEffect(() => {
-        const buscarDados = async () => {
-            try {
-                const dados = await eventosCrudService.getById(eventoId);
-                setTipoEvento(dados.status_maquina || 'Parada');
-                setSetoresSelecionados(dados.setor_afetado ? [dados.setor_afetado] : []);
-                setMaquinasSelecionadas(dados.maquinas || []);
-                setIdMotivoPrincipal(dados.id_motivo_parada || "");
-                setObservacao(dados.observacao || "");
-                if (dados.inicio) {
-                    setInicioData(dados.inicio.split('T')[0]);
-                    setInicioHora(dados.inicio.split('T')[1]?.slice(0, 5));
-                }
-                if (dados.fim) {
-                    setFimData(dados.fim.split('T')[0]);
-                    setFimHora(dados.fim.split('T')[1]?.slice(0, 5));
-                }
-
-                // busca motivos dinamicamente
-                const motivos = await eventosCrudService.getMotivos();
-                setOpcoesMotivo(motivos.map(m => ({ label: m.descricao, value: m.id_motivo })));
-            } catch (error) {
-                toast.error("Erro ao carregar dados do evento.");
-            }
-        };
-
-        if (eventoId) buscarDados();
-    }, [eventoId]);
 
     return (
         <>
             <div className="flex items-center">
                 <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Pencil className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Editar Evento</DialogTitle>
+                    <Plus className="mr-2 text-3xl text-white" />
+                    <DialogTitle className="text-3xl text-white">Registrar Evento</DialogTitle>
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
 
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
 
-                {/* tipo — status_maquina */}
+                {/* tipo  */}
                 <div>
                     <label className="text-2xl font-semibold text-black">1. Tipo de Evento</label>
                     <div className="flex gap-3">
@@ -157,7 +162,7 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     </div>
                 </div>
 
-                {/* setor — setor_afetado */}
+                {/* setor */}
                 <div className="flex flex-col">
                     <label className="text-2xl font-semibold text-black">2. Setor Afetado</label>
                     <button
@@ -199,7 +204,7 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     </div>
                 </div>
 
-                {/* maquinas */}
+                {/* maquina */}
                 <div className="flex flex-col">
                     <label className="text-2xl font-semibold text-black">3. Máquina Afetada</label>
                     <button
@@ -343,47 +348,47 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     </div>
                 </div>
 
-                {/* justificativa — id_motivo_parada e observacao */}
+                {/* justificativa */}
                 <div>
                     <label className="text-2xl font-semibold text-black">6. Justificativa</label>
 
                     <div className="space-y-3">
-                        <div>
-                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
-                            <div className="relative">
-                                <select
-                                    value={idMotivoPrincipal}
-                                    onChange={(e) => setIdMotivoPrincipal(e.target.value)}
-                                    className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
-                                >
-                                    <option value="" disabled>Selecione o motivo</option>
-                                    {opcoesMotivo.map((motivo) => (
-                                        // id_motivo_parada — número — backend: id_motivo_parada
-                                        <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                            </div>
+
+                        <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
+                        <div className="relative">
+                            <select
+                                value={idMotivoPrincipal}
+                                onChange={(e) => setIdMotivoPrincipal(e.target.value)}
+                                className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
+                            >
+                                <option value="" disabled>Selecione o motivo</option>
+                                {/* mapeando do estado */}
+                                {opcoesMotivo.map((motivo) => (
+                                    <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
+                                ))}
+                            </select>
+                            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
-                        <div>
-                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Observação (Opcional):</span>
-                            <textarea
-                                value={observacao}
-                                onChange={(e) => setObservacao(e.target.value)}
-                                placeholder="Escreva uma observação adicional..."
-                                rows="3"
-                                className="w-full border shadow-md border-gray-200 rounded-md p-2.5 text-xl outline-none placeholder-gray-300 resize-none"
-                            ></textarea>
-                        </div>
+
+                    </div>
+                    <div>
+                        <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Observação (Opcional):</span>
+                        <textarea
+                            value={observacao}
+                            onChange={(e) => setObservacao(e.target.value)}
+                            placeholder="Escreva uma observação adicional..."
+                            rows="3"
+                            className="w-full border shadow-md border-gray-200 rounded-md p-2.5 text-xl outline-none placeholder-gray-300 resize-none"
+                        ></textarea>
                     </div>
                 </div>
-
+                
                 <div className="flex justify-center mt-4">
                     <button type="submit" className="bg-[#002866] text-xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg">
-                        Editar
+                        Registrar
                     </button>
                 </div>
-            </form>
+            </form >
         </>
     );
 }

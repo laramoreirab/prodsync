@@ -46,6 +46,7 @@ export default function PageSetores() {
   const { setores, loading, error, refresh } = useSetores();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
 
   //sincronizar dados da API com estado local
   useEffect(() => {
@@ -234,6 +235,12 @@ export default function PageSetores() {
               data={dadosExibidos}
               columns={colunasSetores}
               enableSelection={true}
+              onSelectedChange={setSelecionados}
+              excluirLote={
+                <DialogContent>
+                  <FormExclusaoSetor />
+                </DialogContent>
+              }
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">

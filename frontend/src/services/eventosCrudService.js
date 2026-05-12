@@ -55,6 +55,20 @@ const apiService = {
         if (!response.ok) throw new Error("Erro ao justificar evento");
         return await response.json();
     },
+
+    //buscar eventos pendentes de justificativa --> p/ operador
+    getEventoPendente: async () => {
+        const response = await fetch(`${API_URL}/pendente`);
+        if (!response.ok) throw new Error("Erro ao buscar evento pendente");
+        return (await response.json()).dados;
+    },
+
+    //buscar motivos de eventos
+    getMotivos: async () => {
+        const response = await fetch(`${API_URL}/motivos-parada`);
+        if (!response.ok) throw new Error("Erro ao buscar motivos");
+        return (await response.json()).dados;
+    },
 };
 
 //remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
