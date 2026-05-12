@@ -26,30 +26,11 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 
-import { Label } from "@/components/ui/label"
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea";
-
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
-
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
 import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
 
-import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";
 
 const colunasEventos = [
   {

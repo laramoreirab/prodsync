@@ -1,5 +1,6 @@
 export function DataEvento({ inicio, fim }) {
-  if (!inicio) return <span className="text-muted-foreground">-</span>;
+  if (!inicio) 
+    return <span className="text-muted-foreground">-</span>;
 
   const dataInicio = new Date(inicio);
   const dia = dataInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });

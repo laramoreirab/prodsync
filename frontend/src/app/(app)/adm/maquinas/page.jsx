@@ -48,18 +48,9 @@ const colunasMaquinas = [
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
-        },
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
+        "Produzindo": { variant: "produzindo" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };

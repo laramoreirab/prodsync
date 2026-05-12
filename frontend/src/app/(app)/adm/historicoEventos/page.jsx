@@ -21,7 +21,6 @@ import { useState, useMemo, useEffect } from "react";
 
 import { useEventos } from "@/hooks/useEventos";
 
-//imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 
@@ -349,8 +348,6 @@ export default function HistoricoEventos() {
               <TabsTrigger value="nao-justificadas" className="cursor-pointer">Não Justificadas</TabsTrigger>
             </TabsList>
           </div>
-
-
 
           <div className="flex searchbar">
             <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
