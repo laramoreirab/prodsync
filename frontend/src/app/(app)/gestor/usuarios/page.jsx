@@ -55,6 +55,20 @@ const colunasUsuarios = [
 ];
 
 export default function UsuariosGestor() {
+  const [setorId, setSetorId] = useState(null);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_setor) setSetorId(payload.id_setor);
+    } catch {
+      // token ausente ou inválido
+    }
+  }, []);
+  
   const dadosUsuarios = [
     {
       id: "001",
@@ -254,7 +268,7 @@ export default function UsuariosGestor() {
               </DialogTrigger>
 
               <DialogContent>
-                 <FormCadastroOperadorGestor /*onCadastroSucesso={refresh} *//> 
+                <FormCadastroOperadorGestor /*onCadastroSucesso={refresh} */ />
               </DialogContent>
             </Dialog>
           </div>
@@ -262,35 +276,35 @@ export default function UsuariosGestor() {
         </div>
 
         {/* Gráficos */}
-              <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
-          <QtdUsuariosWidget />
-        </div>
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
-          <TurnosOperadoresWidget setorId={setorId} />
-        </div>
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
-          <TopOperadoresWidget setorId={setorId} />
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex items-center">
-          <TempoSessaoWidget setorId={setorId} />
-        </div>
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <RotatividadeWidget setorId={setorId} />
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <ProducaoMediaUsuarioSetorWidget setorId={setorId} />
-        </div>
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <UsuarioTaxaRefugoWidget setorId={setorId} />
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
+            <QtdUsuariosWidget />
           </div>
-          </section>
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
+            <TurnosOperadoresWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
+            <TopOperadoresWidget setorId={setorId} />
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex items-center">
+            <TempoSessaoWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <RotatividadeWidget setorId={setorId} />
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <ProducaoMediaUsuarioSetorWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <UsuarioTaxaRefugoWidget setorId={setorId} />
+          </div>
+        </section>
 
 
         {/* Listagem */}
@@ -358,7 +372,7 @@ export default function UsuariosGestor() {
                         </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
-                       <FormEdicaoOperadorGestor operadorId={user.id}  /* onEdicaoSucesso={refresh}*/ /> 
+                        <FormEdicaoOperadorGestor operadorId={user.id}  /* onEdicaoSucesso={refresh}*/ />
                       </DialogContent>
                     </Dialog>
 

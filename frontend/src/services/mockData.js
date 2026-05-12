@@ -253,8 +253,8 @@ export const mockTopOperadores = [
 export const mockTempoSessaoPerfil = [
   { perfil: "Gestores",   horas: 1.42, label: "01:25 h", setorId: 1 },
   { perfil: "Operadores", horas: 0.50, label: "00:30 h", setorId: 1 },
-  { perfil: "Gestores",   horas: 1.30, label: "01:18 h", setorId: 2 },
-  { perfil: "Operadores", horas: 0.55, label: "00:33 h", setorId: 2 },
+  { perfil: "Gestores",   horas: 1.62, label: "01:25 h", setorId: 2 },
+  { perfil: "Operadores", horas: 0.50, label: "00:30 h", setorId: 2 },
 ];
 
 export const mockRotatividade = [
