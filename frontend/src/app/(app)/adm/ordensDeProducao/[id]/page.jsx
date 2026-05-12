@@ -3,6 +3,9 @@ import Link from "next/link"; import Image from "next/image";
 import { use, useState, useEffect } from "react";
 
 import TableListagens from "@/components/table";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
+
 import { Badge } from "@/components/ui/badge";
 import { BellRing, Pencil, ChevronDown, Trash2, Flame, Plus, Search, EyeIcon } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -61,8 +64,20 @@ export default function OPDetalhePage({ params }) {
         );
       }
     },
-    { id: 'data', key: 'data', label: 'Data (InÃ­cio - Fim)' },
-    { id: 'duracao', key: 'duracao', label: 'DuraÃ§Ã£o', className: 'text-center justify-center' },
+    {
+      id: 'data',
+      key: 'data',
+      label: 'Data (Início - Fim)',
+      icone: (valor, row) => (
+        <DataEvento inicio={row.inicio} fim={row.fim} />
+      )
+    },
+    {
+      id: 'duracao', key: 'duracao', label: 'Duração',
+      icone: (valor, row) => (
+        <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+      )
+    },
     { id: 'motivo', key: 'motivo', label: 'Motivo' },
   ];
 
@@ -166,8 +181,14 @@ export default function OPDetalhePage({ params }) {
   // -------------------------------------------------------------------------------------------------- Apontamentos  --------------------------------------------------------------------------------------------------
   const colunasApontamento = [
     { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-    { id: 'data', key: 'data', label: 'Data (InÃ­cio - Fim)', className: 'pl-10' },
     {
+      id: 'data',
+      key: 'data',
+      label: 'Data (Início - Fim)',
+      icone: (valor, row) => (
+        <DataEvento inicio={row.inicio} fim={row.fim} />
+      )
+    }, {
       id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
       icone: (valor) => {
         return (
@@ -187,7 +208,7 @@ export default function OPDetalhePage({ params }) {
         );
       }
     },
-    { id: 'observacao', key: 'observacao', label: 'ObservaÃ§Ã£o' },
+    { id: 'observacao', key: 'observacao', label: 'Observação' },
   ];
 
   const dadosApontamento = [
@@ -476,7 +497,7 @@ export default function OPDetalhePage({ params }) {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <DetalhesEvento eventoId={ordermProd.op} />
+                      <DetalhesEvento eventoId={ordemProd.op} />
                     </DialogContent>
                   </Dialog>
 
