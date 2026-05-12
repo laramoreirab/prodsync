@@ -1,6 +1,5 @@
 "use client"
 
-
 import { OPAtivasKPIWidget } from "@/features/ordens/OPAtivasKPIWidget";
 import { OPAtrasadasKPIWidget } from "@/features/ordens/OPAtrasadasKPIWidget";
 import { OPPecasBoasKPIWidget } from "@/features/ordens/OPPecasBoasKPIWidget";
