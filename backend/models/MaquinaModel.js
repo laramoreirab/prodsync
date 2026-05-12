@@ -568,7 +568,7 @@ class MaquinaModel {
                         id_maquina,
                         id_empresa,
                         status_op: {
-                            in: ['Em_Andamento', 'Setup', 'Aguardando']
+                            in: ['Em_Andamento', 'Setup', 'Parada', 'Finalizada']
                         }
                     },
                     orderBy: {
