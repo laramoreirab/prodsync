@@ -41,16 +41,7 @@ export function ProducaoTotalWidget({ setorId }) {
           ))}
         </div>
       </div>
-<<<<<<< HEAD
       <AreaChartBase data={data} xKey="data" yKey="total" config={producaoTotalConfig} />
-=======
-      <AreaChartBase
-        data={dadosGrafico}
-        xKey="data"
-        yKey="total"
-        config={producaoTotalConfig}
-      />
->>>>>>> origin/front_giovana
     </div>
   );
 }
