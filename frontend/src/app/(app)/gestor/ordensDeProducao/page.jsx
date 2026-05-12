@@ -134,9 +134,7 @@ const colunasOrdemProd = [
 ];
 
 
-
 export default function OrdensDeProducaoGestor() {
-<<<<<<< HEAD
   const [setorId, setSetorId] = useState(null);
 
   useEffect(() => {
@@ -150,50 +148,7 @@ export default function OrdensDeProducaoGestor() {
     }
   }, []);
 
-  return (
-    <main
-      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      <div className="w-full max-w-6xl mt-8 pb-10 px-4 space-y-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-4xl font-semibold text-black border-b-4 border-[var(--secondary-foreground)] pb-0 inline-block">
-            Ordens de Produção
-          </h1>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-xl bg-[var(--secondary-foreground)] hover:bg-[var(--azul-cobalto)] text-white text-sm font-medium transition-colors shadow-lg">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Nova OP
-          </button>
-        </div>
-
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget setorId={setorId} /></div>
-        </section>
-
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget setorId={setorId} /></div>
-        </section>
-
-        <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget setorId={setorId} /></div>
-        </section>
-=======
-
+  
   const dadosExibidos = [
     { id: 1, codigo_lote: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status_op: 'Produzindo', progresso: '25%' },
     { id: 2, codigo_lote: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status_op: 'Setup', progresso: '35%' },
@@ -205,6 +160,8 @@ export default function OrdensDeProducaoGestor() {
     { id: 8, codigo_lote: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Concluída', progresso: '15%' },
     { id: 9, codigo_lote: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
   ];
+     
+
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
@@ -233,22 +190,22 @@ export default function OrdensDeProducaoGestor() {
           </div>
 
           <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
-            <div className="bg-white border rounded-xl p-4"><OPAtrasadasKPIWidget /></div>
-            <div className="bg-white border rounded-xl p-4"><OPPecasBoasKPIWidget /></div>
-            <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
-          </section>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget setorId={setorId} /></div>
+        </section>
 
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget /></div>
-            <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget /></div>
-            <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget /></div>
-          </section>
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget setorId={setorId} /></div>
+        </section>
 
-          <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget /></div>
-            <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget /></div>
-          </section>
+        <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget setorId={setorId} /></div>
+          <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget setorId={setorId} /></div>
+        </section>
         </div>
 
         {/* Listagem de OPs */}
@@ -305,8 +262,6 @@ export default function OrdensDeProducaoGestor() {
             )}
           />
         </section>
-
->>>>>>> origin/front_bia
       </div>
     </main>
   );
