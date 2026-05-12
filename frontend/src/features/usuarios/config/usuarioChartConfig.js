@@ -41,3 +41,14 @@ export const taxaRefugoUsuarioConfig = {
 export const producaoMediaUsuarioConfig = {
   media: { label: "Peças por operador:", color: "var(--chart-primary)" },
 };
+
+export const usuariosPorPerfilConfig = {
+  gestores: { 
+    label: "Gestores", 
+    color: "var(--chart-accent)" 
+  },
+  operadores: { 
+    label: "Operadores", 
+    color: "var(--chart-primary)" 
+  },
+};

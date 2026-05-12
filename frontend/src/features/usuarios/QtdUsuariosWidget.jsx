@@ -1,8 +1,8 @@
 "use client";
 
-import { KPI } from "@/components/ui/charts/components/KPI";
+import { DonutChart } from "@/components/ui/charts/components";
 import { useQtdUsuariosPorPerfil } from "./hooks/useQtdUsuariosPorPerfil";
-
+import {usuariosPorPerfilConfig} from "./config/usuarioChartConfig";
 export function QtdUsuariosWidget() {
   const { data, loading, error } = useQtdUsuariosPorPerfil();
 
@@ -15,7 +15,19 @@ export function QtdUsuariosWidget() {
 
   return (
     <div className="h-full">
-      <KPI title="Quantidade de operadores" value={operadores} />
+      <p className="text-sm font-semibold text-black">
+        Quantidade de usuários por perfil
+      </p>
+      <p className="text-xs text-gray-400 font-semibold mt-1">
+        *Atualizado em tempo real
+      </p>
+      <DonutChart
+        data={data}
+        nameKey="name"
+        dataKey="value"
+        config={usuariosPorPerfilConfig}
+        chartSize="donutDefault"
+      />
     </div>
   );
 }

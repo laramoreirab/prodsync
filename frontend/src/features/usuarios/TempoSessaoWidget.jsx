@@ -1,4 +1,3 @@
-// Componente customizado — não há um base genérico 
 "use client";
 import { useTempoSessao } from "./hooks/useTempoSessao";
 
