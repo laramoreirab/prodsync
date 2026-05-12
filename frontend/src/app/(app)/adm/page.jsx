@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react';
-import Header from "@/components/ui/topbar";
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";

@@ -8,7 +8,7 @@ export const qtdUsuariosSetorConfig = {
 };
 
 export const topOperadoresConfig = {
-  media: { label: "Peças Produzidas:", color: "var(--chart-vivid)" },
+  media: { label: "Peças Produzidas:", color: "var(--chart-primary)" },
 };
 
 export const tempoSessaoConfig = {
