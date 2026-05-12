@@ -121,7 +121,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
           <div className="flex items-center gap-2">
             {/* Botão de edição em lote — só aparece se onEditSelected foi passado */}
-            {editarLote && (
+            {/* {editarLote && (
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="h-8 bg-primary text-white">
@@ -131,7 +131,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                 </DialogTrigger>
                 {editarLote}
               </Dialog>
-            )}
+            )} */}
 
             {solicitarJustificativa && (
               <Dialog>
@@ -149,7 +149,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
             {excluirLote && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="h-8 bg-vermelho-vivido text-white">
+                  <Button className="h-8 bg-vermelho-vivido text-white cursor-pointer">
                     <Trash2 className="mr-1 h-4 w-4" />
                     Excluir
                   </Button>
@@ -173,6 +173,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                     checked={table.getIsAllPageRowsSelected()}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Selecionar todos"
+                    className="cursor-pointer"
                   />
                 </TableHead>
               )}
@@ -204,6 +205,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                       checked={row.getIsSelected()}
                       onCheckedChange={(value) => row.toggleSelected(!!value)}
                       aria-label="Selecionar linha"
+                      className="cursor-pointer"
                     />
                   </TableCell>
                 )}

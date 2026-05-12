@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api";
 import {
   SetorArraySchema,
   SetorKPISchema,
@@ -18,7 +18,7 @@ import {
   ProducaoPorHoraArraySchema,
 } from "@features/producao/schemas/producaoSchema";
 import {
-  mockSetores,
+  mockUSE_MOCK,
   mockSetorTotalKPI,
   mockOperadoresMediaKPI,
   mockOEEPorSetor,

@@ -30,19 +30,20 @@ model Empresas {
 }
 
 model Usuarios {
-  id_usuario      Int              @id
-  id_empresa      Int
-  nome            String           @db.VarChar(255)
-  tipo            TipoUsuario
-  cpf             String           @unique @db.VarChar(14)
-  email           String           @unique @db.VarChar(255)
-  senha           String           @db.VarChar(255)
-  imagem_perfil   String?          @db.VarChar(255)
-  apontamentos    Apontamento[]
-  escalas         EscalaTrabalho[]
-  logs            Logs[]
-  setores_geridos Setor_Gestor[]
-  empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  id_usuario        Int              @id
+  id_empresa        Int
+  nome              String           @db.VarChar(255)
+  tipo              TipoUsuario
+  cpf               String           @unique @db.VarChar(14)
+  email             String           @unique @db.VarChar(255)
+  senha             String           @db.VarChar(255)
+  imagem_perfil     String?          @db.VarChar(255)
+  apontamentos      Apontamento[]
+  escalas           EscalaTrabalho[]
+  logs              Logs[]
+  maquinas_operadas Maquinas[]
+  setores_geridos   Setor_Gestor[]
+  empresa           Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
 }
 
 model Setores {
@@ -54,16 +55,16 @@ model Setores {
   maquinas        Maquinas[]
   gestores        Setor_Gestor[]
   empresa         Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  turnos          Turno[]
   ordens_producao OrdemProducao[]  @relation("OrdemProducaoToSetores")
 }
 
 model Categoria_Maquina {
-  id_categoria Int        @id @default(autoincrement())
+  id_categoria Int      @id @default(autoincrement())
   id_empresa   Int
-  nome         String     @db.VarChar(100)
+  nome         String   @db.VarChar(100)
   descricao    String?
-  empresa      Empresas   @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  maquinas     Maquinas[]
+  empresa      Empresas @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
 }
 
 model Maquinas {
@@ -73,14 +74,19 @@ model Maquinas {
   serie             String?             @unique @db.VarChar(50)
   status_atual      StatusMaquina       @default(Parada)
   id_setor          Int?
-  id_categoria      Int
   data_ativacao     DateTime?           @db.Date
   ativo             Boolean             @default(true)
+  capacidade        String?             @db.VarChar(100)
+  data_aquisicao    DateTime?           @db.Date
+  id_operador       Int?
+  imagem            String?             @db.VarChar(255)
+  categoria         String?             @db.VarChar(100)
+  status            String?             @db.VarChar(50)
   apontamentos      Apontamento[]
   escala_trabalho   EscalaTrabalho[]
   historico_eventos Historico_Eventos[]
-  categoria         Categoria_Maquina   @relation(fields: [id_categoria], references: [id_categoria])
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  operador          Usuarios?           @relation(fields: [id_operador], references: [id_usuario])
   setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
   ordens_producao   OrdemProducao[]
 }
@@ -103,10 +109,12 @@ model Turno {
   hora_inicio       DateTime            @db.Time(6)
   hora_fim          DateTime            @db.Time(6)
   dia_semana        DiaSemana
+  id_setor          Int?
   apontamentos      Apontamento[]
   escalas           EscalaTrabalho[]
   historico_eventos Historico_Eventos[]
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  setor             Setores?            @relation(fields: [id_setor], references: [id_setor], onDelete: Cascade)
 }
 
 model EscalaTrabalho {
@@ -240,7 +248,7 @@ enum DiaSemana {
   Sabado
 }
 
-enum StatusOP{
+enum StatusOP {
   Parada
   Em_Andamento @map("Em Andamento")
   Setup

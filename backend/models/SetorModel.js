@@ -228,6 +228,85 @@ class SetorModel {
         }
     }
 
+    // Associa operadores a um setor atualizando suas escalas de trabalho
+    static async associarOperadores(id_setor, ids_operadores, id_empresa) {
+        try {
+            const setor = await prisma.setores.findFirst({
+                where: { id_setor, id_empresa }
+            });
+
+            if (!setor) {
+                throw new Error('Setor não encontrado ou não pertence à empresa');
+            }
+
+            // Atualiza o id_setor em todas as escalas de trabalho dos operadores selecionados
+            const resultado = await prisma.escalaTrabalho.updateMany({
+                where: {
+                    id_operador: { in: ids_operadores },
+                    id_empresa: id_empresa
+                },
+                data: {
+                    id_setor: id_setor
+                }
+            });
+
+            return resultado;
+        } catch (error) {
+            console.error('Erro ao associar operadores ao setor:', error);
+            throw error;
+        }
+    }
+
+    // Remove a associação de um operador com um setor deletando sua escala correspondente
+    static async removerOperador(id_setor, id_operador, id_empresa) {
+        try {
+            // Como id_setor é obrigatório na EscalaTrabalho, remover o operador do setor implica em remover sua escala de trabalho vinculada a este setor.
+            return await prisma.escalaTrabalho.deleteMany({
+                where: {
+                    id_setor,
+                    id_operador,
+                    id_empresa
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao remover operador do setor:', error);
+            throw error;
+        }
+    }
+
+    // Lista operadores de um setor via EscalaTrabalho
+    static async listarOperadoresDoSetor(id_setor, id_empresa) {
+        try {
+            const escalas = await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_setor,
+                    id_empresa
+                },
+                include: {
+                    operador: {
+                        select: { id_usuario: true, nome: true, email: true, tipo: true }
+                    }
+                }
+            });
+            
+            // Retornar apenas os operadores únicos
+            const operadoresUnicos = [];
+            const idsVistos = new Set();
+            
+            for (const escala of escalas) {
+                if (!idsVistos.has(escala.id_operador)) {
+                    operadoresUnicos.push(escala.operador);
+                    idsVistos.add(escala.id_operador);
+                }
+            }
+            
+            return operadoresUnicos;
+        } catch (error) {
+            console.error('Erro ao listar operadores do setor:', error);
+            throw error;
+        }
+    }
+
     // Lista setores de um gestor
     static async listarSetoresDoGestor(id_gestor, id_empresa) {
         try {
@@ -297,7 +376,7 @@ class SetorModel {
     static async obterProducaoPorSetor(id_empresa) {
         try {
             const limites = await this.obterLimitesDiaIndustrial(id_empresa);
-
+            
             const agora = new Date();
             let inicioBusca = new Date(agora);
 
@@ -317,7 +396,7 @@ class SetorModel {
                     id_setor: true,
                     nome_setor: true,
                     ordens_producao: {
-                        where: { status_op: 'Em Andamento' },
+                        where: { status_op: "Em_Andamento" },
                         select: {
                             qtd_planejada: true,
                             apontamentos: {
@@ -344,18 +423,18 @@ class SetorModel {
                     totalProduzido += produzidoNaOP;
                 });
 
-                let porcentagem = 0;
-                if (totalPlanejado > 0) {
-                    porcentagem = (totalProduzido / totalPlanejado) * 100;
-                }
+                // let porcentagem = 0;
+                // if (totalPlanejado > 0) {
+                //     porcentagem = (totalProduzido / totalPlanejado) * 100;
+                // }
 
                 return {
                     setor: setor.nome_setor,
-                    porcentagem: Number(Math.min(porcentagem, 100).toFixed(1))
+                    qtd: totalProduzido
                 };
             });
 
-            return resultado.sort((a, b) => b.porcentagem - a.porcentagem);
+            return resultado
 
         } catch (error) {
             console.error('Erro ao calcular produção por setor:', error);
@@ -376,7 +455,7 @@ class SetorModel {
             });
 
             return setores.map(setor => ({
-                id_setor: setor.id_setor,
+                // id_setor: setor.id_setor,
                 setor: setor.nome_setor,
                 qtd: setor.maquinas.length
             })).sort((a, b) => b.qtd - a.qtd);
@@ -420,11 +499,11 @@ class SetorModel {
             const setoresPorId = new Map(setores.map(setor => [setor.id_setor, setor.nome_setor]));
 
             return paradas.map(parada => ({
-                id_setor: parada.setor_afetado,
+                // id_setor: parada.setor_afetado,
                 setor: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
                 minutos: Number((parada._avg.duracao ?? 0).toFixed(1)),
-                tempo_total_minutos: parada._sum.duracao ?? 0,
-                total_eventos: parada._count.id_evento
+                // tempo_total_minutos: parada._sum.duracao ?? 0,
+                // total_eventos: parada._count.id_evento
             })).sort((a, b) => b.minutos - a.minutos);
         } catch (error) {
             console.error('Erro ao obter tempo medio de parada por setor:', error);
@@ -478,12 +557,12 @@ class SetorModel {
                 const defeito = total > 0 ? Number(((setor.defeitos / total) * 100).toFixed(1)) : 0;
 
                 return {
-                    id_setor: setor.id_setor,
+                    // id_setor: setor.id_setor,
                     setor: setor.setor,
                     produzidas,
                     defeito,
-                    total_produzido: total,
-                    total_refugo: setor.defeitos
+                    // total_produzido: total,
+                    // total_refugo: setor.defeitos
                 };
             }).sort((a, b) => b.total_refugo - a.total_refugo);
         } catch (error) {

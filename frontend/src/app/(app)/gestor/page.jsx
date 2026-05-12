@@ -29,12 +29,12 @@ export default function DashboardGeralGestor() {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-8 pb-10">
-      <header className="mb-4">
-        <h1 className="inline-block border-b-4 border-secondary-foreground pb-2 text-4xl font-semibold text-black">
+    <div className="mx-auto flex w-full flex-col gap-4 pb-10">
+      <div className="mb-2 flex justify-start">
+        <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
           Dashboard Geral do Setor
         </h1>
-      </header>
+        </div>
 
       <section className="w-full bg-white border rounded-xl p-6 shadow-sm">
         <SetorProducaoDiariaWidget setorId={setorId} />

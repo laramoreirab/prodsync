@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 
-import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon } from "lucide-react";
+import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, Loader2 } from "lucide-react";
 import FilterDropdown from "@/components/ui/filterDropdown";
 import OrdenarDropdown from "@/components/ui/ordenarDropdown";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import {
   Dialog,
@@ -16,8 +16,6 @@ import {
 import FormCadastroMaquina from "@/components/ui/forms/maquinas/formCadastroMaquina";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
-import { useEffect } from 'react';
-import { Loader2 } from "lucide-react";
 //Widget imports - Dashboard
 import { MaquinaStatusDonutWidget } from "@/features/maquinas/MaquinaStatusDonutWidget";
 import { MaquinasPorSetorWidget } from "@/features/maquinas/MaquinasPorSetorWidget";
@@ -25,12 +23,11 @@ import { TempoMedioParadaWidget } from "@/features/maquinas/TempoMedioParadaWidg
 import { ProducaoDefeitosWidget } from "@/features/maquinas/ProducaoDefeitosWidget";
 import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidget";
 import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
-
-
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DataUltimaParada } from "@/components/ui/dataUltimaParada";
 
 
 
@@ -41,7 +38,7 @@ const maquinasFilter = [
 ];
 
 const colunasMaquinas = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
+  { id: 'id_maquina', key: 'id_maquina', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'nome', key: 'nome', label: 'Nome' },
   { id: 'setor', key: 'id_setor', label: 'Setor' },
   {
@@ -51,18 +48,9 @@ const colunasMaquinas = [
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
-        },
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
+        "Produzindo": { variant: "produzindo" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -75,28 +63,14 @@ const colunasMaquinas = [
   },
   {
     id: 'ultimaParada', key: 'ultimaParada', label: 'Última parada',
-    icone: (valor) => {
-      const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
-        },
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
-      };
+    icone: (valor, row) => {
+      const eventos = row.historico_eventos;
 
-      const estilo = config[valor] || { variant: "outline", className: "" };
-      return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
-          {valor}
-        </Badge>
-      )
+      const ultimaParada = (eventos && eventos.length > 0)
+        ? eventos[0].termino
+        : null;
+
+      return <DataUltimaParada ultimaParada={ultimaParada} />;
     }
   },
 ];
@@ -110,6 +84,7 @@ export default function Maquinas() {
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(maquinas);
+    console.log(maquinas)
   }, [maquinas]);
 
   //lógica de ordenação
@@ -117,9 +92,9 @@ export default function Maquinas() {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'nome') return a.nome.localeCompare(b.nomeMaquina);
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'nome') return a.nome.localeCompare(b.nome);
+      if (criterio === 'id_asc') return a.id_maquina - b.id_maquina;
+      if (criterio === 'id_desc') return b.id_maquina - a.id_maquina;
       if (criterio === 'setor') return a.id_setor.localeCompare(b.id_setor);
       return 0;
     });
@@ -172,14 +147,9 @@ export default function Maquinas() {
     const termo = busca.toLowerCase();
     return (
       maq.nome.toLowerCase().includes(termo) ||
-      maq.id.toString().includes(termo)
+      maq.id_maquina.toString().includes(termo)
     );
   });
-
-  //ações da tabela
-  const abrirModalExclusao = (maquina) => {
-    setMaquinaSelecionada(maquina);
-  };
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
@@ -318,7 +288,7 @@ export default function Maquinas() {
                 <>
 
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`maquinas/${maquina.id}`}>
+                    <Link href={`maquinas/${maquina.id_maquina}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver Detalhes
                     </Link>
@@ -332,7 +302,7 @@ export default function Maquinas() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormEdicaoMaquina />
+                      <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
@@ -344,7 +314,10 @@ export default function Maquinas() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoMaquina />
+                      <FormExclusaoMaquina
+                        maquinaId={maquina.id_maquina}
+                        onExcluir={excluirMaquina}
+                      />
                     </DialogContent>
                   </Dialog>
 

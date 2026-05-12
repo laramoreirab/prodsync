@@ -159,6 +159,7 @@ class EventoController {
             const id_motivo_parada = Number(req.body.id_motivo_parada);
             const { observacao } = req.body;
 
+            
             if (!Number.isInteger(id_evento) || id_evento <= 0) {
                 return res.status(400).json({ sucesso: false, erro: 'ID do evento invalido' });
             }

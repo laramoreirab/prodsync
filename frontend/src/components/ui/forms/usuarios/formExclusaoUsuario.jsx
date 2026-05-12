@@ -1,13 +1,32 @@
-import { useState, useRef } from 'react';
-import { Trash2, TriangleAlert } from "lucide-react";
+import { useState } from 'react';
+import { Trash2, TriangleAlert, Loader2 } from "lucide-react";
 import {
     DialogTitle,
     DialogClose
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { usuariosCrudService } from '@/services/usuariosCrudService';
 
-export default function FormExclusaoUsuario() {
+export default function FormExclusaoUsuario({ usuarioId, onExclusaoSucesso }) {
+    const [carregando, setCarregando] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setCarregando(true);
+
+        try {
+            await usuariosCrudService.delete(usuarioId);
+            toast.success("Usuário excluído com sucesso!");
+            if (onExclusaoSucesso) onExclusaoSucesso();
+        } catch (error) {
+            console.error("Erro ao excluir usuário:", error);
+            toast.error("Erro ao excluir o usuário.");
+        } finally {
+            setCarregando(false);
+        }
+    };
+
     return (
         <>
             <div className="title_modal flex items-center">
@@ -19,10 +38,10 @@ export default function FormExclusaoUsuario() {
                 </div>
             </div>
             <Separator className="my-2" />
-            <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className='w-full flex flex-col items-center justify-center gap-3'>
-                    <TriangleAlert className='text-[var(--chart-primary)] w-30 h-30' />
-                    <h2 className='font-bold text-2xl text-center '>
+                    <TriangleAlert className='text-[#00357a] w-30 h-30' />
+                    <h2 className='font-bold text-2xl text-center'>
                         Você tem certeza que deseja <br />excluir este usuário?
                     </h2>
                     <p className='text-center font-medium text-[var(--text-soft)]'>
@@ -30,27 +49,26 @@ export default function FormExclusaoUsuario() {
                     </p>
                 </div>
 
-
                 <div className="flex justify-end gap-2">
                     <DialogClose asChild>
                         <button
                             type="button"
-                            className='border py-3 px-4 rounded-lg outline-none text-base font-bold text-[var(--text-soft)] hover:bg-gray-50 disabled:opacity-50'
+                            disabled={carregando}
+                            className='border py-3 px-4 rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
                         >
                             Cancelar
                         </button>
                     </DialogClose>
                     <button
                         type="submit"
-
-                        className='py-3 px-5 bg-[var(--vermelho-vivido)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
+                        disabled={carregando}
+                        className='py-3 px-5 bg-[#b30000] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
                     >
+                        {carregando && <Loader2 className="w-4 h-4 animate-spin" />}
                         Excluir
                     </button>
                 </div>
-
             </form>
-
         </>
     )
 }

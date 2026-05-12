@@ -180,7 +180,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
                           type="checkbox"
                           checked={(filterValues[filter.id] || []).includes(opt)}
                           onChange={() => handleCheckbox(filter.id, opt)}
-                          className="w-4 h-4 rounded border-gray-300 text-secondary-foreground cursor-pointer"
+                          className="w-4 h-4 rounded accent-blue-900 border-gray-300 text-secondary-foreground cursor-pointer"
                         />
                         <span className="text-sm text-gray-700">{opt}</span>
                       </label>
@@ -255,7 +255,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
 
           {/*área das tags */}
           {activeTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-300">
+            <div className="flex flex-wrap gap-2 pt-3">
               {activeTags.map((tag) => (
                 <span key={tag.key} className="flex items-center gap-1 bg-[var(--tag-bg)] text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
                   {tag.label} <X size={12} className="cursor-pointer hover:text-red-500" onClick={tag.onRemove} />

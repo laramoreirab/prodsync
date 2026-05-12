@@ -4,28 +4,27 @@ import {
     DialogTrigger,
     DialogContent,
     DialogTitle,
-    DialogClose,
 } from "@/components/ui/dialog";
 import { Plus, Info, File, Upload, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
+import { usuariosCrudService } from '@/services/usuariosCrudService';
 
-export default function FormCadastroUsuario() {
+export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const [arquivoLote, setArquivoLote] = useState(null);
     const fileInputLoteRef = useRef(null);
     const fileInputFotoRef = useRef(null);
 
-
     const estadoInicialForm = {
-        nomeUser: "",
-        cpfUser: "",
-        emailUser: "",
-        setorUser: "",
-        funcaoUser: "",
-        turnoUser: "",
-        maquinaUser: ""
+        nome: "",
+        cpf: "",
+        email: "",
+        id_setor: "",   // número — backend: id_setor
+        funcao: "",
+        id_turno: "",   // número — backend: id_turno
+        id_maquina: ""  // número — backend: id_maquina
     };
 
     const [formData, setFormData] = useState(estadoInicialForm);
@@ -61,9 +60,30 @@ export default function FormCadastroUsuario() {
 
     const handleSubmitIndividual = async (e) => {
         e.preventDefault();
+
         const payload = new FormData();
-        Object.keys(formData).forEach(key => payload.append(key, formData[key]));
+        //formData.append('campo', value)
+        payload.append('nome', formData.nome);
+        payload.append('cpf', formData.cpf);
+        payload.append('email', formData.email);
+        payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
+        payload.append('funcao', formData.funcao);
+        payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
+        payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
+
         if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+
+        try {
+            await usuariosCrudService.create(payload);
+            toast.success("Usuário criado com sucesso!");
+            //limpar formulário após sucesso
+            setFormData(estadoInicialForm);
+            setFotoPerfil(null);
+            if (onCadastroSucesso) onCadastroSucesso();
+        } catch (error) {
+            console.error("Erro ao criar usuário:", error);
+            toast.error("Erro ao criar usuário.");
+        }
     };
 
     const handleSubmitLote = async (e) => {
@@ -72,6 +92,8 @@ export default function FormCadastroUsuario() {
 
         const payloadLote = new FormData();
         payloadLote.append("file", arquivoLote.raw);
+
+        //integrar endpoint de cadastro em lote quando o backend disponibilizar
     };
 
     const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
@@ -136,8 +158,8 @@ export default function FormCadastroUsuario() {
                                 </div>
 
                                 <div className="flex items-center">
-                                    <Info className="text-[var(--text-soft)] mr-2" />
-                                    <p className="text-[var(--text-soft)]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas. </p>
+                                    <Info className="text-[#7c7c81] mr-2" />
+                                    <p className="text-[#7c7c81]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas.</p>
                                 </div>
 
                                 <div className="flex justify-center mt-4">
@@ -186,47 +208,43 @@ export default function FormCadastroUsuario() {
 
                 <div className="space-y-5">
                     <div>
-                        <label className={labelStyle}>Nome</label>
+                        <label htmlFor="nome" className={labelStyle}>Nome</label>
                         <input
-                            id="nomeUser"
-
+                            id="nome"
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
                             required />
                     </div>
                     <div>
-                        <label className={labelStyle}>CPF</label>
+                        <label htmlFor="cpf" className={labelStyle}>CPF</label>
                         <input
-                            id="cpfUser"
+                            id="cpf"
                             onChange={handleInputChange}
-                            type="text" className={inputStyle}
+                            type="text"
+                            className={inputStyle}
                             required />
                     </div>
                     <div>
-                        <label className={labelStyle}>E-mail</label>
+                        <label htmlFor="email" className={labelStyle}>E-mail</label>
                         <input
-                            id="emailUser"
-
+                            id="email"
                             onChange={handleInputChange}
                             type="email"
                             className={inputStyle}
                             required />
                     </div>
-
-                    {/* Select personalizado com ícone */}
                     <div className="relative">
-                        <label className={labelStyle}>Setor</label>
+                        <label htmlFor="id_setor" className={labelStyle}>Setor</label>
                         <select
-                            id="setorUser"
-
+                            id="id_setor"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="Roscas">Roscas</option>
-                            <option value="Brocas">Brocas</option>
+                            <option value="1">Roscas</option>
+                            <option value="2">Brocas</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -234,11 +252,10 @@ export default function FormCadastroUsuario() {
 
                 <div className="grid grid-cols-2 gap-5">
                     <div className="relative">
-                        <label className={labelStyle}>Função</label>
+                        <label htmlFor="funcao" className={labelStyle}>Função</label>
                         <select
-                            id="funcaoUser"
+                            id="funcao"
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
-
                             onChange={handleInputChange}
                             required
                         >
@@ -249,47 +266,42 @@ export default function FormCadastroUsuario() {
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                     <div className="relative">
-                        <label className={labelStyle}>Turno</label>
+                        <label htmlFor="id_turno" className={labelStyle}>Turno</label>
                         <select
-                            id="turnoUser"
-
+                            id="id_turno"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="Manhã">Manhã</option>
-                            <option value="Tarde">Tarde</option>
-                            <option value="Noite">Noite</option>
+                            <option value="1">Manhã</option>
+                            <option value="2">Tarde</option>
+                            <option value="3">Noite</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
-                {/* Máquina a Gerenciar só aparece se função = operador */}
-                {formData.funcaoUser === "Operador" && (
+                {/* máquina a gerenciar só aparece se função = operador */}
+                {formData.funcao === "Operador" && (
                     <div className="relative pt-1">
-                        <label className={labelStyle}>Máquina a Gerenciar</label>
+                        <label htmlFor="id_maquina" className={labelStyle}>Máquina a Gerenciar</label>
                         <select
-                            id="maquinaUser"
-
+                            id="id_maquina"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="M1">Máquina 1</option>
-                            <option value="M2">Máquina 2</option>
+                            <option value="1">Máquina 1</option>
+                            <option value="2">Máquina 2</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}
 
                 <div className="flex justify-center mt-4">
-                    <button
-                        type="submit"
-                        className="bg-[var(--button-primary)] text-xl text-white font-semibold py-3 px-10 rounded-lg"
-                    >
+                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
                         Criar
                     </button>
                 </div>

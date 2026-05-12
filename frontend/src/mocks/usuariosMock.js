@@ -1,4 +1,4 @@
-// remover este arquivo e o USE_MOCK do service quando o backend estiver pronto
+// Remova este arquivo e o USE_MOCK do service quando o backend estiver pronto
 
 export let usuariosMock = [
   {

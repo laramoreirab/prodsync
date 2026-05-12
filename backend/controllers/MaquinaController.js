@@ -1,4 +1,5 @@
 import MaquinaModel from '../models/MaquinaModel.js';
+import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 
 class MaquinaController {
     static obterIdMaquina(req, res) {
@@ -72,28 +73,31 @@ class MaquinaController {
     // POST /maquinas - Criar nova máquina
     static async criarMaquina(req, res) {
         try {
-            const { id_setor, id_categoria, nome, serie } = req.body;
+            const { id_setor, categoria, nome, serie, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
             const erros = [];
 
-            // Validações originais mantidas...
-            if (!id_setor || isNaN(id_setor)) erros.push({ campo: 'id_setor', mensagem: 'Inválido' });
-            if (!id_categoria || isNaN(id_categoria)) erros.push({ campo: 'id_categoria', mensagem: 'Inválido' });
+            if (!categoria || categoria.trim().length < 2) erros.push({ campo: 'categoria', mensagem: 'Deve ter pelo menos 2 caracteres' });
             if (!nome || nome.trim().length < 2) erros.push({ campo: 'nome', mensagem: 'Deve ter pelo menos 2 caracteres' });
 
             if (erros.length > 0) {
+                // Se deu erro, remover imagem que o multer salvou
+                if (req.file) removerArquivoAntigo(req.file.filename);
                 return res.status(400).json({ sucesso: false, erro: 'Dados inválidos', detalhes: erros });
             }
 
-            // Parâmetros ajustados para bater com o Model
+            const imagem = req.file ? `/uploads/imagens/${req.file.filename}` : null;
+
             const maquina = await MaquinaModel.criarMaquina(
-                id_empresa, parseInt(id_setor), parseInt(id_categoria), nome.trim(), serie?.trim()
+                id_empresa, id_setor, categoria, nome.trim(), serie?.trim(), 
+                capacidade?.trim(), (status_atual || status)?.trim(), data_aquisicao, id_operador, imagem
             );
 
             res.status(201).json({ sucesso: true, mensagem: 'Máquina criada com sucesso!', dados: maquina });
 
         } catch (error) {
             console.error('Erro ao criar máquina:', error);
+            if (req.file) removerArquivoAntigo(req.file.filename);
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
@@ -102,22 +106,43 @@ class MaquinaController {
     static async atualizarMaquina(req, res) {
         try {
             const { id } = req.params;
-            const { nome, serie } = req.body;
+            const { nome, serie, id_setor, id_categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
 
             if (!id || isNaN(id)) return res.status(400).json({ sucesso: false, erro: 'ID inválido' });
 
             const maquinaExistente = await MaquinaModel.buscarMaquinaPorID(parseInt(id), id_empresa);
-            if (!maquinaExistente) return res.status(404).json({ sucesso: false, erro: 'Máquina não encontrada' });
+            if (!maquinaExistente) {
+                if (req.file) removerArquivoAntigo(req.file.filename);
+                return res.status(404).json({ sucesso: false, erro: 'Máquina não encontrada' });
+            }
 
-            if (!nome && !serie) return res.status(400).json({ sucesso: false, erro: 'Nenhum dado para atualizar' });
+            const dadosUpdate = {
+                nome: nome?.trim(),
+                serie: serie?.trim(),
+                id_setor,
+                id_categoria,
+                capacidade: capacidade?.trim(),
+                status: (status_atual || status)?.trim(),
+                data_aquisicao,
+                id_operador
+            };
 
-            await MaquinaModel.atualizarDados(parseInt(id), id_empresa, nome?.trim(), serie?.trim());
+            if (req.file) {
+                dadosUpdate.imagem = `/uploads/imagens/${req.file.filename}`;
+                // Remover imagem antiga se existir
+                if (maquinaExistente.imagem) {
+                    removerArquivoAntigo(maquinaExistente.imagem);
+                }
+            }
+
+            await MaquinaModel.atualizarDados(parseInt(id), id_empresa, dadosUpdate);
 
             res.status(200).json({ sucesso: true, mensagem: 'Máquina atualizada com sucesso!' });
 
         } catch (error) {
             console.error('Erro ao atualizar máquina:', error);
+            if (req.file) removerArquivoAntigo(req.file.filename);
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }

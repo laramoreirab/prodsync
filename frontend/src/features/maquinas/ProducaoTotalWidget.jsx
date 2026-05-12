@@ -27,22 +27,30 @@ export function ProducaoTotalWidget({ setorId }) {
           <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
-          {PERIODOS.map(({ label, key }) => (
+          {PERIODOS.map(({ label, dias }) => (
             <button
-              key={key}
-              onClick={() => setPeriodoKey(key)}
-              className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
-                periodoKey === key
+              key={dias}
+              onClick={() => setDiasSelecionados(dias)}
+              className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${diasSelecionados === dias
                   ? "bg-[var(--secondary-foreground)] text-white shadow-sm"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
+                }`}
             >
               {label}
             </button>
           ))}
         </div>
       </div>
+<<<<<<< HEAD
       <AreaChartBase data={data} xKey="data" yKey="total" config={producaoTotalConfig} />
+=======
+      <AreaChartBase
+        data={dadosGrafico}
+        xKey="data"
+        yKey="total"
+        config={producaoTotalConfig}
+      />
+>>>>>>> origin/front_giovana
     </div>
   );
 }

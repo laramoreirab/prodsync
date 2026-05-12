@@ -77,8 +77,8 @@ class DashboardModel {
             });
 
             return Object.entries(tendencia).map(([data, quantidade]) => ({
-                data,
-                refugos: quantidade
+                dia: data,
+                qtd: quantidade
             }));
         }
         catch (error) {
@@ -87,44 +87,119 @@ class DashboardModel {
         }
     }
 
-    // Média de paradas por dia e peças por minuto
-    static async buscarParadasEPPM(id_empresa) {
+    // Média de paradas por dia
+    static async mediaParadasPorDia(id_empresa) {
         try {
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
 
-            const [paradasHoje, producaoHoje] = await Promise.all([
-                prisma.historico_Eventos.count({
-                    where: {
-                        id_empresa: Number(id_empresa),
-                        status_atual: 'Parada',
-                        inicio: { gte: hoje }
-                    }
-                }),
-                prisma.apontamento.aggregate({
-                    where: {
-                        id_empresa: Number(id_empresa),
-                        data_hora_inicio: { gte: hoje }
+            const amanha = new Date(hoje);
+            amanha.setDate(amanha.getDate() + 1);
+
+            const dadosParadas = await prisma.historico_Eventos.aggregate({
+                where: {
+                    id_empresa: Number(id_empresa),
+
+                    id_motivo_parada: {
+                        not: null
                     },
-                    _sum: { qtd_boa: true }
-                })
-            ]);
+                    OR: [
+                        {
+                            inicio: {
+                                gte: hoje,
+                                lt: amanha
+                            }
+                        },
+                        {
+                            termino: {
+                                gte: hoje,
+                                lt: amanha
+                            }
+                        }
+                    ]
+                },
 
-            const totalPecasHoje = producaoHoje._sum.qtd_boa || 0;
+                _sum: {
+                    duracao: true
+                },
 
-            const agora = new Date();
-            const minutosPassados = Math.max(1, (agora.getTime() - hoje.getTime()) / 1000 / 60);
+                _count: {
+                    id_evento: true
+                }
+            });
 
-            const pecasPorMinuto = totalPecasHoje / minutosPassados;
+            const totalDuracao = dadosParadas._sum.duracao || 0;
+
+            const quantidadeParadas =
+                dadosParadas._count.id_evento || 1;
+
+            const mediaDuracao =
+                totalDuracao / quantidadeParadas;
 
             return {
-                media_paradas_dia: paradasHoje,
-                pecas_por_minuto: Math.round(pecasPorMinuto)
+                titulo: 'Média de Paradas por Dia',
+                valor: `${(mediaDuracao / 60).toFixed(1)}h`
             };
+
+        } catch (error) {
+            console.error('Erro ao buscar média de paradas:', error);
+            throw new Error('Erro ao buscar média de paradas');
         }
-        catch (error) {
-            console.error('Erro ao buscar paradas e EPPM:', error);
-            throw new Error('Erro ao buscar paradas e EPPM');
+    }
+
+    // Top 3 motivos de parada mais frequentes na fábrica
+    static async top3MotivosParadaGeral(id_empresa) {
+        try {
+            // 1. Agrupa os eventos pelo ID do motivo e conta as ocorrências
+            const motivosAgrupados = await prisma.historico_Eventos.groupBy({
+                by: ['id_motivo_parada'],
+                where: {
+                    id_empresa,
+                    id_motivo_parada: { not: null }, // Garante que apenas eventos com motivo entrem
+                    status_atual: { in: ['Parada', 'Setup'] } // Foca nos estados de interesse
+                },
+                _count: {
+                    id_motivo_parada: true
+                },
+                orderBy: {
+                    _count: {
+                        id_motivo_parada: 'desc' // Ordena pelos mais frequentes
+                    }
+                },
+                take: 3 // Pega apenas os 3 primeiros
+            });
+
+            if (motivosAgrupados.length === 0) {
+                return Array(3).fill({
+                    motivo: "Sem dados",
+                    qtd: 0
+                });
+            }
+
+            // 2. Busca as descrições dos motivos encontrados
+            const idsMotivos = motivosAgrupados.map(m => m.id_motivo_parada);
+            const motivosInfo = await prisma.motivos_parada.findMany({
+                where: {
+                    id_empresa,
+                    id_motivo: { in: idsMotivos }
+                },
+                select: {
+                    id_motivo: true,
+                    descricao: true
+                }
+            });
+
+            // 3. Cria um mapa para busca rápida da descrição pelo ID
+            const motivosMap = new Map(motivosInfo.map(m => [m.id_motivo, m.descricao]));
+
+            // 4. Formata o retorno final
+            return motivosAgrupados.map(item => ({
+                motivo: motivosMap.get(item.id_motivo_parada) ?? 'Sem motivo informado',
+                qtd: item._count.id_motivo_parada
+            }));
+        } catch (error) {
+            console.error('Erro ao obter top 3 motivos de parada geral:', error);
+            throw error;
         }
     }
 }

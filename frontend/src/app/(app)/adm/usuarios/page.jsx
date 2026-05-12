@@ -3,19 +3,14 @@
 import { useState, useEffect } from 'react';
 
 import TableListagens from "@/components/table";
-import DataTableWithPaginationDemo from '@/components/shadcn-studio/data-table/data-table-11';
-
-import Header from '@/components/ui/headerHome';
-
 import { useUsuarios } from "@/hooks/useUsuarios";
-import { usuarioService } from "@/services/usuariosCrudService";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert, EyeIcon, Pencil } from "lucide-react";
+import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert, EyeIcon, Pencil, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 import FilterDropdown from "@/components/ui/filterDropdown";
@@ -25,18 +20,11 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenu, DropdownMenuTrigger 
 
 import Link from 'next/link';
 
+//filtros para dropdown de filtros da tabela de usuários
 const usuariosFilter = [
-  { id: "setor", label: "Setor", type: "checkbox", options: ["Brocas", "Roscas"] },
+  { id: "id_setor", label: "Setor", type: "checkbox", options: ["Roscas", "Brocas"] },
   { id: "funcao", label: "Função", type: "checkbox", options: ["Operador", "Gestor"] },
-  { id: "turno", label: "Turno", type: "checkbox", options: ["Manhã", "Tarde", "Noite"] },
-];
-
-//dados dos usuarios
-const dadosOriginais = [
-  { id: 1, nome: 'Ana Silva', setor: 'Roscas', funcao: 'Operador', turno: 'Manhã' },
-  { id: 2, nome: 'Carlos Souza', setor: 'Brocas', funcao: 'Gestor', turno: 'Tarde' },
-  { id: 3, nome: 'Bruno Costa', setor: 'Roscas', funcao: 'Operador', turno: 'Noite' },
-  { id: 4, nome: 'Bia Gonçalves', setor: 'Brocas', funcao: 'Gestor', turno: 'Tarde' }
+  { id: "id_turno", label: "Turno", type: "checkbox", options: ["Manhã", "Tarde", "Noite"] },
 ];
 
 //Widgets dashboard
@@ -51,125 +39,38 @@ import FormCadastroUsuario from '@/components/ui/forms/usuarios/formCadastroUsua
 import FormEdicaoUsuario from '@/components/ui/forms/usuarios/formEdicaoUsuario';
 import FormExclusaoUsuario from '@/components/ui/forms/usuarios/formExclusaoUsuario';
 
+const setorLabel = { "1": "Roscas", "2": "Brocas" };
+const turnoLabel = { "1": "Manhã", "2": "Tarde", "3": "Noite" };
 
+const colunasUsuarios = [
+  { id: 'nome', key: 'nome', label: 'Nome', className: 'w-1/4' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-40' },
+  {
+    id: 'id_setor',
+    key: 'id_setor',
+    label: 'Setor',
+    className: 'w-2/9',
+    icone: (valor) => setorLabel[valor] || valor
+  },
+  { id: 'funcao', key: 'funcao', label: 'Função' },
+  {
+    id: 'id_turno',
+    key: 'id_turno',
+    label: 'Turno',
+    icone: (valor) => turnoLabel[valor] || valor
+  },
+];
 
 export default function Usuarios() {
+  const { usuarios, loading, error, refresh } = useUsuarios();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
 
-  /* API para teste da tabela */
+
+  //sincronizar dados da API com estado local
   useEffect(() => {
-    async function buscarUsuariosFalsos() {
-      try {
-        // 1. Puxando os dados da API de teste
-        const res = await fetch('https://dummyjson.com/users');
-
-        if (!res.ok) throw new Error('Falha ao buscar usuários');
-
-        const json = await res.json();
-
-        // 2. A DummyJSON devolve os usuários dentro de uma propriedade chamada "users"
-        const dadosDaApi = json.users;
-
-        // 3. Vamos "traduzir" os dados em inglês para o formato da sua tabela
-        const usuariosFormatados = dadosDaApi.map((user) => ({
-          id: user.id,
-          nome: `${user.firstName} ${user.lastName}`, // Junta nome e sobrenome
-          setor: user.company.department,             // Usa o departamento da API como "Setor"
-          funcao: user.company.title,                 // Usa o cargo da API como "Função"
-
-          // Como a API não tem "turno", vamos inventar um de forma aleatória só para testar
-          turno: ['Manhã', 'Tarde', 'Noite'][Math.floor(Math.random() * 3)]
-        }));
-
-        // 4. Salva no estado! A tabela vai renderizar 30 usuários reais imediatamente.
-        setDados(usuariosFormatados);
-
-      } catch (error) {
-        console.error("Erro na integração:", error);
-      }
-    }
-
-    buscarUsuariosFalsos();
-  }, []);
-
-
-  /* Fetch da listagem de usuarios OFICIAL
-    useEffect(() => {
-      async function buscarUsuarios() {
-        try {
-          const res = await fetch(''); // Endpoint de usuários exemplo: 'https://localhost:8080/adm/usuarios'
-  
-          if (!res.ok) throw new Error('Falha ao buscar usuários');
-  
-          const json = await res.json();
-  
-          // Lista de Usuarios
-          setDados(json);
-        } catch (error) {
-          console.error("Erro:", error);
-        }
-      }
-  
-      buscarUsuarios();
-    }, []); */
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
-
-  const {
-    formData,
-    fotoPerfil,
-    arquivoLote,
-    usuarioEditandoId,
-    fileInputLoteRef,
-    fileInputFotoRef,
-    handleInputChange,
-    handleFotoChange,
-    handleLoteChange,
-    preencherParaEdicao,
-    limparFormularios,
-  } = useUsuarios();
-
-  // const handleSubmitIndividual = async (e) => {
-  //   e.preventDefault();
-  //   const payload = new FormData();
-  //   Object.keys(formData).forEach(key => payload.append(key, formData[key]));
-  //   if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
-
-  //   try {
-  //     if (usuarioEditandoId) {
-  //       await usuarioService.editar(usuarioEditandoId, payload);
-  //       alert("Usuário atualizado com sucesso!");
-  //     } else {
-  //       await usuarioService.cadastrarIndividual(payload);
-  //       alert("Usuário criado com sucesso!");
-  //     }
-  //     limparFormularios();
-  //     setIsModalOpen(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //     alert("Erro ao salvar.");
-  //   }
-  // };
-
-  // const handleSubmitLote = async (e) => {
-  //   e.preventDefault();
-  //   if (!arquivoLote) return alert("Selecione um arquivo CSV!");
-
-  //   const payloadLote = new FormData();
-  //   payloadLote.append("file", arquivoLote.raw);
-
-  //   try {
-  //     await usuarioService.cadastrarEmLote(payloadLote);
-  //     alert("Lote enviado com sucesso!");
-  //     limparFormularios();
-  //     setIsLoteModalOpen(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //     alert("Erro ao enviar lote.");
-  //   }
-  // };
+    setDados(usuarios || []);
+  }, [usuarios]);
 
   //lógica de ordenação
   const handleSort = (criterio) => {
@@ -179,9 +80,9 @@ export default function Usuarios() {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'turno') return a.turno.localeCompare(b.turno);
+      if (criterio === 'turno') return String(a.id_turno).localeCompare(String(b.id_turno));
       if (criterio === 'funcao') return a.funcao.localeCompare(b.funcao);
-      if (criterio === 'setor') return a.setor.localeCompare(b.setor);
+      if (criterio === 'setor') return String(a.id_setor).localeCompare(String(b.id_setor));
       return 0;
     });
 
@@ -190,26 +91,26 @@ export default function Usuarios() {
 
   //recebendo os filtros do dropdown e atualizando a tabela
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosOriginais];
+    let dadosFiltrados = [...usuarios];
 
-    //filtros para setor
-    if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
+    // setor
+    if (filtrosSelecionados.id_setor?.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(user =>
-        filtrosSelecionados.setor.includes(user.setor)
+        filtrosSelecionados.id_setor.includes(setorLabel[user.id_setor])
       );
     }
 
-    //filtro para funçao do user
-    if (filtrosSelecionados.funcao && filtrosSelecionados.funcao.length > 0) {
+    // função
+    if (filtrosSelecionados.funcao?.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(user =>
         filtrosSelecionados.funcao.includes(user.funcao)
       );
     }
 
-    //filtro para turno
-    if (filtrosSelecionados.turno && filtrosSelecionados.turno.length > 0) {
+    // turno
+    if (filtrosSelecionados.id_turno?.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(user =>
-        filtrosSelecionados.turno.includes(user.turno)
+        filtrosSelecionados.id_turno.includes(turnoLabel[user.id_turno])
       );
     }
 
@@ -225,27 +126,31 @@ export default function Usuarios() {
     { label: 'Setor', value: 'setor' }
   ];
 
-  const colunasUsuarios = [
-    { id: 'nome', key: 'nome', label: 'Nome', className: 'w-1/4' },
-    { id: 'id', key: 'id', label: 'ID', className: 'w-40' },
-    { id: 'setor', key: 'setor', label: 'Setor', className: 'w-2/9' },
-    { id: 'funcao', key: 'funcao', label: 'Função' },
-    { id: 'turno', key: 'turno', label: 'Turno' },
-  ];
-
   //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((user) => {
     const termo = busca.toLowerCase();
+
     return (
-      user.nome.toLowerCase().includes(termo) ||
-      user.id.toString().includes(termo)
+      user.nome?.toLowerCase().includes(termo) ||
+      user.id?.toString().includes(termo)
     );
   });
 
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando usuários...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      
+
       <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <div className="flex justify-between p-8">
@@ -255,7 +160,7 @@ export default function Usuarios() {
             </h1>
           </div>
 
-          {/* Modal de Cadastrar Usuário*/}
+          {/* Modal de Cadastrar Usuário */}
           <Dialog>
             <DialogTrigger
               className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
@@ -265,15 +170,15 @@ export default function Usuarios() {
             </DialogTrigger>
 
             <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
-              <FormCadastroUsuario />
+              <FormCadastroUsuario onCadastroSucesso={refresh} />
             </DialogContent>
           </Dialog>
-
         </div>
 
         {/* Gráficos */}
       </section>
-      {/* SEÇÃO 1: CHarts*/}
+
+      {/* SEÇÃO 1: Charts */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -288,12 +193,11 @@ export default function Usuarios() {
           <div className="border rounded-xl p-4 bg-white">
             <TopOperadoresWidget />
           </div>
-
         </div>
       </section>
 
       {/* SEÇÃO 2: Charts */}
-      <section className=" p-6">
+      <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="border rounded-xl p-6 bg-white">
@@ -303,12 +207,11 @@ export default function Usuarios() {
           <div className="border rounded-xl p-4 bg-white">
             <RotatividadeWidget />
           </div>
-
         </div>
       </section>
 
       {/* SEÇÃO 3: Charts */}
-      <section className=" p-6">
+      <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="border rounded-xl p-4 bg-white">
@@ -318,11 +221,8 @@ export default function Usuarios() {
           <div className="border rounded-xl p-4 bg-white">
             <ProducaoMediaSetorWidget />
           </div>
-
         </div>
       </section>
-
-
 
       {/* Listagem */}
       <section id="listagem_usuarios" className='px-8'>
@@ -345,7 +245,7 @@ export default function Usuarios() {
           </div>
         </div>
 
-        {/* Linha de quantidade total de usuarios e filtrar e ordenar funcional */}
+        {/* Linha de quantidade total de usuários e filtrar e ordenar funcional */}
         <div className="row_ord_fil_cont flex items-center justify-between mt-3">
           <p>{dadosExibidos.length} usuários encontrados</p>
 
@@ -355,7 +255,6 @@ export default function Usuarios() {
               options={opcoesOrdenacao}
               onSortChange={handleSort}
             />
-
             <FilterDropdown
               filtersConfig={usuariosFilter}
               onApply={aplicarFiltros}
@@ -365,15 +264,12 @@ export default function Usuarios() {
 
         <div className="flex flex-col flex-1 items-center w-full mt-4">
           {dadosExibidos.length > 0 ? (
-
             <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
               data={dadosExibidos}
               columns={colunasUsuarios}
               acoesDropdown={(user) => (
                 <>
-
-                  {/* Ação 1: Link Direto */}
+                  {/* link*/}
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link href={`usuarios/${user.id}`}>
                       <EyeIcon className="mr-2 h-10 w-10" />
@@ -381,7 +277,7 @@ export default function Usuarios() {
                     </Link>
                   </DropdownMenuItem>
 
-                  {/* Editar (Abre um modal) */}
+                  {/* editar */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -389,12 +285,12 @@ export default function Usuarios() {
                         Editar
                       </DropdownMenuItem>
                     </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoUsuario />
+                    <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
+                      <FormEdicaoUsuario usuarioId={user.id} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
-                  {/* Ação 3: Excluir (Abre um Dialog de Confirmação) */}
+                  {/* excluir */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -403,10 +299,9 @@ export default function Usuarios() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoUsuario />
+                      <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
-                  
                 </>
               )}
             />
@@ -420,6 +315,6 @@ export default function Usuarios() {
           )}
         </div>
       </section>
-    </main >
+    </main>
   );
 }

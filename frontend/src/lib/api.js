@@ -4,14 +4,20 @@ export async function apiFetch(rota, opcoes = {}) {
 
   const token = localStorage.getItem("token")
 
+    const headers = {
+    "Authorization": `Bearer ${token}`,
+    ...opcoes.headers
+  };
+  
+  // só adiciona application/json se NÃO for FormData
+  if (!(opcoes.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(`${API_URL}${rota}`, {
     ...opcoes,
-    headers: {
-      "Content-Type":  "application/json",
-      "Authorization": `Bearer ${token}`,
-      ...opcoes.headers
-    }
-  })
+    headers
+  });
 
   // token expirado — manda pro login
   if (res.status === 401) {

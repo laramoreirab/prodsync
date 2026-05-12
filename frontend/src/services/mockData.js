@@ -549,13 +549,6 @@ export const mockAndonSectorStatusMaquinas = {
   emSetup:     3,
   emParada:    2,
 };
- 
-export const mockAndonRanking = [
-  { setor: "THAK-9879", produtividade: 95 },
-  { setor: "THAK-9878", produtividade: 80 },
-  { setor: "THAK-9877", produtividade: 70 },
-  { setor: "THAK-9876", produtividade: 55 },
-];
 
 export const mockMetaKPI = {
   titulo: "Sua Meta", valor: "500", unidade: "peças"
@@ -583,6 +576,186 @@ export const mockOEEMaquinaDetalhes = {
   qualidade:       91,
   oee:             57,
 };
+
+export const mockAndonFactoryRanking = [
+  { setor: "THAK-909816", produtividade: 95 },
+  { setor: "THAK-909823", produtividade: 88 },
+  { setor: "THAK-909818", produtividade: 73 },
+  { setor: "THAK-909821", produtividade: 61 },
+];
+
+export const mockAndonFactorySections = [
+  {
+    id: "engrenagens",
+    titulo: "Setor das Engrenagens",
+    maquinas: [
+      {
+        id: "eng-1",
+        codigo: "THAK-909816",
+        status: "emProducao",
+        operador: "Luis Mariz",
+        detalheLabel: "Velocidade",
+        detalheValor: "200 peças/h",
+        metaTurno: "280/500 peças",
+        metaDia: "280/1200 peças",
+        oee: 88,
+        tempoStatus: "Em produção há 1h 35m",
+      },
+      {
+        id: "eng-2",
+        codigo: "THAK-909817",
+        status: "emParada",
+        operador: "Luis Alves",
+        detalheLabel: "Motivo",
+        detalheValor: "Falta de material",
+        metaTurno: "30/600 peças",
+        metaDia: "280/1200 peças",
+        oee: 42,
+        tempoStatus: "Parada há 45m",
+      },
+      {
+        id: "eng-3",
+        codigo: "THAK-909818",
+        status: "emSetup",
+        operador: "Luis Mariz",
+        detalheLabel: "Motivo",
+        detalheValor: "Troca de molde",
+        metaTurno: "80/200 peças",
+        metaDia: "80/800 peças",
+        oee: 42,
+        tempoStatus: "Em setup há 45m",
+      },
+      {
+        id: "eng-4",
+        codigo: "THAK-909819",
+        status: "emProducao",
+        operador: "Luis Mariz",
+        detalheLabel: "Velocidade",
+        detalheValor: "200 peças/h",
+        metaTurno: "280/500 peças",
+        metaDia: "280/1200 peças",
+        oee: 88,
+        tempoStatus: "Em produção há 1h 35m",
+      },
+    ],
+  },
+  {
+    id: "roscas",
+    titulo: "Setor das Roscas",
+    maquinas: [
+      {
+        id: "ros-1",
+        codigo: "THAK-909820",
+        status: "emProducao",
+        operador: "Luis Mariz",
+        detalheLabel: "Velocidade",
+        detalheValor: "200 peças/h",
+        metaTurno: "280/500 peças",
+        metaDia: "280/1200 peças",
+        oee: 88,
+        tempoStatus: "Em produção há 1h 35m",
+      },
+      {
+        id: "ros-2",
+        codigo: "THAK-909821",
+        status: "emParada",
+        operador: "Luis Alves",
+        detalheLabel: "Motivo",
+        detalheValor: "Falta de material",
+        metaTurno: "30/600 peças",
+        metaDia: "280/1200 peças",
+        oee: 42,
+        tempoStatus: "Parada há 45m",
+      },
+      {
+        id: "ros-3",
+        codigo: "THAK-909822",
+        status: "emSetup",
+        operador: "Luis Mariz",
+        detalheLabel: "Motivo",
+        detalheValor: "Troca de molde",
+        metaTurno: "80/200 peças",
+        metaDia: "80/800 peças",
+        oee: 42,
+        tempoStatus: "Em setup há 45m",
+      },
+      {
+        id: "ros-4",
+        codigo: "THAK-909823",
+        status: "emProducao",
+        operador: "Luis Mariz",
+        detalheLabel: "Velocidade",
+        detalheValor: "200 peças/h",
+        metaTurno: "280/500 peças",
+        metaDia: "280/1200 peças",
+        oee: 88,
+        tempoStatus: "Em produção há 1h 35m",
+      },
+    ],
+  },
+];
+
+// export const mockAndonSectorSections = [
+//   {
+//     id: "engrenagens",
+//     titulo: "Setor das Engrenagens",
+//     maquinas: [
+//       {
+//         id: "eng-1",
+//         codigo: "THAK-909816",
+//         status: "emProducao",
+//         operador: "Luis Mariz",
+//         detalheLabel: "Velocidade",
+//         detalheValor: "200 peças/h",
+//         metaTurno: "280/500 peças",
+//         metaDia: "280/1200 peças",
+//         oee: 88,
+//         tempoStatus: "Em produção há 1h 35m",
+//       },
+//       {
+//         id: "eng-2",
+//         codigo: "THAK-909817",
+//         status: "emParada",
+//         operador: "Luis Alves",
+//         detalheLabel: "Motivo",
+//         detalheValor: "Falta de material",
+//         metaTurno: "30/600 peças",
+//         metaDia: "280/1200 peças",
+//         oee: 42,
+//         tempoStatus: "Parada há 45m",
+//       },
+//       {
+//         id: "eng-3",
+//         codigo: "THAK-909818",
+//         status: "emSetup",
+//         operador: "Luis Mariz",
+//         detalheLabel: "Motivo",
+//         detalheValor: "Troca de molde",
+//         metaTurno: "80/200 peças",
+//         metaDia: "80/800 peças",
+//         oee: 42,
+//         tempoStatus: "Em setup há 45m",
+//       },
+//       {
+//         id: "eng-4",
+//         codigo: "THAK-909819",
+//         status: "emProducao",
+//         operador: "Luis Mariz",
+//         detalheLabel: "Velocidade",
+//         detalheValor: "200 peças/h",
+//         metaTurno: "280/500 peças",
+//         metaDia: "280/1200 peças",
+//         oee: 88,
+//         tempoStatus: "Em produção há 1h 35m",
+//       },
+//     ],
+//   },
+// ];
+
+export const mockAndonStatusMaquinas = mockAndonFactoryStatusMaquinas;
+
+export const mockAndonRanking = mockAndonFactoryRanking;
+
 
 export const mockProducaoPorMaquinaSetor = [
   { setor: "THAK-002", qtd: 80 },
@@ -691,14 +864,14 @@ Object.assign(mockAndonFactoryStatusMaquinas, {
   emParada: 4,
 });
 
-export const mockAndonFactoryRanking = [
-  { setor: "Engrenagens", produtividade: 95 },
-  { setor: "Usinagem", produtividade: 89 },
-  { setor: "Montagem", produtividade: 84 },
-  { setor: "Soldagem", produtividade: 78 },
-  { setor: "Pintura", produtividade: 72 },
-  { setor: "Embalagens", produtividade: 68 },
-];
+// export const mockAndonFactoryRanking = [
+//   { setor: "Engrenagens", produtividade: 95 },
+//   { setor: "Usinagem", produtividade: 89 },
+//   { setor: "Montagem", produtividade: 84 },
+//   { setor: "Soldagem", produtividade: 78 },
+//   { setor: "Pintura", produtividade: 72 },
+//   { setor: "Embalagens", produtividade: 68 },
+// ];
 
 export const mockAndonSectorRanking = [
   { setor: "THAK-9879", produtividade: 95 },
@@ -708,34 +881,34 @@ export const mockAndonSectorRanking = [
   { setor: "THAK-9875", produtividade: 49 },
 ];
 
-export const mockAndonFactorySections = [
-  {
-    id: "usinagem",
-    titulo: "Usinagem",
-    maquinas: [
-      { id: "m-001", codigo: "THAK-9879", status: "emProducao", operador: "Marcos Lima", detalheLabel: "OP atual", detalheValor: "OP-4491", metaTurno: "420 pcs", metaDia: "1.260 pcs", oee: 91, tempoStatus: "02h 15m" },
-      { id: "m-002", codigo: "THAK-9878", status: "emSetup", operador: "Camila Rocha", detalheLabel: "Setup", detalheValor: "Troca de ferramenta", metaTurno: "360 pcs", metaDia: "1.080 pcs", oee: 64, tempoStatus: "00h 42m" },
-      { id: "m-003", codigo: "THAK-9877", status: "emParada", operador: "Rafael Souza", detalheLabel: "Motivo", detalheValor: "Falta de material", metaTurno: "390 pcs", metaDia: "1.170 pcs", oee: 38, tempoStatus: "01h 08m" },
-    ],
-  },
-  {
-    id: "montagem",
-    titulo: "Montagem",
-    maquinas: [
-      { id: "m-004", codigo: "THAK-9821", status: "emProducao", operador: "Bianca Alves", detalheLabel: "OP atual", detalheValor: "OP-4521", metaTurno: "510 pcs", metaDia: "1.530 pcs", oee: 88, tempoStatus: "03h 04m" },
-      { id: "m-005", codigo: "THAK-9822", status: "emProducao", operador: "Joana Costa", detalheLabel: "OP atual", detalheValor: "OP-4534", metaTurno: "480 pcs", metaDia: "1.440 pcs", oee: 82, tempoStatus: "01h 55m" },
-      { id: "m-006", codigo: "THAK-9823", status: "emSetup", operador: "Antonio Reis", detalheLabel: "Setup", detalheValor: "Ajuste de gabarito", metaTurno: "450 pcs", metaDia: "1.350 pcs", oee: 59, tempoStatus: "00h 31m" },
-    ],
-  },
-  {
-    id: "soldagem",
-    titulo: "Soldagem",
-    maquinas: [
-      { id: "m-007", codigo: "THAK-9760", status: "emProducao", operador: "Maria Nunes", detalheLabel: "OP atual", detalheValor: "OP-4540", metaTurno: "300 pcs", metaDia: "900 pcs", oee: 76, tempoStatus: "02h 44m" },
-      { id: "m-008", codigo: "THAK-9761", status: "emParada", operador: "Mauro Pinto", detalheLabel: "Motivo", detalheValor: "Manutencao corretiva", metaTurno: "320 pcs", metaDia: "960 pcs", oee: 41, tempoStatus: "00h 56m" },
-    ],
-  },
-];
+// export const mockAndonFactorySections = [
+//   {
+//     id: "usinagem",
+//     titulo: "Usinagem",
+//     maquinas: [
+//       { id: "m-001", codigo: "THAK-9879", status: "emProducao", operador: "Marcos Lima", detalheLabel: "OP atual", detalheValor: "OP-4491", metaTurno: "420 pcs", metaDia: "1.260 pcs", oee: 91, tempoStatus: "02h 15m" },
+//       { id: "m-002", codigo: "THAK-9878", status: "emSetup", operador: "Camila Rocha", detalheLabel: "Setup", detalheValor: "Troca de ferramenta", metaTurno: "360 pcs", metaDia: "1.080 pcs", oee: 64, tempoStatus: "00h 42m" },
+//       { id: "m-003", codigo: "THAK-9877", status: "emParada", operador: "Rafael Souza", detalheLabel: "Motivo", detalheValor: "Falta de material", metaTurno: "390 pcs", metaDia: "1.170 pcs", oee: 38, tempoStatus: "01h 08m" },
+//     ],
+//   },
+//   {
+//     id: "montagem",
+//     titulo: "Montagem",
+//     maquinas: [
+//       { id: "m-004", codigo: "THAK-9821", status: "emProducao", operador: "Bianca Alves", detalheLabel: "OP atual", detalheValor: "OP-4521", metaTurno: "510 pcs", metaDia: "1.530 pcs", oee: 88, tempoStatus: "03h 04m" },
+//       { id: "m-005", codigo: "THAK-9822", status: "emProducao", operador: "Joana Costa", detalheLabel: "OP atual", detalheValor: "OP-4534", metaTurno: "480 pcs", metaDia: "1.440 pcs", oee: 82, tempoStatus: "01h 55m" },
+//       { id: "m-006", codigo: "THAK-9823", status: "emSetup", operador: "Antonio Reis", detalheLabel: "Setup", detalheValor: "Ajuste de gabarito", metaTurno: "450 pcs", metaDia: "1.350 pcs", oee: 59, tempoStatus: "00h 31m" },
+//     ],
+//   },
+//   {
+//     id: "soldagem",
+//     titulo: "Soldagem",
+//     maquinas: [
+//       { id: "m-007", codigo: "THAK-9760", status: "emProducao", operador: "Maria Nunes", detalheLabel: "OP atual", detalheValor: "OP-4540", metaTurno: "300 pcs", metaDia: "900 pcs", oee: 76, tempoStatus: "02h 44m" },
+//       { id: "m-008", codigo: "THAK-9761", status: "emParada", operador: "Mauro Pinto", detalheLabel: "Motivo", detalheValor: "Manutencao corretiva", metaTurno: "320 pcs", metaDia: "960 pcs", oee: 41, tempoStatus: "00h 56m" },
+//     ],
+//   },
+// ];
 
 export const mockAndonSectorSections = [
   {
