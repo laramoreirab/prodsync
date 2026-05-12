@@ -28,7 +28,7 @@ export const maquinaStatusService = {
       const data = MaquinaStatusArraySchema.parse(mockMaquinaStatus);
       // Se setorId for fornecido, filtra apenas máquinas do setor
       if (setorId) {
-        return data.filter(item => item.setorId === setorId);
+        return data.filter(item => String(item.setorId) === String(setorId));
       }
       return data;
     }

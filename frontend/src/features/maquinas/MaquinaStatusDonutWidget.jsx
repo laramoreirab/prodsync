@@ -11,6 +11,19 @@ export function MaquinaStatusDonutWidget({ setorId }) {
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
+  const chartData = data
+    .filter(item => !setorId || item.setorId === setorId)
+    .map((item) => ({
+      ...item,
+      // Garantimos que o name seja uma string válida para o DonutChart não quebrar
+      name: item.name ? item.name.toLowerCase() : "desconhecido",
+      value: Number(item.value) || 0
+    }));
+
+  if (chartData.length === 0) {
+    return <p className="text-xs text-muted-foreground">Sem máquinas neste setor.</p>;
+  }
+
   return (
     <><p className="text-sm font-semibold text-black self-start">
       Status Operacional das Máquinas
@@ -19,12 +32,12 @@ export function MaquinaStatusDonutWidget({ setorId }) {
         *Atualizado em tempo real
       </p>
       <DonutChart
-        data={data}
+        data={chartData}
         config={maquinaStatusConfig}
         dataKey="value"
         nameKey="name"
-      /></>
-
-
+        chartSize="donutDefault"
+      />
+      </>
   );
 }
