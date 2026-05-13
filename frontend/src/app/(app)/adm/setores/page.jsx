@@ -17,8 +17,8 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 import { useSetores } from "@/hooks/useSetores";

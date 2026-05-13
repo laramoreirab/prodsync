@@ -51,8 +51,8 @@ import {
 } from "@/components/ui/tabs";
 
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
