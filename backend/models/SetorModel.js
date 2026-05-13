@@ -133,6 +133,11 @@ class SetorModel {
     // Deleta um setor
     static async deletarSetor(id_setor, id_empresa) {
         try {
+            await prisma.maquinas.updateMany({
+                where: { id_setor, id_empresa },
+                data: { id_setor: null }
+            });
+
             const result = await prisma.setores.deleteMany({
                 where: {
                     id_setor: id_setor,
@@ -390,49 +395,52 @@ class SetorModel {
             inicioBusca.setHours(limites.horaInicio, limites.minutoInicio, 0, 0);
             const fimBusca = new Date(inicioBusca.getTime() + (24 * 60 * 60 * 1000));
 
-            const setoresComProducao = await prisma.setores.findMany({
-                where: { id_empresa },
-                select: {
-                    id_setor: true,
-                    nome_setor: true,
-                    ordens_producao: {
-                        where: { status_op: "Em_Andamento" },
-                        select: {
-                            qtd_planejada: true,
-                            apontamentos: {
-                                where: {
-                                    data_hora_fim: {
-                                        gte: inicioBusca,
-                                        lt: fimBusca
-                                    }
-                                },
-                                select: { qtd_boa: true }
+            const [setores, apontamentos] = await Promise.all([
+                prisma.setores.findMany({
+                    where: { id_empresa },
+                    select: {
+                        id_setor: true,
+                        nome_setor: true
+                    }
+                }),
+                prisma.apontamento.findMany({
+                    where: {
+                        id_empresa,
+                        data_hora_fim: {
+                            gte: inicioBusca,
+                            lt: fimBusca
+                        }
+                    },
+                    select: {
+                        qtd_boa: true,
+                        maquina: {
+                            select: {
+                                id_setor: true
                             }
                         }
                     }
-                }
-            });
+                })
+            ]);
 
-            const resultado = setoresComProducao.map(setor => {
-                let totalPlanejado = 0;
-                let totalProduzido = 0;
+            const producaoPorSetor = new Map(
+                setores.map(setor => [
+                    setor.id_setor,
+                    {
+                        setor: setor.nome_setor,
+                        qtd: 0
+                    }
+                ])
+            );
 
-                setor.ordens_producao.forEach(op => {
-                    totalPlanejado += op.qtd_planejada;
-                    const produzidoNaOP = op.apontamentos.reduce((sum, ap) => sum + (ap.qtd_boa || 0), 0);
-                    totalProduzido += produzidoNaOP;
-                });
+            for (const apontamento of apontamentos) {
+                const id_setor = apontamento.maquina?.id_setor;
+                if (!id_setor || !producaoPorSetor.has(id_setor)) continue;
 
-                // let porcentagem = 0;
-                // if (totalPlanejado > 0) {
-                //     porcentagem = (totalProduzido / totalPlanejado) * 100;
-                // }
+                const setor = producaoPorSetor.get(id_setor);
+                setor.qtd += apontamento.qtd_boa ?? 0;
+            }
 
-                return {
-                    setor: setor.nome_setor,
-                    qtd: totalProduzido
-                };
-            });
+            const resultado = Array.from(producaoPorSetor.values());
 
             return resultado
 

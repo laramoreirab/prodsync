@@ -9,6 +9,16 @@ class OrdemProducaoModel {
                 where: {
                     id_empresa: id_empresa,
                 },
+                include: {
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            setor: { select: { id_setor: true, nome_setor: true } }
+                        }
+                    }
+                },
                 orderBy: {
                     id_ordem: 'asc' // Mantém a lista organizada
                 },
@@ -47,17 +57,32 @@ class OrdemProducaoModel {
         }
     }
     static async converterTimestamp(timestamp) {
+        if (!timestamp) return null
+        if (timestamp instanceof Date) return timestamp
+        const valorNumerico = Number(timestamp)
+        if (Number.isNaN(valorNumerico)) return new Date(timestamp)
         const ms = String(timestamp).length === 10
             ? timestamp * 1000   // veio em segundos → converte
             : timestamp          // veio em milissegundos → usa direto
         return new Date(ms)
         //  ex: 1711461000 → 2024-03-26T14:10:00.000Z
     }
-    static async buscarOrdem(id_ordem) {
+    static async buscarOrdem(id_ordem, id_empresa = null) {
         try {
             const resultado = await prisma.ordemProducao.findFirst({
                 where:{
-                    id_ordem: id_ordem
+                    id_ordem: Number(id_ordem),
+                    ...(id_empresa ? { id_empresa: Number(id_empresa) } : {})
+                },
+                include: {
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            setor: { select: { id_setor: true, nome_setor: true } }
+                        }
+                    }
                 }
             })
             return resultado
@@ -72,7 +97,7 @@ class OrdemProducaoModel {
             const ordem = await prisma.ordemProducao.findFirst({
                 where:{
                     id_maquina: id_maquina,
-                    status_op: 'Em Andamento'
+                    status_op: 'Em_Andamento'
                 },
                 select: {
                     id_ordem: true
@@ -88,8 +113,8 @@ class OrdemProducaoModel {
         try {
             const resultado = await prisma.ordemProducao.updateMany({
                 where:{
-                    id_ordem: id_ordem,
-                    id_empresa: id_empresa
+                    id_ordem: Number(id_ordem),
+                    id_empresa: Number(id_empresa)
                 },
                 data: {
                     ...dados
@@ -102,8 +127,18 @@ class OrdemProducaoModel {
 
             return await prisma.ordemProducao.findFirst({
                 where: {
-                    id_ordem,
-                    id_empresa
+                    id_ordem: Number(id_ordem),
+                    id_empresa: Number(id_empresa)
+                },
+                include: {
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            setor: { select: { id_setor: true, nome_setor: true } }
+                        }
+                    }
                 }
             });
         } catch (error) {
@@ -116,7 +151,7 @@ class OrdemProducaoModel {
             const deletar = await prisma.ordemProducao.deleteMany({
                 where: {
                     id_empresa: id_empresa,
-                    id_ordem: id_ordem
+                    id_ordem: Number(id_ordem)
                 }
             })
             return deletar
@@ -130,7 +165,7 @@ class OrdemProducaoModel {
             const res = await prisma.ordemProducao.count({
                 where: {
                     id_empresa: id_empresa,
-                    status_op: 'Em Andamento'
+                    status_op: 'Em_Andamento'
                 }
             })
             return res
@@ -187,7 +222,7 @@ class OrdemProducaoModel {
     static async progressoOP(id_empresa, id_ordem) {
         try {
             const [ordem, apontamentos] = await Promise.all([
-                prisma.ordemProducao.findUnique({
+                prisma.ordemProducao.findFirst({
                     where: { id_ordem: Number(id_ordem), id_empresa },
                     select: { qtd_planejada: true, produto: true }
                 }),
@@ -279,7 +314,7 @@ class OrdemProducaoModel {
     }
     static async cargaPorSetor(id_empresa) {
         try {
-            const statusAtivos = ['Em Andamento', 'Aguardando', 'Parada', 'Setup']
+            const statusAtivos = ['Em_Andamento', 'Parada', 'Setup']
 
             const resultado = await prisma.ordemProducao.groupBy({
                 by: ['id_setor'],
@@ -336,7 +371,7 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async opsConcluídasPorDia(id_empresa) {
+    static async opsConcluidasPorDia(id_empresa) {
         const hoje = new Date()
         hoje.setHours(23, 59, 59, 999)
 

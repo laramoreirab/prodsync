@@ -71,13 +71,17 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
         e.preventDefault();
 
         const payload = {
-            id_evento: eventoId, // backend: id_evento
-            id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null, // backend: id_motivo_parada
-            observacao, // backend: observacao
+            status_maquina: tipoEvento,
+            setor_afetado: setoresSelecionados[0] || "",
+            maquinas: maquinasSelecionadas,
+            inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000` : null,
+            fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000` : null,
+            id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null,
+            observacao,
         };
 
         try {
-            await eventosCrudService.justificar(payload);
+            await eventosCrudService.update(eventoId, payload);
             toast.success("Evento atualizado com sucesso!");
             if (onEdicaoSucesso) onEdicaoSucesso();
         } catch (error) {

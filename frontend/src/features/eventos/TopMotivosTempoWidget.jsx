@@ -9,7 +9,7 @@ export function TopMotivosTempoWidget() {
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar motivos.</p>;
-
+  
   // BarHorizontal usa "setor" como label do eixo Y
   const formattedData = data?.map(item => ({ ...item, setor: item.motivo }));
 

@@ -67,6 +67,8 @@ class MaquinaModel {
     // Cria uma nova máquina
     static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem) {
         try {
+            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
+            const statusNormalizado = statusValidos.includes(status) ? status : undefined;
             const maquina = await prisma.maquinas.create({
                 data: {
                     id_empresa: id_empresa,
@@ -76,7 +78,7 @@ class MaquinaModel {
                     serie: serie,
                     capacidade: capacidade,
                     status: status,
-                    status_atual: undefined,
+                    status_atual: statusNormalizado,
                     data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
                     id_operador: id_operador ? parseInt(id_operador) : null,
                     imagem: imagem
@@ -113,7 +115,7 @@ class MaquinaModel {
                 nome: dados.nome,
                 serie: dados.serie,
                 id_setor: dados.id_setor ? parseInt(dados.id_setor) : undefined,
-                id_categoria: dados.id_categoria ? parseInt(dados.id_categoria) : undefined,
+                categoria: dados.categoria,
                 capacidade: dados.capacidade,
                 status: dados.status,
                 status_atual: dados.status || undefined,
@@ -244,7 +246,7 @@ class MaquinaModel {
             const maquinas = await prisma.maquinas.findMany({
                 where: {
                     id_empresa: id_empresa,
-                    id_categoria: id_categoria,
+                    categoria: String(id_categoria),
                     ativo: true
                 }
             });
@@ -388,20 +390,23 @@ class MaquinaModel {
         return maquina?.id_setor ?? null;
     }
 
-    static async montarFiltroAndon(id_empresa, scope, id_operador) {
+    static async montarFiltroAndon(id_empresa, scope, id_operador, id_setor = null) {
         const filtro = { id_empresa, ativo: true };
 
         if (scope === 'sector') {
-            const id_setor = await this.obterSetorOperador(id_empresa, id_operador);
-            if (!id_setor) return { ...filtro, id_maquina: -1 };
-            filtro.id_setor = id_setor;
+            const setorInformado = id_setor ? Number(id_setor) : null;
+            const setor = Number.isInteger(setorInformado) && setorInformado > 0
+                ? setorInformado
+                : await this.obterSetorOperador(id_empresa, id_operador);
+            if (!setor) return { ...filtro, id_maquina: -1 };
+            filtro.id_setor = setor;
         }
 
         return filtro;
     }
 
-    static async obterAndonStatus(id_empresa, scope = 'factory', id_operador = null) {
-        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador);
+    static async obterAndonStatus(id_empresa, scope = 'factory', id_operador = null, id_setor = null) {
+        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador, id_setor);
         const agrupados = await prisma.maquinas.groupBy({
             by: ['status_atual'],
             where,
@@ -423,8 +428,8 @@ class MaquinaModel {
         return Math.min(100, Math.round((qtdProduzida / qtdPlanejada) * 100));
     }
 
-    static async obterAndonRanking(id_empresa, scope = 'factory', id_operador = null) {
-        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador);
+    static async obterAndonRanking(id_empresa, scope = 'factory', id_operador = null, id_setor = null) {
+        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador, id_setor);
         const maquinas = await prisma.maquinas.findMany({
             where,
             select: {
@@ -501,8 +506,8 @@ class MaquinaModel {
         };
     }
 
-    static async obterAndonSecoes(id_empresa, scope = 'factory', id_operador = null) {
-        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador);
+    static async obterAndonSecoes(id_empresa, scope = 'factory', id_operador = null, id_setor = null) {
+        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador, id_setor);
         const maquinas = await prisma.maquinas.findMany({
             where,
             include: {

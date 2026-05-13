@@ -12,7 +12,7 @@ const USE_MOCK = false;
 export const eventosService = {
   async getParadasComparadas() {
     if (USE_MOCK) return mockTempoParadoProduzindo;
-    const data = await apiFetch("/eventos/tempo_parado_produzindo");
+    const data = await apiFetch("/api/eventos/tempo_parado_produzindo");
     return data;
   },
 };
@@ -20,7 +20,7 @@ export const eventosService = {
 export const topMotivosTempoService = {
   async getTopMotivosTempo() {
     if (USE_MOCK) return MotivoTempoArraySchema.parse(mockTopMotivosTempo);
-    const data = await apiFetch("/eventos/top_motivos_tempo");
-    return MotivoTempoArraySchema.parse(data);
+    const data = await apiFetch("/api/eventos/top_motivos_tempo");
+    return MotivoTempoArraySchema.parse(data.dados);
   },
 };

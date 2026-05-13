@@ -323,7 +323,7 @@ class TurnoModel {
                 where: {
                     id_turno: Number(id_turno),
                     id_ordemProducao: {
-                        not: null
+                        not: 0
                     },
                     ...(id_empresa ? { id_empresa } : {}),
                     ...(dataInicio || dataFim ? {

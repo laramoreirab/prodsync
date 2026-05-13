@@ -31,7 +31,7 @@ class UsuarioController {
 
             return res.status(200).json({
                 sucesso: true,
-                dados: dadosNormalizados,
+                dados: resultado.dados || [],
                 meta: resultado.meta
             });
 
@@ -81,7 +81,7 @@ class UsuarioController {
 
     //GET api/usuarios/:id - busca de usuário por id (via params ou token)
     static async buscarPorId(req, res) {
-        try 
+        try {
             // Aceita id via params (rota /:id) ou fallback para o usuário logado
             const id_usuario = req.params.id ? parseInt(req.params.id) : req.user.id_usuario;
             const id_empresa = req.user.id_empresa;

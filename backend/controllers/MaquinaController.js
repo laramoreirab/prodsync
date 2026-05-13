@@ -106,7 +106,7 @@ class MaquinaController {
     static async atualizarMaquina(req, res) {
         try {
             const { id } = req.params;
-            const { nome, serie, id_setor, id_categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
+            const { nome, serie, id_setor, categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
 
             if (!id || isNaN(id)) return res.status(400).json({ sucesso: false, erro: 'ID inválido' });
@@ -121,7 +121,7 @@ class MaquinaController {
                 nome: nome?.trim(),
                 serie: serie?.trim(),
                 id_setor,
-                id_categoria,
+                categoria: categoria?.trim(),
                 capacidade: capacidade?.trim(),
                 status: (status_atual || status)?.trim(),
                 data_aquisicao,

@@ -175,6 +175,32 @@ class EventoController {
         }
     }
 
+    static async atualizarEvento(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa;
+            const id_evento = Number(req.params.id);
+
+            if (!Number.isInteger(id_evento) || id_evento <= 0) {
+                return res.status(400).json({ sucesso: false, erro: 'ID do evento invalido' });
+            }
+
+            const dados = await EventoModel.atualizarEventoSistema(id_empresa, id_evento, req.body);
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Evento atualizado com sucesso',
+                dados
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar evento:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel atualizar o evento'
+            });
+        }
+    }
+
     static async justificarEvento(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
