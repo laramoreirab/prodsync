@@ -16,7 +16,7 @@ import {
     SetorProducaoMaquinaArraySchema,
   } from "@features/setores/schemas/setorSchema";
 import {
-  mockUSE_MOCK,
+  mockSetores,
   mockSetorTotalKPI,
   mockOperadoresMediaKPI,
   mockOEEPorSetor,
@@ -33,7 +33,7 @@ import {
     mockSetorMotivosParada,
   } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const setorService = {
   async getSetores() {

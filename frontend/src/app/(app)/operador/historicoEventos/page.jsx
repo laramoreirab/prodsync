@@ -26,8 +26,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
 
 import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";

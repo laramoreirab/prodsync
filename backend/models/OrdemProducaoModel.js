@@ -127,7 +127,7 @@ class OrdemProducaoModel {
     }
     static async totalOPsAtivas(id_empresa) {
         try {
-            const res = await prisma.ordemproducao.count({
+            const res = await prisma.ordemProducao.count({
                 where: {
                     id_empresa: id_empresa,
                     status_op: 'Em Andamento'
@@ -141,7 +141,7 @@ class OrdemProducaoModel {
     }
     static async totalOPsAtrasadas(id_empresa) {
         try {
-            const res = await prisma.ordemproducao.count({
+            const res = await prisma.ordemProducao.count({
                 where: {
                     id_empresa: id_empresa,
                     status_op: { in: ['Parada', 'Setup'] }
@@ -260,8 +260,7 @@ class OrdemProducaoModel {
                 select: {
                     id_ordem: true,
                     codigo_lote: true,
-                    produto: true,
-                    setores: { select: { nome_setor: true } }
+                    produto: true
                 }
             })
 
@@ -348,7 +347,7 @@ class OrdemProducaoModel {
         const ordens = await prisma.ordemProducao.findMany({
             where: {
                 id_empresa,
-                status_op: 'Finaliazada',
+                status_op: 'Finalizada',
                 data_fim: { gte: seteDiasAtras, lte: hoje }
             },
             select: { data_fim: true }
@@ -371,6 +370,7 @@ class OrdemProducaoModel {
 
         return Object.values(agrupado)
     }
+
 }
 
 export default OrdemProducaoModel;

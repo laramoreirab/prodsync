@@ -10,8 +10,8 @@ const metricas = [
   { key: "oee",             label: "OEE Geral Consolidado", color: "#00357a" },
 ];
 
-export function OPOEEDetalheWidget({ opId }) {
-  const { data, loading, error } = useOPOEEDetalhe(opId);
+export function OPOEEDetalheWidget({ opId, maquinaId }) {
+  const { data, loading, error } = useOPOEEDetalhe(opId, maquinaId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
