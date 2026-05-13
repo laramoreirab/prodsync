@@ -18,6 +18,13 @@ import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario"
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import {
+  PageLayout, PageHeader, SectionDivider,
+  StaggerWrapper, FadeUpItem, AnimatedTitle,
+  KPIGrid, ContentGrid, WidgetCard,
+  SearchBar, FilterRow, EmptyState, LoadingState,
+  PageSection,
+} from "@/components/AnimatedComponents";
 
 const colunasUsuario = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
@@ -155,7 +162,7 @@ export default function ProducaoOperadorPage({ params }) {
   });
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+    <PageLayout> 
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         <Link className="flex items-center" href="/adm/usuarios">
@@ -350,6 +357,6 @@ export default function ProducaoOperadorPage({ params }) {
         </div>
 
       </div>
-    </main>
+    </PageLayout>
   );
 }
