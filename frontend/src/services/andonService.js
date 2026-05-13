@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api"
+import { apiFetch } from "@/lib/api";
 import {
   AndonRankingArraySchema,
   AndonSectionArraySchema,
@@ -19,24 +19,11 @@ function normalizeScope(scope = "factory") {
   return scope === "sector" ? "sector" : "factory";
 }
 
-const statusByScope = {
-  factory: mockAndonFactoryStatusMaquinas,
-  sector: mockAndonSectorStatusMaquinas,
-};
-
-const rankingByScope = {
-  factory: mockAndonFactoryRanking,
-  sector: mockAndonSectorRanking,
-};
-
-const sectionsByScope = {
-  factory: mockAndonFactorySections,
-  sector: mockAndonSectorSections,
-};
-
 export const andonStatusService = {
-  async getStatus(scope = "factory") {
+  async getStatus(scope = "factory", id_setor = null) {
     const normalizedScope = normalizeScope(scope);
+    const params = new URLSearchParams({ scope: normalizedScope });
+    if (id_setor) params.append("id_setor", id_setor);
 
     if (USE_MOCK) {
       return AndonStatusMaquinasSchema.parse(statusByScope[normalizedScope]);
@@ -44,12 +31,16 @@ export const andonStatusService = {
 
     const data = await apiFetch(`/api/andon/status_maquinas?scope=${normalizedScope}`);
     return AndonStatusMaquinasSchema.parse(data.dados ?? data);
+    const data = await apiFetch(`/api/andon/status_maquinas?${params.toString()}`);
+    return AndonStatusMaquinasSchema.parse(data);
   },
 };
 
 export const andonRankingService = {
-  async getRanking(scope = "factory") {
+  async getRanking(scope = "factory", id_setor = null) {
     const normalizedScope = normalizeScope(scope);
+    const params = new URLSearchParams({ scope: normalizedScope });
+    if (id_setor) params.append("id_setor", id_setor);
 
     if (USE_MOCK) {
       return AndonRankingArraySchema.parse(rankingByScope[normalizedScope]);
@@ -57,12 +48,16 @@ export const andonRankingService = {
 
     const data = await apiFetch(`/api/andon/ranking_produtividade?scope=${normalizedScope}`);
     return AndonRankingArraySchema.parse(data.dados ?? data);
+    const data = await apiFetch(`/api/andon/ranking_produtividade?${params.toString()}`);
+    return AndonRankingArraySchema.parse(data);
   },
 };
 
 export const andonSectionsService = {
-  async getSections(scope = "factory") {
+  async getSections(scope = "factory", id_setor = null) {
     const normalizedScope = normalizeScope(scope);
+    const params = new URLSearchParams({ scope: normalizedScope });
+    if (id_setor) params.append("id_setor", id_setor);
 
     if (USE_MOCK) {
       return AndonSectionArraySchema.parse(sectionsByScope[normalizedScope]);
@@ -70,5 +65,7 @@ export const andonSectionsService = {
 
     const data = await apiFetch(`/api/andon/secoes?scope=${normalizedScope}`);
     return AndonSectionArraySchema.parse(data.dados ?? data);
+    const data = await apiFetch(`/api/andon/secoes?${params.toString()}`);
+    return AndonSectionArraySchema.parse(data);
   },
 };

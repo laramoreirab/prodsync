@@ -2,6 +2,7 @@ import UsuarioModel from '../models/UsuarioModel.js'
 import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
 import SetorModel from '../models/SetorModel.js';
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
+import prisma from '../config/prisma.js';
 
 class UsuarioController {
 
@@ -14,9 +15,24 @@ class UsuarioController {
 
             const resultado = await UsuarioModel.listarTodos(id_empresa, paginacao);
 
+            // Normaliza o retorno: a query é sobre escalaTrabalho (inclui operador, turno, setor)
+            // O frontend espera: { id, nome, funcao, id_setor, id_turno, id_maquina, email, cpf, imagem_perfil }
+            const dadosNormalizados = (resultado.dados || []).map(escala => ({
+                id: escala.operador?.id_usuario ?? escala.id_operador,
+                nome: escala.operador?.nome ?? '',
+                email: escala.operador?.email ?? '',
+                cpf: escala.operador?.cpf ?? '',
+                funcao: escala.operador?.tipo ?? '',
+                imagem_perfil: escala.operador?.imagem_perfil ?? null,
+                id_setor: escala.id_setor,
+                id_turno: escala.id_turno,
+                id_maquina: escala.id_maquina ?? null,
+            }));
+
             return res.status(200).json({
                 sucesso: true,
-                ...resultado
+                dados: dadosNormalizados,
+                meta: resultado.meta
             });
 
         } catch (error) {
@@ -24,7 +40,7 @@ class UsuarioController {
             return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível listar os usuário'
+                mensagem: 'Não foi possível listar os usuários'
             });
         }
     }
@@ -63,10 +79,11 @@ class UsuarioController {
         }
     }
 
-    //GET api/usuarios - busca de usuário por id 
+    //GET api/usuarios/:id - busca de usuário por id (via params ou token)
     static async buscarPorId(req, res) {
-        try {
-            const id_usuario = req.params.id;
+        try 
+            // Aceita id via params (rota /:id) ou fallback para o usuário logado
+            const id_usuario = req.params.id ? parseInt(req.params.id) : req.user.id_usuario;
             const id_empresa = req.user.id_empresa;
             // Validação básica do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -77,18 +94,35 @@ class UsuarioController {
                 });
             }
 
+            // Busca dados básicos do usuário
             const usuario = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
 
             if (!usuario) {
                 return res.status(404).json({
                     sucesso: false,
                     erro: 'Usuário não encontrado',
-
                 })
             };
+
+            // Busca também os dados de escala (setor, turno, máquina)
+            const escala = await prisma.escalaTrabalho.findFirst({
+                where: { id_operador: id_usuario, id_empresa },
+                select: {
+                    id_setor: true,
+                    id_turno: true,
+                    id_maquina: true
+                }
+            });
+
             return res.status(200).json({
                 sucesso: true,
-                dados: usuario
+                dados: {
+                    ...usuario,
+                    funcao: usuario.tipo,
+                    id_setor: escala?.id_setor ?? null,
+                    id_turno: escala?.id_turno ?? null,
+                    id_maquina: escala?.id_maquina ?? null
+                }
             });
 
         } catch (error) {
@@ -610,6 +644,36 @@ class UsuarioController {
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar peças por dia' });
+        }
+    }
+
+    static async getOEE(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.oeeOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar OEE do operador' });
+        }
+    }
+
+    static async getOEEMaquina(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.oeeMaquinaOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar OEE da máquina' });
+        }
+    }
+
+    static async getOEEMaquinaDetalhes(req, res) {
+        try {
+            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const dados = await UsuarioModel.oeeMaquinaDetalhesOperador(req.user.id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            return res.status(500).json({ sucesso: false, erro: 'Erro ao buscar detalhes do OEE da máquina' });
         }
     }
 

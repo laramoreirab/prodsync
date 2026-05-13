@@ -24,7 +24,7 @@ export let eventosMock = [
     tipo: "Parada",
     status_maquina: "Parada",
     setor_afetado: "Engrenagens",
-    op_afetada: "Tal OP",
+    op_afetada: "Outra OP",
     maquinas: [2],
     inicio: "2026-05-06T13:09:00.000Z",
     fim: null,

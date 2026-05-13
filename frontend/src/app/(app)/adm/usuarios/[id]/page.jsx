@@ -172,18 +172,7 @@ export default function ProducaoOperadorPage({ params }) {
   });
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-
-
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         <Link className="flex items-center" href="/adm/usuarios">
@@ -191,7 +180,7 @@ export default function ProducaoOperadorPage({ params }) {
           <p className="text-xl font-semibold text-gray-800">Voltar para Usuários </p>
         </Link>
 
-        <section id="infos_op" className="flex flex-col">
+        <section id="infos_user" className="flex flex-col">
           <div className="flex justify-between items-start">
             <div className="flex">
               <Image
@@ -297,85 +286,86 @@ export default function ProducaoOperadorPage({ params }) {
 
         {/* Gráficos */}
         <h1 className="font-bold text-3xl mt-8">Produção</h1>
-        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
-          <OEEOperadorWidget operadorId={operadorId} />
-        </section>
+        <div className="flex flex-col gap-4 ">
+          <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+            <OEEOperadorWidget operadorId={operadorId} />
+          </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <PecasPorDiaWidget operadorId={operadorId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center">
-            <MetaProducaoWidget operadorId={operadorId} />
-          </div>
-        </section>
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <PecasPorDiaWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center">
+              <MetaProducaoWidget operadorId={operadorId} />
+            </div>
+          </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <EficienciaMaquinaWidget operadorId={operadorId} />
-          </div>
-        </section>
-
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <EficienciaMaquinaWidget operadorId={operadorId} />
+            </div>
+          </section>
+        </div>
 
         {/* Listagem */}
         <div className="flex items-center gap-5">
-          <h1 className="text-4xl w-[125] font-semibold">Histórico de Apontamentos Feitos pelo Usuário</h1>
-          
-        </div>
-        {/* Busca */}
-        <div className="flex searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-            <input
-              type="search"
-              className="p-2 w-full outline-none bg-transparent"
-              placeholder="Busque por nome ou id..."
-              value={buscaApontamento}
-              onChange={(e) => setBuscaApontamento(e.target.value)}
-            />
-            <button className="outline-none cursor-pointer mr-2"><Search /></button>
+          <h1 className="text-4xl font-bold">Histórico de Apontamentos Feitos pelo Usuário</h1>
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid   items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por nome ou id..."
+                value={buscaApontamento}
+                onChange={(e) => setBuscaApontamento(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            </div>
           </div>
-        </div>
 
-        <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-          <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
 
-          <div className="flex items-center gap-4 mb-3">
-            <OrdenarDropdown
-              label="Ordenar por"
-              options={opcoesOrdenacaoApontamento}
-              onSortChange={handleSortApontamento}
-            />
+            <div className="flex items-center gap-4 mb-3">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacaoApontamento}
+                onSortChange={handleSortApontamento}
+              />
 
-            <FilterDropdown
-              filtersConfig={apontamentoFilter}
-              onApply={aplicarFiltrosApontamento}
-            />
+              <FilterDropdown
+                filtersConfig={apontamentoFilter}
+                onApply={aplicarFiltrosApontamento}
+              />
+            </div>
           </div>
+          <section>
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosApontamentosFiltrados}
+              columns={colunasUsuario}
+              acoesDropdown={(usuario) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver OP relacionada
+                    </Link>
+
+                  </DropdownMenuItem>
+                </>
+              )}
+            />
+          </section>
         </div>
-        <section>
-          <TableListagens
-            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-            data={dadosApontamentosFiltrados}
-            columns={colunasUsuario}
-            acoesDropdown={(usuario) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver OP relacionada
-                  </Link>
-                  
-                </DropdownMenuItem>
-              </>
-            )}
-          />
-        </section>
+
       </div>
     </main>
   );

@@ -21,6 +21,7 @@ import FormCadastroMaquina from "@/components/ui/forms/maquinas/formCadastroMaqu
 import FormCadastroUsuario from "@/components/ui/forms/usuarios/formCadastroUsuario";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import turnoCrudService from "@/services/turnoCrudService";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
@@ -90,6 +91,7 @@ export default function SetorEspecificoPage({ params }) {
   const [dadosExibidos, setDadosExibidos] = useState([]);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
   const [buscaUsuarios, setBuscaUsuarios] = useState("");
+  
   const gestor = setor?.gestores?.[0]?.gestor;
 
   const normalizarMaquina = (maquina) => ({
@@ -311,9 +313,15 @@ export default function SetorEspecificoPage({ params }) {
               <div className="flex">
                 <p>Turnos:</p>
                 <ul className="list-disc list-inside ml-4">
-                  <li>Manhã (Segunda a Sexta): 06:00 - 14:00</li>
-                  <li>Tarde (Segunda a Sexta): 14:00 - 22:00</li>
-                  <li>Noite (Segunda a Sexta): 22:00 - 06:00</li>
+                  {turnos.length > 0 ? (
+                    turnos.map((t) => (
+                      <li key={t.id_turno}>
+                        {t.nome_turno} ({t.dia_semana}): {new Date(t.hora_inicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(t.hora_fim).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500 italic">Nenhum turno cadastrado para este setor</li>
+                  )}
                 </ul>
               </div>
               <p>Localização: {setor?.localizacao || "-"}</p>

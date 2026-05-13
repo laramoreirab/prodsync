@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
 import UsuarioController from '../controllers/UsuarioController.js'
+import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js'
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js'
 
 const router = Router()

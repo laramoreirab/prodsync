@@ -16,18 +16,10 @@ const OPCOES_MOTIVO = [
     { label: "Outros", value: 5 },
 ];
 
-const formatarDataBR = (dataString) => {
-    if (!dataString) return '';
-    return dataString.split('-').reverse().join('/');
-};
-
 export default function DetalhesEvento({ eventoId }) {
-    // const [loading, setLoading] = useState(true);
     const [dadosEvento, setDadosEvento] = useState(null)
 
     const [tipoEvento, setTipoEvento] = useState('');
-    const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]);
-    const [setoresSelecionados, setSetoresSelecionados] = useState([]);
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
     const [idMotivoPrincipal, setIdMotivoPrincipal] = useState([]);
     const [observacao, setObservacao] = useState('');
@@ -42,8 +34,6 @@ export default function DetalhesEvento({ eventoId }) {
             try {
                 const dados = await eventosCrudService.getById(eventoId);
                 setTipoEvento(dados.status_maquina || '');
-                setMaquinasSelecionadas(dados.maquina ? [dados.maquina] : []);
-                setSetoresSelecionados(dados.setor_afetado ? [dados.setor_afetado] : []);
                 setOpsSelecionadas(dados.op_afetada ? [dados.op_afetada] : []);
                 setIdMotivoPrincipal(dados.id_motivo_parada || '');
                 setObservacao(dados.observacao || '');
@@ -66,9 +56,6 @@ export default function DetalhesEvento({ eventoId }) {
 
     // helpers de exibição
     const nomeMotivo = OPCOES_MOTIVO.find(m => m.value === Number(idMotivoPrincipal))?.label;
-
-    const diaFormatado = formatarDataBR(inicioData);
-    const fimDataFormatada = formatarDataBR(fimData);
 
     return (
         <>
@@ -98,52 +85,26 @@ export default function DetalhesEvento({ eventoId }) {
                                 className="px-3 text-lg" >
                                 {tipoEvento}
                             </Badge>
-                        </div>
-
-                        {/* Setor */}
-                        <div className="flex items-center">
-                            <span className="text-xl font-semibold text-black">Setor:</span>
-                            <div className="flex">
-                                {setoresSelecionados.map(setor => (
-                                    <span key={setor} className="text-[#333333] font-medium px-1 text-xl">
-                                        {setor}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-
-
-                        {/* Máquinas */}
-                        <div className="flex flex-col gap-1.5">
-                            <span className="text-xl font-semibold text-black">Máquina(s) Afetada(s): </span>
-
-                            <div className="flex flex-wrap gap-2">
-                                {maquinasSelecionadas.map((maquina, index) => (
-                                    <span key={index} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                        {maquina}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
+                        </div>       
 
                         {/* Ordens de Produção */}
                         <div className="flex flex-col gap-1.5">
                             <span className="text-xl font-semibold text-black">OP(s) Afetada(s):</span>
-                            <div className="flex flex-wrap gap-2">
+                            <ul className="flex flex-col">
                                 {opsSelecionadas.map((op, index) => (
-                                    <span key={index} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                        {op}
-                                    </span>
+                                    <li key={index} className="text-[#333333] font-medium text-xl">
+                                        - {op}
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
 
                         {/* Início */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Data Início: </span>
                             <div className="flex">
-                                <span className="text-[#333333] font-medium text-xl">
-                                    {diaFormatado} às {inicioHora}
+                                <span className="text-xl text-[#333333]">
+                                    {inicioData} às {inicioHora}
                                 </span>
                             </div>
                         </div>
@@ -151,9 +112,9 @@ export default function DetalhesEvento({ eventoId }) {
                         {/* Fim */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Data Fim:</span>
-                            <span className="text-[#333333] font-medium text-xl">
+                            <span className="text-xl text-[#333333]">
                                 {fimData && fimHora
-                                    ? `${fimDataFormatada} às ${fimHora}`
+                                    ? `${fimData} às ${fimHora}`
                                     : <span>Ativo</span>
                                 }
                             </span>

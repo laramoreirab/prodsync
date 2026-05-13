@@ -42,12 +42,6 @@ const colunasSetores = [
   { id: "qtd_de_operadores", key: "qtd_de_operadores", label: "Qtd. de Operadores" },
 ];
 
-const modalExclusao = (
-  <DialogContent>
-    <FormExclusaoSetor />
-  </DialogContent>
-);
-
 export default function PageSetores() {
   const { setores, loading, error, refresh } = useSetores();
   const [dados, setDados] = useState([]);
@@ -247,7 +241,11 @@ export default function PageSetores() {
               columns={colunasSetores}
               enableSelection={true}
               onSelectedChange={setSelecionados}
-              excluirLote={modalExclusao}
+              excluirLote={
+                <DialogContent>
+                  <FormExclusaoSetor />
+                </DialogContent>
+              }
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">

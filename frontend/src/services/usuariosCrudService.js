@@ -13,40 +13,37 @@ const API_URL = "/api/usuarios";
     return await apiFetch(`${API_URL}/`, options);
   },
 
-  //buscar detalhes de um usuário
+  // Buscar detalhes de um usuário por id
   getById: async (id) => {
     const options = { method: "GET"}
     const response = await apiFetch(`${API_URL}/${id}`, options);
     return response.dados || response;
   },
 
-  //criar
+  // Criar novo usuário (aceita FormData para upload de foto)
   create: async (dados) => {
     const options = { method: "POST" };
     if (dados instanceof FormData) {
       options.body = dados;
     } else {
-      options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
     return await apiFetch(`${API_URL}/criar`, options);
   },
 
-  //atuzalizar
+  // Atualizar usuário (aceita FormData para upload de foto)
   update: async (id, dados) => {
     const options = { method: "PUT" };
     if (dados instanceof FormData) {
-      // Garante que id_usuario está no FormData
       if (!dados.get("id_usuario")) dados.append("id_usuario", id);
       options.body = dados;
     } else {
-      options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify({ id_usuario: id, ...dados });
     }
     return await apiFetch(`${API_URL}/${id}/atualizar`, options);
   },
 
-  //deletar
+  // Excluir usuário
   delete: async (id) => {
     return await apiFetch(`${API_URL}/${id}/deletar`, {
       method: "DELETE"

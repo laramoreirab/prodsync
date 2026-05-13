@@ -402,9 +402,9 @@ class UsuarioModel {
                 orderBy: { _sum: { qtd_boa: 'desc' } },
                 take: 5
             })
-            const ids = resultado.map(r => r.id_operador)
+
             const usuarios = await prisma.usuarios.findMany({
-                where: { id_usuario: { in: ids } },
+                where: { id_usuario: { in: resultado.map(r => r.id_operador) } },
                 select: { id_usuario: true, nome: true }
             })
 
@@ -414,42 +414,49 @@ class UsuarioModel {
 
             return resultado.map(r => ({
                 nome: nomeUsuario[r.id_operador] ?? 'Desconhecido',
-                total: (r._sum.qtd_boa ?? 0) + (r._sum.qtd_refugo ?? 0)
+                pecas_boas: r._sum.qtd_boa ?? 0,
+                refugo: r._sum.qtd_refugo ?? 0
             }))
-
         } catch (error) {
-            console.error('Erro ao classificar top 5 operadores com mais peças produzidas no banco de dados:', error);
+            console.error('Erro ao retornar top 5 operadores no banco de dados:', error);
             throw error;
         }
     }
+
     static async producaoMediaPorDiaSetor(id_empresa) {
         try {
-            const apontamentos = await prisma.apontamento.findMany({
+            const setores = await prisma.setores.findMany({
                 where: { id_empresa },
                 select: {
-                    qtd_boa: true,
-                    qtd_refugo: true,
-                    data_hora_inicio: true,
-                    maquina: {
+                    id_setor: true,
+                    nome_setor: true,
+                    maquinas: {
                         select: {
-                            setor: { select: { nome_setor: true } }
+                            apontamentos: {
+                                select: {
+                                    data_hora_inicio: true,
+                                    qtd_boa: true
+                                }
+                            }
                         }
                     }
                 }
             })
 
-            const producaoPorSetorDia = {}
+            return setores.map(s => {
+                const setor = s.nome_setor
+                const apontamentos = s.maquinas.flatMap(m => m.apontamentos)
 
-            for (const ap of apontamentos) {
-                const nomeSetor = ap.maquina?.setor?.nome_setor ?? 'Sem setor'
-                const dia = ap.data_hora_inicio.toISOString().split('T')[0]
-                const total = (ap.qtd_boa ?? 0) + (ap.qtd_refugo ?? 0)
+                const porDia = {}
+                apontamentos.forEach(ap => {
+                    const dia = ap.data_hora_inicio.toISOString().split('T')[0]
+                    porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa
+                })
 
-                if (!producaoPorSetorDia[nomeSetor]) producaoPorSetorDia[nomeSetor] = {}
-                if (!producaoPorSetorDia[nomeSetor][dia]) producaoPorSetorDia[nomeSetor][dia] = 0
-
-                producaoPorSetorDia[nomeSetor][dia] += total
-            }
+                const valores = Object.values(porDia)
+                const mediaDiaria = valores.length > 0
+                    ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
+                    : 0
 
             return Object.entries(producaoPorSetorDia).map(([setor, dias]) => {
                 const valores = Object.values(dias)
@@ -463,6 +470,7 @@ class UsuarioModel {
             throw error;
         }
     }
+
     static async rotatividade(id_empresa) {
         try {
             // busca ids dos usuários da empresa para filtrar os logs
@@ -503,7 +511,6 @@ class UsuarioModel {
                 if (!meses[mes]) meses[mes] = { mes, novos: 0, desligados: 0 }
                 meses[mes].novos++
             }
-
             for (const log of logsDesligados) {
                 const mes = nomeMes[log.criado_em.getMonth()]
                 if (!meses[mes]) meses[mes] = { mes, novos: 0, desligados: 0 }
@@ -511,7 +518,6 @@ class UsuarioModel {
             }
 
             return Object.values(meses)
-
         } catch (error) {
             console.error('Erro ao retornar rotatividade de usuários por mês no banco de dados:', error);
             throw error;
@@ -854,5 +860,198 @@ class UsuarioModel {
         return { atual, ideal: Math.max(atual, 1) };
     }
 
+    static async producaoPorHoraOperador(id_empresa, id_usuario) {
+        try {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const amanha = new Date(hoje);
+            amanha.setDate(hoje.getDate() + 1);
+
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_empresa,
+                    id_operador: id_usuario,
+                    data_hora_inicio: { gte: hoje, lt: amanha }
+                },
+                select: {
+                    data_hora_inicio: true,
+                    qtd_boa: true
+                }
+            });
+
+            const porHora = Array.from({ length: 24 }, (_, i) => ({ hora: `${i}h`, pecas: 0 }));
+            apontamentos.forEach(ap => {
+                const hora = new Date(ap.data_hora_inicio).getHours();
+                porHora[hora].pecas += ap.qtd_boa;
+            });
+
+            return porHora;
+        } catch (error) {
+            console.error('Erro ao buscar produção por hora do operador:', error);
+            throw error;
+        }
+    }
+
+    static async produtividadeDiaOperador(id_empresa, id_usuario) {
+        try {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const amanha = new Date(hoje);
+            amanha.setDate(hoje.getDate() + 1);
+
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_empresa,
+                    id_operador: id_usuario,
+                    data_hora_inicio: { gte: hoje, lt: amanha }
+                },
+                select: {
+                    qtd_boa: true,
+                    qtd_refugo: true
+                }
+            });
+
+            const total = apontamentos.reduce((acc, ap) => acc + ap.qtd_boa + ap.qtd_refugo, 0);
+            const bons = apontamentos.reduce((acc, ap) => acc + ap.qtd_boa, 0);
+            const produtividade = total > 0 ? Math.round((bons / total) * 100) : 0;
+
+            return { produtividade };
+        } catch (error) {
+            console.error('Erro ao buscar produtividade do dia do operador:', error);
+            throw error;
+        }
+    }
+
+    static async qualidadeOperador(id_empresa, id_usuario) {
+        try {
+            const apontamentos = await prisma.apontamento.findMany({
+                where: { id_empresa, id_operador: id_usuario },
+                select: { qtd_boa: true, qtd_refugo: true }
+            });
+
+            const bons = apontamentos.reduce((acc, ap) => acc + ap.qtd_boa, 0);
+            const refugos = apontamentos.reduce((acc, ap) => acc + ap.qtd_refugo, 0);
+            const total = bons + refugos;
+
+            return {
+                qualidade: total > 0 ? Math.round((bons / total) * 100) : 0,
+                bons,
+                refugos
+            };
+        } catch (error) {
+            console.error('Erro ao buscar qualidade do operador:', error);
+            throw error;
+        }
+    }
+
+    static async velocimetroOperador(id_empresa, id_usuario) {
+        try {
+            const ultimaOP = await prisma.apontamento.findFirst({
+                where: { id_empresa, id_operador: id_usuario },
+                orderBy: { data_hora_inicio: 'desc' },
+                include: { maquina: true }
+            });
+
+            if (!ultimaOP || !ultimaOP.maquina) return { velocidade: 0 };
+
+            // Simulação de velocidade baseada na capacidade da máquina
+            const velocidade = Math.floor(Math.random() * (ultimaOP.maquina.capacidade || 100));
+            return { velocidade };
+        } catch (error) {
+            console.error('Erro ao buscar velocímetro do operador:', error);
+            throw error;
+        }
+    }
+
+    static async pecasPorDiaOperador(id_empresa, id_usuario) {
+        try {
+            const seteDiasAtras = new Date();
+            seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
+
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_empresa,
+                    id_operador: id_usuario,
+                    data_hora_inicio: { gte: seteDiasAtras }
+                },
+                select: {
+                    data_hora_inicio: true,
+                    qtd_boa: true
+                }
+            });
+
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            const agrupado = {};
+
+            apontamentos.forEach(ap => {
+                const dia = diasSemana[new Date(ap.data_hora_inicio).getDay()];
+                agrupado[dia] = (agrupado[dia] || 0) + ap.qtd_boa;
+            });
+
+            return Object.entries(agrupado).map(([dia, pecas]) => ({ dia, pecas }));
+        } catch (error) {
+            console.error('Erro ao buscar peças por dia do operador:', error);
+            throw error;
+        }
+    }
+
+    static async oeeOperador(id_empresa, id_usuario) {
+        try {
+            const escala = await prisma.escalaTrabalho.findFirst({
+                where: { id_operador: id_usuario, id_empresa },
+                select: { id_maquina: true }
+            });
+
+            if (!escala || !escala.id_maquina) return { oee: 0, disponibilidade: 0, performance: 0, qualidade: 0 };
+
+            const OEEModel = (await import('./OEEModel.js')).default;
+            return await OEEModel.obterOeeMaquina(escala.id_maquina, id_empresa);
+        } catch (error) {
+            console.error('Erro ao buscar OEE do operador:', error);
+            throw error;
+        }
+    }
+
+    static async oeeMaquinaOperador(id_empresa, id_usuario) {
+        try {
+            const escala = await prisma.escalaTrabalho.findFirst({
+                where: { id_operador: id_usuario, id_empresa },
+                select: { id_maquina: true }
+            });
+
+            if (!escala || !escala.id_maquina) return [];
+
+            const OEEModel = (await import('./OEEModel.js')).default;
+            const oee = await OEEModel.obterOeeMaquina(escala.id_maquina, id_empresa);
+            
+            return [{
+                oee: oee.oee || 0,
+                disponibilidade: oee.disponibilidade || 0,
+                performance: oee.performance || 0,
+                qualidade: oee.qualidade || 0
+            }];
+        } catch (error) {
+            console.error('Erro ao buscar OEE da máquina do operador:', error);
+            throw error;
+        }
+    }
+
+    static async oeeMaquinaDetalhesOperador(id_empresa, id_usuario) {
+        try {
+            const escala = await prisma.escalaTrabalho.findFirst({
+                where: { id_operador: id_usuario, id_empresa },
+                select: { id_maquina: true }
+            });
+
+            if (!escala || !escala.id_maquina) return null;
+
+            const OEEModel = (await import('./OEEModel.js')).default;
+            return await OEEModel.obterOeeMaquina(escala.id_maquina, id_empresa);
+        } catch (error) {
+            console.error('Erro ao buscar detalhes do OEE da máquina do operador:', error);
+            throw error;
+        }
+    }
 }
-export default UsuarioModel
+
+export default UsuarioModel;

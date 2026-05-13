@@ -49,7 +49,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
 
-import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";
 
 const colunasEventos = [
   {
