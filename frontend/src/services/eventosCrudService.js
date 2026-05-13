@@ -1,78 +1,58 @@
-import { eventosMockService } from "@/mocks/eventosMock";
-
-// trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = true;
+import { apiFetch } from "@/lib/api";
 
 const API_URL = "/api/eventos";
 
-const apiService = {
-    //buscar todos os eventos
-    getAll: async () => {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error("Erro ao buscar eventos");
-        return await response.json();
-    },
+export const eventosCrudService = {
+  // Buscar todos os eventos (paginado)
+  getAll: async (pagina = 1, limite = 50) => {
+    const res = await apiFetch(`${API_URL}?pagina=${pagina}&limite=${limite}`);
+    return res;
+  },
 
-    //buscar evento por id
-    getById: async (id) => {
-        const response = await fetch(`${API_URL}/${id}`);
-        if (!response.ok) throw new Error("Erro ao buscar evento");
-        return await response.json();
-    },
+  // Buscar evento por id
+  getById: async (id) => {
+    const res = await apiFetch(`${API_URL}/${id}`);
+    // Backend retorna { sucesso, dados }
+    return res.dados ?? res;
+  },
 
-    //buscar eventos justificados
-    getJustificados: async () => {
-        const response = await fetch(`${API_URL}/justificadas`);
-        if (!response.ok) throw new Error("Erro ao buscar eventos justificados");
-        return await response.json();
-    },
+  // Buscar eventos justificados
+  getJustificados: async (pagina = 1, limite = 50) => {
+    const res = await apiFetch(`${API_URL}/justificadas?pagina=${pagina}&limite=${limite}`);
+    return res;
+  },
 
-    //buscar eventos não justificados
-    getNaoJustificados: async () => {
-        const response = await fetch(`${API_URL}/nao-justificadas`);
-        if (!response.ok) throw new Error("Erro ao buscar eventos não justificados");
-        return await response.json();
-    },
+  // Buscar eventos não justificados
+  getNaoJustificados: async (pagina = 1, limite = 50) => {
+    const res = await apiFetch(`${API_URL}/nao-justificadas?pagina=${pagina}&limite=${limite}`);
+    return res;
+  },
 
-    //registrar evento 
-    create: async (dados) => {
-        const response = await fetch(`${API_URL}/sistema`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dados),
-        });
-        if (!response.ok) throw new Error("Erro ao registrar evento");
-        return await response.json();
-    },
+  // Registrar evento manualmente (ADM/Gestor)
+  create: async (dados) => {
+    return await apiFetch(`${API_URL}/sistema`, {
+      method: "POST",
+      body: JSON.stringify(dados),
+    });
+  },
 
-    //editar/justificar evento
-    justificar: async (dados) => {
-        const response = await fetch(`${API_URL}/justificar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dados),
-        });
-        if (!response.ok) throw new Error("Erro ao justificar evento");
-        return await response.json();
-    },
+  // Justificar evento existente: { id_evento, id_motivo_parada, observacao }
+  justificar: async (dados) => {
+    return await apiFetch(`${API_URL}/justificar`, {
+      method: "POST",
+      body: JSON.stringify(dados),
+    });
+  },
 
-    //buscar eventos pendentes de justificativa --> p/ operador
-    getEventoPendente: async () => {
-        const response = await fetch(`${API_URL}/pendente`);
-        if (!response.ok) throw new Error("Erro ao buscar evento pendente");
-        return (await response.json()).dados;
-    },
+  // Buscar evento pendente de justificativa (operador logado)
+  getEventoPendente: async () => {
+    const res = await apiFetch(`${API_URL}/pendente`);
+    return res.dados ?? null;
+  },
 
-    //buscar motivos de eventos
-    getMotivos: async () => {
-        const response = await fetch(`${API_URL}/motivos-parada`);
-        if (!response.ok) throw new Error("Erro ao buscar motivos");
-        return (await response.json()).dados;
-    },
+  // Buscar motivos de parada disponíveis
+  getMotivos: async () => {
+    const res = await apiFetch(`${API_URL}/motivos-parada`);
+    return res.dados ?? [];
+  },
 };
-
-//remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
-export const eventosCrudService = USE_MOCK ? eventosMockService : apiService;
-//após a conexão com o backend, remover o arquivo maquinasMock.js e o USE_MOCK do service
-//além disso, coloque o que está dentro da const apiService dentro de:
-//export const eventosCrudService ={o que ta dentro de apiService aqui dentro}
