@@ -1,5 +1,5 @@
 "use client"
-import { KPI } from "@/components/ui/charts/components";
+import {KPIRetangulo } from "@/components/ui/charts/components";
 import { usePecasPorMinuto } from "./hooks/usePecasPorMinuto";
 
 
@@ -12,7 +12,7 @@ export function PecasPorMinutoWidget(){
      if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
      
       return (
-        <KPI
+        <KPIRetangulo 
           title={data?.titulo}
           value={data?.valor}
         />
