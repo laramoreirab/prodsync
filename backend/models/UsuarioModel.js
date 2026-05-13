@@ -6,43 +6,57 @@ import { gerarIdUsuario } from '../dev-utils/gerarIdUsuario.js';
 class UsuarioModel {
     //Listar todos os usuários com paginacção
     static async listarTodos(id_empresa, paginacao) {
-        try {
-
-            const regrasDaBusca = {
-                where: {
-                    id_empresa: id_empresa
-                },
-                include: {
-                    operador: true, // Traz os dados do operador
-                    turno: {
-                        select: {
-                            nome_turno: true, // Traz apenas o nome do turno
-                        },
+    try {
+        const regrasDaBusca = {
+            where: {
+                id_empresa,
+                tipo: { in: ['Gestor', 'Operador'] }  // exclui Adm da listagem
+            },
+            select: {
+                id_usuario:    true,
+                nome:          true,
+                tipo:          true,
+                email:         true,
+                imagem_perfil: true,
+                escalas: {
+                    select: {
+                        id_turno: true,
+                        id_setor: true,
+                        turno: { select: { nome_turno: true } },
+                        setor: { select: { nome_setor:  true } }
                     },
-                    setor: {
-                        select: {
-                            nome_setor: true, // Traz apenas o nome do setor
-                        },
-                    },
-                },
-                orderBy: {
-                    id_operador: 'asc'
-                },
-            }
-
-            const resultadoPaginado = await paginarPrisma(
-                prisma.escalaTrabalho,
-                regrasDaBusca,
-                paginacao
-            );
-
-            return resultadoPaginado;
-
-        } catch (error) {
-            console.error('Erro ao listar usuários:', error);
-            throw error;
+                    take: 1
+                }
+            },
+            orderBy: { id_usuario: 'asc' }
         }
-    };
+
+        const resultadoPaginado = await paginarPrisma(
+            prisma.usuarios,
+            regrasDaBusca,
+            paginacao
+        )
+
+        return {
+            ...resultadoPaginado,
+            dados: resultadoPaginado.dados.map(u => ({
+                id:        u.id_usuario,
+                nome:      u.nome,
+                email:     u.email,
+                funcao:    u.tipo,
+                id_setor:  u.escalas[0]?.id_setor  ?? null,
+                id_turno:  u.escalas[0]?.id_turno  ?? null,
+                setor:     u.escalas[0]?.setor?.nome_setor  ?? 'Sem setor',
+                turno:     u.escalas[0]?.turno?.nome_turno  ?? 'Sem turno',
+                imagem_perfil: u.imagem_perfil
+            }))
+        }
+
+    } catch (error) {
+        console.error('Erro ao listar usuários:', error)
+        throw error
+    }
+}
 
     static async listarSemAdms(id_empresa) {
         try {

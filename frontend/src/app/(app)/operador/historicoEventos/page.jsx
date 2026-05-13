@@ -170,13 +170,13 @@ export default function HistoricoEventos() {
       if (filtrosSelecionados.data.start) {
         const dataInicio = new Date(filtrosSelecionados.data.start);
         dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.data) >= dataInicio
+          new Date(item.inicio ?? item.data) >= dataInicio
         );
       }
       if (filtrosSelecionados.data.end) {
         const dataFim = new Date(filtrosSelecionados.data.end);
         dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.data) <= dataFim
+          new Date(item.inicio ?? item.data) <= dataFim
         );
       }
     }

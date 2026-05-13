@@ -73,6 +73,30 @@ class EventoModel {
         };
     }
 
+    static async obterMaquinaOperador(id_empresa, id_operador) {
+        const escala = await prisma.escalaTrabalho.findFirst({
+            where: {
+                id_empresa,
+                id_operador: Number(id_operador),
+                id_maquina: { not: null }
+            },
+            select: { id_maquina: true }
+        });
+
+        if (escala?.id_maquina) return escala.id_maquina;
+
+        const maquina = await prisma.maquinas.findFirst({
+            where: {
+                id_empresa,
+                id_operador: Number(id_operador),
+                ativo: true
+            },
+            select: { id_maquina: true }
+        });
+
+        return maquina?.id_maquina ?? null;
+    }
+
     static async listarTodos(id_empresa, paginacao) {
         try {
             const regrasDaBusca = {
@@ -97,6 +121,77 @@ class EventoModel {
             throw error;
         }
     }
+
+    static async listarPorOperador(id_empresa, id_operador, paginacao) {
+        try {
+            const id_maquina = await this.obterMaquinaOperador(id_empresa, id_operador);
+
+            if (!id_maquina) {
+                return {
+                    dados: [],
+                    meta: {
+                        totalItens: 0,
+                        itensPorPagina: paginacao.limite,
+                        totalPaginas: 0,
+                        paginaAtual: paginacao.pagina
+                    }
+                };
+            }
+
+            const regrasDaBusca = {
+                where: { id_empresa, id_maquina },
+                include: {
+                    maquina: {
+                        select: { id_maquina: true, nome: true, serie: true }
+                    },
+                    motivo_parada: {
+                        select: { id_motivo: true, descricao: true, tipo: true }
+                    },
+                    turno: {
+                        select: { id_turno: true, nome_turno: true, dia_semana: true }
+                    }
+                },
+                orderBy: { inicio: 'desc' }
+            };
+
+            return await paginarPrisma(prisma.historico_Eventos, regrasDaBusca, paginacao);
+        } catch (error) {
+            console.error('Erro ao listar eventos do operador:', error);
+            throw error;
+        }
+    }
+
+    static async obterEventoPendente(id_empresa, id_operador = null) {
+        try {
+            const id_maquina = id_operador
+                ? await this.obterMaquinaOperador(id_empresa, id_operador)
+                : null;
+
+            if (id_operador && !id_maquina) return null;
+
+            const evento = await prisma.historico_Eventos.findFirst({
+                where: {
+                    id_empresa,
+                    ...(id_maquina ? { id_maquina } : {}),
+                    id_motivo_parada: null,
+                    status_atual: {
+                        in: ['Parada', 'Setup', 'Manutencao']
+                    }
+                },
+                include: {
+                    maquina: {
+                        select: { id_maquina: true, nome: true, serie: true }
+                    }
+                },
+                orderBy: { inicio: 'desc' }
+            });
+
+            return evento ? this.formatarEvento(evento) : null;
+        } catch (error) {
+            console.error('Erro ao buscar evento pendente:', error);
+            throw error;
+        }
+    }
     //listar paradas não justificadas
     static async listarNaoJustificadas(id_empresa, paginacao) {
         try {
@@ -109,7 +204,7 @@ class EventoModel {
                 }
             }
             const resultadoPaginado = await paginarPrisma(
-                prisma.historico_eventos,
+                prisma.historico_Eventos,
                 regrasDaBusca,
                 paginacao
             );
@@ -131,7 +226,7 @@ class EventoModel {
                 }
             }
             const resultadoPaginado = await paginarPrisma(
-                prisma.historico_eventos,
+                prisma.historico_Eventos,
                 regrasDaBusca,
                 paginacao
             );
@@ -235,7 +330,7 @@ class EventoModel {
                 return {
                     id_empresa,
                     id_maquina,
-                    ordemProducaoId: ordem?.id_ordem ?? null,
+                    id_ordemProducao: ordem?.id_ordem ?? null,
                     id_turno: turno.id_turno,
                     status_atual: status_maquina,
                     setor_afetado: Number(setor_afetado),
@@ -263,7 +358,7 @@ class EventoModel {
 
     static async verificaJustificativa(id_empresa, id_evento) {
         try {
-            const evento = await prisma.historico_eventos.findFirst({
+            const evento = await prisma.historico_Eventos.findFirst({
                 where: {
                     id_empresa,
                     id_evento

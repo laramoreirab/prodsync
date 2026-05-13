@@ -347,7 +347,7 @@ class SetorController {
   static async top5Operadores(req, res) {
     try {
          const id_empresa = req.user.id_empresa
-        const id_setor = req.params.id_setor
+        const id_setor = Number(req.params.id_setor)
       const dados = await SetorModel.top5OperadoresSetor(
         id_setor,
         id_empresa

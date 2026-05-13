@@ -643,9 +643,9 @@ class SetorModel {
       by:    ['id_motivo_parada'],
       where: {
         id_empresa,
-        setor_afetado:   id_setor,
+        setor_afetado:  Number(id_setor),
         id_motivo_parada: { not: null },
-        status_atual:    { in: ['Parada', 'Manutencao', 'Setup'] }
+        status_atual:    { in: ['Parada', 'Setup'] }
       },
       _count:  { id_evento: true },
       orderBy: { _count: { id_evento: 'desc' } },

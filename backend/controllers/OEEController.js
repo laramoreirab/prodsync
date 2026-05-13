@@ -113,7 +113,7 @@ class OEEController {
 
     static async evolucaoOEESetor(req, res) {
     try {
-        const id_setor = req.params.id_setor
+        const id_setor = Number(req.params.id_setor)
         const id_empresa = req.user.id_empresa
       const dados = await OEEModel.evolucaoOEESetor(id_setor,id_empresa)
       return res.status(200).json({ sucesso: true, dados })

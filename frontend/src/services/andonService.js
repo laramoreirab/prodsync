@@ -13,7 +13,7 @@ import {
   mockAndonSectorStatusMaquinas,
 } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 function normalizeScope(scope = "factory") {
   return scope === "sector" ? "sector" : "factory";
@@ -42,8 +42,8 @@ export const andonStatusService = {
       return AndonStatusMaquinasSchema.parse(statusByScope[normalizedScope]);
     }
 
-    const data = await apiFetch(`/andon/status_maquinas?scope=${normalizedScope}`);
-    return AndonStatusMaquinasSchema.parse(data);
+    const data = await apiFetch(`/api/andon/status_maquinas?scope=${normalizedScope}`);
+    return AndonStatusMaquinasSchema.parse(data.dados ?? data);
   },
 };
 
@@ -55,8 +55,8 @@ export const andonRankingService = {
       return AndonRankingArraySchema.parse(rankingByScope[normalizedScope]);
     }
 
-    const data = await apiFetch(`/andon/ranking_produtividade?scope=${normalizedScope}`);
-    return AndonRankingArraySchema.parse(data);
+    const data = await apiFetch(`/api/andon/ranking_produtividade?scope=${normalizedScope}`);
+    return AndonRankingArraySchema.parse(data.dados ?? data);
   },
 };
 
@@ -68,7 +68,7 @@ export const andonSectionsService = {
       return AndonSectionArraySchema.parse(sectionsByScope[normalizedScope]);
     }
 
-    const data = await apiFetch(`/andon/secoes?scope=${normalizedScope}`);
-    return AndonSectionArraySchema.parse(data);
+    const data = await apiFetch(`/api/andon/secoes?scope=${normalizedScope}`);
+    return AndonSectionArraySchema.parse(data.dados ?? data);
   },
 };

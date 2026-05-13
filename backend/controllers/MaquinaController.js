@@ -503,7 +503,7 @@ class MaquinaController {
     static async pecasProduzidas7Dias(req, res) {
     try {
         const id_empresa = req.user.id_empresa
-        const id_setor = req.params.id_setor
+        const id_setor = Number(req.params.id_setor)
       const dados = await MaquinaModel.pecasProduzidas7Dias(
         id_setor,
         id_empresa
@@ -533,7 +533,7 @@ static async statusMaquinas(req, res) {
    static async producaoMaquinas(req, res) {
     try {
         const id_empresa = req.user.id_empresa
-        const id_setor = req.params.id_setor
+        const id_setor = Number(req.params.id_setor)
       const dados = await MaquinaModel.producaoMaquinasSetor(
         id_setor,
         id_empresa
