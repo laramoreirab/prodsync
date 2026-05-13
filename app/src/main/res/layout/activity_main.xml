@@ -67,7 +67,6 @@
     <LinearLayout
         android:id="@+id/btn_cadastrar"
         android:contentDescription="Botão de cadastro"
-        android:roleDescription="button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -195,16 +194,6 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/tv_esqueceu_senha"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Esqueceu a Senha?"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:layout_marginTop="5dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/il_senha" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_login"
@@ -219,7 +208,7 @@
                 app:cornerRadius="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_esqueceu_senha" />
+                app:layout_constraintTop_toBottomOf="@id/il_senha" />
 
             <TextView
                 android:id="@+id/tv_cadastro"
