@@ -30,17 +30,8 @@ export default function OPDetalheGestor({ params }) {
   const { id } = use(params);
   const opId = id;
 
-
   const [buscaApontamento, setBuscaApontamento] = useState("");
-
-
-  const parseData = (dataStr) => {
-    const [dataParte] = dataStr.split(" ");
-    const [dia, mes] = dataParte.split("/");
-
-    // ano fixo (ajuste se precisar)
-    return new Date(`2025-${mes}-${dia}`);
-  };
+  const parseData = (dataStr) => new Date(dataStr);
 
   // -------------------------------------------------------------------------------------------------- Eventos --------------------------------------------------------------------------------------------------
   const colunasOP = [
@@ -196,11 +187,11 @@ export default function OPDetalheGestor({ params }) {
     { label: 'ID Decrescente', value: 'id_desc' },
     { label: 'Data Crescente', value: 'data_asc' },
     { label: 'Data Decrescente', value: 'data_desc' },
-    { label: 'DuraÃ§Ã£o Crescente', value: 'duracao_asc' },
-    { label: 'DuraÃ§Ã£o Decrescente', value: 'duracao_desc' }
+    { label: 'Duraçãoo Crescente', value: 'duracao_asc' },
+    { label: 'Duração Decrescente', value: 'duracao_desc' }
   ];
 
-  //lÃ³gica de ordenaÃ§Ã£o de Eventos
+  //lógica de ordenação de Eventos
   const handleSortEventos = (criterio) => {
     const copia = [...dadosEventos];
 
@@ -208,19 +199,19 @@ export default function OPDetalheGestor({ params }) {
       if (criterio === "id_asc") return a.id - b.id;
       if (criterio === "id_desc") return b.id - a.id;
 
-      if (criterio === "data_asc") return parseData(a.data) - parseData(b.data);
-      if (criterio === "data_desc") return parseData(b.data) - parseData(a.data);
+
+      if (criterio === "data_asc") return parseData(a.inicio) - parseData(b.inicio);
+      if (criterio === "data_desc") return parseData(b.inicio) - parseData(a.inicio);
 
       if (criterio === "duracao_asc") {
-        const [hA, mA] = a.duracao.split(":").map(Number);
-        const [hB, mB] = b.duracao.split(":").map(Number);
-        return hA * 60 + mA - (hB * 60 + mB);
+        const duracaoA = parseData(a.fim) - parseData(a.inicio);
+        const duracaoB = parseData(b.fim) - parseData(b.inicio);
+        return duracaoA - duracaoB;
       }
-
       if (criterio === "duracao_desc") {
-        const [hA, mA] = a.duracao.split(":").map(Number);
-        const [hB, mB] = b.duracao.split(":").map(Number);
-        return hB * 60 + mB - (hA * 60 + mA);
+        const duracaoA = parseData(a.fim) - parseData(a.inicio);
+        const duracaoB = parseData(b.fim) - parseData(b.inicio);
+        return duracaoB - duracaoA;
       }
 
       return 0;
@@ -233,30 +224,40 @@ export default function OPDetalheGestor({ params }) {
   const eventosFilter = [
     { id: "evento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
-    // {id:"duracao", label:"DuraÃ§Ã£o", type:"time-max"} --> nÃ£o funcionou, tentei de vÃ¡rias formas mas o filtro por duraÃ§Ã£o nÃ£o funcionou, entÃ£o deixei comentado por enquanto. quem quiser tentar implementar depois, fique Ã  vontade!
+    // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
   ];
 
 
   const aplicarFiltrosEventos = (filtrosSelecionados) => {
     let dadosFiltrados = [...dadosOP];
 
+    //filtro por tipo de evento
     if (filtrosSelecionados.evento?.length) {
       dadosFiltrados = dadosFiltrados.filter((e) =>
         filtrosSelecionados.evento.includes(e.evento)
       );
     }
 
+    //filtro por data
+
     if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(
-          (e) => parseData(e.data) >= new Date(filtrosSelecionados.data.start)
-        );
+      const { start, end } = filtrosSelecionados.data;
+      if (start) {
+        const dataInicioFiltro = new Date(start).getTime();
+
+        dadosFiltrados = dadosFiltrados.filter((e) => {
+          const dataEvento = new Date(e.inicio).getTime();
+          return dataEvento >= dataInicioFiltro;
+        });
       }
 
-      if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(
-          (e) => parseData(e.data) <= new Date(filtrosSelecionados.data.end)
-        );
+      if (end) {
+        const dataFimFiltro = new Date(end).getTime();
+
+        dadosFiltrados = dadosFiltrados.filter((e) => {
+          const dataEvento = new Date(e.inicio).getTime();
+          return dataEvento <= dataFimFiltro;
+        });
       }
     }
 
@@ -356,7 +357,7 @@ export default function OPDetalheGestor({ params }) {
     { label: 'Refugo Decrescente', value: 'refugo_desc' }
   ];
 
-  //lÃ³gica de ordenaÃ§Ã£o de Apontamentos
+  //lógica de ordenação de Apontamentos
   const handleSortApontamento = (criterio) => {
     const dadosCopiados = [...dadosApontamentoState];
 
@@ -385,8 +386,9 @@ export default function OPDetalheGestor({ params }) {
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosApontamentoState];
+    let dadosFiltrados = [...dadosApontamento];
 
+    //filtro por produzido
     if (filtrosSelecionados.produzido) {
       if (filtrosSelecionados.produzido.min != null) {
         dadosFiltrados = dadosFiltrados.filter(a =>
@@ -401,6 +403,7 @@ export default function OPDetalheGestor({ params }) {
       }
     }
 
+    //filtro por refugo
     if (filtrosSelecionados.refugo) {
       if (filtrosSelecionados.refugo.min != null) {
         dadosFiltrados = dadosFiltrados.filter(a =>
@@ -416,16 +419,14 @@ export default function OPDetalheGestor({ params }) {
     }
 
     if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          parseData(a.data) >= new Date(filtrosSelecionados.data.start)
-        );
+      const { start, end } = filtrosSelecionados.data;
+      if (start) {
+        const dStart = new Date(start).getTime();
+        dadosFiltrados = dadosFiltrados.filter(a => new Date(a.inicio).getTime() >= dStart);
       }
-
-      if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          parseData(a.data) <= new Date(filtrosSelecionados.data.end)
-        );
+      if (end) {
+        const dEnd = new Date(end).getTime();
+        dadosFiltrados = dadosFiltrados.filter(a => new Date(a.inicio).getTime() <= dEnd);
       }
     }
 
@@ -594,51 +595,59 @@ export default function OPDetalheGestor({ params }) {
           </div>
 
           {/* Tabela */}
-          <TableListagens
-            data={dadosOP}
-            columns={colunasOP}
-            enableSelection={true}
-            onEditSelected={(rows) => handleEditBatch(rows)}
-            acoesDropdown={(ordemProd) => (
-              <>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                      Ver Detalhes
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DetalhesEvento eventoId={ordemProd.op} />
-                  </DialogContent>
-                </Dialog>
+          {dadosExibidos.length > 0 ? (
+            <TableListagens
+              data={dadosExibidos}
+              columns={colunasOP}
+              enableSelection={true}
+              onEditSelected={(rows) => handleEditBatch(rows)}
+              acoesDropdown={(ordemProd) => (
+                <>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={ordemProd.op} />
+                    </DialogContent>
+                  </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <BellRing className="mr-2 h-4 w-4" />
-                      Solicitar Justificativa
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <ModalSucessNotificacao />
-                  </DialogContent>
-                </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <BellRing className="mr-2 h-4 w-4" />
+                        Solicitar Justificativa
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <ModalSucessNotificacao />
+                    </DialogContent>
+                  </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <Pencil className="mr-2 h-4 w-4 text-primary" />
-                      Editar Evento
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormEdicaoEvento />
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-          />
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar Evento
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoEvento />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
+              <Search className="w-12 h-12 text-gray-300 mb-3" />
+              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
+              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
+            </div>
+          )}
 
         </section>
 
@@ -647,7 +656,7 @@ export default function OPDetalheGestor({ params }) {
           <div className="flex items-center justify-between gap-5 mt-5">
             <h1 className="text-4xl w-[125] font-semibold">Histórico de Apontamentos da OP</h1>
           </div>
-          
+
           {/* Busca */}
           <div className="flex searchbar">
             <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
@@ -680,14 +689,18 @@ export default function OPDetalheGestor({ params }) {
           </div>
 
           {/* Tabela */}
-          <div>
+          {dadosApontamentosFiltrados.length > 0 ? (
             <TableListagens
-              /* Dados e colunas a depender da pÃ¡gina [no momento estÃ¡ estÃ¡tico definido em um json, posteriormente serÃ¡ um get]  */
-              data={dadosApontamento}
+              data={dadosApontamentosFiltrados}
               columns={colunasApontamento}
             />
-
-          </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
+              <Search className="w-12 h-12 text-gray-300 mb-3" />
+              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
+              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
+            </div>
+          )}
         </section>
 
       </div>
