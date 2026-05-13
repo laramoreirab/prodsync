@@ -378,6 +378,84 @@ class OEEModel {
             })
         };
     }
+
+    // ------------------------------------------OEE da tela especifica de usuario Gestor-----------------------------------------------------
+     static ultimosSeteDias() {
+    const dias = []
+    for (let i = 6; i >= 0; i--) {
+      const data = new Date()
+      data.setDate(data.getDate() - i)
+      data.setHours(0, 0, 0, 0)
+      dias.push(data.toISOString().split('T')[0])
+    }
+    return dias
+  }
+    static async evolucaoOEESetor(id_setor, id_empresa) {
+    const dias = this.ultimosSeteDias()
+
+    const resultado = await Promise.all(
+      dias.map(async (data, i) => {
+        const inicio = new Date(`${data}T00:00:00`)
+        const fim    = new Date(`${data}T23:59:59`)
+
+        const [apontamentos, ordens, paradas] = await Promise.all([
+          prisma.apontamento.findMany({
+            where: {
+              id_empresa,
+              data_hora_inicio: { gte: inicio, lte: fim },
+              maquina: { id_setor }
+            },
+            select: {
+              qtd_boa:          true,
+              qtd_refugo:       true,
+              data_hora_inicio: true,
+              data_hora_fim:    true
+            }
+          }),
+          prisma.ordemProducao.aggregate({
+            where: {
+              id_empresa,
+              id_setor,
+              data_inicio: { lte: fim },
+              OR: [{ data_fim: null }, { data_fim: { gte: inicio } }]
+            },
+            _sum: { qtd_planejada: true }
+          }),
+          prisma.historico_Eventos.aggregate({
+            where: {
+              id_empresa,
+              setor_afetado: id_setor,
+              inicio:        { gte: inicio, lte: fim },
+              duracao:       { not: null }
+            },
+            _sum: { duracao: true }
+          })
+        ])
+
+        // calcula OEE do dia
+        const qtdBoa       = apontamentos.reduce((a, ap) => a + (ap.qtd_boa ?? 0), 0)
+        const qtdRefugo    = apontamentos.reduce((a, ap) => a + (ap.qtd_refugo ?? 0), 0)
+        const qtdTotal     = qtdBoa + qtdRefugo
+        const qtdPlanejada = ordens._sum.qtd_planejada ?? 0
+        const tempoParado  = paradas._sum.duracao ?? 0
+
+        const tempoProduzindo = apontamentos.reduce((acc, ap) => {
+          if (!ap.data_hora_fim) return acc
+          return acc + (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
+        }, 0)
+
+        const tempoTotal       = tempoProduzindo + tempoParado
+        const disponibilidade  = tempoTotal > 0     ? tempoProduzindo / tempoTotal : 0
+        const performance      = qtdPlanejada > 0   ? qtdTotal / qtdPlanejada      : 0
+        const qualidade        = qtdTotal > 0        ? qtdBoa / qtdTotal            : 0
+        const oee              = Math.round(disponibilidade * performance * qualidade * 100)
+
+        return { dia: `Dia ${i + 1}`, oee }
+      })
+    )
+
+    return resultado
+  }
 }
 
 export default OEEModel;

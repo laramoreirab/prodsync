@@ -660,8 +660,8 @@ export const mockAndonRanking = mockAndonFactoryRanking;
 
 
 export const mockProducaoPorMaquinaSetor = [
-  { setor: "THAK-002", qtd: 80 },
-  { setor: "THAK-004", qtd: 60 },
-  { setor: "THAK-005", qtd: 40 },
-  { setor: "THAK-008", qtd: 25 },
+  { maquina: "THAK-002", qtd: 80 },
+  { maquina: "THAK-004", qtd: 60 },
+  { maquina: "THAK-005", qtd: 40 },
+  { maquina: "THAK-008", qtd: 25 },
 ];

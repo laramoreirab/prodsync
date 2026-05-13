@@ -637,6 +637,65 @@ class SetorModel {
         }
     }
 
+    // ---------------------------------------Pagina de Gestor -----------------------------------------------
+     static async motivosParadaSetor(id_setor, id_empresa) {
+    const resultado = await prisma.historico_Eventos.groupBy({
+      by:    ['id_motivo_parada'],
+      where: {
+        id_empresa,
+        setor_afetado:   id_setor,
+        id_motivo_parada: { not: null },
+        status_atual:    { in: ['Parada', 'Manutencao', 'Setup'] }
+      },
+      _count:  { id_evento: true },
+      orderBy: { _count: { id_evento: 'desc' } },
+      take:    5
+    })
+
+    const ids     = resultado.map(r => r.id_motivo_parada)
+    const motivos = await prisma.motivos_Parada.findMany({
+      where:  { id_motivo: { in: ids } },
+      select: { id_motivo: true, descricao: true }
+    })
+
+    const nomeMotivo = Object.fromEntries(
+      motivos.map(m => [m.id_motivo, m.descricao])
+    )
+
+    return resultado.map(r => ({
+      motivo: nomeMotivo[r.id_motivo_parada] ?? 'Sem motivo',
+      qtd:    r._count.id_evento
+    }))
+  }
+
+  static async top5OperadoresSetor(id_setor, id_empresa) {
+    const resultado = await prisma.apontamento.groupBy({
+      by:    ['id_operador'],
+      where: {
+        id_empresa,
+        maquina: { id_setor }
+      },
+      _sum:    { qtd_boa: true, qtd_refugo: true },
+      orderBy: { _sum: { qtd_boa: 'desc' } },
+      take:    5
+    })
+
+    const ids      = resultado.map(r => r.id_operador)
+    const usuarios = await prisma.usuarios.findMany({
+      where:  { id_usuario: { in: ids } },
+      select: { id_usuario: true, nome: true }
+    })
+
+    const nomeUsuario = Object.fromEntries(
+      usuarios.map(u => [u.id_usuario, u.nome])
+    )
+
+    return resultado.map(r => ({
+      operador:  nomeUsuario[r.id_operador] ?? 'Desconhecido',
+      qtd: (r._sum.qtd_boa ?? 0) + (r._sum.qtd_refugo ?? 0)
+    }))
+  }
+
 }
 
 export default SetorModel;

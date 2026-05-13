@@ -328,7 +328,7 @@ export default function SetorEspecificoPage({ params }) {
               Criar Turno
             </DialogTrigger>
             <DialogContent>
-              <FormCriacaoTurno />
+              <FormCriacaoTurno onSuccess={refresh} />
             </DialogContent>
           </Dialog>
         </div>
@@ -529,7 +529,7 @@ export default function SetorEspecificoPage({ params }) {
                 acoesDropdown={(setor) => (
                   <>
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`/adm/usuarios/${setor.id_usuario}`}>
+                      <Link href={setor.funcao === "Gestor" ? `/adm/usuarios/gestor/${setor.id_usuario}` : `/adm/usuarios/${setor.id_usuario}`}>
                         <EyeIcon className="mr-2 h-4 w-4" />
                         Ver Detalhes
                       </Link>

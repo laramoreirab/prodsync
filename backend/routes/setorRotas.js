@@ -25,6 +25,9 @@ router.get('/:id_setor', SetorController.obterSetorPorId)
 router.put('/:id_setor', SetorController.atualizarSetor)
 router.delete('/:id_setor', SetorController.deletarSetor)
 
+router.get('/motivosParada/:id_setor', SetorController.motivosParada)
+router.get('/top5operadoresPorSetor/:id_setor', SetorController.top5Operadores)
+
 router.post('/:id_setor/gestores', SetorController.associarGestor)
 router.delete('/:id_setor/gestores', SetorController.removerGestor)
 router.get('/:id_setor/gestores', SetorController.listarGestoresDoSetor)

@@ -1,4 +1,4 @@
-// import { usuariosMockService } from "@/mocks/usuariosMock";
+import { apiFetch } from "@/lib/api";
 
 // trocar para true p false quando o backend estiver pronto p integração!!
 const USE_MOCK = false;
@@ -10,13 +10,14 @@ const API_URL = "/api/usuarios";
   //buscar todos os usuários
   getAll: async () => {
     const options = { method: "GET"}
-    return await fetch(`${API_URL}/`, options);
+    return await apiFetch(`${API_URL}/`, options);
   },
 
   //buscar detalhes de um usuário
   getById: async (id) => {
     const options = { method: "GET"}
-    return await fetch(`${API_URL}/${id}`, options);
+    const response = await apiFetch(`${API_URL}/${id}`, options);
+    return response.dados || response;
   },
 
   //criar
@@ -28,7 +29,7 @@ const API_URL = "/api/usuarios";
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
-    return await fetch(`${API_URL}/criar`, options);
+    return await apiFetch(`${API_URL}/criar`, options);
   },
 
   //atuzalizar
@@ -42,12 +43,12 @@ const API_URL = "/api/usuarios";
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify({ id_usuario: id, ...dados });
     }
-    return await fetch(`${API_URL}/${id}/atualizar`, options);
+    return await apiFetch(`${API_URL}/${id}/atualizar`, options);
   },
 
   //deletar
   delete: async (id) => {
-    return await fetch(`${API_URL}/${id}/deletar`, {
+    return await apiFetch(`${API_URL}/${id}/deletar`, {
       method: "DELETE"
     });
   },

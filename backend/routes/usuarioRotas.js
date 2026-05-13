@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middlewares/authMiddleware.js'
 import UsuarioController from '../controllers/UsuarioController.js'
+import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js'
 
 const router = Router()
 
@@ -14,10 +15,11 @@ router.get('/dashboard/tempo-medio-sessao-perfil',authMiddleware, UsuarioControl
 router.get('/dashboard/rotatividadeUsuarios', authMiddleware, UsuarioController.rotatividade )
 router.get('/dashboard/producaoMediaPorSetor', authMiddleware, UsuarioController.producaoMediaPorDiaSetor)
 router.get('/dashboard/metaProducaoPorSetor', authMiddleware, UsuarioController.metaProducaoPorSetor)
-router.get('/criar', authMiddleware, UsuarioController.criarUsuario)
+router.post('/criar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, UsuarioController.criarUsuario)
 router.get('/:id', authMiddleware, UsuarioController.buscarPorId)
-router.get('/:id/deletar', authMiddleware, UsuarioController.deletarUsuario)
-router.get('/:id/atualizar', authMiddleware, UsuarioController.atualizarUsuario)
+router.delete('/:id/deletar', authMiddleware, UsuarioController.deletarUsuario)
+router.put('/:id/atualizar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, UsuarioController.atualizarUsuario)
+router.get('/:id/apontamentos', authMiddleware, UsuarioController.listarApontamentosUsuario)
 router.get('/operadores/:id_setor', authMiddleware, UsuarioController.listarOperadoresporSetor)
 router.get('/:id/producao_por_hora', authMiddleware, UsuarioController.getProducaoPorHora);
 router.get('/:id/produtividade_dia', authMiddleware, UsuarioController.getProdutividadeDia);

@@ -9,6 +9,8 @@ import { Plus, Info, File, Upload, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/api';
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -16,7 +18,9 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [arquivoLote, setArquivoLote] = useState(null);
     const fileInputLoteRef = useRef(null);
     const fileInputFotoRef = useRef(null);
-    const [listaSetores, setListaSetores] = useEffect([])
+    const [listaSetores, setListaSetores] = useState([])
+    const [listaTurnos, setListaTurnos] = useState([])
+    const [listaMaquinas, setListaMaquinas] = useState([])
 
     useEffect(() => {
             async function carregarSetores() {
@@ -32,6 +36,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     
             carregarSetores();
         }, []);
+
 
     const estadoInicialForm = {
         nome: "",
@@ -87,7 +92,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
         payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
 
-        if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+        if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
         try {
             await usuariosCrudService.create(payload);
@@ -111,6 +116,38 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
 
         //integrar endpoint de cadastro em lote quando o backend disponibilizar
     };
+
+     useEffect(() => {
+            async function carregarTurnos() {
+                try {
+                    const options = { method : "GET"}
+                    const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`,options)
+                    setListaTurnos(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar turnos.");
+                }
+    
+            }
+    
+            carregarTurnos();
+        }, [formData.id_setor]);
+
+        useEffect(() => {
+            async function carregarMaquinas() {
+                try {
+                    const options = { method : "GET"}
+                    const dados = await apiFetch(`/api/maquinas/setor/${formData.id_setor}`,options)
+                    setListaMaquinas(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar setores.");
+                }
+    
+            }
+    
+            carregarMaquinas();
+        }, [formData.id_setor]);
 
     const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
     const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
@@ -295,13 +332,21 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             id="id_turno"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disable={!formData.id_setor}
                             required
                         >
-                            <option value="">Selecione...</option>
-                            <option value="1">Manhã</option>
-                            <option value="2">Tarde</option>
-                            <option value="3">Noite</option>
-                        </select>
+                              <option value="">Selecione...</option>
+                                 {listaTurnos.map((turno) => (
+
+                                    <option
+                                        key={turno.id_turno}
+                                        value={turno.id_turno}
+                                    >
+                                        {turno.nome_turno}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
@@ -314,12 +359,21 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             id="id_maquina"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disable={!formData.id_setor}
                             required
                         >
-                            <option value="">Selecione...</option>
-                            <option value="1">Máquina 1</option>
-                            <option value="2">Máquina 2</option>
-                        </select>
+                             <option value="">Selecione...</option>
+                                 {listaMaquinas.map((maquina) => (
+
+                                    <option
+                                        key={maquina.id_maquina}
+                                        value={maquina.id_maquina}
+                                    >
+                                        {maquina.nome}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}

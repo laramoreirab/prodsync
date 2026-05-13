@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { DialogTitle } from "@/components/ui/dialog";
 import { Plus, ChevronDown, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
+import turnoCrudService from '@/services/turnoCrudService';
 
 const DIAS_DA_SEMANA = [
     'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'
@@ -65,7 +67,7 @@ export default function FormCadastroTurnoSetor({ onSuccess }) {
             };
 
             const response = await turnoCrudService.create(payload);
-            if (response.sucesso) {
+            if (response?.sucesso) {
                 toast.success('Turno(s) criado(s) com sucesso!');
                 if (onSuccess) onSuccess();
             } else {

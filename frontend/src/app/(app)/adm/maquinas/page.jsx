@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, Loader2 } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import React, { useState, useEffect } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import {

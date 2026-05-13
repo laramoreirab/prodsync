@@ -292,6 +292,50 @@ class MaquinaModel {
         }
     }
 
+    static async obterMaquinaOperador(id_empresa, id_operador){
+        try {
+            const resposta = await prisma.escalaTrabalho.findFirst({
+                where:{
+                    id_empresa: id_empresa,
+                    id_operador: Number(id_operador)
+                },
+                select:{
+                    id_maquina: true
+                }
+            })
+            return resposta
+            
+        } catch (error) {
+            console.error('Erro ao obter máquina pelo ID do operador no banco', error);
+            throw error;
+        }
+    }
+
+    static async eficienciaMaquina(id_empresa, id_operador) {
+        const escala = await prisma.escalaTrabalho.findFirst({
+            where: {
+                id_empresa: Number(id_empresa),
+                id_operador: Number(id_operador),
+                id_maquina: { not: null }
+            },
+            select: { id_maquina: true }
+        });
+
+        if (!escala?.id_maquina) return [];
+
+        const dias = this.criarMapaUltimosDias(7);
+        return Promise.all(dias.map(async (dia, index) => {
+            const inicio = this.inicioDoDia(new Date(`${dia}T00:00:00`));
+            const fim = this.fimDoDia(inicio);
+            const oee = await OEEModel.obterOeeMaquina(escala.id_maquina, Number(id_empresa), inicio, fim);
+
+            return {
+                dia: `Dia ${index + 1}`,
+                eficiencia: oee.oee
+            };
+        }));
+    }
+
     // -------------------------------------dashboard--------------------------------------------------
     static async taxaCumprimentoMetaPorSetor(id_empresa) {
         try {
@@ -829,6 +873,96 @@ class MaquinaModel {
             throw error;
         }
     }
+
+    // ----------------------------------------------------Tela de Gestor -----------------------------------------------------------
+    static ultimosSeteDias() {
+    const dias = []
+    for (let i = 6; i >= 0; i--) {
+      const data = new Date()
+      data.setDate(data.getDate() - i)
+      data.setHours(0, 0, 0, 0)
+      dias.push(data.toISOString().split('T')[0])
+    }
+    return dias
+  }
+    static async pecasProduzidas7Dias(id_setor, id_empresa) {
+    const dias = this.ultimosSeteDias()
+    const inicio = new Date(dias[0])
+
+    const apontamentos = await prisma.apontamento.findMany({
+      where: {
+        id_empresa,
+        data_hora_inicio: { gte: inicio },
+        maquina: { id_setor }
+      },
+      select: {
+        qtd_boa:          true,
+        qtd_refugo:       true,
+        data_hora_inicio: true
+      }
+    })
+
+    // agrupa por dia
+    const agrupado = Object.fromEntries(
+      dias.map((d, i) => [d, { dia: `Dia ${i + 1}`, qtd: 0 }])
+    )
+
+    for (const ap of apontamentos) {
+      const chave = ap.data_hora_inicio.toISOString().split('T')[0]
+      if (agrupado[chave]) {
+        agrupado[chave].qtd += (ap.qtd_boa ?? 0) + (ap.qtd_refugo ?? 0)
+      }
+    }
+
+    return Object.values(agrupado)
+  }
+
+   static async statusMaquinasSetor(id_setor, id_empresa) {
+    const resultado = await prisma.maquinas.groupBy({
+      by:    ['status_atual'],
+      where: { id_empresa, id_setor, ativo: true },
+      _count: { status_atual: true }
+    })
+
+    const nomeStatus = {
+      Produzindo: 'Produzindo',
+      Parada:     'Parada',
+      Setup:      'Setup',
+      Aguardando: 'Aguardando'
+    }
+
+    return resultado.map(r => ({
+      name:  nomeStatus[r.status_atual] ?? r.status_atual,
+      value: r._count.status_atual
+    }))
+  }
+static async producaoMaquinasSetor(id_setor, id_empresa) {
+    const resultado = await prisma.apontamento.groupBy({
+      by:    ['id_maquina'],
+      where: {
+        id_empresa,
+        maquina: { id_setor }
+      },
+      _sum:    { qtd_boa: true, qtd_refugo: true },
+      orderBy: { _sum: { qtd_boa: 'desc' } }
+    })
+
+    const ids      = resultado.map(r => r.id_maquina)
+    const maquinas = await prisma.maquinas.findMany({
+      where:  { id_maquina: { in: ids } },
+      select: { id_maquina: true, nome: true, serie: true }
+    })
+
+    const nomeMaquina = Object.fromEntries(
+      maquinas.map(m => [m.id_maquina, m.serie ?? m.nome])
+    )
+
+    return resultado.map(r => ({
+      maquina: nomeMaquina[r.id_maquina] ?? `Máquina ${r.id_maquina}`,
+      qtd:   (r._sum.qtd_boa ?? 0) + (r._sum.qtd_refugo ?? 0)
+    }))
+  }
+
 }
 
 export default MaquinaModel;

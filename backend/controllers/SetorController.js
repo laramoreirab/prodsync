@@ -1,3 +1,4 @@
+import MaquinaModel from '../models/MaquinaModel.js';
 import SetorModel from '../models/SetorModel.js';
 
 class SetorController {
@@ -326,6 +327,37 @@ class SetorController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
+
+    // ---------------------------------------Pagina de Gestor ----------------------------------------------------
+    static async motivosParada(req, res) {
+    try {
+        const id_empresa = req.user.id_empresa
+        const id_setor = req.params.id_setor
+      const dados = await SetorModel.motivosParadaSetor(
+        id_setor,
+        id_empresa
+      )
+      return res.status(200).json({ sucesso: true, dados })
+    } catch (error) {
+      console.error('Erro no gráfico motivos de parada frequentes do setor:', error)
+      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    }
+  }
+
+  static async top5Operadores(req, res) {
+    try {
+         const id_empresa = req.user.id_empresa
+        const id_setor = req.params.id_setor
+      const dados = await SetorModel.top5OperadoresSetor(
+        id_setor,
+        id_empresa
+      )
+      return res.status(200).json({ sucesso: true, dados })
+    } catch (error) {
+      console.error('Erro top5Operadores:', error)
+      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    }
+  }
 
 }
 

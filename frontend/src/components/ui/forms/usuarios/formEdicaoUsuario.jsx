@@ -95,7 +95,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         payload.append('id_usuario', usuarioId);           // backend espera id_usuario no body
 
         // Só anexa a foto se o usuário tiver selecionado uma nova
-        if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+        if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
         try {
             await usuariosCrudService.update(usuarioId, payload);

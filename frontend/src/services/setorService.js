@@ -111,39 +111,43 @@ export const setorOEEMedioService = {
 export const setorOEEEvolucaoService = {
   async getEvolucao(setorId) {
     if (USE_MOCK) return SetorOEEEvolucaoArraySchema.parse(mockSetorOEEEvolucao);
-    return SetorOEEEvolucaoArraySchema.parse([]);
+    const data = await apiFetch(`/api/oee/evolucaoOEEsetor/${setorId}`)
+    return SetorOEEEvolucaoArraySchema.parse(data.dados);
   },
 };
  
 export const setorTopOperadoresService = {
   async getTopOperadores(setorId) {
     if (USE_MOCK) return SetorTopOperadoresArraySchema.parse(mockSetorTopOperadores);
-    const data = await apiFetch(`/api/setores/${setorId}/operadores`);
+    const data = await apiFetch(`/api/setores/top5operadoresPorSetor/${setorId}`);
     const operadores = (data.dados || []).slice(0, 5).map((operador) => ({
       operador: operador.nome,
       qtd: operador.qtd ?? 0,
     }));
-    return SetorTopOperadoresArraySchema.parse(operadores);
+    return SetorTopOperadoresArraySchema.parse(data.dados);
   },
 };
  
 export const setorMotivosParadaService = {
   async getMotivos(setorId) {
     if (USE_MOCK) return SetorMotivosParadaArraySchema.parse(mockSetorMotivosParada);
-    return SetorMotivosParadaArraySchema.parse([]);
+    const data = await apiFetch(`/api/setores/motivosParada/${setorId}`)
+    return SetorMotivosParadaArraySchema.parse(data.dados);
   },
 };
 
 export const setorProducaoSemanalService = {
   async getProducaoSemanal(setorId) {
     if (USE_MOCK) return SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal);
-    return SetorProducaoSemanalArraySchema.parse([]);
+    const data = await apiFetch(`/api/maquinas/dashboard/pecasProduzidas7dias/${setorId}`)
+    return SetorProducaoSemanalArraySchema.parse(data.dados);
   },
 };
 
 export const setorProducaoMaquinaService = {
   async getProducaoPorMaquina(setorId) {
     if (USE_MOCK) return SetorProducaoMaquinaArraySchema.parse(mockProducaoPorMaquinaSetor);
-    return SetorProducaoMaquinaArraySchema.parse([]);
+    const data = await apiFetch(`/api/maquinas/producaoMaquinas/${setorId}`)
+    return SetorProducaoMaquinaArraySchema.parse(data.dados);
   },
 };
