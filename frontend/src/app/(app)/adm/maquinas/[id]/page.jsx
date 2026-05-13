@@ -115,13 +115,6 @@ const colunasApontamento = [
   { id: 'observacao', key: 'observacao', label: 'Observação' },
 ];
 
-const dadosOriginais = [
-  { id: 1, tipoEvento: 'Setup', data: '26/03 (08:00 - 09:00)', duracao: '00:35', motivo: 'Troca de ferramenta', inicio: "2025-03-26T08:00:00.000Z", fim: null },
-  { id: 2, tipoEvento: 'Parada', data: '06/01 (09:30 - 10:15)', duracao: '00:45', motivo: 'Manutenção corretiva', inicio: "2025-01-06T09:30:00.000Z", fim: "2025-01-06T10:15:00.000Z" },
-  { id: 3, tipoEvento: 'Setup', data: '13/09 (10:15 - 10:35)', duracao: '00:20', motivo: 'Ajuste de parâmetros', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z" },
-  { id: 4, tipoEvento: 'Parada', data: '30/09 (11:00 - 12:00)', duracao: '01:00', motivo: 'Falha elétrica', inicio: "2025-09-30T11:00:00.000Z", fim: "2025-09-30T12:00:00.000Z" },
-];
-
 export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
   const maquinaId = Number(id);
@@ -242,16 +235,6 @@ export default function MaquinaDetalhePage({ params }) {
     return new Date(`2025-${mes}-${dia}`);
   };
 
-  const dadosApontamento = [
-    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta', inicio: "2025-03-26T08:00:00.000Z", fim: null },
-    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva', inicio: "2025-03-26T08:00:00.000Z", fim: null },
-    { id: 3, op: '5678', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-    { id: 4, op: '9012', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-    { id: 5, op: '1223', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
-    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
-    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
-    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
-  ];
   // -------------------------------------------------------------------------------------------------- Eventos --------------------------------------------------------------------------------------------------
   const opcoesOrdenacaoEventos = [
     { label: 'ID Crescente', value: 'id_asc' },
@@ -447,7 +430,7 @@ export default function MaquinaDetalhePage({ params }) {
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando máquina...</p>
+          <p className="text-lg text-gray-600 font-medium">Carregando informações da máquina...</p>
         </div>
       </main>
     );
@@ -618,8 +601,8 @@ export default function MaquinaDetalhePage({ params }) {
           <div>
             {dadosExibidos.length > 0 ? (
               <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                data={dadosExibidos} columns={colunasMaquina}
+                data={dadosExibidos} 
+                columns={colunasMaquina}
                 acoesDropdown={(maquina) => (
                   <>
                     <Dialog>
@@ -666,7 +649,7 @@ export default function MaquinaDetalhePage({ params }) {
               <div className="flex flex-col items-center justify-center p-8 text-gray-500">
                 <Search className="w-12 h-12 mb-4 text-gray-300" />
                 <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                <p>Não encontramos nenhum evento: "{buscaEvento}".</p>
+                <p>Não encontramos nenhum evento correspondente ao filtro ou pesquisa.</p>
               </div>
             )}
           </div>
@@ -708,8 +691,8 @@ export default function MaquinaDetalhePage({ params }) {
 
               {dadosApontamentosFiltrados.length > 0 ? (
                 <TableListagens
-                  /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                  data={dadosApontamentosFiltrados} columns={colunasApontamento}
+                  data={dadosApontamentosFiltrados} 
+                  columns={colunasApontamento}
                   acoesDropdown={(apontamento) => (
                     <>
                       <DropdownMenuItem asChild className="cursor-pointer">
@@ -725,7 +708,7 @@ export default function MaquinaDetalhePage({ params }) {
                 <div className="flex flex-col items-center justify-center p-8 text-gray-500">
                   <Search className="w-12 h-12 mb-4 text-gray-300" />
                   <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                  <p>Não encontramos nenhum apontamento "{buscaEvento}".</p>
+                  <p>Não encontramos nenhum apontamento correspondente ao filtro ou busca.</p>
                 </div>
               )}
 
