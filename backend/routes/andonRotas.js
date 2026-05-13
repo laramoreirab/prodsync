@@ -16,4 +16,10 @@ router.get('/ranking_produtividade', AndonController.getRankingProdutividade);
 // GET /api/andon/secoes?scope=factory|sector&id_setor=<id>
 router.get('/secoes', AndonController.getSecoes);
 
+//--------------------------------------Operador-------------------------------
+
+router.get('/status_maquinas', AndonController.obterStatusMaquinas);
+router.get('/ranking_produtividade', AndonController.obterRankingProdutividade);
+router.get('/secoes', AndonController.obterSecoes);
+
 export default router;

@@ -6,8 +6,9 @@ import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidge
 import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
 import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
 import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
-import { use, useState, useEffect } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -25,11 +26,14 @@ import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina"
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
+import { apiFetch } from "@/lib/api";
+import { setorCrudService } from "@/services/setorCrudService";
+import { maquinaCrudService } from "@/services/maquinaCrudService";
 
 
 const colunaUsuarioSetor = [
   { id: "nome", key: "nome", label: "Nome", className: "w-1/7" },
-  { id: "id", key: "id", label: "ID", className: "w-1/5" },
+  { id: "id_usuario", key: "id_usuario", label: "ID", className: "w-1/5" },
   { id: "funcao", key: "funcao", label: "Função", className: "w-1/5" },
   { id: "turno", key: "turno", label: "Turno", className: "w-1/5" },
   {
@@ -41,7 +45,8 @@ const colunaUsuarioSetor = [
 ];
 
 const colunaMaquinaSetor = [
-  { id: "nome", key: "nome", label: "Nome(ID)", className: "w-1/7" },
+  { id: "nome", key: "nome", label: "Nome", className: "w-1/7" },
+  { id: "id_maquina", key: "id_maquina", label: "ID", className: "w-1/7" },
   { id: "oee_atual", key: "oee_atual", label: "OEE Atual", className: "w-45", },
   { id: "operador", key: "operador", label: "Operador", className: "w-1/5" },
   {
@@ -78,76 +83,63 @@ const colunaMaquinaSetor = [
 
 export default function SetorEspecificoPage({ params }) {
   const { id } = use(params);
+  const router = useRouter();
+  const [setor, setSetor] = useState(null);
+  const [maquinas, setMaquinas] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [dadosMaquina, setDadosMaquina] = useState([]);
+  const [dadosExibidos, setDadosExibidos] = useState([]);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
   const [buscaUsuarios, setBuscaUsuarios] = useState("");
-  const [turnos, setTurnos] = useState([]);
+  
+  const gestor = setor?.gestores?.[0]?.gestor;
 
-  useEffect(() => {
-    const carregarTurnos = async () => {
-      try {
-        const response = await turnoCrudService.getBySetor(id);
-        if (response.sucesso) setTurnos(response.dados);
-      } catch (error) {
-        console.error("Erro ao carregar turnos:", error);
-      }
-    };
-    carregarTurnos();
+  const normalizarMaquina = (maquina) => ({
+    ...maquina,
+    oee_atual: maquina.oee_atual ?? "-",
+    operador: maquina.operador?.nome ?? maquina.operador ?? "-",
+    status: maquina.status_atual || maquina.status || "-",
+    ultima_parada: maquina.ultima_parada ?? "-",
+  });
+
+  const normalizarOperador = (usuario) => ({
+    ...usuario,
+    id_usuario: usuario.id_usuario ?? usuario.id_operador,
+    funcao: usuario.funcao ?? usuario.tipo ?? "Operador",
+    turno: usuario.turno?.nome_turno ?? usuario.turno ?? "-",
+    oee_medio: usuario.oee_medio ?? "-",
+  });
+
+  const refresh = useCallback(async () => {
+    if (!id) return;
+
+    const [setorResp, maquinasResp, operadoresResp] = await Promise.all([
+      setorCrudService.getById(id),
+      apiFetch(`/api/maquinas/setor/${id}`, { method: "GET" }),
+      setorCrudService.listarOperadores(id),
+    ]);
+
+    const setorAtual = setorResp.dados || setorResp;
+    const maquinasAtualizadas = (maquinasResp.dados || []).map(normalizarMaquina);
+    const operadoresAtualizados = (operadoresResp.dados || []).map(normalizarOperador);
+    const gestoresAtualizados = (setorAtual.gestores || []).map(({ gestor }) => ({
+      ...gestor,
+      funcao: "Gestor",
+      turno: "-",
+      oee_medio: "-",
+    }));
+    const usuariosAtualizados = [...gestoresAtualizados, ...operadoresAtualizados];
+
+    setSetor(setorAtual);
+    setMaquinas(maquinasAtualizadas);
+    setDadosMaquina(maquinasAtualizadas);
+    setUsuarios(usuariosAtualizados);
+    setDadosExibidos(usuariosAtualizados);
   }, [id]);
 
-  const dadosExibidos = []; // TODO: Integrar listagem real de usuários do setor
-  const dadosMaquina = [
-    {
-      nome: "Injetora 01",
-      oee_atual: "88%",
-      oee_medio: "82%",
-      operador: "Luiz Gonçalves",
-      status: "Produzindo",
-      ultima_parada: "Hoje, 08:15",
-    },
-    {
-      nome: "Torno CNC A2",
-      oee_atual: "0%",
-      oee_medio: "75%",
-      operador: "Luiz Gonçalves",
-      status: "Parada",
-      ultima_parada: "Hoje, 10:30",
-    },
-    {
-      nome: "Prensa Hidráulica",
-      oee_atual: "92%",
-      oee_medio: "89%",
-      operador: "Luiz Gonçalves",
-      status: "Produzindo",
-      ultima_parada: "Ontem, 22:00",
-    },
-    {
-      nome: "Fresa Industrial",
-      oee_atual: "45%",
-      oee_medio: "70%",
-      operador: "Luiz Gonçalves",
-      status: "Setup",
-      ultima_parada: "Hoje, 07:00",
-    },
-    {
-      nome: "Solda Robótica 05",
-      oee_atual: "98%",
-      oee_medio: "95%",
-      operador: "Luiz Gonçalves",
-      status: "Produzindo",
-      ultima_parada: "01/05, 14:20",
-    },
-    {
-      nome: "Corte a Laser",
-      oee_atual: "0%",
-      oee_medio: "60%",
-      operador: "Luiz Gonçalves",
-      status: "Setup",
-      ultima_parada: "Hoje, 11:45",
-    }
-  ];
-
-
-
+  useEffect(() => {
+    refresh().catch((error) => console.error("Erro ao carregar setor:", error));
+  }, [refresh]);
   //opções de ordenação para máquinas e usuários
   const opcoesOrdenacaoMaquinas = [
     { label: 'ID Crescente', value: 'id_asc' },
@@ -184,24 +176,83 @@ export default function SetorEspecificoPage({ params }) {
   // funções para ordenação e aplicação de filtros 
   // ainda precisam ser implementadas! no momento que elas foram feitas, não havia tabelas ainda
   const handleSortMaquinas = (criterio) => {
-    console.log("Ordenar máquinas por:", criterio);
-    //lógica de ordenação aqui
+    const parseOEE = (valor) => parseFloat(String(valor).replace("%", "")) || 0;
+    const dadosOrdenados = [...dadosMaquina].sort((a, b) => {
+      switch (criterio) {
+        case "id_asc": return (a.id_maquina || 0) - (b.id_maquina || 0);
+        case "id_desc": return (b.id_maquina || 0) - (a.id_maquina || 0);
+        case "oee_asc": return parseOEE(a.oee_atual) - parseOEE(b.oee_atual);
+        case "oee_desc": return parseOEE(b.oee_atual) - parseOEE(a.oee_atual);
+        case "status": return String(a.status).localeCompare(String(b.status));
+        default: return 0;
+      }
+    });
+    setDadosMaquina(dadosOrdenados);
   };
+
   const handleSortUsuarios = (criterio) => {
-    console.log("Ordenar usuários por:", criterio);
-    //lógica de ordenação aqui
+    const parseOEE = (valor) => parseFloat(String(valor).replace("%", "")) || 0;
+    const dadosOrdenados = [...dadosExibidos].sort((a, b) => {
+      switch (criterio) {
+        case "nome_asc": return String(a.nome).localeCompare(String(b.nome));
+        case "id_asc": return (a.id_usuario || 0) - (b.id_usuario || 0);
+        case "id_desc": return (b.id_usuario || 0) - (a.id_usuario || 0);
+        case "oee_asc": return parseOEE(a.oee_medio) - parseOEE(b.oee_medio);
+        case "oee_desc": return parseOEE(b.oee_medio) - parseOEE(a.oee_medio);
+        case "turno": return String(a.turno).localeCompare(String(b.turno));
+        case "funcao": return String(a.funcao).localeCompare(String(b.funcao));
+        default: return 0;
+      }
+    });
+    setDadosExibidos(dadosOrdenados);
   }
 
   const aplicarFiltrosMaquinas = (filtrosSelecionados) => {
-    console.log("Aplicar filtros nas máquinas:", filtrosSelecionados);
-    // lógica de aplicação de filtros aqui
+    let filtrados = [...maquinas];
+    if (filtrosSelecionados.status?.length) {
+      filtrados = filtrados.filter((maquina) => filtrosSelecionados.status.includes(maquina.status));
+    }
+    if (filtrosSelecionados.oee) {
+      const { min, max } = filtrosSelecionados.oee;
+      filtrados = filtrados.filter((maquina) => {
+        const oee = parseFloat(String(maquina.oee_atual).replace("%", "")) || 0;
+        return oee >= (min || 0) && oee <= (max || Infinity);
+      });
+    }
+    setDadosMaquina(filtrados);
   }
 
   const aplicarFiltrosUsers = (filtrosSelecionados) => {
-    console.log("Aplicar filtros nos usuários:", filtrosSelecionados);
-    //lógica de aplicação de filtros aqui
+    let filtrados = [...usuarios];
+    if (filtrosSelecionados.funcao?.length) {
+      filtrados = filtrados.filter((usuario) => filtrosSelecionados.funcao.includes(usuario.funcao));
+    }
+    if (filtrosSelecionados.turno?.length) {
+      filtrados = filtrados.filter((usuario) => filtrosSelecionados.turno.includes(usuario.turno));
+    }
+    if (filtrosSelecionados.oee) {
+      const { min, max } = filtrosSelecionados.oee;
+      filtrados = filtrados.filter((usuario) => {
+        const oee = parseFloat(String(usuario.oee_medio).replace("%", "")) || 0;
+        return oee >= (min || 0) && oee <= (max || Infinity);
+      });
+    }
+    setDadosExibidos(filtrados);
   }
 
+  const maquinasExibidas = dadosMaquina.filter((maquina) => {
+    const termo = buscaMaquinas.toLowerCase();
+    return maquina.nome?.toLowerCase().includes(termo) || String(maquina.id_maquina || "").includes(termo);
+  });
+
+  const usuariosExibidos = dadosExibidos.filter((usuario) => {
+    const termo = buscaUsuarios.toLowerCase();
+    return usuario.nome?.toLowerCase().includes(termo) || String(usuario.id_usuario || "").includes(termo);
+  });
+
+  const excluirSetorAtual = async () => {
+    router.push("/adm/setores");
+  };
   return (
     <main
       className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
@@ -225,7 +276,7 @@ export default function SetorEspecificoPage({ params }) {
 
         <section id="infos_setor" className="flex flex-col">
           <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold">Setor: Engrenagens</h1>
+            <h1 className="text-4xl font-bold">Setor: {setor?.nome_setor || id}</h1>
 
             <div className="flex space-x-2">
               <Dialog>
@@ -233,7 +284,7 @@ export default function SetorEspecificoPage({ params }) {
                   <Pencil size={36} className="mr-1" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormEdicaoSetor />
+                  <FormEdicaoSetor setorId={id} onEdicaoSucesso={refresh} />
                 </DialogContent>
               </Dialog>
 
@@ -242,7 +293,7 @@ export default function SetorEspecificoPage({ params }) {
                   <Trash2 className=" w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormExclusaoSetor />
+                  <FormExclusaoSetor setorId={id} onExclusaoSucesso={excluirSetorAtual} />
                 </DialogContent>
               </Dialog>
             </div>
@@ -250,10 +301,14 @@ export default function SetorEspecificoPage({ params }) {
 
           <div className="py-3 font-medium text-gray-900 text-xl">
             <div className="flex flex-col gap-1">
-              <p>Gestor Responsável:
-                <Link href="/adm/operadores/1" className="hover:underline ml-2">
-                  João Silva
-                </Link>
+              <p>Gestor Responsavel:
+                {gestor ? (
+                  <Link href={`/adm/usuarios/${gestor.id_usuario}`} className="hover:underline ml-2">
+                    {gestor.nome}
+                  </Link>
+                ) : (
+                  <span className="ml-2">-</span>
+                )}
               </p>
               <div className="flex">
                 <p>Turnos:</p>
@@ -269,7 +324,7 @@ export default function SetorEspecificoPage({ params }) {
                   )}
                 </ul>
               </div>
-              <p>Localização: Galpão Sul - Bloco A</p>
+              <p>Localização: {setor?.localizacao || "-"}</p>
             </div>
           </div>
         </section>
@@ -281,12 +336,7 @@ export default function SetorEspecificoPage({ params }) {
               Criar Turno
             </DialogTrigger>
             <DialogContent>
-              <FormCriacaoTurno onSuccess={() => {
-                // Recarregar turnos após criação
-                turnoCrudService.getBySetor(id).then(res => {
-                  if (res.sucesso) setTurnos(res.dados);
-                });
-              }} />
+              <FormCriacaoTurno onSuccess={refresh} />
             </DialogContent>
           </Dialog>
         </div>
@@ -336,9 +386,7 @@ export default function SetorEspecificoPage({ params }) {
                 Cadastrar
               </DialogTrigger>
 
-              <DialogContent>
-                <FormCadastroMaquina />
-              </DialogContent>
+              <FormCadastroMaquina onCadastroSucesso={refresh} />
             </Dialog>
           </div>
 
@@ -359,7 +407,7 @@ export default function SetorEspecificoPage({ params }) {
 
           {/* Listagem de Máquinas */}
           <div className="flex items-center justify-between w-full mt-3">
-            <p>{dadosExibidos.length} máquinas encontradas</p>
+            <p>{maquinasExibidas.length} máquinas encontradas</p>
 
             <div className="flex items-center gap-4">
               <OrdenarDropdown
@@ -375,15 +423,15 @@ export default function SetorEspecificoPage({ params }) {
             </div>
           </div>
           <div className="flex flex-col flex-1 items-center w-full mt-4">
-            {dadosMaquina.length > 0 ? (
+            {maquinasExibidas.length > 0 ? (
               /* dados só renderizam a tabela se tiver resultado */
               <TableListagens
-                data={dadosMaquina}
+                data={maquinasExibidas}
                 columns={colunaMaquinaSetor}
                 acoesDropdown={(setor) => (
                   <>
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`setores/${setor.setor}`}>
+                      <Link href={`/adm/maquinas/${setor.id_maquina}`}>
                         <EyeIcon className="mr-2 h-4 w-4" />
                         Ver Detalhes
                       </Link>
@@ -397,7 +445,7 @@ export default function SetorEspecificoPage({ params }) {
                         </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent>
-                        <FormEdicaoMaquina />
+                        <FormEdicaoMaquina maquinaId={setor.id_maquina} onEdicaoSucesso={refresh} />
                       </DialogContent>
                     </Dialog>
 
@@ -409,7 +457,7 @@ export default function SetorEspecificoPage({ params }) {
                         </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent>
-                        <FormExclusaoMaquina />
+                        <FormExclusaoMaquina maquinaId={setor.id_maquina} onExcluir={async (maquinaId) => { await maquinaCrudService.delete(maquinaId); await refresh(); }} />
                       </DialogContent>
                     </Dialog>
 
@@ -442,7 +490,7 @@ export default function SetorEspecificoPage({ params }) {
               </DialogTrigger>
 
               <DialogContent>
-                <FormCadastroUsuario />
+                <FormCadastroUsuario onCadastroSucesso={refresh} />
               </DialogContent>
             </Dialog>
           </div>
@@ -463,7 +511,7 @@ export default function SetorEspecificoPage({ params }) {
           </div>
 
           <div className="flex items-center justify-between w-full mt-3">
-            <p> {dadosExibidos.length} usuários encontrados</p>
+            <p> {usuariosExibidos.length} usuários encontrados</p>
 
             <div className="flex items-center gap-4">
               <OrdenarDropdown
@@ -481,15 +529,15 @@ export default function SetorEspecificoPage({ params }) {
 
           {/* Listagem */}
           <div className="flex flex-col flex-1 items-center w-full mt-4">
-            {dadosExibidos.length > 0 ? (
+            {usuariosExibidos.length > 0 ? (
               /* dados só renderizam a tabela se tiver resultado */
               <TableListagens
-                data={dadosExibidos}
+                data={usuariosExibidos}
                 columns={colunaUsuarioSetor}
                 acoesDropdown={(setor) => (
                   <>
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`setores/${setor.setor}`}>
+                      <Link href={setor.funcao === "Gestor" ? `/adm/usuarios/gestor/${setor.id_usuario}` : `/adm/usuarios/${setor.id_usuario}`}>
                         <EyeIcon className="mr-2 h-4 w-4" />
                         Ver Detalhes
                       </Link>
@@ -503,7 +551,7 @@ export default function SetorEspecificoPage({ params }) {
                         </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent>
-                        <FormEdicaoUsuario />
+                        <FormEdicaoUsuario usuarioId={setor.id_usuario} onEdicaoSucesso={refresh} />
                       </DialogContent>
                     </Dialog>
 
@@ -515,7 +563,7 @@ export default function SetorEspecificoPage({ params }) {
                         </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent>
-                        <FormExclusaoUsuario />
+                        <FormExclusaoUsuario usuarioId={setor.id_usuario} onExclusaoSucesso={refresh} />
                       </DialogContent>
                     </Dialog>
 

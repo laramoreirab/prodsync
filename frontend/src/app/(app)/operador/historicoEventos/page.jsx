@@ -26,6 +26,25 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 
+import { Label } from "@/components/ui/label"
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea";
+
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
+
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
@@ -151,13 +170,13 @@ export default function HistoricoEventos() {
       if (filtrosSelecionados.data.start) {
         const dataInicio = new Date(filtrosSelecionados.data.start);
         dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.data) >= dataInicio
+          new Date(item.inicio ?? item.data) >= dataInicio
         );
       }
       if (filtrosSelecionados.data.end) {
         const dataFim = new Date(filtrosSelecionados.data.end);
         dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.data) <= dataFim
+          new Date(item.inicio ?? item.data) <= dataFim
         );
       }
     }

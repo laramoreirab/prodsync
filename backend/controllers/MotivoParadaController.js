@@ -27,6 +27,16 @@ class MotivoParadaController {
         }
     }
 
+    static async listarMotivosEmpresa(req, res) {
+        try {
+            const motivosParada = await MotivoParadaModel.buscarTodosMotivosParada(req.user.id_empresa);
+            res.status(200).json({ sucesso: true, dados: motivosParada });
+        } catch (error) {
+            console.error('Erro ao listar motivos de parada:', error);
+            res.status(500).json({ sucesso: false, erro: error.message });
+        }
+    }
+
     // Buscar um motivo de parada por ID
     static async buscarMotivoParadaPorId(req, res) {
         try {

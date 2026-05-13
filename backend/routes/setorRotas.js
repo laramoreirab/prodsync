@@ -13,6 +13,8 @@ router.get('/obterTempoMedioParadaPorSetor', SetorController.obterTempoMedioPara
 router.get('/obterProducaoDefeitosPorSetor', SetorController.obterProducaoDefeitosPorSetor)
 router.get('/obterQuantidadeOperadoresPorSetor', SetorController.obterQuantidadeOperadoresPorSetor)
 
+router.get('/totalSetores', SetorController.totalDeSetores)
+
 router.post('/criarSetor', SetorController.criarSetor)
 router.post('/:id_setor/maquinas', SetorController.associarMaquinas)
 
@@ -22,6 +24,9 @@ router.get('/empresa', SetorController.listarSetores)
 router.get('/:id_setor', SetorController.obterSetorPorId)
 router.put('/:id_setor', SetorController.atualizarSetor)
 router.delete('/:id_setor', SetorController.deletarSetor)
+
+router.get('/motivosParada/:id_setor', SetorController.motivosParada)
+router.get('/top5operadoresPorSetor/:id_setor', SetorController.top5Operadores)
 
 router.post('/:id_setor/gestores', SetorController.associarGestor)
 router.delete('/:id_setor/gestores', SetorController.removerGestor)

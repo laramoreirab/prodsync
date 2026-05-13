@@ -73,7 +73,7 @@ class MaquinaController {
     // POST /maquinas - Criar nova máquina
     static async criarMaquina(req, res) {
         try {
-            const { id_setor, categoria, nome, serie, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
+            const { id_setor, categoria, nome, serie, capacidade, status, status_atual = null, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
             const erros = [];
 
@@ -261,6 +261,22 @@ class MaquinaController {
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível listar as máquinas'
+            });
+        }
+    }
+
+    static async obterMaquinaOperador(req, res){
+        try {
+            const id_operador = req.params.id_operador
+            const id_empresa = req.user.id_empresa
+            const maquinaId = await MaquinaModel.obterMaquinaOperador(id_empresa, id_operador)
+            return res.status(200).json(maquinaId)
+        } catch (error) {
+            console.error('Erro ao obter máquina pelo ID do operador', error);
+            res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível obter máquina pelo ID do operador'
             });
         }
     }
@@ -462,6 +478,72 @@ class MaquinaController {
             });
         }
     }
-}
 
+    static async eficienciaMaquina(req, res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_operador = req.params.id_operador
+            const dados = await MaquinaModel.eficienciaMaquina(id_empresa, id_operador)
+            return res.status(200).json({
+                sucesso: true,
+                dados
+            })
+        } catch (error) {
+            console.error('Erro ao obter eficiendia da máquina na ultima semana:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter eficiendia da máquina na ultima semana'
+            });
+        }
+    }
+
+    // ---------------------------------------------------Tela de Gestor -----------------------------------------------
+
+    static async pecasProduzidas7Dias(req, res) {
+    try {
+        const id_empresa = req.user.id_empresa
+        const id_setor = Number(req.params.id_setor)
+      const dados = await MaquinaModel.pecasProduzidas7Dias(
+        id_setor,
+        id_empresa
+      )
+      return res.status(200).json({ sucesso: true, dados })
+    } catch (error) {
+      console.error('Erro no gráfico Peças Produzidas no últimos 7 Dias:', error)
+      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    }
+  }
+
+static async statusMaquinas(req, res) {
+    try {
+        const id_empresa = req.user.id_empresa
+        const id_setor = req.params.id_setor
+         const dados = await MaquinaModel.statusMaquinasSetor(
+        id_setor,
+        id_empresa
+      )
+      return res.status(200).json({ sucesso: true, dados })
+    } catch (error) {
+      console.error('Erro statusMaquinas:', error)
+      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    }
+  }
+
+   static async producaoMaquinas(req, res) {
+    try {
+        const id_empresa = req.user.id_empresa
+        const id_setor = Number(req.params.id_setor)
+      const dados = await MaquinaModel.producaoMaquinasSetor(
+        id_setor,
+        id_empresa
+      )
+      return res.status(200).json({ sucesso: true, dados })
+    } catch (error) {
+      console.error('Erro producaoMaquinas:', error)
+      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    }
+  }
+
+}
 export default MaquinaController;

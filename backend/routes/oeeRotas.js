@@ -13,5 +13,6 @@ router.get('/maquinas/:id_maquina', OEEController.obterOeeMaquina);
 router.get('/setores/media', OEEController.mediaPorSetor);
 router.get('/setores/critico', OEEController.setorCritico);
 router.get('/setores/:id_setor', OEEController.individualSetor);
+router.get('/evolucaoOEEsetor/:id_setor',OEEController.evolucaoOEESetor)
 
 export default router;

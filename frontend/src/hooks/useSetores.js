@@ -6,12 +6,21 @@ export function useSetores() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const normalizarSetor = (setor) => ({
+    ...setor,
+    id: setor.id ?? setor.id_setor,
+    gestor: setor.gestor ?? setor.gestores?.[0]?.gestor?.nome ?? "-",
+    oee_medio: setor.oee_medio ?? setor.oeeMedio ?? "-",
+    qtd_de_maquinas: setor.qtd_de_maquinas ?? setor.maquinas?.length ?? 0,
+    qtd_de_operadores: setor.qtd_de_operadores ?? setor.operadores?.length ?? 0,
+  });
+
   //carregar todos os setores
   const fetchSetores = useCallback(async () => {
     setLoading(true);
     try {
       const data = await setorCrudService.getAll();
-      setSetores(data);
+      setSetores((data.dados || []).map(normalizarSetor));
       setError(null);
     } catch (err) {
       setError('Falha ao carregar setores');

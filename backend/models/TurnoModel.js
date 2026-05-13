@@ -79,7 +79,8 @@ class TurnoModel {
                     hora_inicio: dados.hora_inicio,
                     hora_fim: dados.hora_fim,
                     dia_semana: dados.dia_semana,
-                    id_empresa: dados.id_empresa
+                    id_empresa: dados.id_empresa,
+                    id_setor: dados.id_setor
                 }
             });
             return turno;
@@ -90,9 +91,13 @@ class TurnoModel {
     }
 
     //Obtém todos os turnos de uma empresa
-    static async obterTurnosPorEmpresa(id_empresa) {
+    static async obterTurnosPorEmpresa(id_empresa, id_setor = null) {
         return await prisma.turno.findMany({
-            where: { id_empresa: id_empresa }
+            where: {
+                id_empresa: id_empresa,
+                ...(id_setor ? { id_setor: Number(id_setor) } : {})
+            },
+            orderBy: { hora_inicio: 'asc' }
         });
     }
 

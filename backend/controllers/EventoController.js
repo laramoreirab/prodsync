@@ -6,7 +6,9 @@ class EventoController {
         try {
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
-            const resultado = await EventoModel.listarTodos(id_empresa, paginacao);
+            const resultado = req.user.tipo === 'Operador'
+                ? await EventoModel.listarPorOperador(id_empresa, req.user.id_usuario, paginacao)
+                : await EventoModel.listarTodos(id_empresa, paginacao);
 
             // Normaliza para o formato esperado pelo frontend
             const dadosNormalizados = (resultado.dados || []).map(evento => ({
@@ -176,8 +178,7 @@ class EventoController {
     static async justificarEvento(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            // Aceita id_evento via body (POST /justificar) ou via params (rota /:id/justificar)
-            const id_evento = Number(req.body.id_evento ?? req.params.id);
+            const id_evento = Number(req.params.id ?? req.body.id_evento);
             const id_motivo_parada = Number(req.body.id_motivo_parada);
             const { observacao } = req.body;
 
@@ -213,6 +214,24 @@ class EventoController {
                 sucesso: false,
                 erro: 'Erro interno do servidor',
                 mensagem: 'Nao foi possivel registrar a justificativa do evento'
+            });
+        }
+    }
+
+    static async obterEventoPendente(req, res) {
+        try {
+            const dados = await EventoModel.obterEventoPendente(
+                req.user.id_empresa,
+                req.user.tipo === 'Operador' ? req.user.id_usuario : null
+            );
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao obter evento pendente:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel obter evento pendente'
             });
         }
     }

@@ -1,5 +1,6 @@
 import UsuarioModel from '../models/UsuarioModel.js'
 import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
+import SetorModel from '../models/SetorModel.js';
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 import prisma from '../config/prisma.js';
 
@@ -44,6 +45,24 @@ class UsuarioController {
         }
     }
 
+    static async listarSemAdms(req, res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const dados = await UsuarioModel.listarSemAdms(id_empresa)
+            return res.status(200).json({
+                sucesso: true,
+                dados: dados
+            })
+        } catch (error) {
+             console.error('Erro ao listar usuários sem administradores:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível listar os usuário sem administradores'
+            });
+        }
+    }
+
     static async listarOperadoresporSetor(req,res){
         try {
             const id_empresa = req.user.id_empresa
@@ -62,7 +81,7 @@ class UsuarioController {
 
     //GET api/usuarios/:id - busca de usuário por id (via params ou token)
     static async buscarPorId(req, res) {
-        try {
+        try 
             // Aceita id via params (rota /:id) ou fallback para o usuário logado
             const id_usuario = req.params.id ? parseInt(req.params.id) : req.user.id_usuario;
             const id_empresa = req.user.id_empresa;
@@ -116,7 +135,7 @@ class UsuarioController {
         }
     }
 
-    //POST api/usuarios - Criar novo usuário (apenas dmin)
+    //POST api/usuarios/criar - Criar novo usuário (apenas dmin)
     static async criarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
@@ -185,7 +204,7 @@ class UsuarioController {
             };
 
             //validação do turno
-            if (!id_turno) {
+            if (funcao !== 'Gestor' && !id_turno) {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
@@ -201,7 +220,7 @@ class UsuarioController {
                 })
             };
             //validação maquina
-            if (!id_maquina) {
+            if (funcao === 'Operador' && !id_maquina) {
                 res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
@@ -233,6 +252,9 @@ class UsuarioController {
                 })
             }
 
+            if (funcao === 'Gestor') {
+                await SetorModel.associarGestor(Number(id_setor), usuarioId, Number(id_empresa));
+            } else {
             //preparar dados de escala de trabalho para tabela escalaTrabalho
             const dadosEscala = {
                 id_empresa: Number(id_empresa),
@@ -248,6 +270,7 @@ class UsuarioController {
                     erro: 'Não foi possível registrar escala',
                     mensagem: 'Não foi possível registrar escala!'
                 })
+            }
             }
 
             res.status(201).json({
@@ -268,7 +291,8 @@ class UsuarioController {
     static async atualizarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { id_usuario, nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const id_usuario = req.params.id
+            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
 
             // Validação do ID
             if (!id_usuario || isNaN(id_usuario)) {
@@ -359,10 +383,10 @@ class UsuarioController {
         }
     }
 
-    //DELETE api/usuarios - Excluir funcionario 
+    //DELETE api/usuarios/:id/deletar - Excluir funcionario 
     static async deletarUsuario(req, res) {
         try {
-            const { id_usuario } = req.body
+            const id_usuario = req.params.id
             const id_empresa = req.user.id_empresa;
 
             // Validação do ID
@@ -460,6 +484,23 @@ class UsuarioController {
         }
     }
 
+    static async listarApontamentosUsuario(req, res) {
+        try {
+            const id_usuario = Number(req.params.id);
+            const id_empresa = req.user.id_empresa;
+
+            if (!id_usuario || isNaN(id_usuario)) {
+                return res.status(400).json({ sucesso: false, erro: 'ID de usuÃ¡rio invÃ¡lido' });
+            }
+
+            const dados = await UsuarioModel.listarApontamentosUsuario(id_empresa, id_usuario);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar apontamentos do usuÃ¡rio:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
+        }
+    }
+
     // --------------------------------------------dashboards-----------------------------------------------------------------------------------------
 
     static async qtdDeUsuariosTipo(req, res) {
@@ -519,6 +560,15 @@ class UsuarioController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
+    static async metaProducaoPorSetor(req, res){
+        try {
+             const dados = await UsuarioModel.metaProducaoPorSetor(req.user.id_empresa)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+               console.error('Erro no gráfico Meta de Produção por Setor:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
 
     // ------------------------------------Dashboard da página específica de usuário----------------------------------------------------------------
 
@@ -538,7 +588,7 @@ class UsuarioController {
         try {
             const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
             const id_maquina = req.body.id_maquina;
-            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_maquina)
+            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo da máquina do operador', error)

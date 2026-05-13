@@ -11,7 +11,8 @@ import  prisma  from '../config/prisma.js'; // Ajuste o caminho se necessário
 
 export const paginarPrisma = async (modeloPrisma, argsDaBusca = {}, paginacao) => {
     try {
-        const { pagina, limite } = paginacao;
+        const pagina = Number(paginacao?.pagina) || 1;
+        const limite = Number(paginacao?.limite) || 10;
         const pular = (pagina - 1) * limite;
 
         // Fazemos as duas consultas simultaneamente

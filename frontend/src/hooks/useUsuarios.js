@@ -10,10 +10,8 @@ export function useUsuarios() {
   const fetchUsuarios = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await usuariosCrudService.getAll();
-      // Backend retorna { sucesso, dados, meta } — extrai o array
-      const lista = Array.isArray(res) ? res : (res?.dados ?? []);
-      setUsuarios(lista);
+      const data = await usuariosCrudService.getAll();
+      setUsuarios(data.dados);
       setError(null);
     } catch (err) {
       setError('Falha ao carregar usuários');
