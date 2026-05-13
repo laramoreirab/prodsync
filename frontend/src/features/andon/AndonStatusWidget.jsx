@@ -18,7 +18,7 @@ const cards = [
   {
     key: "emParada",
     label: "Em Parada",
-    border: "border-rose-200",
+    border: "border-red-400",
     accent: "text-rose-700",
   },
 ];
@@ -41,7 +41,7 @@ export function AndonStatusWidget({ scope = "factory", title }) {
             key={key}
             className={`flex min-h-28 flex-col items-center justify-center gap-2 rounded-lg border ${border} bg-white px-4 py-5 text-center`}>
             <span className="text-xs font-semibold text-slate-500">{label}</span>
-            <span className={`text-5xl font-medium tracking-tight text-slate-900 ${accent}`}>
+            <span className={`text-5xl font-medium tracking-tight text-black`}>
               {data[key]}
             </span>
           </div>

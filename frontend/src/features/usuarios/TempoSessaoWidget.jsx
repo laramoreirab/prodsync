@@ -26,7 +26,7 @@ export function TempoSessaoWidget() {
                 {perfil}
               </span>
 
-              <div className="flex-1 bg-gray-100 rounded-full h-9 overflow-hidden">
+              <div className="flex-1 bg-gray-100 border border-gray-100 rounded-full h-9 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-[#23304c] transition-all duration-500"
                   style={{ width: `${pct}%` }}

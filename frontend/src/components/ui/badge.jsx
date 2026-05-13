@@ -19,8 +19,8 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
-        parada: "font-semibold text-sm bg-vermelho-vivido/10 text-vermelho-vivido",
-        setup: "font-semibold text-sm bg-[#fffbea] text-amarelo ",
+        parada: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm font-semibold border-none dark:!border-red-300/35 dark:!bg-red-500/20 dark:!text-red-100",
+        setup: "!border-amber-300 !bg-amber-100 !text-amber-900 text-sm font-semibold border-none dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100",
       },
     },
     defaultVariants: {

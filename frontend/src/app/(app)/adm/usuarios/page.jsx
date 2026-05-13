@@ -181,13 +181,13 @@ export default function Usuarios() {
       {/* SEÇÃO 1: Charts */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="border rounded-xl p-4">
+          <div className="bg-white border rounded-xl p-4">
             <QtdUsuariosWidget />
           </div>
-          <div className="border rounded-xl p-4">
+          <div className="bg-white border rounded-xl p-4">
             <QtdUsuariosPorSetorWidget />
           </div>
-          <div className="border rounded-xl p-4">
+          <div className="bg-white border rounded-xl p-4">
             <TopOperadoresWidget />
           </div>
         </div>
@@ -196,10 +196,10 @@ export default function Usuarios() {
       {/* SEÇÃO 2: Charts */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border rounded-xl p-6">
+          <div className="bg-white border rounded-xl p-6">
             <TempoSessaoWidget />
           </div>
-          <div className="border rounded-xl p-4">
+          <div className="bg-white border rounded-xl p-4">
             <RotatividadeWidget />
           </div>
         </div>
@@ -208,10 +208,10 @@ export default function Usuarios() {
       {/* SEÇÃO 3: Charts */}
       <section className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="border rounded-xl p-4">
+          <div className="bg-white border rounded-xl p-4">
             <CumprimentoMetaSetorWidget />
           </div>
-          <div className="border rounded-xl p-4">
+          <div className="bg-white border rounded-xl p-4">
             <ProducaoMediaSetorWidget />
           </div>
         </div>

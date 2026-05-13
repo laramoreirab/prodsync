@@ -91,7 +91,9 @@
   --amarelo: #ffd51e;
   --azul-cobalto: #004aad;
   --cinza-escuro: #545454;
-  --color-op-concluidas: #00357a;
+
+  --color-grafico-area: #00357a;
+  --color-grafico-colunas: #7d95c6;
 }
 
 .dark {
@@ -126,7 +128,9 @@
   --sidebar-accent-foreground: #f8f8f8;
   --sidebar-border: rgba(255, 255, 255, 0.18);
   --sidebar-ring: rgba(255, 255, 255, 0.3);
-  --color-op-concluidas: #3b82f6 !important;
+
+  --color-grafico-area: #3b82f6 !important;
+  --color-grafico-colunas: #7d95c6 !important;
 }
 
 @layer base {
@@ -171,6 +175,8 @@
 }
 
 .dark [data-app-shell] [class~="text-black"],
+.dark [data-app-shell] [class~="text-gray-700"],
+.dark [data-app-shell] [class~="text-gray-800"],
 .dark [data-app-shell] [class~="text-zinc-950"],
 .dark [data-app-shell] [class~="text-slate-950"],
 .dark [data-app-shell] [class~="text-gray-950"] {
