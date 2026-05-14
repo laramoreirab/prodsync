@@ -1,14 +1,8 @@
-// import { maquinasMockService } from "@/mocks/maquinasMock";
 import { apiFetch } from "@/lib/api";
-
-// trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = false;
 
 const API_URL = "/api/maquinas";
 
-// const apiService = {
-
-  export const maquinaCrudService = {
+export const maquinaCrudService = {
   getAll: async () => {
     const options = { method: "GET" };
     return await apiFetch(`${API_URL}/`);
@@ -50,8 +44,3 @@ const API_URL = "/api/maquinas";
 };
 
 
-//remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
-// export const maquinaCrudService = USE_MOCK ? maquinasMockService : apiService;
-
-//após a conexão com o backend, remover o arquivo maquinasMock.js e o USE_MOCK do service
-//além disso, coloque o que está dentro da const apiService dentro de:

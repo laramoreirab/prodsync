@@ -1,39 +1,17 @@
 import { apiFetch } from "@/lib/api";
-import { MotivosFrequentesArraySchema } from "@/features/paradas/schemas/paradasSchema";
-import { mockMotivosFrequentesParadas } from "./mockData";
-
-import {MediaParadasDiaArraychema} from "@/features/paradas/schemas/paradasSchema";
-import { mockMediaParadasDia } from "./mockData";
-
-const USE_MOCK = false; 
+import { MotivosFrequentesArraySchema, MediaParadasDiaSchema } from "@/features/paradas/schemas/paradasSchema";
 
 export const paradaService = {
   async getParadas() {
-    if (USE_MOCK) return MotivosFrequentesArraySchema.parse(mockMotivosFrequentesParadas);
     const data = await apiFetch("/api/dashboard/top-motivos-parada");
-    console.log("ARRAY DO MOTIVOS FREQUENTES", data.dados)
     return MotivosFrequentesArraySchema.parse(data.dados);
   },
 };
 
 export const paradasPorDiaService = {
   async getParadasDia() {
-    if (USE_MOCK) return MediaParadasDiaArraychema.parse(mockMediaParadasDia);
     const data = await apiFetch("/api/dashboard/media-paradas-por-dia");
-    return MediaParadasDiaArraychema.parse(data.dados);
-  }
-}
-
-// import { apiFetch } from "@/lib/api";
-// import {
-//MaquinaStatusSchema
-// } from "@features/maquinas/schemas/maquinaSchema";
-
-// export const maquinaService = {
-//   async getStatus() {
-//     const data = await apiFetch("/maquinas/status");
-//     return MaquinaStatusSchema.parse(data); 
-//   },
-
-
+    return MediaParadasDiaSchema.parse(data.dados);
+  },
+};
 

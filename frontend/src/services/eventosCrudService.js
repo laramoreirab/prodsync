@@ -1,7 +1,5 @@
 import { apiFetch } from "@/lib/api";
-import { eventosMockService } from "@/mocks/eventosMock";
 
-const USE_MOCK = false;
 const API_URL = "/api/eventos";
 
 const extrairDados = (resposta) => resposta?.dados ?? resposta ?? [];

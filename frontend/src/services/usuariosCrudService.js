@@ -1,12 +1,8 @@
 import { apiFetch } from "@/lib/api";
 
-// trocar para true p false quando o backend estiver pronto p integração!!
-const USE_MOCK = false;
-
 const API_URL = "/api/usuarios";
 
-// const apiService = {
-  export const usuariosCrudService ={
+export const usuariosCrudService = {
   //buscar todos os usuários
   getAll: async () => {
     const options = { method: "GET"}
@@ -50,9 +46,3 @@ const API_URL = "/api/usuarios";
     });
   },
 };
-
-//remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
-// export const usuariosCrudService = USE_MOCK ? usuariosMockService : apiService;
-//após a conexão com o backend, remover o arquivo usuariosMock.js e o USE_MOCK do service
-//além disso, coloque o que está dentro da const apiService dentro de:
-//export const usuariosCrudService ={o que ta dentro de apiService aqui dentro}
