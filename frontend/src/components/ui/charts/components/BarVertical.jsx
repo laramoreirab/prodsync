@@ -13,8 +13,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { ChartState } from "./ChartWidgetShell";
-import { getChartSize } from "./chartSizes";
 
 export function BarVerticalBase({
   title,
@@ -24,12 +22,10 @@ export function BarVerticalBase({
   loading,
   error,
   xKey,
-  chartSize = "default",
-  heightClassName,
 }) {
 
-  if (loading) return <ChartState>Carregando...</ChartState>;
-  if (error) return <ChartState type="error">Erro ao carregar dados.</ChartState>;
+  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
+  if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
   if (!data?.length) return null;
 
   // Pegamos todas as chaves do config para gerar as barras automaticamente
@@ -37,11 +33,11 @@ export function BarVerticalBase({
 
   return (
     <div>
-      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
+      <h3 className="text-sm font-medium mb-3">{title}</h3>
       {description && (
         <p className="text-xs text-muted-foreground mb-3">{description}</p>
       )}
-      <ChartContainer config={config} className={getChartSize(chartSize, heightClassName)}>
+      <ChartContainer config={config} className="h-[200px] w-full">
         <BarChart data={data} margin={{ top: 10 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis 

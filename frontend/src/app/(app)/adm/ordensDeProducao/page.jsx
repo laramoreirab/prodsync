@@ -290,10 +290,10 @@ export default function OrdensDeProducao() {
 
         {/* SEÇÃO 1: Graphs */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4"><OPAtrasadasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4"><OPPecasBoasKPIWidget /></div>
+          <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
         </section>
 
 

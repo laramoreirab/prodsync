@@ -62,7 +62,7 @@ const colunaMaquinaSetor = [
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
@@ -343,10 +343,10 @@ export default function SetorEspecificoPage({ params }) {
 
         {/* Seção de Gráficos */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm h-full min-h-[240px] md:min-h-[300px]">
+          <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
             <SetorMaquinaStatusWidget setorId={id} />
           </div>
-          <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center h-full min-h-[240px] md:min-h-[300px]">
+          <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
             <SetorOEEMedioWidget setorId={id} />
           </div>
         </section>

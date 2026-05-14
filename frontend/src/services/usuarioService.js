@@ -8,9 +8,6 @@ import {
   RotatividadeArraySchema,
   CumprimentoMetaSetorArraySchema,
   ProducaoMediaSetorArraySchema,
-  UsuariosPorTurnoArraySchema,
-  UsuarioTaxaRefugoArraySchema,
-  ProducaoMediaUsuarioArraySchema,
 } from "@features/usuarios/schemas/usuarioSchema";
 import {
   mockQtdUsuariosPorPerfil,
@@ -20,12 +17,9 @@ import {
   mockRotatividade,
   mockCumprimentoMetaSetor,
   mockProducaoMediaSetor,
-  mockUsuariosPorTurno,
-  mockUsuarioTaxaRefugo,
-  mockProducaoMediaUsuarioSetor,
 } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const qtdUsuariosPerfilService = {
   async getQtdPorPerfil() {
@@ -80,41 +74,5 @@ export const producaoMediaSetorService = {
     if (USE_MOCK) return ProducaoMediaSetorArraySchema.parse(mockProducaoMediaSetor);
     const data = await apiFetch("/api/usuarios/dashboard/producaoMediaPorSetor");
     return ProducaoMediaSetorArraySchema.parse(data.dados);
-  },
-};
-
-export const turnosOperadoresService = {
-  async getTurnos(setorId = null) {
-    if (USE_MOCK) {
-      const data = UsuariosPorTurnoArraySchema.parse(mockUsuariosPorTurno);
-      return setorId ? data.filter((item) => String(item.setorId) === String(setorId)) : data;
-    }
-    const url = setorId ? `/usuarios/turnos?setorId=${setorId}` : "/usuarios/turnos";
-    const data = await apiFetch(url);
-    return UsuariosPorTurnoArraySchema.parse(data);
-  },
-};
-
-export const usuarioTaxaRefugoService = {
-  async getTaxaRefugo(setorId = null) {
-    if (USE_MOCK) {
-      const data = UsuarioTaxaRefugoArraySchema.parse(mockUsuarioTaxaRefugo);
-      return setorId ? data.filter((item) => String(item.setorId) === String(setorId)) : data;
-    }
-    const url = setorId ? `/usuarios/taxa_refugo?setorId=${setorId}` : "/usuarios/taxa_refugo";
-    const data = await apiFetch(url);
-    return UsuarioTaxaRefugoArraySchema.parse(data);
-  },
-};
-
-export const producaoMediaUsuarioSetorService = {
-  async getProducaoMedia(setorId = null) {
-    if (USE_MOCK) {
-      const data = ProducaoMediaUsuarioArraySchema.parse(mockProducaoMediaUsuarioSetor);
-      return setorId ? data.filter((item) => String(item.setorId) === String(setorId)) : data;
-    }
-    const url = setorId ? `/usuarios/producao_media_por_usuario?setorId=${setorId}` : "/usuarios/producao_media_por_usuario";
-    const data = await apiFetch(url);
-    return ProducaoMediaUsuarioArraySchema.parse(data);
   },
 };

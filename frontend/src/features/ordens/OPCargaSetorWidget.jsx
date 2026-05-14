@@ -1,27 +1,24 @@
 "use client";
 
-import { BarVerticalBase, ChartWidgetShell } from "@/components/ui/charts/components";
+import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
 import { useOPCargaSetor } from "./hooks/useOPCargaSetor";
 import { opCargaSetorConfig } from "./config/ordensChartConfig";
 
-export function OPCargaSetorWidget({ setorId = null }) {
-  const { data, loading, error } = useOPCargaSetor(setorId);
+export function OPCargaSetorWidget() {
+  const { data, loading, error } = useOPCargaSetor();
 
   return (
-    <ChartWidgetShell
-      title="Carga de Trabalho por Setor"
-      loading={loading}
-      error={error}
-      empty={!data || (Array.isArray(data) && data.length === 0)}
-      className="p-1"
-    >
+    <div className="p-1 h-full">
       <BarVerticalBase
+        title="Carga de Trabalho por Setor"
+        description="*Atualizado em tempo real"
         data={data}
         config={opCargaSetorConfig}
+        loading={loading}
+        error={error}
         xKey="setor"
         yKey="carga"
-        chartSize="default"
       />
-    </ChartWidgetShell>
+    </div>
   );
 }

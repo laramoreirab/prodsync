@@ -6,11 +6,9 @@ import { oeeMetricasConfig } from "./config/producaoChartConfig";
 export function OEEWidget() {
   const { data, loading, error } = useOEE();
 
-   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
- if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
- if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
- if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
- 
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
+  if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
+
   return (
     <div className="flex flex-col gap-2">
       {/* Header */}
@@ -20,8 +18,8 @@ export function OEEWidget() {
       </div>
 
       {/* Gauges */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 place-items-center">
-      {oeeMetricasConfig.map(({ key, label, color }) => (
+      <div className="flex flex-col md:flex-row md:items-end justify-around gap-4">
+        {oeeMetricasConfig.map(({ key, label, color }) => (
           <div key={key} className="flex my-4 flex-col items-center">
             <GaugeSemicircular
               title={label}
