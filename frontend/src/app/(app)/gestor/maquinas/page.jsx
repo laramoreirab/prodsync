@@ -166,10 +166,10 @@ export default function MaquinasGestor() {
   const [busca, setBusca] = useState("");
   const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
 
-  // //sincronizar dados da API com estado local
-  // useEffect(() => {
-  //   setDados(maquinas);
-  // }, [maquinas]);
+  //sincronizar dados da API com estado local
+  useEffect(() => {
+    setDados(maquinas);
+  }, [maquinas]);
 
   const opcoesOrdenacao = [
     { label: 'Ordem Alfabética', value: 'nome' },

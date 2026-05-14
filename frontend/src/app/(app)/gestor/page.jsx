@@ -7,20 +7,24 @@ import { SetorOEEEvolucaoWidget }    from "@/features/setores/SetorOEEEvolucaoWi
 import { SetorTopOperadoresWidget }  from "@/features/setores/SetorTopOperadoresWidget";
 import { SetorMotivosParadaWidget }  from "@/features/setores/SetorMotivosParadaWidget";
 import { SetorProducaoSemanalWidget} from "@/features/setores/SetorProducaoSemanalWidget";
+import { apiFetch } from "@/lib/api";
 
 export default function DashboardGeralGestor() {
   const [setorId, setSetorId] = useState(null);
 
-  useEffect(() => {
+  useEffect( () => {
+    const carregarDadosGestor = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
+        const resposta = await apiFetch('/api/setores/gestor')
+        if(Array.isArray(resposta.dados) && resposta.dados.length > 0){
+          setSetorId(resposta.dados[0].id_setor)
+        }else{
+        setSetorId(resposta.dados.id_setor)}
     } catch {
-      // token ausente ou malformado
+      console.log("Não foi possível obter setor do gestor", error)
     }
-    //O SETORID VEM PELO TOKEN
+    }
+    carregarDadosGestor()
   }, []);
 
   return (
