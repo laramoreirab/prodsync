@@ -427,7 +427,7 @@ export default function OPDetalhePage({ params }) {
             </div>
           </section>
 
-          {/* SEÃ‡ÃƒO 2: OEE Gauges */}
+          {/* Seção 2: OEE Gauges */}
           <section className="bg-white border rounded-xl p-6 shadow-sm">
             <OPOEEDetalheWidget opId={opId} />
           </section>
@@ -436,7 +436,7 @@ export default function OPDetalhePage({ params }) {
           {/* Listagem de Hist. Eventos da OP */}
           <section id="listagem_histEventos">
             <div className="flex items-center justify-between gap-5 mt-6 mb-3">
-              <h1 className="text-4xl w-[125] font-semibold">HistÃ³rico de Eventos da OP</h1>
+              <h1 className="text-4xl font-semibold">Histórico de Eventos da OP</h1>
               <Dialog>
                 <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-2xl gap-2">
                   <Plus size={28} className="text-white cursor-pointer" />
