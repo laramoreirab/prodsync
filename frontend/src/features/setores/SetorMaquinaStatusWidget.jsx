@@ -26,26 +26,24 @@ const statusCards = [
 export function SetorMaquinaStatusWidget({ setorId }) {
   const { data, loading, error } = useSetorMaquinaStatus(setorId);
 
-   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
- if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
- if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
- if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
- 
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar status.</p>;
+  if (!data) return null;
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2">
+    <div className="flex flex-col gap-2">
       <div>
         <p className="text-sm font-semibold text-black">Status das Máquinas</p>
         <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
       </div>
 
-      <div className="grid flex-1 gap-3 mt-2 sm:grid-cols-3">
+      <div className="flex gap-3 mt-2">
         {statusCards.map(({ key, label, border, text }) => (
           <div
             key={key}
-            className={`border-2 ${border} rounded-lg p-3 min-h-[96px] h-full flex flex-col items-center justify-center gap-2 text-center`}
+            className={`flex-1 aspect-square border-2 ${border} rounded-lg p-2 flex flex-col items-center justify-center gap-1`}
           >
-            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-500 leading-tight">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-500 text-center leading-tight">
               {label}
             </span>
             <span className={`text-3xl font-bold ${text}`}>

@@ -267,11 +267,21 @@ class EscalaTrabalhoModel {
         try {
             const dados = this.removerCamposInvalidos(dadosAtualizados ?? diaSemanaOuDados);
 
+            if (dadosAtualizados === null && typeof diaSemanaOuDados === 'object') {
+                return await prisma.escalaTrabalho.updateMany({
+                    where: {
+                        id_operador: Number(id_operador),
+                        id_empresa: Number(id_turno)
+                    },
+                    data: dados
+                });
+            }
+
             return await prisma.escalaTrabalho.update({
                 where: {
                     id_operador_id_turno: {
-                        id_operador,
-                        id_turno
+                        id_operador: Number(id_operador),
+                        id_turno: Number(id_turno)
                     }
                 },
                 data: dados

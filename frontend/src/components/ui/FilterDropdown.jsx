@@ -257,7 +257,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
           {activeTags.length > 0 && (
             <div className="flex flex-wrap gap-2 pt-3">
               {activeTags.map((tag) => (
-                <span key={tag.key} className="flex items-center gap-1 bg-[var(--tag-bg)] text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
+                <span key={tag.key} className="flex items-center gap-1 bg-[#e2e2e2] text-gray-800 px-2 py-1 rounded-md text-xs font-medium">
                   {tag.label} <X size={12} className="cursor-pointer hover:text-red-500" onClick={tag.onRemove} />
                 </span>
               ))}

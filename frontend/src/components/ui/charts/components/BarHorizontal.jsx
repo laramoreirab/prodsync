@@ -8,7 +8,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { getChartSize } from "./chartSizes";
 
 // ============================================================
 // BAR CHART HORIZONTAL
@@ -16,7 +15,7 @@ import { getChartSize } from "./chartSizes";
 // layout="vertical" inverte os eixos => barra fica horizontal.
 
 // Componente genérico 
-export function BarHorizontal({ data, config, title, yKey = "setor", chartSize = "default", heightClassName }) {
+export function BarHorizontal({ data, config, title }) {
   if (!data?.length) return null;
 
   const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
@@ -24,10 +23,10 @@ export function BarHorizontal({ data, config, title, yKey = "setor", chartSize =
   return (
     <div>
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
-      <ChartContainer config={config} className={getChartSize(chartSize, heightClassName)}>
+      <ChartContainer config={config} className="h-[200px] w-full">
         <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
           <YAxis
-            dataKey={yKey}
+            dataKey="setor"
             type="category"
             tickLine={false}
             axisLine={false}

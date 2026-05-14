@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     Dialog,
     DialogTrigger,
@@ -9,6 +9,8 @@ import { Plus, Info, File, Upload, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/api';
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -16,6 +18,25 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [arquivoLote, setArquivoLote] = useState(null);
     const fileInputLoteRef = useRef(null);
     const fileInputFotoRef = useRef(null);
+    const [listaSetores, setListaSetores] = useState([])
+    const [listaTurnos, setListaTurnos] = useState([])
+    const [listaMaquinas, setListaMaquinas] = useState([])
+
+    useEffect(() => {
+            async function carregarSetores() {
+                try {
+                    const dados = await setorCrudService.getAll();
+                    setListaSetores(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar setores.");
+                }
+    
+            }
+    
+            carregarSetores();
+        }, []);
+
 
     const estadoInicialForm = {
         nome: "",
@@ -71,7 +92,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
         payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
 
-        if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+        if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
         try {
             await usuariosCrudService.create(payload);
@@ -96,6 +117,38 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         //integrar endpoint de cadastro em lote quando o backend disponibilizar
     };
 
+     useEffect(() => {
+            async function carregarTurnos() {
+                try {
+                    const options = { method : "GET"}
+                    const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`,options)
+                    setListaTurnos(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar turnos.");
+                }
+    
+            }
+    
+            carregarTurnos();
+        }, [formData.id_setor]);
+
+        useEffect(() => {
+            async function carregarMaquinas() {
+                try {
+                    const options = { method : "GET"}
+                    const dados = await apiFetch(`/api/maquinas/setor/${formData.id_setor}`,options)
+                    setListaMaquinas(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar setores.");
+                }
+    
+            }
+    
+            carregarMaquinas();
+        }, [formData.id_setor]);
+
     const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
     const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
 
@@ -109,7 +162,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                     </DialogTitle>
                 </div>
             </div>
-            <Separator className="m-2 bg-[var(--border-soft)]" />
+            <Separator className="m-2 bg-[#a6a6a6]" />
 
             <form onSubmit={handleSubmitIndividual} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className="flex justify-end">
@@ -126,7 +179,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                     <DialogTitle className="text-3xl text-white">Criar Usuários em Lote</DialogTitle>
                                 </div>
                             </div>
-                            <Separator className="m-2 bg-[var(--border-soft)]" />
+                            <Separator className="m-2 bg-[#a6a6a6]" />
 
                             <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
                                 <input
@@ -149,7 +202,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center w-full">
-                                            <div className="flex items-center bg-[var(--info-bg)] text-[var(--info-text)] px-3 py-2 rounded-md w-full">
+                                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
                                                 <File className="w-4 h-4 mr-2 shrink-0" />
                                                 <span className="text-sm truncate">{arquivoLote.nome}</span>
                                             </div>
@@ -163,7 +216,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                 </div>
 
                                 <div className="flex justify-center mt-4">
-                                    <button type="button" onClick={handleSubmitLote} className="bg-[var(--button-primary)] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                                    <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
                                         Criar em Lote
                                     </button>
                                 </div>
@@ -198,7 +251,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                 alt="Preview"
                                 className="w-32 h-32 object-cover rounded-lg mb-2 border"
                             />
-                            <div className="flex items-center bg-[var(--info-bg)] text-[var(--info-text)] px-3 py-2 rounded-md w-full">
+                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
                                 <File className="w-4 h-4 mr-2 shrink-0" />
                                 <span className="text-sm truncate">{fotoPerfil.nome}</span>
                             </div>
@@ -243,9 +296,17 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Roscas</option>
-                            <option value="2">Brocas</option>
-                        </select>
+                                 {listaSetores.map((setor) => (
+
+                                    <option
+                                        key={setor.id_setor}
+                                        value={setor.id_setor}
+                                    >
+                                        {setor.nome_setor}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
@@ -271,13 +332,21 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             id="id_turno"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disable={!formData.id_setor}
                             required
                         >
-                            <option value="">Selecione...</option>
-                            <option value="1">Manhã</option>
-                            <option value="2">Tarde</option>
-                            <option value="3">Noite</option>
-                        </select>
+                              <option value="">Selecione...</option>
+                                 {listaTurnos.map((turno) => (
+
+                                    <option
+                                        key={turno.id_turno}
+                                        value={turno.id_turno}
+                                    >
+                                        {turno.nome_turno}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
@@ -290,12 +359,21 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             id="id_maquina"
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disable={!formData.id_setor}
                             required
                         >
-                            <option value="">Selecione...</option>
-                            <option value="1">Máquina 1</option>
-                            <option value="2">Máquina 2</option>
-                        </select>
+                             <option value="">Selecione...</option>
+                                 {listaMaquinas.map((maquina) => (
+
+                                    <option
+                                        key={maquina.id_maquina}
+                                        value={maquina.id_maquina}
+                                    >
+                                        {maquina.nome}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}

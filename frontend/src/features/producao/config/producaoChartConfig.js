@@ -1,27 +1,20 @@
 export const producaoSetorConfig = {
   qtd: {
     label: "Peças produzidas:",
-    color: "var(--chart-accent)",
+    color: "#7d95c6",
   },
 };
 
 export const producaoDiaConfig = {
   pcs: {
     label: "Peças/hora:",
-    color: "var(--chart-primary)",
+    color: "#00357a",
   },
 };
 
 export const oeeMetricasConfig = [
-  { key: "disponibilidade", label: "Disponibilidade:", color: "var(--chart-primary)" },
-  { key: "performance",     label: "Performance:",     color: "var(--chart-primary)" },
-  { key: "qualidade",       label: "Qualidade:",       color: "var(--chart-primary)" },
-  { key: "oee",             label: "OEE Geral:",       color: "var(--chart-primary)" },
-];
-
-const metricasConfig = [
-  { key: "disponibilidade", label: "Disponibilidade",      color: "var(--chart-primary)" },
-  { key: "performance",     label: "Performance",          color: "var(--chart-primary)" },
-  { key: "qualidade",       label: "Qualidade",            color: "var(--chart-primary)" },
-  { key: "oee",             label: "OEE Geral Consolidado", color: "var(--chart-primary)" },
+  { key: "disponibilidade", label: "Disponibilidade:", color: "#00357a" },
+  { key: "performance",     label: "Performance:",     color: "#00357a" },
+  { key: "qualidade",       label: "Qualidade:",       color: "#00357a" },
+  { key: "oee",             label: "OEE Geral:",       color: "#00357a" },
 ];

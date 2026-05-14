@@ -2,6 +2,6 @@
 export const topMotivosTempoConfig = {
   minutos: {
     label: "Duração (min):",
-    color: "var(--chart-accent)",
+    color: "#7d95c6",
   },
 };

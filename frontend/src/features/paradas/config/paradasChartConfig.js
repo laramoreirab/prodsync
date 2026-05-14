@@ -1,6 +1,6 @@
 export const paradasChartConfig = {
   qtd: {
     label: "Motivo de Paradas Frequentes:",
-    color: "var(--chart-accent)",
+    color: "#7d95c6",
   },
 };

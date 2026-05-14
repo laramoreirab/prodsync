@@ -76,7 +76,7 @@ class MaquinaModel {
                     serie: serie,
                     capacidade: capacidade,
                     status: status,
-                    status_atual: status || undefined,
+                    status_atual: undefined,
                     data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
                     id_operador: id_operador ? parseInt(id_operador) : null,
                     imagem: imagem
@@ -290,6 +290,277 @@ class MaquinaModel {
             console.error('Erro ao obter informações em tempo real da máquina:', error);
             throw error;
         }
+    }
+
+    static async obterMaquinaOperador(id_empresa, id_operador){
+        try {
+            const resposta = await prisma.escalaTrabalho.findFirst({
+                where:{
+                    id_empresa: id_empresa,
+                    id_operador: Number(id_operador)
+                },
+                select:{
+                    id_maquina: true
+                }
+            })
+            return resposta
+            
+        } catch (error) {
+            console.error('Erro ao obter máquina pelo ID do operador no banco', error);
+            throw error;
+        }
+    }
+
+    static async eficienciaMaquina(id_empresa, id_operador) {
+        const escala = await prisma.escalaTrabalho.findFirst({
+            where: {
+                id_empresa: Number(id_empresa),
+                id_operador: Number(id_operador),
+                id_maquina: { not: null }
+            },
+            select: { id_maquina: true }
+        });
+
+        if (!escala?.id_maquina) return [];
+
+        const dias = this.criarMapaUltimosDias(7);
+        return Promise.all(dias.map(async (dia, index) => {
+            const inicio = this.inicioDoDia(new Date(`${dia}T00:00:00`));
+            const fim = this.fimDoDia(inicio);
+            const oee = await OEEModel.obterOeeMaquina(escala.id_maquina, Number(id_empresa), inicio, fim);
+
+            return {
+                dia: `Dia ${index + 1}`,
+                eficiencia: oee.oee
+            };
+        }));
+    }
+
+    static mapearStatusAndon(status) {
+        if (status === 'Produzindo') return 'emProducao';
+        if (status === 'Setup') return 'emSetup';
+        return 'emParada';
+    }
+
+    static formatarTempoDesde(data) {
+        if (!data) return 'Sem evento recente';
+
+        const minutos = Math.max(0, Math.round((new Date() - new Date(data)) / 1000 / 60));
+        const horas = Math.floor(minutos / 60);
+        const resto = minutos % 60;
+
+        if (horas <= 0) return `${resto} min no status`;
+        if (resto === 0) return `${horas}h no status`;
+        return `${horas}h ${resto}min no status`;
+    }
+
+    static async obterSetorOperador(id_empresa, id_operador) {
+        const escala = await prisma.escalaTrabalho.findFirst({
+            where: {
+                id_empresa,
+                id_operador: Number(id_operador)
+            },
+            select: {
+                id_setor: true,
+                id_maquina: true
+            }
+        });
+
+        if (escala?.id_setor) return escala.id_setor;
+
+        if (escala?.id_maquina) {
+            const maquinaEscala = await prisma.maquinas.findFirst({
+                where: { id_empresa, id_maquina: escala.id_maquina, ativo: true },
+                select: { id_setor: true }
+            });
+            if (maquinaEscala?.id_setor) return maquinaEscala.id_setor;
+        }
+
+        const maquina = await prisma.maquinas.findFirst({
+            where: {
+                id_empresa,
+                id_operador: Number(id_operador),
+                ativo: true
+            },
+            select: { id_setor: true }
+        });
+
+        return maquina?.id_setor ?? null;
+    }
+
+    static async montarFiltroAndon(id_empresa, scope, id_operador) {
+        const filtro = { id_empresa, ativo: true };
+
+        if (scope === 'sector') {
+            const id_setor = await this.obterSetorOperador(id_empresa, id_operador);
+            if (!id_setor) return { ...filtro, id_maquina: -1 };
+            filtro.id_setor = id_setor;
+        }
+
+        return filtro;
+    }
+
+    static async obterAndonStatus(id_empresa, scope = 'factory', id_operador = null) {
+        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador);
+        const agrupados = await prisma.maquinas.groupBy({
+            by: ['status_atual'],
+            where,
+            _count: { status_atual: true }
+        });
+
+        return agrupados.reduce((acc, item) => {
+            acc[this.mapearStatusAndon(item.status_atual)] += item._count.status_atual;
+            return acc;
+        }, {
+            emProducao: 0,
+            emSetup: 0,
+            emParada: 0
+        });
+    }
+
+    static calcularProdutividade(qtdPlanejada, qtdProduzida) {
+        if (!qtdPlanejada || qtdPlanejada <= 0) return 0;
+        return Math.min(100, Math.round((qtdProduzida / qtdPlanejada) * 100));
+    }
+
+    static async obterAndonRanking(id_empresa, scope = 'factory', id_operador = null) {
+        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador);
+        const maquinas = await prisma.maquinas.findMany({
+            where,
+            select: {
+                id_maquina: true,
+                nome: true,
+                serie: true,
+                setor: {
+                    select: {
+                        id_setor: true,
+                        nome_setor: true
+                    }
+                },
+                ordens_producao: {
+                    select: { qtd_planejada: true }
+                },
+                apontamentos: {
+                    select: {
+                        qtd_boa: true,
+                        qtd_refugo: true
+                    }
+                }
+            }
+        });
+
+        const agrupado = new Map();
+
+        for (const maquina of maquinas) {
+            const chave = scope === 'sector'
+                ? String(maquina.id_maquina)
+                : String(maquina.setor?.id_setor ?? 'sem-setor');
+            const nome = scope === 'sector'
+                ? (maquina.serie ?? maquina.nome)
+                : (maquina.setor?.nome_setor ?? 'Sem setor');
+            const atual = agrupado.get(chave) ?? { setor: nome, planejado: 0, produzido: 0 };
+
+            atual.planejado += maquina.ordens_producao.reduce((acc, ordem) => acc + (ordem.qtd_planejada ?? 0), 0);
+            atual.produzido += maquina.apontamentos.reduce(
+                (acc, apontamento) => acc + (apontamento.qtd_boa ?? 0) + (apontamento.qtd_refugo ?? 0),
+                0
+            );
+
+            agrupado.set(chave, atual);
+        }
+
+        return Array.from(agrupado.values())
+            .map(item => ({
+                setor: item.setor,
+                produtividade: this.calcularProdutividade(item.planejado, item.produzido)
+            }))
+            .sort((a, b) => b.produtividade - a.produtividade)
+            .slice(0, 8);
+    }
+
+    static async montarCardAndon(maquina, id_empresa) {
+        const ordemAtual = maquina.ordens_producao?.[0];
+        const ultimoEvento = maquina.historico_eventos?.[0];
+        const oee = await OEEModel.obterOeeMaquina(maquina.id_maquina, id_empresa);
+        const produzido = maquina.apontamentos.reduce(
+            (acc, apontamento) => acc + (apontamento.qtd_boa ?? 0) + (apontamento.qtd_refugo ?? 0),
+            0
+        );
+
+        return {
+            id: String(maquina.id_maquina),
+            codigo: maquina.serie ?? maquina.nome,
+            status: this.mapearStatusAndon(maquina.status_atual),
+            operador: maquina.operador?.nome ?? 'Sem operador',
+            detalheLabel: ordemAtual?.produto ? 'Produto' : 'OP',
+            detalheValor: ordemAtual?.produto ?? ordemAtual?.codigo_lote ?? 'Sem OP ativa',
+            metaTurno: `${produzido}/${ordemAtual?.qtd_planejada ?? 0}`,
+            metaDia: `${produzido}/${ordemAtual?.qtd_planejada ?? 0}`,
+            oee: oee.oee ?? 0,
+            tempoStatus: this.formatarTempoDesde(ultimoEvento?.inicio ?? maquina.data_ativacao)
+        };
+    }
+
+    static async obterAndonSecoes(id_empresa, scope = 'factory', id_operador = null) {
+        const where = await this.montarFiltroAndon(id_empresa, scope, id_operador);
+        const maquinas = await prisma.maquinas.findMany({
+            where,
+            include: {
+                setor: {
+                    select: {
+                        id_setor: true,
+                        nome_setor: true
+                    }
+                },
+                operador: {
+                    select: {
+                        nome: true
+                    }
+                },
+                ordens_producao: {
+                    orderBy: { data_inicio: 'desc' },
+                    take: 1,
+                    select: {
+                        codigo_lote: true,
+                        produto: true,
+                        qtd_planejada: true
+                    }
+                },
+                apontamentos: {
+                    select: {
+                        qtd_boa: true,
+                        qtd_refugo: true
+                    }
+                },
+                historico_eventos: {
+                    orderBy: { inicio: 'desc' },
+                    take: 1,
+                    select: {
+                        inicio: true
+                    }
+                }
+            },
+            orderBy: [
+                { id_setor: 'asc' },
+                { nome: 'asc' }
+            ]
+        });
+
+        const secoes = new Map();
+
+        for (const maquina of maquinas) {
+            const idSecao = String(maquina.setor?.id_setor ?? 'sem-setor');
+            const secao = secoes.get(idSecao) ?? {
+                id: idSecao,
+                titulo: maquina.setor?.nome_setor ?? 'Sem setor',
+                maquinas: []
+            };
+
+            secao.maquinas.push(await this.montarCardAndon(maquina, id_empresa));
+            secoes.set(idSecao, secao);
+        }
+
+        return Array.from(secoes.values()).filter(secao => secao.maquinas.length > 0);
     }
 
     // -------------------------------------dashboard--------------------------------------------------
@@ -829,6 +1100,96 @@ class MaquinaModel {
             throw error;
         }
     }
+
+    // ----------------------------------------------------Tela de Gestor -----------------------------------------------------------
+    static ultimosSeteDias() {
+    const dias = []
+    for (let i = 6; i >= 0; i--) {
+      const data = new Date()
+      data.setDate(data.getDate() - i)
+      data.setHours(0, 0, 0, 0)
+      dias.push(data.toISOString().split('T')[0])
+    }
+    return dias
+  }
+    static async pecasProduzidas7Dias(id_setor, id_empresa) {
+    const dias = this.ultimosSeteDias()
+    const inicio = new Date(dias[0])
+
+    const apontamentos = await prisma.apontamento.findMany({
+      where: {
+        id_empresa,
+        data_hora_inicio: { gte: inicio },
+        maquina: { id_setor }
+      },
+      select: {
+        qtd_boa:          true,
+        qtd_refugo:       true,
+        data_hora_inicio: true
+      }
+    })
+
+    // agrupa por dia
+    const agrupado = Object.fromEntries(
+      dias.map((d, i) => [d, { dia: `Dia ${i + 1}`, qtd: 0 }])
+    )
+
+    for (const ap of apontamentos) {
+      const chave = ap.data_hora_inicio.toISOString().split('T')[0]
+      if (agrupado[chave]) {
+        agrupado[chave].qtd += (ap.qtd_boa ?? 0) + (ap.qtd_refugo ?? 0)
+      }
+    }
+
+    return Object.values(agrupado)
+  }
+
+   static async statusMaquinasSetor(id_setor, id_empresa) {
+    const resultado = await prisma.maquinas.groupBy({
+      by:    ['status_atual'],
+      where: { id_empresa, id_setor, ativo: true },
+      _count: { status_atual: true }
+    })
+
+    const nomeStatus = {
+      Produzindo: 'Produzindo',
+      Parada:     'Parada',
+      Setup:      'Setup',
+      Aguardando: 'Aguardando'
+    }
+
+    return resultado.map(r => ({
+      name:  nomeStatus[r.status_atual] ?? r.status_atual,
+      value: r._count.status_atual
+    }))
+  }
+static async producaoMaquinasSetor(id_setor, id_empresa) {
+    const resultado = await prisma.apontamento.groupBy({
+      by:    ['id_maquina'],
+      where: {
+        id_empresa,
+        maquina: { id_setor }
+      },
+      _sum:    { qtd_boa: true, qtd_refugo: true },
+      orderBy: { _sum: { qtd_boa: 'desc' } }
+    })
+
+    const ids      = resultado.map(r => r.id_maquina)
+    const maquinas = await prisma.maquinas.findMany({
+      where:  { id_maquina: { in: ids } },
+      select: { id_maquina: true, nome: true, serie: true }
+    })
+
+    const nomeMaquina = Object.fromEntries(
+      maquinas.map(m => [m.id_maquina, m.serie ?? m.nome])
+    )
+
+    return resultado.map(r => ({
+      maquina: nomeMaquina[r.id_maquina] ?? `Máquina ${r.id_maquina}`,
+      qtd:   (r._sum.qtd_boa ?? 0) + (r._sum.qtd_refugo ?? 0)
+    }))
+  }
+
 }
 
 export default MaquinaModel;

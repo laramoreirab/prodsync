@@ -10,23 +10,17 @@ const mockTempoParadoProduzindo = [
 const USE_MOCK = false;
 
 export const eventosService = {
-  async getParadasComparadas(setorId = null) {
+  async getParadasComparadas() {
     if (USE_MOCK) return mockTempoParadoProduzindo;
-    const url = setorId
-      ? `/eventos/tempo_parado_produzindo?setorId=${encodeURIComponent(setorId)}`
-      : "/eventos/tempo_parado_produzindo";
-    const data = await apiFetch(url);
+    const data = await apiFetch("/eventos/tempo_parado_produzindo");
     return data;
   },
 };
 
 export const topMotivosTempoService = {
-  async getTopMotivosTempo(setorId = null) {
+  async getTopMotivosTempo() {
     if (USE_MOCK) return MotivoTempoArraySchema.parse(mockTopMotivosTempo);
-    const url = setorId
-      ? `/eventos/top_motivos_tempo?setorId=${encodeURIComponent(setorId)}`
-      : "/eventos/top_motivos_tempo";
-    const data = await apiFetch(url);
+    const data = await apiFetch("/eventos/top_motivos_tempo");
     return MotivoTempoArraySchema.parse(data);
   },
 };

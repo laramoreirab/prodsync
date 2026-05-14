@@ -1,15 +1,14 @@
-"use client";
+"use client"
 
-import { OPAtivasKPIWidget }     from "@/features/ordens/OPAtivasKPIWidget";
-import { OPAtrasadasKPIWidget }  from "@/features/ordens/OPAtrasadasKPIWidget";
-import { OPPecasBoasKPIWidget }  from "@/features/ordens/OPPecasBoasKPIWidget";
-import { OPRefugoKPIWidget }     from "@/features/ordens/OPRefugoKPIWidget";
-import { OPEficienciaWidget }    from "@/features/ordens/OPEficienciaWidget";
-import { OPTopRefugoWidget }     from "@/features/ordens/OPTopRefugoWidget";
-import { OPCargaSetorWidget }    from "@/features/ordens/OPCargaSetorWidget";
-import { OPStatusWidget }        from "@/features/ordens/OPStatusWidget";
+import { OPAtivasKPIWidget } from "@/features/ordens/OPAtivasKPIWidget";
+import { OPAtrasadasKPIWidget } from "@/features/ordens/OPAtrasadasKPIWidget";
+import { OPPecasBoasKPIWidget } from "@/features/ordens/OPPecasBoasKPIWidget";
+import { OPRefugoKPIWidget } from "@/features/ordens/OPRefugoKPIWidget";
+import { OPEficienciaWidget } from "@/features/ordens/OPEficienciaWidget";
+import { OPTopRefugoWidget } from "@/features/ordens/OPTopRefugoWidget";
+import { OPCargaSetorWidget } from "@/features/ordens/OPCargaSetorWidget";
+import { OPStatusWidget } from "@/features/ordens/OPStatusWidget";
 import { OPConcluidasDiaWidget } from "@/features/ordens/OPConcluidasDiaWidget";
-import { useEffect, useState } from "react";
 
 import { useState, useEffect } from "react";
 import { useOps } from "@/hooks/useOps";
@@ -83,12 +82,6 @@ const colunasOrdemProd = [
     }
   },
   {
-    id: "setor",
-    key: "setor",
-    label: "Setor",
-    className: "w-1/5",
-  },
-  {
     id: "status_op",
     key: "status_op",
     label: 'Status',
@@ -134,34 +127,114 @@ const colunasOrdemProd = [
 ];
 
 
+
 export default function OrdensDeProducaoGestor() {
-  const [setorId, setSetorId] = useState(null);
+  const { ops, loading, error, refresh } = useOps();
+  const [dados, setDados] = useState([]);
+  const [busca, setBusca] = useState("");
 
+  //sincronizar dados da API com estado local
   useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
-    } catch {
-      // token ausente ou malformado
-    }
-  }, []);
+    setDados(ops);
+  }, [ops]);
 
-  
-  const dadosExibidos = [
-    { id: 1, codigo_lote: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status_op: 'Produzindo', progresso: '25%' },
-    { id: 2, codigo_lote: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status_op: 'Setup', progresso: '35%' },
-    { id: 3, codigo_lote: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status_op: 'Parada', progresso: '55%' },
-    { id: 4, codigo_lote: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status_op: 'Setup', progresso: '85%' },
-    { id: 5, codigo_lote: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
-    { id: 6, codigo_lote: 'Carol Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
-    { id: 7, codigo_lote: 'Guilherme Santos', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
-    { id: 8, codigo_lote: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Concluída', progresso: '15%' },
-    { id: 9, codigo_lote: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+
+  //lógica de ordenação
+  const handleSort = (criterio) => {
+    const dadosCopiados = [...dados];
+
+
+    dadosCopiados.sort((a, b) => {
+      if (criterio === 'id_asc') return a.id - b.id;
+      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'progresso_asc') return a.progresso - b.progresso;
+      if (criterio === 'progresso_desc') return b.progresso - a.progresso;
+      return 0;
+    });
+
+
+    setDados(dadosCopiados);
+  };
+
+  const opsFilter = [
+    { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
+    { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Crítica", "Alta", "Média", "Baixa"] },
+    { id: "progresso", label: "Progresso", type: "number-range" }
   ];
-     
 
+  const aplicarFiltros = (filtrosSelecionados) => {
+    let dadosFiltrados = [...ops]; // usa o estado da API, não array estático
+
+
+    //filtro por status
+    if (filtrosSelecionados.status_op && filtrosSelecionados.status_op.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter(op =>
+        filtrosSelecionados.status_op.includes(op.status_op)
+      );
+    }
+
+
+    //filtro por setor
+    if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter(op =>
+        filtrosSelecionados.setor.includes(op.setor)
+      );
+    }
+
+
+    //filtro por prioridade
+    if (filtrosSelecionados.prioridade?.length) {
+      dadosFiltrados = dadosFiltrados.filter(op =>
+        filtrosSelecionados.prioridade.includes(op.prioridade)
+      );
+    }
+
+
+    //filtro por progresso (intervalo)
+    if (filtrosSelecionados.progresso) {
+      const { min, max } = filtrosSelecionados.progresso;
+      if (min !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso >= min);
+      if (max !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso <= max);
+    }
+
+
+    setDados(dadosFiltrados);
+  };
+
+
+  const opcoesOrdenacao = [
+    { label: 'ID Crescente', value: 'id_asc' },
+    { label: 'ID Decrescente', value: 'id_desc' },
+    { label: 'Progresso Crescente', value: 'progresso_asc' },
+    { label: 'Progresso Decrescente', value: 'progresso_desc' },
+  ];
+
+
+  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
+  const dadosExibidos = dados.filter((op) => {
+    const termo = (busca || "").toLowerCase();
+
+    const nome = op?.codigo_lote?.toLowerCase() || "";
+    const id = op?.id?.toString() || "";
+
+    return (
+      nome.includes(termo) ||
+      id.includes(termo)
+    );
+  });
+
+
+  //tela de carregamento enquanto busca os dados da API
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
+          <p className="text-lg text-gray-600 font-medium">Carregando ordens de produção...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
@@ -183,85 +256,130 @@ export default function OrdensDeProducaoGestor() {
                   Criar OP
                 </DialogTrigger>
                 <DialogContent>
-
+                  <FormCadastroOp onCadastroSucesso={refresh} />
                 </DialogContent>
               </Dialog>
             </div>
           </div>
 
+
+          {/* GRÁFICOS */}
           <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget setorId={setorId} /></div>
-        </section>
+            <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
+            <div className="bg-white border rounded-xl p-4"><OPAtrasadasKPIWidget /></div>
+            <div className="bg-white border rounded-xl p-4"><OPPecasBoasKPIWidget /></div>
+            <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
+          </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget setorId={setorId} /></div>
-        </section>
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget /></div>
+            <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget /></div>
+            <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget /></div>
+          </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget setorId={setorId} /></div>
-          <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget setorId={setorId} /></div>
-        </section>
+          <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget /></div>
+            <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget /></div>
+          </section>
         </div>
 
         {/* Listagem de OPs */}
         <section>
           <div className="flex items-center py-8 gap-5">
-            <h1 className="text-4xl w-30 font-semibold">OPs</h1>
+            <h1 className="text-4xl font-semibold">OPs</h1>
             <hr className="bg-black flex-1 h-1" />
           </div>
 
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none font-medium bg-transparent"
+                placeholder="Busque por id ou nome ..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2">
+                <Search />
+              </button>
+            </div>
+          </div>
+
+          <div className="row_ord_fil_cont flex items-center py-3 justify-between mt-3">
+            <p>{dadosExibidos.length} OPs encontradas</p>
+
+            <div className="flex items-center gap-4">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacao}
+                onSortChange={handleSort}
+              />
+              <FilterDropdown
+                filtersConfig={opsFilter}
+                onApply={aplicarFiltros}
+              />
+            </div>
+          </div>
+
           {/* Tabela */}
-          <TableListagens
-            data={dadosExibidos}
-            columns={colunasOrdemProd}
-            enableSelection={true}
-            acoesDropdown={(op) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`ordensDeProducao/${op.id}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver Detalhes
-                  </Link>
-                </DropdownMenuItem>
+          {dadosExibidos.length > 0 ? (
+            <TableListagens
+              data={dadosExibidos}
+              columns={colunasOrdemProd}
+              enableSelection={true}
+              acoesDropdown={(op) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`ordensDeProducao/${op.id}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="cursor-pointer"
-                    >
-                      <Pencil className="mr-2 h-4 w-4 text-primary" />
-                      Editar OP
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar OP
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh}/>
+                    </DialogContent>
+                  </Dialog>
 
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="cursor-pointer"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-          />
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormExclusaoOp opId={op.id}
+                      idMaquina={op.id_maquina}
+                      onExclusaoSucesso={refresh}/>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
+              <Search className="w-12 h-12 text-gray-300 mb-3" />
+              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
+              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
+            </div>
+          )}
         </section>
+
       </div>
     </main>
   );

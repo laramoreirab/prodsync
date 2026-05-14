@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react';
+import Header from "@/components/ui/topbar";
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";
@@ -12,39 +13,33 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
-import {
-  PageLayout,
-  PageHeader,
-  KPIGrid,
-  WidgetCard,
-  ContentGrid,
-  StaggerWrapper,
-  FadeUpItem,
-} from "@/components/AnimatedComponents";
-
 export default function DashboardGeralPage() {
   return (
-    <PageLayout>
-
-      <PageHeader title="Dashboard Geral da Empresa" underline />
-
-      {/* SEÇÃO 1 - Produção do Dia */}
-      <FadeUpItem>
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-          <ProducaoDiaWidget />
+     <div className="mx-auto flex w-full p-8 flex-col gap-4 pb-10">
+        
+        {/* Cabeçalho */}
+        <div className="mb-2 flex justify-start">
+          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+            Dashboard Geral da Empresa
+          </h1>
         </div>
-      </FadeUpItem>
 
-      {/* SEÇÃO 2 - Resumo OEE */}
-      <FadeUpItem>
-        <div className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100 flex items-center justify-around">
-          <OEEWidget />
-        </div>
-      </FadeUpItem>
+        {/* SEÇÃO 1 - Produção do Dia (Destaque Largo) */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+          <div className="w-full">
+            <ProducaoDiaWidget />
+          </div>
+        </section>
 
-      {/* SEÇÃO 3 - Produção por Setor + Status Máquinas */}
-      <FadeUpItem>
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+        {/* SEÇÃO 2 - Resumo OEE (Unificado e Espaçado) */}
+        <section className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
+          <div className="w-full flex items-center justify-around">
+            <OEEWidget />
+          </div>
+        </section>
+
+        {/* SEÇÃO 3 - Produção por Setor e Status Máquinas (Grid 2/1) */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 border-r border-gray-100 pr-6">
               <ProducaoSetorWidget />
@@ -53,12 +48,10 @@ export default function DashboardGeralPage() {
               <MaquinaStatusWidget />
             </div>
           </div>
-        </div>
-      </FadeUpItem>
+        </section>
 
-      {/* SEÇÃO 4 - Motivos + Tendência de Refugo */}
-      <FadeUpItem>
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+        {/* SEÇÃO 4 - Motivos e Tendência de Refugo (Grid 1/2) */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
             <div className="md:col-span-2 border-r border-gray-100 pr-6">
               <MotivosFrequentesWidget />
@@ -67,12 +60,10 @@ export default function DashboardGeralPage() {
               <TendendiaRefugoWidget />
             </div>
           </div>
-        </div>
-      </FadeUpItem>
+        </section>
 
-      {/* SEÇÃO 5 - KPIs inferiores */}
-      <FadeUpItem>
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+        {/* SEÇÃO 5 - KPIs Inferiores (Retangulares e Largos) */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
               <MediaParadasDiaWidget />
@@ -87,9 +78,8 @@ export default function DashboardGeralPage() {
               <ProducaoPorTurnoLotesWidget />
             </div>
           </div>
-        </div>
-      </FadeUpItem>
+        </section>
 
-    </PageLayout>
+      </div>
   );
 }

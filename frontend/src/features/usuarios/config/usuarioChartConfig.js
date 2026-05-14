@@ -1,54 +1,29 @@
 export const qtdUsuariosPerfilConfig = {
-  gestores:   { label: "Gestores:",   color: "var(--chart-primary)" },
-  operadores: { label: "Operadores:", color: "var(--chart-secondary)" },
+  gestores:   { label: "Gestores:",   color: "#00357a" },
+  operadores: { label: "Operadores:", color: "#212e4b" },
 };
 
 export const qtdUsuariosSetorConfig = {
-  qtd: { label: "Usuários:", color: "var(--chart-accent)" },
+  qtd: { label: "Usuários:", color: "#7d95c6" },
 };
 
 export const topOperadoresConfig = {
-  media: { label: "Peças Produzidas:", color: "var(--chart-primary)" },
+  media: { label: "Peças Produzidas:", color: "#4a7ff7" },
 };
 
 export const tempoSessaoConfig = {
-  horas: { label: "Tempo (h):", color: "var(--chart-primary)" },
+  horas: { label: "Tempo (h):", color: "#00357a" },
 };
 
 export const rotatividadeConfig = {
-  novos:      { label: "Novos:",      color: "var(--chart-primary)" },
-  desligados: { label: "Desligados:", color: "var(--chart-secondary)" },
+  novos:      { label: "Novos:",      color: "#00357a" },
+  desligados: { label: "Desligados:", color: "#212e4b" },
 };
 
 export const cumprimentoMetaConfig = {
-  media: { label: "Máquinas/usuário:", color: "var(--chart-primary)" },
+  media: { label: "Máquinas/usuário:", color: "#00357a" },
 };
 
 export const producaoMediaConfig = {
-  media: { label: "Peças/dia:", color: "var(--chart-vivid)" },
-};
-
-export const turnosOperadoresConfig = {
-  Manhã: { label: "Manhã", color: "var(--chart-primary)" },
-  Tarde: { label: "Tarde", color: "var(--chart-secondary)" },
-  Noite: { label: "Noite", color: "var(--chart-accent)" },
-};
-
-export const taxaRefugoUsuarioConfig = {
-  taxa: { label: "Taxa de Refugo:", color: "var(--chart-vivid)" },
-};
-
-export const producaoMediaUsuarioConfig = {
-  media: { label: "Peças por operador:", color: "var(--chart-primary)" },
-};
-
-export const usuariosPorPerfilConfig = {
-  gestores: { 
-    label: "Gestores", 
-    color: "var(--chart-accent)" 
-  },
-  operadores: { 
-    label: "Operadores", 
-    color: "var(--chart-primary)" 
-  },
+  media: { label: "Peças/dia:", color: "#4a7ff7" },
 };

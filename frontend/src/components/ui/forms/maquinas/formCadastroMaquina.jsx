@@ -143,7 +143,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         <DialogTitle className="text-3xl text-white">Cadastrar Máquina</DialogTitle>
                     </div>
                 </div>
-                <Separator className="m-2 bg-[var(--border-soft)]" />
+                <Separator className="m-2 bg-[#a6a6a6]" />
 
                 <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                     <input
@@ -171,7 +171,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                     alt="Preview"
                                     className="w-32 h-32 object-cover rounded-lg mb-2 border"
                                 />
-                                <div className="flex items-center bg-[var(--info-bg)] text-[var(--info-text)] px-3 py-2 rounded-md w-full">
+                                <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
                                     <File className="w-4 h-4 mr-2 shrink-0" />
                                     <span className="text-sm truncate">{arquivo.nome}</span>
                                 </div>
@@ -301,7 +301,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                     </div>
 
                     <div className="flex justify-center mt-4">
-                        <button type="submit" className="bg-[var(--button-primary)] text-xl text-white font-semibold py-3 px-10 rounded-lg ">
+                        <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg ">
                             Cadastrar
                         </button>
                     </div>

@@ -74,14 +74,14 @@ export default function LoginForm() {
                 <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
-                            <Label className="text-[var(--cinza-escuro)] font-medium mt-5">Identificador</Label>
+                            <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
                             <Input className="h-9" placeholder="Ex: 11.111.-11"
                                 value={id} onChange={(e) => setId(e.target.value)} />
                         </div>
 
                         <div className="grid gap-3">
                             <div className="flex items-center">
-                                <Label className="font-medium text-[var(--cinza-escuro)]">Senha</Label>
+                                <Label className="font-medium text-[#545454]">Senha</Label>
                             </div>
                             <Input className="h-9" type="password" placeholder="••••••••"
                                 value={senha} onChange={(e) => setSenha(e.target.value)} />
@@ -119,7 +119,7 @@ export default function LoginForm() {
                 </form>
 
                 {/* AINDA NÃO TEM UMA CONTA */}
-                <p className="text-sm text-center font-medium text-[var(--cinza-escuro)]">
+                <p className="text-sm text-center font-medium text-[#545454]">
                     Não tem uma conta?{" "}
                     <span className="font-semibold text-foreground cursor-pointer hover:underline">
                         Cadastre-se

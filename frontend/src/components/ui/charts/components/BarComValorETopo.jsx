@@ -24,11 +24,7 @@ export function BarComValorETopo({ data, config, title }) {
 
 
   const dataKey = Object.keys(config)[0];
-  const labelKey = data[0].operador
-    ? "operador"
-    : data[0].setor
-    ? "setor"
-    : Object.keys(data[0]).find((key) => key !== dataKey);
+  const labelKey = data[0].setor ? "setor" : Object.keys(data[0]).find(key => key !== dataKey);
 
   return (
     <div className="w-full">
@@ -42,7 +38,7 @@ export function BarComValorETopo({ data, config, title }) {
             dataKey={labelKey}
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 12, fill: "var(--secondary-foreground)" }}
+            tick={{ fontSize: 12, fill: "hsl(var(--secondary-foreground))" }}
           />
           <YAxis hide />
           <ChartTooltip

@@ -5,37 +5,35 @@ import {
   OEEPorSetorArraySchema,
   RefugoPorSetorArraySchema,
   OEECriticoSchema,
-  SetorMaquinaStatusSchema,
-  SetorOEEMedioSchema,
-  SetorOEEEvolucaoArraySchema,
-  SetorOEEPanelSchema,
-  SetorTopOperadoresArraySchema,
-  SetorMotivosParadaArraySchema,
-  SetorProducaoSemanalArraySchema,
-  SetorProducaoMaquinaArraySchema,
 } from "@features/setores/schemas/setorSchema";
 import {
-  ProducaoPorHoraArraySchema,
-} from "@features/producao/schemas/producaoSchema";
+    SetorMaquinaStatusSchema,
+    SetorOEEMedioSchema,
+    SetorOEEEvolucaoArraySchema,
+    SetorTopOperadoresArraySchema,
+    SetorMotivosParadaArraySchema,
+    SetorProducaoSemanalArraySchema,
+    SetorProducaoMaquinaArraySchema,
+  } from "@features/setores/schemas/setorSchema";
 import {
-  mockUSE_MOCK,
+  mockSetores,
   mockSetorTotalKPI,
   mockOperadoresMediaKPI,
   mockOEEPorSetor,
   mockRefugoPorSetor,
   mockOEECritico,
   mockSetorProducaoSemanal,
-  mockProducaoPorMaquinaSetor,
-  mockSetorProducaoDiaria,
-  mockSetorOEEPanel,
-  mockSetorMaquinaStatus,
-  mockSetorOEEMedio,
-  mockSetorOEEEvolucao,
-  mockSetorTopOperadores,
-  mockSetorMotivosParada,
+  mockProducaoPorMaquinaSetor 
 } from "./mockData";
+ import {
+    mockSetorMaquinaStatus,
+    mockSetorOEEMedio,
+    mockSetorOEEEvolucao,
+    mockSetorTopOperadores,
+    mockSetorMotivosParada,
+  } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const setorService = {
   async getSetores() {
@@ -48,31 +46,36 @@ export const setorService = {
 export const setorTotalKPIService = {
   async getKPI() {
     if (USE_MOCK) return SetorKPISchema.parse(mockSetorTotalKPI);
-    const data = await apiFetch("/setores/kpi/total");
-    return SetorKPISchema.parse(data);
+    const data = await apiFetch("/api/setores/totalSetores");
+    return SetorKPISchema.parse(data.dados);
   },
 };
 
 export const operadoresMediaKPIService = {
   async getKPI() {
     if (USE_MOCK) return SetorKPISchema.parse(mockOperadoresMediaKPI);
-    const data = await apiFetch("/setores/kpi/operadores-media");
-    return SetorKPISchema.parse(data);
+    const data = await apiFetch("/api/setores/obterQuantidadeOperadoresPorSetor");
+    return SetorKPISchema.parse(data.dados);
   },
 };
 
 export const oeeSetorService = {
   async getOEEPorSetor() {
     if (USE_MOCK) return OEEPorSetorArraySchema.parse(mockOEEPorSetor);
-    const data = await apiFetch("/setores/oee");
-    return OEEPorSetorArraySchema.parse(data);
+    const data = await apiFetch("/api/oee/setores/media");
+    return OEEPorSetorArraySchema.parse(data.dados);
   },
 };
 
 export const refugoSetorService = {
   async getRefugoPorSetor() {
     if (USE_MOCK) return RefugoPorSetorArraySchema.parse(mockRefugoPorSetor);
-    const data = await apiFetch("/setores/refugo");
+    const listaDados = await apiFetch("/api/setores/obterProducaoDefeitosPorSetor");
+    const dadosOriginais = listaDados.dados
+    const data = dadosOriginais.map((item)=>({
+        setor: item.setor,
+        refugo: item.defeito
+    }));
     return RefugoPorSetorArraySchema.parse(data);
   },
 };
@@ -80,78 +83,71 @@ export const refugoSetorService = {
 export const oeeCriticoService = {
   async getOEECritico() {
     if (USE_MOCK) return OEECriticoSchema.parse(mockOEECritico);
-    const data = await apiFetch("/setores/oee-critico");
-    return OEECriticoSchema.parse(data);
+    const data = await apiFetch("/api/oee/setores/critico");
+    return OEECriticoSchema.parse(data.dados);
   },
 };
 export const setorMaquinaStatusService = {
   async getStatus(setorId) {
     if (USE_MOCK) return SetorMaquinaStatusSchema.parse(mockSetorMaquinaStatus);
-    const data = await apiFetch(`/setores/${setorId}/maquinas/status`);
-    return SetorMaquinaStatusSchema.parse(data);
+    const data = await apiFetch(`/api/maquinas/setor/${setorId}`);
+    const maquinas = data.dados || [];
+    return SetorMaquinaStatusSchema.parse({
+      emProducao: maquinas.filter((maquina) => (maquina.status_atual || maquina.status) === "Produzindo").length,
+      emSetup: maquinas.filter((maquina) => (maquina.status_atual || maquina.status) === "Setup").length,
+      emParada: maquinas.filter((maquina) => (maquina.status_atual || maquina.status) === "Parada").length,
+    });
   },
 };
  
 export const setorOEEMedioService = {
   async getOEE(setorId) {
     if (USE_MOCK) return SetorOEEMedioSchema.parse(mockSetorOEEMedio);
-    const data = await apiFetch(`/setores/${setorId}/oee_medio`);
-    return SetorOEEMedioSchema.parse(data);
+    const data = await apiFetch(`/api/oee/setores/${setorId}`);
+    return SetorOEEMedioSchema.parse(data.dados);
   },
 };
  
 export const setorOEEEvolucaoService = {
   async getEvolucao(setorId) {
     if (USE_MOCK) return SetorOEEEvolucaoArraySchema.parse(mockSetorOEEEvolucao);
-    const data = await apiFetch(`/setores/${setorId}/oee_evolucao`);
-    return SetorOEEEvolucaoArraySchema.parse(data);
+    const data = await apiFetch(`/api/oee/evolucaoOEEsetor/${setorId}`)
+    return SetorOEEEvolucaoArraySchema.parse(data.dados);
   },
 };
  
 export const setorTopOperadoresService = {
   async getTopOperadores(setorId) {
     if (USE_MOCK) return SetorTopOperadoresArraySchema.parse(mockSetorTopOperadores);
-    const data = await apiFetch(`/setores/${setorId}/top_operadores`);
-    return SetorTopOperadoresArraySchema.parse(data);
+    const data = await apiFetch(`/api/setores/top5operadoresPorSetor/${setorId}`);
+    const operadores = (data.dados || []).slice(0, 5).map((operador) => ({
+      operador: operador.nome,
+      qtd: operador.qtd ?? 0,
+    }));
+    return SetorTopOperadoresArraySchema.parse(data.dados);
   },
 };
  
 export const setorMotivosParadaService = {
   async getMotivos(setorId) {
     if (USE_MOCK) return SetorMotivosParadaArraySchema.parse(mockSetorMotivosParada);
-    const data = await apiFetch(`/setores/${setorId}/motivos_parada`);
-    return SetorMotivosParadaArraySchema.parse(data);
+    const data = await apiFetch(`/api/setores/motivosParada/${setorId}`)
+    return SetorMotivosParadaArraySchema.parse(data.dados);
   },
 };
 
 export const setorProducaoSemanalService = {
   async getProducaoSemanal(setorId) {
     if (USE_MOCK) return SetorProducaoSemanalArraySchema.parse(mockSetorProducaoSemanal);
-    const data = await apiFetch(`/setores/${setorId}/producao_semanal`);
-    return SetorProducaoSemanalArraySchema.parse(data);
-  },
-};
-
-export const setorProducaoDiariaService = {
-  async getProducaoDiaria(setorId) {
-    if (USE_MOCK) return ProducaoPorHoraArraySchema.parse(mockSetorProducaoDiaria);
-    const data = await apiFetch(`/setores/${setorId}/producao_diaria`);
-    return ProducaoPorHoraArraySchema.parse(data);
-  },
-};
-
-export const setorOEEPanelService = {
-  async getOEEPanel(setorId) {
-    if (USE_MOCK) return SetorOEEPanelSchema.parse(mockSetorOEEPanel);
-    const data = await apiFetch(`/setores/${setorId}/oee_panel`);
-    return SetorOEEPanelSchema.parse(data);
+    const data = await apiFetch(`/api/maquinas/dashboard/pecasProduzidas7dias/${setorId}`)
+    return SetorProducaoSemanalArraySchema.parse(data.dados);
   },
 };
 
 export const setorProducaoMaquinaService = {
   async getProducaoPorMaquina(setorId) {
     if (USE_MOCK) return SetorProducaoMaquinaArraySchema.parse(mockProducaoPorMaquinaSetor);
-    const data = await apiFetch(`/setores/${setorId}/producao_por_maquina`);
-    return SetorProducaoMaquinaArraySchema.parse(data);
+    const data = await apiFetch(`/api/maquinas/producaoMaquinas/${setorId}`)
+    return SetorProducaoMaquinaArraySchema.parse(data.dados);
   },
 };

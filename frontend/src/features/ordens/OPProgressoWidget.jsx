@@ -2,15 +2,18 @@
 
 import { useOPProgresso } from "./hooks/useOPProgresso";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
-import { progressoConfig } from "@/features/ordens/config/ordensChartConfig"
+
+const progressoConfig = {
+  produzidos: { label: "Produzidos", color: "#00357a" },
+  aProduzir:  { label: "A Produzir", color: "#b0bfd8" },
+};
 
 export function OPProgressoWidget({ opId }) {
   const { data, loading, error } = useOPProgresso(opId);
 
-  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
-if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
-if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (error)   return <p className="text-sm text-destructive">Erro ao carregar progresso.</p>;
+  if (!data)   return null;
 
   const chartData = [
     { name: "produzidos", value: data.produzidos },

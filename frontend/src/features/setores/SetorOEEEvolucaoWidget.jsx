@@ -7,11 +7,9 @@ import { setorOEEEvolucaoConfig } from "./config/setoresChartConfig";
 export function SetorOEEEvolucaoWidget({ setorId }) {
   const { data, loading, error } = useSetorOEEEvolucao(setorId);
 
-    if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
-  if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
-  
+  if (loading) return <div className="h-[200px] flex items-center justify-center">Carregando...</div>;
+  if (error) return <div className="h-[200px] flex items-center justify-center text-destructive">Erro ao carregar dados.</div>;
+
   return (
     <div>
       <p className="text-sm font-semibold text-black">Evolução do OEE</p>

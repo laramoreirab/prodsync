@@ -1,37 +1,36 @@
 export const eficienciaConfig = {
-  eficiencia: { label: "Eficiência %:", color: "var(--chart-primary)" },
+  eficiencia: { label: "Eficiência %:", color: "#00357a" },
 };
 
 export const metaConfig = {
-  completo: { label: "Completo:", color: "var(--chart-primary)" },
-  restante: { label: "Restante:", color: "var(--chart-muted-fill)" },
+  completo: { label: "Completo:", color: "#00357a" },
+  restante: { label: "Restante:", color: "#e2e8f0" },
 };
 
 export const metricas = [
-  { key: "disponibilidade", label: "Disponibilidade:", color: "var(--chart-primary)" },
-  { key: "performance",     label: "Performance:",     color: "var(--chart-primary)" },
-  { key: "qualidade",       label: "Qualidade:",       color: "var(--chart-primary)" },
-  { key: "oee",             label: "OEE Geral Consolidado:", color: "var(--chart-primary)" },
+  { key: "disponibilidade", label: "Disponibilidade:", color: "#00357a" },
+  { key: "performance",     label: "Performance:",     color: "#00357a" },
+  { key: "qualidade",       label: "Qualidade:",       color: "#00357a" },
+  { key: "oee",             label: "OEE Geral Consolidado:", color: "#00357a" },
 ];
 
 export const tempoParadoTempoProduzindoOperadorConfig  = {
-  produzindo: { label: "Tempo Produzindo:", color: "var(--chart-accent)" },
-  parada:       { label: "Tempo Parado:",        color: "var(--chart-secondary)" },
+  produzindo: { label: "Tempo Produzindo:", color: "#7d95c6" },
+  parada:       { label: "Tempo Parado:",        color: "#212e4b" },
 };
 
 export const pecasPorDiaConfig = {
   qtd: { 
     label: "Peças:", 
-    color: "var(--chart-primary)"
+    color: "#00357a" 
   },
 };
 
 export const producaoPorHoraConfig = {
-  qtd: { label: "Peças/hora:", color: "var(--chart-primary)" },
+  qtd: { label: "Peças/hora:", color: "#00357a" },
 };
 
 export const produtividadeDiariaConfig = {
-  produzido: { label: "Produzido:", color: "var(--chart-primary)" },
-  meta:      { label: "Sua Meta:", color: "var(--chart-soft)" },
+  produzido: { label: "Produzido:", color: "#00357a" },
+  meta:      { label: "Sua Meta:", color: "#b0bfd8" },
 };
-

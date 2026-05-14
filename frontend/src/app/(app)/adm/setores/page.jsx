@@ -17,8 +17,8 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 import { useSetores } from "@/hooks/useSetores";
@@ -29,7 +29,7 @@ import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
 import Link from "next/link";
 
 const setoresFilter = [
-  { id: "nome_setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens", "Brocas"] },
+  { id: "nome_setor", label: "Setor", type: "checkbox", options: [] },
   { id: "qtd_de_maquinas", label: "Qtd. de Máquinas", type: "number-range" },
   { id: "qtd_de_operadores", label: "Qtd. de Operadores", type: "number-range" },
 ];
@@ -42,17 +42,16 @@ const colunasSetores = [
   { id: "qtd_de_operadores", key: "qtd_de_operadores", label: "Qtd. de Operadores" },
 ];
 
-const modalExclusao = (
-  <DialogContent>
-    <FormExclusaoSetor />
-  </DialogContent>
-);
-
 export default function PageSetores() {
   const { setores, loading, error, refresh } = useSetores();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
+  const filtersConfig = setoresFilter.map((filter) =>
+    filter.id === "nome_setor"
+      ? { ...filter, options: setores.map((setor) => setor.nome_setor).filter(Boolean) }
+      : filter
+  );
 
   //sincronizar dados da API com estado local
   useEffect(() => {
@@ -204,7 +203,7 @@ export default function PageSetores() {
 
         {/* Busca */}
         <div className="flex px-8 searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]">
+          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
             <input
               type="search"
               className="p-2 w-full outline-none bg-transparent"
@@ -229,7 +228,7 @@ export default function PageSetores() {
               onSortChange={handleSort}
             />
             <FilterDropdown
-              filtersConfig={setoresFilter}
+              filtersConfig={filtersConfig}
               onApply={aplicarFiltros}
             />
           </div>
@@ -242,11 +241,15 @@ export default function PageSetores() {
               columns={colunasSetores}
               enableSelection={true}
               onSelectedChange={setSelecionados}
-              excluirLote={modalExclusao}
+              excluirLote={
+                <DialogContent>
+                  <FormExclusaoSetor />
+                </DialogContent>
+              }
               acoesDropdown={(setor) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`setores/${setor.id}`}>
+                    <Link href={`setores/${setor.id_setor}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver Detalhes
                     </Link>
@@ -260,7 +263,7 @@ export default function PageSetores() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                      <FormEdicaoSetor setorId={setor.id} onEdicaoSucesso={refresh} />
+                      <FormEdicaoSetor setorId={setor.id_setor} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
@@ -272,7 +275,7 @@ export default function PageSetores() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoSetor setorId={setor.id} onExclusaoSucesso={refresh} />
+                      <FormExclusaoSetor setorId={setor.id_setor} onExclusaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
                 </>

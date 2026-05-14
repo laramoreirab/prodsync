@@ -26,11 +26,30 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import { Label } from "@/components/ui/label"
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea";
+
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
+
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
 
-import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";
 
 const colunasEventos = [
   {
@@ -42,7 +61,7 @@ const colunasEventos = [
       const config = {
         "Setup": {
           variant: "secondary",
-          className: "bg-[var(--status-warning-bg)] text-amarelo font-semibold text-sm "
+          className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
         },
         "Parada": {
           variant: "destructive",
@@ -151,13 +170,13 @@ export default function HistoricoEventos() {
       if (filtrosSelecionados.data.start) {
         const dataInicio = new Date(filtrosSelecionados.data.start);
         dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.data) >= dataInicio
+          new Date(item.inicio ?? item.data) >= dataInicio
         );
       }
       if (filtrosSelecionados.data.end) {
         const dataFim = new Date(filtrosSelecionados.data.end);
         dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.data) <= dataFim
+          new Date(item.inicio ?? item.data) <= dataFim
         );
       }
     }
@@ -220,7 +239,7 @@ export default function HistoricoEventos() {
         <section>
           {/* Busca */}
           <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
               <input
                 type="search"
                 className="p-2 w-full outline-none font-medium bg-transparent"
