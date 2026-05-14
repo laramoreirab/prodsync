@@ -471,10 +471,13 @@ class SetorModel {
         }
     }
 
-    static async obterQuantidadeMaquinasPorSetor(id_empresa) {
+    static async obterQuantidadeMaquinasPorSetor(id_empresa, setorId = null) {
         try {
             const setores = await prisma.setores.findMany({
-                where: { id_empresa },
+                where: {
+                    id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {})
+                },
                 include: {
                     maquinas: {
                         where: { ativo: true },
@@ -484,8 +487,10 @@ class SetorModel {
             });
 
             return setores.map(setor => ({
-                // id_setor: setor.id_setor,
+                id_setor: setor.id_setor,
+                id: setor.id_setor,
                 setor: setor.nome_setor,
+                quantidade: setor.maquinas.length,
                 qtd: setor.maquinas.length
             })).sort((a, b) => b.qtd - a.qtd);
         } catch (error) {
@@ -494,7 +499,7 @@ class SetorModel {
         }
     }
 
-    static async obterTempoMedioParadaPorSetor(id_empresa, dias = null) {
+    static async obterTempoMedioParadaPorSetor(id_empresa, dias = null, setorId = null) {
         try {
             const [paradas, setores] = await Promise.all([
                 prisma.historico_Eventos.groupBy({
@@ -504,6 +509,7 @@ class SetorModel {
                         status_atual: {
                             in: ['Parada', 'Manutencao', 'Setup']
                         },
+                        ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                         duracao: {
                             not: null
                         },
@@ -529,7 +535,10 @@ class SetorModel {
 
             return paradas.map(parada => ({
                 // id_setor: parada.setor_afetado,
+                id_setor: parada.setor_afetado,
+                setorId: parada.setor_afetado,
                 setor: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
+                maquina: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
                 minutos: Number((parada._avg.duracao ?? 0).toFixed(1)),
                 // tempo_total_minutos: parada._sum.duracao ?? 0,
                 // total_eventos: parada._count.id_evento
@@ -540,11 +549,12 @@ class SetorModel {
         }
     }
 
-    static async obterProducaoDefeitosPorSetor(id_empresa, dias = null) {
+    static async obterProducaoDefeitosPorSetor(id_empresa, dias = null, setorId = null) {
         try {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     ...this.montarFiltroPeriodo('data_hora_fim', dias)
                 },
                 select: {
@@ -587,7 +597,10 @@ class SetorModel {
 
                 return {
                     // id_setor: setor.id_setor,
+                    id_setor: setor.id_setor,
+                    setorId: setor.id_setor,
                     setor: setor.setor,
+                    maquina: setor.setor,
                     produzidas,
                     defeito,
                     // total_produzido: total,

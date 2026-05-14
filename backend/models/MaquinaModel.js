@@ -48,7 +48,10 @@ class MaquinaModel {
                     id_maquina: 'asc' // Mantém a lista organizada
                 },
                 // Se no futuro quiser incluir o Setor na resposta, é só descomentar a linha abaixo:
-                // include: { setor: true, categoria: true }
+                include: {
+                    setor: { select: { id_setor: true, nome_setor: true } },
+                    operador: { select: { id_usuario: true, nome: true } }
+                }
             };
 
             const resultadoPaginado = await paginarPrisma(
@@ -381,6 +384,15 @@ class MaquinaModel {
     }
 
     static async obterSetorOperador(id_empresa, id_operador) {
+        const setorGerido = await prisma.setor_Gestor.findFirst({
+            where: {
+                id_empresa,
+                id_gestor: Number(id_operador)
+            },
+            select: { id_setor: true }
+        });
+        if (setorGerido?.id_setor) return setorGerido.id_setor;
+
         const escala = await prisma.escalaTrabalho.findFirst({
             where: {
                 id_empresa,
@@ -674,12 +686,13 @@ class MaquinaModel {
         }
     }
 
-    static async obterStatusGeralMaquinas(id_empresa) {
+    static async obterStatusGeralMaquinas(id_empresa, setorId = null) {
         try {
             const statusAgrupados = await prisma.maquinas.groupBy({
                 by: ['status_atual'],
                 where: {
                     id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                     ativo: true
                 },
                 _count: {
@@ -695,6 +708,7 @@ class MaquinaModel {
             return statusAgrupados.map(status => ({
                 name: status.status_atual,
                 value: status._count.status_atual,
+                setorId: setorId ? Number(setorId) : undefined,
                 status: status.status_atual,
                 total: status._count.status_atual
             }));
@@ -704,7 +718,7 @@ class MaquinaModel {
         }
     }
 
-    static async obterProducaoTotalMaquinas(id_empresa, dias) {
+    static async obterProducaoTotalMaquinas(id_empresa, dias, setorId = null) {
         try {
             const quantidadeDias = Number(dias) || 7;
             const chavesDias = this.criarMapaUltimosDias(quantidadeDias);
@@ -713,6 +727,7 @@ class MaquinaModel {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     data_hora_fim: {
                         gte: dataInicio
                     }
@@ -731,6 +746,7 @@ class MaquinaModel {
                 dia,
                 {
                     data: dia,
+                    setorId: setorId ? Number(setorId) : undefined,
                     produzidas: 0,
                     refugo: 0,
                     total: 0,

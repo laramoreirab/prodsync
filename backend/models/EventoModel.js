@@ -97,10 +97,13 @@ class EventoModel {
         return maquina?.id_maquina ?? null;
     }
 
-    static async listarTodos(id_empresa, paginacao) {
+    static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
-                where: { id_empresa },
+                where: {
+                    id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {})
+                },
                 include: {
                     maquina: {
                         select: { id_maquina: true, nome: true, serie: true }
@@ -460,7 +463,7 @@ class EventoModel {
 
     // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
 
-    static async tempoParadoTempoProduzindoEvento(id_empresa) {
+    static async tempoParadoTempoProduzindoEvento(id_empresa, setorId = null) {
         function semanaAtual() {
             const hoje = new Date()
             const diaSemana = hoje.getDay()
@@ -484,6 +487,7 @@ class EventoModel {
             prisma.apontamento.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     data_hora_inicio: { gte: inicio, lte: fim }
                 },
                 select: {
@@ -495,6 +499,7 @@ class EventoModel {
             prisma.historico_Eventos.aggregate({
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
                     inicio: { gte: inicio, lte: fim },
                     duracao: { not: null }
@@ -552,12 +557,13 @@ class EventoModel {
 
     // -------------- Dashboards --------------- //
 
-    static async obterMotivosParadaFrequentes(id_empresa, limite = 10) {
+    static async obterMotivosParadaFrequentes(id_empresa, limite = 10, setorId = null) {
         try {
             const agrupados = await prisma.historico_Eventos.groupBy({
                 by: ['id_motivo_parada'],
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     id_motivo_parada: {
                         not: null
                     },
@@ -786,9 +792,9 @@ class EventoModel {
         }
     }
 
-    static async obterTopMotivosTempo(id_empresa, limite = 5) {
+    static async obterTopMotivosTempo(id_empresa, limite = 5, setorId = null) {
         try {
-            const motivos = await this.obterMotivosParadaFrequentes(id_empresa, limite);
+            const motivos = await this.obterMotivosParadaFrequentes(id_empresa, limite, setorId);
 
             return motivos
                 .sort((a, b) => b.duracao_total_minutos - a.duracao_total_minutos)

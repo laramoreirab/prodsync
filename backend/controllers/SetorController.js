@@ -270,7 +270,7 @@ class SetorController {
 
     static async obterQuantidadeMaquinasPorSetor(req, res) {
         try {
-            const dados = await SetorModel.obterQuantidadeMaquinasPorSetor(req.user.id_empresa);
+            const dados = await SetorModel.obterQuantidadeMaquinasPorSetor(req.user.id_empresa, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter quantidade de maquinas por setor:', error);
@@ -281,7 +281,7 @@ class SetorController {
     static async obterTempoMedioParadaPorSetor(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : null;
-            const dados = await SetorModel.obterTempoMedioParadaPorSetor(req.user.id_empresa, dias);
+            const dados = await SetorModel.obterTempoMedioParadaPorSetor(req.user.id_empresa, dias, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter tempo medio de parada por setor:', error);
@@ -292,7 +292,7 @@ class SetorController {
     static async obterProducaoDefeitosPorSetor(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : null;
-            const dados = await SetorModel.obterProducaoDefeitosPorSetor(req.user.id_empresa, dias);
+            const dados = await SetorModel.obterProducaoDefeitosPorSetor(req.user.id_empresa, dias, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter producao de defeitos por setor:', error);

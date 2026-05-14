@@ -8,7 +8,7 @@ class EventoController {
             const paginacao = req.paginacao;
             const resultado = req.user.tipo === 'Operador'
                 ? await EventoModel.listarPorOperador(id_empresa, req.user.id_usuario, paginacao)
-                : await EventoModel.listarTodos(id_empresa, paginacao);
+                : await EventoModel.listarTodos(id_empresa, paginacao, req.query.setorId);
 
             // Normaliza para o formato esperado pelo frontend
             const dadosNormalizados = (resultado.dados || []).map(evento => ({
@@ -324,7 +324,7 @@ class EventoController {
     static async obterTopMotivosTempo(req, res) {
         try {
             const limite = req.query.limite ? Number(req.query.limite) : 5;
-            const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite);
+            const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -336,7 +336,7 @@ class EventoController {
 
     static async tempoParadoTempoProduzindoEvento(req, res) {
         try {
-            const dados = await EventoModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa)
+            const dados = await EventoModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo geral da fábrica:', error)

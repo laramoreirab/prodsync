@@ -55,9 +55,19 @@ export const qtdMaquinasPorSetorService = {
       }
       return data;
     }
-    const url = setorId ? `/api/setores/quantidade_por_setor?setorId=${setorId}` : "/api/setores/obterQuantidadeMaquinasPorSetor";
-    const data = await apiFetch(url);
-    return QtdMaquinaPorSetorArraySchema.parse(data.dados);
+    if (setorId) {
+      const data = await apiFetch(`/api/maquinas/setor/${setorId}`);
+      const maquinas = data.dados || [];
+      const nomeSetor = maquinas[0]?.setor?.nome_setor || "Setor";
+      return QtdMaquinaPorSetorArraySchema.parse([{ id: Number(setorId), setor: nomeSetor, quantidade: maquinas.length }]);
+    }
+    const data = await apiFetch("/api/setores/obterQuantidadeMaquinasPorSetor");
+    const dados = (data.dados || []).map((item, index) => ({
+      id: item.id_setor ?? item.id ?? index + 1,
+      setor: item.setor,
+      quantidade: item.quantidade ?? item.qtd ?? 0,
+    }));
+    return QtdMaquinaPorSetorArraySchema.parse(dados);
   },
 };
 
@@ -71,9 +81,14 @@ export const tempoMedioParadaService = {
       }
       return data;
     }
-    const url = setorId ? `/api/setores/tempo_medio_parada?setorId=${setorId}` : "/api/setores/obterTempoMedioParadaPorSetor";
+    const url = setorId ? `/api/setores/obterTempoMedioParadaPorSetor?setorId=${setorId}` : "/api/setores/obterTempoMedioParadaPorSetor";
     const data = await apiFetch(url);
-    return TempoMedioParadaArraySchema.parse(data.dados);
+    const dados = (data.dados || []).map((item) => ({
+      maquina: item.maquina ?? item.setor,
+      minutos: item.minutos,
+      setorId: item.setorId ?? item.id_setor,
+    }));
+    return TempoMedioParadaArraySchema.parse(dados);
   },
 };
 
@@ -87,9 +102,15 @@ export const producaoDefeitosService = {
       }
       return data;
     }
-    const url = setorId ? `/api/setores/producao_defeitos?setorId=${setorId}` : "/api/setores/obterProducaoDefeitosPorSetor";
+    const url = setorId ? `/api/setores/obterProducaoDefeitosPorSetor?setorId=${setorId}` : "/api/setores/obterProducaoDefeitosPorSetor";
     const data = await apiFetch(url);
-    return ProducaoDefeitoPorSetorArraySchema.parse(data.dados);
+    const dados = (data.dados || []).map((item) => ({
+      maquina: item.maquina ?? item.setor,
+      produzidas: item.produzidas,
+      defeito: item.defeito,
+      setorId: item.setorId ?? item.id_setor,
+    }));
+    return ProducaoDefeitoPorSetorArraySchema.parse(dados);
   },
 };
 
@@ -103,7 +124,7 @@ export const maquinasPorTurnoService = {
       }
       return data;
     }
-    const url = setorId ? `/api/turnos/status_por_turno?setorId=${setorId}` : "/api/turnos/status-maquinas-por-turno";
+    const url = setorId ? `/api/turnos/status-maquinas-por-turno?setorId=${setorId}` : "/api/turnos/status-maquinas-por-turno";
     const data = await apiFetch(url);
     return MaquinaPorTurnoArraySchema.parse(data.dados);
   },
@@ -126,8 +147,8 @@ export const producaoTotalService = {
       return data;
     }
     const url = setorId
-      ? `/api/maquinas/producao_total?periodo=${periodo}&setorId=${setorId}`
-      : `/api/maquinas/producao_total?periodo=${periodo}`;
+      ? `/api/maquinas/dashboard/obter-producao-total-maquinas?periodo=${periodo}&setorId=${setorId}`
+      : `/api/maquinas/dashboard/obter-producao-total-maquinas?periodo=${periodo}`;
     const data = await apiFetch(url);
     return ProducaoTotalArraySchema.parse(data.dados);
   },

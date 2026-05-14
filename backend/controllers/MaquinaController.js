@@ -297,7 +297,7 @@ class MaquinaController {
     static async obterStatusGeralMaquinas(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const dados = await MaquinaModel.obterStatusGeralMaquinas(id_empresa);
+            const dados = await MaquinaModel.obterStatusGeralMaquinas(id_empresa, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -313,7 +313,7 @@ class MaquinaController {
     static async obterProducaoTotalMaquinas(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : 7;
-            const dados = await MaquinaModel.obterProducaoTotalMaquinas(req.user.id_empresa, dias);
+            const dados = await MaquinaModel.obterProducaoTotalMaquinas(req.user.id_empresa, dias, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {

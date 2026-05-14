@@ -211,7 +211,7 @@ class OrdemProducaoController {
 
     static async totalOPsAtivas(req, res) {
         try {
-            const resultado = await OrdemProducaoModel.totalOPsAtivas(req.user.id_empresa)
+            const resultado = await OrdemProducaoModel.totalOPsAtivas(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, resultado })
         } catch (error) {
             console.error('Erro ao exibir total de OPs ativas', error)
@@ -221,7 +221,7 @@ class OrdemProducaoController {
 
     static async totalOPsAtrasadas(req, res) {
         try {
-            const resultado = await OrdemProducaoModel.totalOPsAtrasadas(req.user.id_empresa)
+            const resultado = await OrdemProducaoModel.totalOPsAtrasadas(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, resultado })
         } catch (error) {
             console.error('Erro ao exibir total de OPs atrasadas', error)
@@ -231,7 +231,7 @@ class OrdemProducaoController {
 
     static async totalPecasBoas(req, res) {
         try {
-            const resultado = await OrdemProducaoModel.totalPecasBoas(req.user.id_empresa)
+            const resultado = await OrdemProducaoModel.totalPecasBoas(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, resultado })
         } catch (error) {
             console.error('Erro ao exibir total de Pecas Boas produzidas', error)
@@ -241,7 +241,7 @@ class OrdemProducaoController {
 
     static async totalRefugo(req, res) {
         try {
-            const resultado = await OrdemProducaoModel.totalRefugo(req.user.id_empresa)
+            const resultado = await OrdemProducaoModel.totalRefugo(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, resultado })
         } catch (error) {
             console.error('Erro ao exibir total de Refugo produzido', error)
@@ -263,7 +263,7 @@ class OrdemProducaoController {
 
     static async eficienciaGeral(req, res) {
         try {
-            const dados = await OrdemProducaoModel.eficienciaGeral(req.user.id_empresa)
+            const dados = await OrdemProducaoModel.eficienciaGeral(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro ao retornar grafico Eficiencia Geral Das OPs:', error)
@@ -273,7 +273,7 @@ class OrdemProducaoController {
 
     static async top3OPsMaiorRefugo(req, res) {
         try {
-            const dados = await OrdemProducaoModel.top3OPsMaiorRefugo(req.user.id_empresa)
+            const dados = await OrdemProducaoModel.top3OPsMaiorRefugo(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro ao retornar grafico Top 3 OPs com Maior Refugo:', error)
@@ -283,7 +283,7 @@ class OrdemProducaoController {
 
     static async cargaPorSetor(req, res) {
         try {
-            const dados = await OrdemProducaoModel.cargaPorSetor(req.user.id_empresa)
+            const dados = await OrdemProducaoModel.cargaPorSetor(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro ao retornar grafico Carga de Trabalho Por Setor:', error)
@@ -293,7 +293,7 @@ class OrdemProducaoController {
 
     static async statusOPs(req, res) {
         try {
-            const dados = await OrdemProducaoModel.statusOPs(req.user.id_empresa)
+            const dados = await OrdemProducaoModel.statusOPs(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro ao retornar grafico Status das OPs', error)
@@ -303,7 +303,7 @@ class OrdemProducaoController {
 
     static async opsConcluidasPorDia(req, res) {
         try {
-            const dados = await OrdemProducaoModel.opsConcluidasPorDia(req.user.id_empresa)
+            const dados = await OrdemProducaoModel.opsConcluidasPorDia(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro ao retornar grafico OPs Concluidas', error)
