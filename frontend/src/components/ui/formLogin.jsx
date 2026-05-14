@@ -111,7 +111,7 @@ export default function LoginForm() {
 
                     {/* BUTTON LOGIN */}
                     <Button id="btn_login"
-                    type="submit"
+                        type="submit"
                         disabled={carregando}
                         className="cursor-pointer py-3 w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-semibold rounded-lg">
                         {carregando ? "Entrando..." : "Entrar"}
@@ -121,14 +121,19 @@ export default function LoginForm() {
                 {/* AINDA NÃO TEM UMA CONTA */}
                 <p className="text-sm text-center font-medium text-[#545454]">
                     Não tem uma conta?{" "}
-                    <span className="font-semibold text-foreground cursor-pointer hover:underline">
-                        Cadastre-se
-                    </span>
+                    <a href="/cadastro">
+                        <span className="font-semibold text-foreground cursor-pointer hover:underline">
+                            Cadastre-se
+                        </span>
+                    </a>
                 </p>
 
-                <p className="text-sm text-center font-semibold text-foreground cursor-pointer hover:underline">
-                    É seu primeiro acesso?
-                </p>
+                <a href="/primeiro-acesso">
+                    <p className="text-sm text-center font-semibold text-foreground cursor-pointer hover:underline">
+
+                        É seu primeiro acesso?
+                    </p>
+                </a>
             </div>
 
 
