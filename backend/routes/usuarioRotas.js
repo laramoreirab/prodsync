@@ -16,12 +16,15 @@ router.get('/dashboard/tempo-medio-sessao-perfil',authMiddleware, UsuarioControl
 router.get('/dashboard/rotatividadeUsuarios', authMiddleware, UsuarioController.rotatividade )
 router.get('/dashboard/producaoMediaPorSetor', authMiddleware, UsuarioController.producaoMediaPorDiaSetor)
 router.get('/dashboard/metaProducaoPorSetor', authMiddleware, UsuarioController.metaProducaoPorSetor)
+router.get('/turnos', authMiddleware, UsuarioController.turnosOperadores)
+router.get('/taxa_refugo', authMiddleware, UsuarioController.taxaRefugo)
+router.get('/producao_media_por_usuario', authMiddleware, UsuarioController.producaoMediaPorUsuario)
 router.post('/criar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, UsuarioController.criarUsuario)
+router.get('/operadores/:id_setor', authMiddleware, UsuarioController.listarOperadoresporSetor)
 router.get('/:id', authMiddleware, UsuarioController.buscarPorId)
 router.delete('/:id/deletar', authMiddleware, UsuarioController.deletarUsuario)
 router.put('/:id/atualizar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, UsuarioController.atualizarUsuario)
 router.get('/:id/apontamentos', authMiddleware, UsuarioController.listarApontamentosUsuario)
-router.get('/operadores/:id_setor', authMiddleware, UsuarioController.listarOperadoresporSetor)
 router.get('/:id/producao_por_hora', authMiddleware, UsuarioController.getProducaoPorHora);
 router.get('/:id/produtividade_dia', authMiddleware, UsuarioController.getProdutividadeDia);
 router.get('/:id/qualidade', authMiddleware, UsuarioController.getQualidade);

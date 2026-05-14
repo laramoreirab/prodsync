@@ -3,6 +3,6 @@
 import { useChartData } from "@/hooks/useChartData";
 import { topMotivosTempoService } from "@services/eventosService";
 
-export function useTopMotivosTempo() {
-  return useChartData(topMotivosTempoService.getTopMotivosTempo);
+export function useTopMotivosTempo(setorId = null) {
+  return useChartData(topMotivosTempoService.getTopMotivosTempo, setorId);
 }

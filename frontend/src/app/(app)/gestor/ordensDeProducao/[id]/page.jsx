@@ -239,6 +239,7 @@ const dadosApontamento = [
 export default function OPDetalheGestor({ params }) {
   const { id } = use(params);
   const opId = id;
+  const handleEditBatch = () => {};
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">

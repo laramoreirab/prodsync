@@ -7,11 +7,15 @@
     "dev:front": "cd frontend && npm run dev",
     "dev:back": "cd backend && npm start",
     "dev": "concurrently -n \"FRONT,BACK\" -c \"magenta,blue\" \"npm run dev:front\" \"npm run dev:back\""
-},
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "framer-motion": "^12.38.0",
+    "motion": "^12.38.0"
   }
 }

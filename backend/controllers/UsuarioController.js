@@ -18,18 +18,6 @@ class UsuarioController {
 
             // Normaliza o retorno: a query é sobre escalaTrabalho (inclui operador, turno, setor)
             // O frontend espera: { id, nome, funcao, id_setor, id_turno, id_maquina, email, cpf, imagem_perfil }
-            const dadosNormalizados = (resultado.dados || []).map(escala => ({
-                id: escala.operador?.id_usuario ?? escala.id_operador,
-                nome: escala.operador?.nome ?? '',
-                email: escala.operador?.email ?? '',
-                cpf: escala.operador?.cpf ?? '',
-                funcao: escala.operador?.tipo ?? '',
-                imagem_perfil: escala.operador?.imagem_perfil ?? null,
-                id_setor: escala.id_setor,
-                id_turno: escala.id_turno,
-                id_maquina: escala.id_maquina ?? null,
-            }));
-
             return res.status(200).json({
                 sucesso: true,
                 dados: resultado.dados || [],
@@ -140,7 +128,8 @@ class UsuarioController {
     static async criarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const { nome, cpf, email, id_setor, id_turno, id_maquina } = req.body;
+            const funcao = String(req.body.funcao || '').trim().toLowerCase() === 'gestor' ? 'Gestor' : 'Operador';
 
             const erros = [];
             // Validar nome
@@ -197,7 +186,7 @@ class UsuarioController {
 
             //validação do setor
             if (!id_setor) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Setor é obrigatório',
                     mensagem: 'O setor é obrigatório!'
@@ -206,7 +195,7 @@ class UsuarioController {
 
             //validação do turno
             if (funcao !== 'Gestor' && !id_turno) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
                     mensagem: 'O turno é obrigatório!'
@@ -214,7 +203,7 @@ class UsuarioController {
             };
             //validação funcao
             if (!funcao || funcao.trim() == '') {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
                     mensagem: 'O turno é obrigatório!'
@@ -222,7 +211,7 @@ class UsuarioController {
             };
             //validação maquina
             if (funcao === 'Operador' && !id_maquina) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
                     mensagem: 'O turno é obrigatório!'
@@ -572,6 +561,36 @@ class UsuarioController {
     }
 
     // ------------------------------------Dashboard da página específica de usuário----------------------------------------------------------------
+
+    static async turnosOperadores(req, res) {
+        try {
+            const dados = await UsuarioModel.turnosOperadores(req.user.id_empresa, req.query.setorId)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no grafico Operadores por turno:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    static async taxaRefugo(req, res) {
+        try {
+            const dados = await UsuarioModel.taxaRefugo(req.user.id_empresa, req.query.setorId)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no grafico Taxa de refugo por usuario:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    static async producaoMediaPorUsuario(req, res) {
+        try {
+            const dados = await UsuarioModel.producaoMediaPorUsuario(req.user.id_empresa, req.query.setorId)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no grafico Producao media por usuario:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
 
     static async metaProducao(req, res) {
         try {

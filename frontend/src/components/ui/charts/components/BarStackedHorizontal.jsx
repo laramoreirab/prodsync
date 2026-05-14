@@ -22,14 +22,14 @@ import {
 
 
 
-export function BarStackedHorizontal({ data, config, title }) {
+export function BarStackedHorizontal({ data, config, title, xKey = "setor" }) {
   return (
     <div>
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
       <ChartContainer config={config} className="h-[220px] w-full">
         <BarChart data={data} layout="vertical">
           <YAxis
-            dataKey="setor"
+            dataKey={xKey}
             type="category"
             tickLine={false}
             axisLine={false}
@@ -45,8 +45,8 @@ export function BarStackedHorizontal({ data, config, title }) {
           <ChartTooltip content={<ChartTooltipContent />} />
           <ChartLegend content={<ChartLegendContent />} />
           {/* Mesmo stackId = mesma pilha. Ordem define qual fica na base. */}
-          <Bar dataKey="produzidas" stackId="stack1" fill="var(--color-produzidas)" radius={[0, 0, 0, 0]} />
-          <Bar dataKey="defeito" stackId="stack1" fill="var(--color-defeito)" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="produzidas" stackId="stack1" fill={config.produzidas?.color || "var(--chart-primary)"} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="defeito" stackId="stack1" fill={config.defeito?.color || "var(--chart-accent)"} radius={[0, 4, 4, 0]} />
         </BarChart>
       </ChartContainer>
     </div>

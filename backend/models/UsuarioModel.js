@@ -23,7 +23,16 @@ class UsuarioModel {
                         select: {
                             id_turno: true,
                             id_setor: true,
+                            id_maquina: true,
                             turno: { select: { nome_turno: true } },
+                            setor: { select: { nome_setor: true } },
+                            maquina: { select: { nome: true, serie: true } }
+                        },
+                        take: 1
+                    },
+                    setores_geridos: {
+                        select: {
+                            id_setor: true,
                             setor: { select: { nome_setor: true } }
                         },
                         take: 1
@@ -47,10 +56,12 @@ class UsuarioModel {
                     email: u.email,
                     cpf: u.cpf,
                     funcao: u.tipo,
-                    id_setor: u.escalas[0]?.id_setor ?? null,
+                    id_setor: u.escalas[0]?.id_setor ?? u.setores_geridos[0]?.id_setor ?? null,
                     id_turno: u.escalas[0]?.id_turno ?? null,
-                    setor: u.escalas[0]?.setor?.nome_setor ?? 'Sem setor',
+                    id_maquina: u.escalas[0]?.id_maquina ?? null,
+                    setor: u.escalas[0]?.setor?.nome_setor ?? u.setores_geridos[0]?.setor?.nome_setor ?? 'Sem setor',
                     turno: u.escalas[0]?.turno?.nome_turno ?? 'Sem turno',
+                    maquina: u.escalas[0]?.maquina?.serie ?? u.escalas[0]?.maquina?.nome ?? 'Sem maquina',
                     imagem_perfil: u.imagem_perfil
                 }))
             }
@@ -568,7 +579,7 @@ class UsuarioModel {
 
                 dadosAtuais.produzido += ap.qtd_boa ?? 0;
                 // Somamos o planejado da ordem vinculada a este apontamento
-                dadosAtuais.planejado += ap.ordemProducao?.qtd_planejada ?? 0;
+                dadosAtuais.planejado += ap.ordem_producao?.qtd_planejada ?? 0;
 
                 consolidadoPorSetor.set(nomeSetor, dadosAtuais);
             }
@@ -592,6 +603,102 @@ class UsuarioModel {
     }
 
     // ------------------------------------------------------Dashboard da página específica de usuário-------------------------------------------------------------
+
+    static async turnosOperadores(id_empresa, setorId = null) {
+        const where = {
+            id_empresa: Number(id_empresa),
+            ...(setorId ? { id_setor: Number(setorId) } : {})
+        };
+
+        const resultado = await prisma.escalaTrabalho.groupBy({
+            by: ['id_turno', 'id_setor'],
+            where,
+            _count: { id_operador: true }
+        });
+
+        const turnos = await prisma.turno.findMany({
+            where: { id_empresa: Number(id_empresa) },
+            select: { id_turno: true, nome_turno: true }
+        });
+        const nomes = Object.fromEntries(turnos.map(t => [t.id_turno, t.nome_turno]));
+
+        return resultado.map(item => ({
+            turno: nomes[item.id_turno] ?? `Turno ${item.id_turno}`,
+            value: item._count.id_operador,
+            setorId: item.id_setor
+        }));
+    }
+
+    static async taxaRefugo(id_empresa, setorId = null) {
+        const resultado = await prisma.apontamento.groupBy({
+            by: ['id_operador'],
+            where: {
+                id_empresa: Number(id_empresa),
+                ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {})
+            },
+            _sum: { qtd_boa: true, qtd_refugo: true },
+            orderBy: { _sum: { qtd_refugo: 'desc' } },
+            take: 8
+        });
+
+        const ids = resultado.map(r => r.id_operador);
+        const usuarios = await prisma.usuarios.findMany({
+            where: { id_empresa: Number(id_empresa), id_usuario: { in: ids } },
+            select: { id_usuario: true, nome: true }
+        });
+        const nomes = Object.fromEntries(usuarios.map(u => [u.id_usuario, u.nome]));
+
+        return resultado.map(item => {
+            const boas = item._sum.qtd_boa ?? 0;
+            const refugo = item._sum.qtd_refugo ?? 0;
+            const total = boas + refugo;
+
+            return {
+                operador: nomes[item.id_operador] ?? `Usuario ${item.id_operador}`,
+                taxa: total > 0 ? Number(((refugo / total) * 100).toFixed(1)) : 0,
+                setorId: setorId ? Number(setorId) : undefined
+            };
+        });
+    }
+
+    static async producaoMediaPorUsuario(id_empresa, setorId = null) {
+        const apontamentos = await prisma.apontamento.findMany({
+            where: {
+                id_empresa: Number(id_empresa),
+                ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {})
+            },
+            select: {
+                id_operador: true,
+                qtd_boa: true,
+                data_hora_inicio: true,
+                operador: { select: { nome: true } },
+                maquina: { select: { id_setor: true } }
+            }
+        });
+
+        const porUsuario = new Map();
+        for (const ap of apontamentos) {
+            const dia = ap.data_hora_inicio.toISOString().slice(0, 10);
+            const atual = porUsuario.get(ap.id_operador) ?? {
+                usuario: ap.operador?.nome ?? `Usuario ${ap.id_operador}`,
+                total: 0,
+                dias: new Set(),
+                setorId: ap.maquina?.id_setor
+            };
+            atual.total += ap.qtd_boa ?? 0;
+            atual.dias.add(dia);
+            porUsuario.set(ap.id_operador, atual);
+        }
+
+        return Array.from(porUsuario.values())
+            .map(item => ({
+                usuario: item.usuario,
+                media: item.dias.size > 0 ? Math.round(item.total / item.dias.size) : 0,
+                setorId: item.setorId
+            }))
+            .sort((a, b) => b.media - a.media)
+            .slice(0, 8);
+    }
 
     static async metaProducao(id_empresa, id_usuario, id_maquina) {
         try {

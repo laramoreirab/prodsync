@@ -31,6 +31,27 @@ class SetorModel {
                     id_setor: id_setor
                 }
             });
+            const maquinas = await prisma.maquinas.findMany({
+                where: {
+                    id_maquina: { in: ids_maquinas },
+                    id_empresa,
+                    id_operador: { not: null }
+                },
+                select: { id_maquina: true, id_operador: true }
+            });
+
+            await Promise.all(maquinas.map(maquina =>
+                prisma.escalaTrabalho.updateMany({
+                    where: {
+                        id_empresa,
+                        id_operador: maquina.id_operador
+                    },
+                    data: {
+                        id_setor,
+                        id_maquina: maquina.id_maquina
+                    }
+                })
+            ));
             return resultado;
         } catch (error) {
             console.error('Erro ao associar máquinas ao setor:', error);

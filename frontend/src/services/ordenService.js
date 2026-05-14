@@ -10,10 +10,17 @@ import {
   OPOEEDetalheSchema,
 } from "@features/ordens/schemas/ordenSchema";
 
+const USE_MOCK = false;
+
+function withSetorId(path, setorId) {
+  return setorId ? `${path}?setorId=${encodeURIComponent(setorId)}` : path;
+}
+
 export const opAtivasService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
+    if (USE_MOCK) return OPKPISchema.parse(mockOPAtivasKPI);
     try {
-      const response = await apiFetch("/api/ordens/kpi/ativas");
+      const response = await apiFetch(withSetorId("/api/ordens/kpi/ativas", setorId));
       return OPKPISchema.parse({
         titulo: "OPs Ativas",
         valor: response.resultado
@@ -25,9 +32,10 @@ export const opAtivasService = {
 };
 
 export const opAtrasadasService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
+    if (USE_MOCK) return OPKPISchema.parse(mockOPAtrasadasKPI);
     try {
-      const response = await apiFetch("/api/ordens/kpi/atrasadas");
+      const response = await apiFetch(withSetorId("/api/ordens/kpi/atrasadas", setorId));
       return OPKPISchema.parse({
         titulo: "OPs Atrasadas",
         valor: response.resultado
@@ -39,9 +47,10 @@ export const opAtrasadasService = {
 };
 
 export const opPecasBoasService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
+    if (USE_MOCK) return OPKPISchema.parse(mockOPPecasBoas);
     try {
-      const response = await apiFetch("/api/ordens/kpi/pecas-boas");
+      const response = await apiFetch(withSetorId("/api/ordens/kpi/pecas-boas", setorId));
       return OPKPISchema.parse({
         titulo: "Peças Boas",
         valor: response.resultado._sum.qtd_boa || 0
@@ -53,9 +62,10 @@ export const opPecasBoasService = {
 };
 
 export const opRefugoKPIService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
+    if (USE_MOCK) return OPKPISchema.parse(mockOPRefugoKPI);
     try {
-      const response = await apiFetch("/api/ordens/kpi/refugo");
+      const response = await apiFetch(withSetorId("/api/ordens/kpi/refugo", setorId));
       return OPKPISchema.parse({
         titulo: "Refugo Total",
         valor: response.resultado._sum.qtd_refugo || 0
@@ -67,9 +77,10 @@ export const opRefugoKPIService = {
 };
 
 export const opEficienciaService = {
-  async getEficiencia() {
+  async getEficiencia(setorId = null) {
+    if (USE_MOCK) return OPEficienciaSchema.parse(mockOPEficiencia);
     try {
-      const response = await apiFetch("/api/ordens/dashboard/eficiencia");
+      const response = await apiFetch(withSetorId("/api/ordens/dashboard/eficiencia", setorId));
       return OPEficienciaSchema.parse(response.dados);
     } catch (error) {
       console.error('Erro ao buscar eficiência:', error);
@@ -78,9 +89,10 @@ export const opEficienciaService = {
 };
 
 export const opTopRefugoService = {
-  async getTopRefugo() {
+  async getTopRefugo(setorId = null) {
+    if (USE_MOCK) return OPRefugoArraySchema.parse(mockOPTopRefugo);
     try {
-      const response = await apiFetch("/api/ordens/dashboard/top-refugo");
+      const response = await apiFetch(withSetorId("/api/ordens/dashboard/top-refugo", setorId));
       const dados = response.dados.map(item => ({
         op: item.label,
         refugo: item.qtd_refugo
@@ -93,9 +105,10 @@ export const opTopRefugoService = {
 };
 
 export const opCargaSetorService = {
-  async getCargaSetor() {
+  async getCargaSetor(setorId = null) {
+    if (USE_MOCK) return OPCargaSetorArraySchema.parse(mockOPCargaSetor);
     try {
-      const response = await apiFetch("/api/ordens/dashboard/carga-setor");
+      const response = await apiFetch(withSetorId("/api/ordens/dashboard/carga-setor", setorId));
       const dados = response.dados.map(item => ({
         setor: item.setor,
         carga: item.qtd_ops
@@ -108,9 +121,10 @@ export const opCargaSetorService = {
 };
 
 export const opStatusService = {
-  async getStatus() {
+  async getStatus(setorId = null) {
+    if (USE_MOCK) return OPStatusArraySchema.parse(mockOPStatus);
     try {
-      const response = await apiFetch("/api/ordens/dashboard/status");
+      const response = await apiFetch(withSetorId("/api/ordens/dashboard/status", setorId));
       const dados = response.dados.map(item => ({
         name: item.status,
         value: item.quantidade
@@ -123,9 +137,10 @@ export const opStatusService = {
 };
 
 export const opConcluidasDiaService = {
-  async getConcluidasDia() {
+  async getConcluidasDia(setorId = null) {
+    if (USE_MOCK) return OPConcluidasDiaArraySchema.parse(mockOPConcluidasDia);
     try {
-      const response = await apiFetch("/api/ordens/dashboard/concluidas-dia");
+      const response = await apiFetch(withSetorId("/api/ordens/dashboard/concluidas-dia", setorId));
       const dados = response.dados.map(item => ({
         dia: item.dia,
         total: item.ops_concluidas

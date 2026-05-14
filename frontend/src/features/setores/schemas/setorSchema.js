@@ -52,6 +52,13 @@ export const SetorOEEEvolucaoSchema = z.object({
   oee: z.number().min(0).max(100),
 });
 export const SetorOEEEvolucaoArraySchema = z.array(SetorOEEEvolucaoSchema);
+
+export const SetorOEEPanelSchema = z.object({
+  disponibilidade: z.number().min(0).max(100),
+  performance: z.number().min(0).max(100),
+  qualidade: z.number().min(0).max(100),
+  oee: z.number().min(0).max(100),
+});
  
 export const SetorTopOperadoresSchema = z.object({
   operador: z.string(),
@@ -72,7 +79,12 @@ export const SetorProducaoMaquinaSchema = z.object({
   maquina: z.string(),
   qtd:   z.number(),
 });
+export const SetorProducaoDiariaSchema = z.object({
+  hora: z.string(),
+  pcs: z.number(),
+});
 
 export const SetorProducaoMaquinaArraySchema = z.array(SetorProducaoMaquinaSchema);
 export const SetorMotivosParadaArraySchema = z.array(SetorMotivosParadaSchema);
 export const SetorProducaoSemanalArraySchema = z.array(SetorProducaoSemanalSchema);
+export const SetorProducaoDiariaArraySchema = z.array(SetorProducaoDiariaSchema);

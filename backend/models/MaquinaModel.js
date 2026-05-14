@@ -84,6 +84,18 @@ class MaquinaModel {
                     imagem: imagem
                 }
             });
+            if (id_operador) {
+                await prisma.escalaTrabalho.updateMany({
+                    where: {
+                        id_empresa: Number(id_empresa),
+                        id_operador: Number(id_operador)
+                    },
+                    data: {
+                        id_maquina: maquina.id_maquina,
+                        ...(id_setor ? { id_setor: Number(id_setor) } : {})
+                    }
+                });
+            }
             return maquina;
         } catch (error) {
             console.error('Erro ao criar máquina:', error);
@@ -137,6 +149,18 @@ class MaquinaModel {
             });
             if (atualizarMaquina.count === 0) {
                 throw new Error('Máquina não encontrada ou não pertence à empresa');
+            }
+            if (dados.id_operador) {
+                await prisma.escalaTrabalho.updateMany({
+                    where: {
+                        id_empresa: Number(id_empresa),
+                        id_operador: Number(dados.id_operador)
+                    },
+                    data: {
+                        id_maquina: Number(id_maquina),
+                        ...(dados.id_setor ? { id_setor: Number(dados.id_setor) } : {})
+                    }
+                });
             }
             return atualizarMaquina;
         } catch (error) {
@@ -707,6 +731,8 @@ class MaquinaModel {
                 dia,
                 {
                     data: dia,
+                    produzidas: 0,
+                    refugo: 0,
                     total: 0,
                 }
             ]));

@@ -61,7 +61,7 @@ export function BarComLimiteDegrade({ data, config, title }) {
             stroke="red"
             strokeDasharray="4 4"
             label={{
-              value: "Limite: 60%",
+              value: "Mínimo: 60%",
               position: "insideTopRight",
               fontSize: 11,
               fill: "red",

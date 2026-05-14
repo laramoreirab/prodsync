@@ -58,14 +58,14 @@ export function AppSidebar({
     <Sidebar
       collapsible="icon"
       style={{
-        "--sidebar": "#00357a",
-        "--sidebar-foreground": "#ffffff",
-        "--sidebar-primary": "#ffffff",
-        "--sidebar-primary-foreground": "#00357a",
-        "--sidebar-accent": "rgba(255, 255, 255, 0.12)",
-        "--sidebar-accent-foreground": "#ffffff",
-        "--sidebar-border": "rgba(255, 255, 255, 0.18)",
-        "--sidebar-ring": "rgba(255, 255, 255, 0.3)",
+        "--sidebar": "var(--chart-primary)",
+        "--sidebar-foreground": "var(--white)",
+        "--sidebar-primary": "var(--white)",
+        "--sidebar-primary-foreground": "var(--chart-primary)",
+        "--sidebar-accent": "var(--sidebar-accent-overlay)",
+        "--sidebar-accent-foreground": "var(--white)",
+        "--sidebar-border": "var(--sidebar-border-overlay)",
+        "--sidebar-ring": "var(--sidebar-ring-overlay)",
       }}
       {...props}>
       <SidebarContent className="py-1">
