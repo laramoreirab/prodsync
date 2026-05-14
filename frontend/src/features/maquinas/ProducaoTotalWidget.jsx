@@ -1,24 +1,53 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AreaChartBase } from "@/components/ui/charts/components/AreaChart";
 import { producaoTotalConfig } from "./config/maquinaChartConfig";
-import { useProducaoTotal } from "./hooks/useProducaoTotal";
+import { apiFetch } from "@/lib/api";
+// import { useProducaoTotal } from "./hooks/useProducaoTotal";
+
 
 const PERIODOS = [
-  { label: "Últimos 3 meses", key: "3meses" },
-  { label: "Últimos 30 dias", key: "30dias" },
-  { label: "Últimos 7 dias",  key: "7dias"  },
+  { label: "Últimos 3 meses", dias: 90 },
+  { label: "Últimos 30 dias", dias: 30 },
+  { label: "Últimos 7 dias", dias: 7 },
 ];
 
 export function ProducaoTotalWidget({ setorId }) {
-  const [periodoKey, setPeriodoKey] = useState("3meses");
-  const { data, loading, error } = useProducaoTotal(periodoKey, setorId);
+  const [diasSelecionados, setDiasSelecionados] = useState(90);
 
-  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
-  if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
-  
+  const [data, setData] = useState([]);
+
+  async function carregarDados() {
+    try {
+
+      const response = await apiFetch(
+        `/api/maquinas/dashboard/obter-producao-total-maquinas?dias=${diasSelecionados}`
+      );
+
+      setData(response.dados);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    carregarDados();
+  }, [diasSelecionados]);
+
+  const dadosGrafico = data.map(item => ({
+    ...item,
+    data: new Date(item.data).toLocaleDateString("pt-BR", {
+      day: "numeric",
+      month: "short",
+    }),
+  }));
+
+  // const [periodoKey, setPeriodoKey] = useState("3meses");
+
+  // const periodoAtual = PERIODOS.find((p) => p.key === periodoKey);
+  // const data = periodoAtual.mock;
+ 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
@@ -41,7 +70,7 @@ export function ProducaoTotalWidget({ setorId }) {
           ))}
         </div>
       </div>
-      <AreaChartBase data={data} xKey="data" yKey="total" config={producaoTotalConfig} />
+      <AreaChartBase data={dadosGrafico} xKey="data" yKey="total" config={producaoTotalConfig} />
     </div>
   );
 }
