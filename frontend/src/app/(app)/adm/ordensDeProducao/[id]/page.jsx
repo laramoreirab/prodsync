@@ -476,7 +476,7 @@ export default function OPDetalhePage({ params }) {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <DetalhesEvento eventoId={ordermProd.op} />
+                      <DetalhesEvento eventoId={orderProd.op} />
                     </DialogContent>
                   </Dialog>
 

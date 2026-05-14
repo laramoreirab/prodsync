@@ -28,6 +28,14 @@ import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 
+import {
+  PageLayout, PageHeader, SectionDivider,
+  StaggerWrapper, FadeUpItem, AnimatedTitle,
+  KPIGrid, ContentGrid, WidgetCard,
+  SearchBar, FilterRow, EmptyState, LoadingState,
+  PageSection,
+} from "@/components/AnimatedComponents";
+
 
 const dadosOriginais = [
   { id: 1, nome: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status_op: 'Produzindo', progresso: '25%' },
@@ -262,57 +270,81 @@ export default function OrdensDeProducao() {
 
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+    <PageLayout>
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
+        <PageHeader title="Ordens de Produção" action={
 
-        {/* TÍTULO */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-            Ordens de Produção
-          </h1>
+          <Dialog>
+            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+              <Plus className="mr-2" />
+              Criar OP
+            </DialogTrigger>
+            <DialogContent>
+              <FormCadastroOp onCadastroSucesso={refresh} />
+            </DialogContent>
+          </Dialog>
 
-
-          {/* Modal de Criação de OP */}
-          <div className="modal_cadastro">
-            <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
-                <Plus className="mr-2" />
-                Criar OP
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroOp onCadastroSucesso={refresh} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
+        } />
 
 
         {/* SEÇÃO 1: Graphs */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget /></div>
-          <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget /></div>
-        </section>
+
+        <KPIGrid cols={4} className="mt-4">
+
+          <WidgetCard>
+            <OPAtivasKPIWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPAtrasadasKPIWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPPecasBoasKPIWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPRefugoKPIWidget />
+          </WidgetCard>
+
+
+        </KPIGrid>
 
 
         {/* SEÇÃO 2: Graphs */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget /></div>
-          <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget /></div>
-          <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget /></div>
-        </section>
+
+        <KPIGrid cols={3} className="mt-4">
+
+          <WidgetCard>
+            <OPEficienciaWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPTopRefugoWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPCargaSetorWidget />
+          </WidgetCard>
+
+
+        </KPIGrid>
 
 
         {/* SEÇÃO 3: Graphs */}
-        <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget /></div>
-          <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget /></div>
-        </section>
 
+        <ContentGrid cols={2} className="mt-6">
+          <WidgetCard>
+            <OPStatusWidget />
+          </WidgetCard>
+          <WidgetCard>
+            <OPConcluidasDiaWidget />
+          </WidgetCard>
+        </ContentGrid>
 
-        {/* Tabela sem filtros ainda */}
+        
+     {/* Listagem */}
         <section id="listagem_ops">
           <div className="flex items-center py-8 gap-5">
             <h1 className="text-4xl w-125 font-semibold">OPs</h1>
@@ -403,6 +435,6 @@ export default function OrdensDeProducao() {
           />
         </section>
       </div>
-    </main>
+    </PageLayout>
   );
 } 
