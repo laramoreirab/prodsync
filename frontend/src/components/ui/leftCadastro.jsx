@@ -9,41 +9,22 @@ const Player = dynamic(
 
 export default function LeftCards() {
   return (
-    <div className="relative w-full h-full flex items-center justify-end">
-      
-      {/* Back card */}
-      <div className="absolute w-[80%] h-[85%] bg-[#00357a] rounded-3xl -translate-x-6 -translate-y-6 z-0 overflow-hidden shadow-lg">
-
-      </div>
+<div className="relative w-full lg:w-[100%] max-w-[1100px] h-screen max-h-screen ml-0 flex items-center justify-center">
+      <div className="absolute w-[90%] h-full bg-[var(--chart-primary)] rounded-r-3xl -top-15 -left-8 z-0" />
 
       {/* Front card */}
-      <div className="relative w-[85%] h-[80%] bg-[#004aad] rounded-3xl z-10 overflow-hidden flex items-center justify-center shadow-2xl border border-white/10">
-        
-      <div 
-           className="absolute inset-0 opacity-20" 
-           style={{ 
-             backgroundImage: `radial-gradient(#ffffff 1px, transparent 1px)`, 
-             backgroundSize: '24px 24px' 
-           }} 
-         />
-
-        {/* Player Lottie */}
-        <div className="relative z-20 w-full h-full flex items-center justify-center">
-            <Player
-              autoplay
-              loop={false}
-              speed={0.5}
-              src="animations/analytics.json"
-              className="w-full h-full" 
-              style={{
-                filter: "grayscale(1) brightness(1.2)",
-              }}
-              keepLastFrame
-            />
-        </div>
-
-        {/* Gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
+      <div className="absolute w-[90%] h-[95%] bg-[var(--azul-cobalto)] rounded-r-3xl -top- z-10 overflow-hidden  items-end justify-end relative">
+        <Player
+          autoplay
+          loop ={false}
+          speed={0.5}
+          src="animations/analytics.json"
+          className="absolute inset-0 w-full h-full opacity-90"
+          style={{
+            filter: "grayscale(1) brightness(1.2)",
+          }}
+           keepLastFrame
+        />
       </div>
     </div>
   );

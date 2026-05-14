@@ -161,71 +161,51 @@ const dadosEstaticos = [
 
 
 export default function MaquinasGestor() {
-  const { maquinas, loading, error, refresh, cadastrarMaquina, editarMaquina, excluirMaquina } = useMaquinas();
-  const [dados, setDados] = useState(dadosEstaticos);
+  const [setorId, setSetorId] = useState(null);
+  const { maquinas, loading, refresh, excluirMaquina } = useMaquinas();
   const [busca, setBusca] = useState("");
-  const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
+  const [dados, setDados] = useState([]);
 
-  // //sincronizar dados da API com estado local
-  // useEffect(() => {
-  //   setDados(maquinas);
-  // }, [maquinas]);
+  // 1. Pega SetorID do Token
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_setor) setSetorId(payload.id_setor);
+    } catch (e) { console.error("Erro no token", e); }
+  }, []);
 
-  const opcoesOrdenacao = [
-    { label: 'Ordem Alfabética', value: 'nome' },
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'OEE Crescente', value: 'oee_asc' },
-    { label: 'OEE Decrescente', value: 'oee_desc' }
-  ];
+  // 2. Sincroniza dados da API
+  useEffect(() => {
+    setDados(maquinas);
+  }, [maquinas]);
 
-  //lógica de ordenação
+  // --- Lógica de Ordenação e Filtro ---
   const handleSort = (criterio) => {
     const dadosCopiados = [...dados];
-
     dadosCopiados.sort((a, b) => {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
-      // precisa implementar oee asc e desc
-
       return 0;
     });
-
     setDados(dadosCopiados);
   };
 
-  const maquinasFilter = [
-    { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
-    { id: "oee", label: "OEE", type: "number-range" }
-  ];
-
-  const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...maquinas];
-    // precisa implementar
-    setDados(dadosFiltrados);
-  };
-
-  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((maq) => {
     const termo = busca.toLowerCase();
-    return (
-      maq.nome.toLowerCase().includes(termo) ||
-      maq.id.toString().includes(termo)
-    );
+    return maq.nome.toLowerCase().includes(termo) || maq.id_maquina?.toString().includes(termo);
   });
 
-  //tela de carregamento enquanto busca os dados da API
   if (loading) {
     return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando máquinas...</p>
-        </div>
+      <main className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="animate-spin text-blue-900 w-12 h-12" />
       </main>
     );
   }
+  
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="p-8">
@@ -246,42 +226,32 @@ export default function MaquinasGestor() {
         </div>
 
         {/* Gráficos */}
-        <div className="flex flex-col gap-4 ">
-          <section className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
-                <p className="text-sm font-semibold text-black self-start">Status Operacional das Máquinas</p>
-                <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">*Atualizado em tempo real</p>
-                <div className="w-full">
-                  <MaquinaStatusDonutWidget />
-                </div>
-              </div>
-              <div className="bg-white border rounded-xl p-4">
-                <MaquinasPorSetorWidget />
-              </div>
-              <div className="border bg-white rounded-xl p-4">
-                <TempoMedioParadaWidget />
-              </div>
-            </div>
-          </section>
+        <div className="flex flex-col gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white border rounded-xl p-6 shadow-sm">
+            <MaquinaStatusDonutWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border rounded-xl p-6 shadow-sm">
+            <MaquinasPorSetorWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border rounded-xl p-6 shadow-sm">
+            <TempoMedioParadaWidget setorId={setorId} />
+          </div>
+        </section>
 
-          <section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border bg-white rounded-xl p-4">
-                <ProducaoDefeitosWidget />
-              </div>
-              <div className="border bg-white rounded-xl p-4">
-                <MaquinasPorTurnoWidget />
-              </div>
-            </div>
-          </section>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white border rounded-xl p-6 shadow-sm">
+            <ProducaoDefeitosWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border rounded-xl p-6 shadow-sm">
+            <MaquinasPorTurnoWidget setorId={setorId} />
+          </div>
+        </section>
 
-          <section>
-            <div className="border bg-white rounded-xl p-4">
-              <ProducaoTotalWidget />
-            </div>
-          </section>
-        </div>
+        <section className="bg-white border rounded-xl p-6 shadow-sm">
+          <ProducaoTotalWidget setorId={setorId} />
+        </section>
+      </div>
 
 
         {/* LISTAGEM MAQUINAS */}

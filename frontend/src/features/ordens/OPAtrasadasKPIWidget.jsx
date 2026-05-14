@@ -1,12 +1,14 @@
 "use client";
-import { KPI } from "@/components/ui/charts/components";
+import { KPIRetangulo } from "@/components/ui/charts/components";
 import { useOPAtrasadas } from "./hooks/useOPAtrasadas";
 
-export function OPAtrasadasKPIWidget() {
-  const { data, loading, error } = useOPAtrasadas();
+export function OPAtrasadasKPIWidget({ setorId = null }) {
+  const { data, loading, error } = useOPAtrasadas(setorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
+  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
+if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
+if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
-  return <KPI title={data?.titulo} value={data?.valor} />;
+  return <KPIRetangulo title={data?.titulo} value={data?.valor} />;
 }

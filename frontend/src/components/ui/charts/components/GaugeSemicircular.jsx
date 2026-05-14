@@ -14,7 +14,7 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
       innerRadius: 60,
       outerRadius: 85,
       barSize: 20,
-      mt: "-mt-30",
+      overlay: "pt-14",
       valueText: "text-3xl",
       labelText: "text-sm",
     },
@@ -23,15 +23,16 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
       innerRadius: 85,
       outerRadius: 115,
       barSize: 26,
-      mt: "-mt-42",
+      overlay: "pt-20",
       valueText: "text-5xl",
+      labelText: "text-sm",
     },
   };
 
   const s = sizes[size];
 
   return (
-    <div className="flex flex-col items-center">
+    <div className={`relative flex ${s.container} items-center justify-center`}>
       <ChartContainer config={config} className={`${s.container}`}>
         <RadialBarChart
           data={data}
@@ -42,11 +43,11 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
           barSize={s.barSize}
         >
           <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-          <RadialBar dataKey="value" background={{ fill: "#7D95C6" }} cornerRadius={6} />
+          <RadialBar dataKey="value" background={{ fill: "var(--chart-accent)" }} cornerRadius={6} />
         </RadialBarChart>
       </ChartContainer>
 
-      <div className={`flex flex-col items-center ${s.mt}`}>
+      <div className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center ${s.overlay}`}>
         <span className={`${s.valueText} font-bold leading-none`}>
           {data[0].value}%
         </span>

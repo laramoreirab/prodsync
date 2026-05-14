@@ -13,6 +13,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
   } from "@/components/ui/chart";
+import { getChartSize } from "./chartSizes";
 
   function useChart(config, key) {
     const item = config?.[key];
@@ -33,13 +34,15 @@ export function AreaChartBase({
   xKey,
   yKey,
   config,
+  chartSize = "default",
+  heightClassName,
 }) {
   const { color } = useChart(config, yKey);
   const gradientId = `grad-${yKey}`;
 
   return (
     <div>
-      <h3 className="text-sm font-medium mb-1">{title}</h3>
+      {title && <h3 className="text-sm font-medium mb-1">{title}</h3>}
 
       {description && (
         <p className="text-xs text-muted-foreground mb-3">
@@ -47,7 +50,7 @@ export function AreaChartBase({
         </p>
       )}
 
-      <ChartContainer config={config} className="h-[200px] w-full">
+      <ChartContainer config={config} className={getChartSize(chartSize, heightClassName)}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id={gradientId}>

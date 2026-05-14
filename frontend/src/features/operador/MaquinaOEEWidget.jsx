@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge";
 
 const makeConfig = (cor) => ({
   valor: { label: "Valor", color: cor },
-  resto: { label: "Resto", color: "#e2e8f0" },
+  resto: { label: "Resto", color: "var(--chart-muted-fill)" },
 });
 
 const metricas = [
-  { key: "disponibilidade", label: "Disponibilidade", cor: "#00357a" },
-  { key: "performance",     label: "Performance",     cor: "#00357a" },
-  { key: "qualidade",       label: "Qualidade",       cor: "#00357a" },
-  { key: "oee",             label: "OEE geral",       cor: "#00357a" },
+  { key: "disponibilidade", label: "Disponibilidade", cor: "var(--chart-primary)" },
+  { key: "performance",     label: "Performance",     cor: "var(--chart-primary)" },
+  { key: "qualidade",       label: "Qualidade",       cor: "var(--chart-primary)" },
+  { key: "oee",             label: "OEE geral",       cor: "var(--chart-primary)" },
 ];
 
 export function MaquinaOEEWidget() {
@@ -20,7 +20,8 @@ export function MaquinaOEEWidget() {
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro.</p>;
-  if (!data) return null;
+  if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
   return (
     <div className="flex flex-col gap-4">

@@ -2,6 +2,6 @@
 import { useChartData } from "@/hooks/useChartData";
 import { maquinaStatusService } from "@/services/maquinaService";
 
-export function useMaquinaStatus() {
-  return useChartData(maquinaStatusService.getStatus);
+export function useMaquinaStatus(setorId = null) {
+  return useChartData(maquinaStatusService.getStatus, setorId);
 }

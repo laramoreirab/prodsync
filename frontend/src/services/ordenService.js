@@ -25,8 +25,12 @@ import {
 
 const USE_MOCK = false;
 
+function withSetorId(path, setorId) {
+  return setorId ? `${path}?setorId=${encodeURIComponent(setorId)}` : path;
+}
+
 export const opAtivasService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
     if (USE_MOCK) return OPKPISchema.parse(mockOPAtivasKPI);
     try {
       const response = await apiFetch("/ordens/kpi/ativas");
@@ -42,7 +46,7 @@ export const opAtivasService = {
 };
 
 export const opAtrasadasService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
     if (USE_MOCK) return OPKPISchema.parse(mockOPAtrasadasKPI);
     try {
       const response = await apiFetch("/ordens/kpi/atrasadas");
@@ -58,7 +62,7 @@ export const opAtrasadasService = {
 };
 
 export const opPecasBoasService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
     if (USE_MOCK) return OPKPISchema.parse(mockOPPecasBoas);
     try {
       const response = await apiFetch("/ordens/kpi/pecas-boas");
@@ -74,7 +78,7 @@ export const opPecasBoasService = {
 };
 
 export const opRefugoKPIService = {
-  async getKPI() {
+  async getKPI(setorId = null) {
     if (USE_MOCK) return OPKPISchema.parse(mockOPRefugoKPI);
     try {
       const response = await apiFetch("/ordens/kpi/refugo");
@@ -90,7 +94,7 @@ export const opRefugoKPIService = {
 };
 
 export const opEficienciaService = {
-  async getEficiencia() {
+  async getEficiencia(setorId = null) {
     if (USE_MOCK) return OPEficienciaSchema.parse(mockOPEficiencia);
     try {
       const response = await apiFetch("/ordens/dashboard/eficiencia");
@@ -103,7 +107,7 @@ export const opEficienciaService = {
 };
 
 export const opTopRefugoService = {
-  async getTopRefugo() {
+  async getTopRefugo(setorId = null) {
     if (USE_MOCK) return OPRefugoArraySchema.parse(mockOPTopRefugo);
     try {
       const response = await apiFetch("/ordens/dashboard/top-refugo");
@@ -120,7 +124,7 @@ export const opTopRefugoService = {
 };
 
 export const opCargaSetorService = {
-  async getCargaSetor() {
+  async getCargaSetor(setorId = null) {
     if (USE_MOCK) return OPCargaSetorArraySchema.parse(mockOPCargaSetor);
     try {
       const response = await apiFetch("/ordens/dashboard/carga-setor");
@@ -137,7 +141,7 @@ export const opCargaSetorService = {
 };
 
 export const opStatusService = {
-  async getStatus() {
+  async getStatus(setorId = null) {
     if (USE_MOCK) return OPStatusArraySchema.parse(mockOPStatus);
     try {
       const response = await apiFetch("/ordens/dashboard/status");
@@ -154,7 +158,7 @@ export const opStatusService = {
 };
 
 export const opConcluidasDiaService = {
-  async getConcluidasDia() {
+  async getConcluidasDia(setorId = null) {
     if (USE_MOCK) return OPConcluidasDiaArraySchema.parse(mockOPConcluidasDia);
     try {
       const response = await apiFetch("/ordens/dashboard/concluidas-dia");

@@ -5,16 +5,18 @@ import {
   OEEPorSetorArraySchema,
   RefugoPorSetorArraySchema,
   OEECriticoSchema,
+  SetorMaquinaStatusSchema,
+  SetorOEEMedioSchema,
+  SetorOEEEvolucaoArraySchema,
+  SetorOEEPanelSchema,
+  SetorTopOperadoresArraySchema,
+  SetorMotivosParadaArraySchema,
+  SetorProducaoSemanalArraySchema,
+  SetorProducaoMaquinaArraySchema,
 } from "@features/setores/schemas/setorSchema";
 import {
-    SetorMaquinaStatusSchema,
-    SetorOEEMedioSchema,
-    SetorOEEEvolucaoArraySchema,
-    SetorTopOperadoresArraySchema,
-    SetorMotivosParadaArraySchema,
-    SetorProducaoSemanalArraySchema,
-    SetorProducaoMaquinaArraySchema,
-  } from "@features/setores/schemas/setorSchema";
+  ProducaoPorHoraArraySchema,
+} from "@features/producao/schemas/producaoSchema";
 import {
   mockSetores,
   mockSetorTotalKPI,
@@ -23,15 +25,15 @@ import {
   mockRefugoPorSetor,
   mockOEECritico,
   mockSetorProducaoSemanal,
-  mockProducaoPorMaquinaSetor 
+  mockProducaoPorMaquinaSetor,
+  mockSetorProducaoDiaria,
+  mockSetorOEEPanel,
+  mockSetorMaquinaStatus,
+  mockSetorOEEMedio,
+  mockSetorOEEEvolucao,
+  mockSetorTopOperadores,
+  mockSetorMotivosParada,
 } from "./mockData";
- import {
-    mockSetorMaquinaStatus,
-    mockSetorOEEMedio,
-    mockSetorOEEEvolucao,
-    mockSetorTopOperadores,
-    mockSetorMotivosParada,
-  } from "./mockData";
 
 const USE_MOCK = false;
 

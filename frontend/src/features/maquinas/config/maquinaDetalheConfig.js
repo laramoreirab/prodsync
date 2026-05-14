@@ -1,25 +1,25 @@
 export const motivoRefugoConfig = {
-  "Rolhas na Injeção": { label: "Rolhas na Injeção:", color: "#00357a" },
-  "Peça Incompleta":   { label: "Peça Incompleta:",   color: "#7d95c6" },
-  "Rebarba Grossa":    { label: "Rebarba Grossa:",    color: "#212e4b" },
+  "Rolhas na Injeção": { label: "Rolhas na Injeção:", color: "var(--chart-primary)" },
+  "Peça Incompleta":   { label: "Peça Incompleta:",   color: "var(--chart-accent)" },
+  "Rebarba Grossa":    { label: "Rebarba Grossa:",    color: "var(--chart-secondary)" },
 };
  
 export const motivoSetupConfig = {
-  minutos: { label: "Duração (min):", color: "#7d95c6" },
+  minutos: { label: "Duração (min):", color: "var(--chart-accent)" },
 };
  
 export const oeeEvolucaoConfig = {
-  oee: { label: "OEE (%):", color: "#00357a" },
+  oee: { label: "OEE (%):", color: "var(--chart-primary)" },
 };
  
 export const velocidadeConfig = {
-  valor: { label: "Peças/min:", color: "#004aad" },
+  valor: { label: "Peças/min:", color: "var(--azul-cobalto)" },
 };
  
 export const oeeMetricasMaquinaConfig = [
-  { key: "disponibilidade", label: "Disponibilidade:", color: "#00357a" },
-  { key: "performance",     label: "Performance:",     color: "#00357a" },
-  { key: "qualidade",       label: "Qualidade:",       color: "#00357a" },
-  { key: "oee",             label: "OEE Geral Consolidado:", color: "#00357a" },
+  { key: "disponibilidade", label: "Disponibilidade:", color: "var(--chart-primary)" },
+  { key: "performance",     label: "Performance:",     color: "var(--chart-primary)" },
+  { key: "qualidade",       label: "Qualidade:",       color: "var(--chart-primary)" },
+  { key: "oee",             label: "OEE Geral Consolidado:", color: "var(--chart-primary)" },
 ];
  
