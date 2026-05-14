@@ -427,53 +427,57 @@ class UsuarioModel {
     }
 
     static async producaoMediaPorDiaSetor(id_empresa) {
-        try {
-            const setores = await prisma.setores.findMany({
-                where: { id_empresa },
-                select: {
-                    id_setor: true,
-                    nome_setor: true,
-                    maquinas: {
-                        select: {
-                            apontamentos: {
-                                select: {
-                                    data_hora_inicio: true,
-                                    qtd_boa: true
-                                }
+    try {
+        const setores = await prisma.setores.findMany({
+            where: { 
+                id_empresa: Number(id_empresa) // Proteção de tipo para o Prisma
+            },
+            select: {
+                id_setor: true,
+                nome_setor: true,
+                maquinas: {
+                    select: {
+                        apontamentos: {
+                            select: {
+                                data_hora_inicio: true,
+                                qtd_boa: true
                             }
                         }
                     }
                 }
-            })
+            }
+        });
 
-            return setores.map(s => {
-                const setor = s.nome_setor
-                const apontamentos = s.maquinas.flatMap(m => m.apontamentos)
+        const resultado = setores.map(s => {
+            const nomeSetor = s.nome_setor;
+            const apontamentos = s.maquinas.flatMap(m => m.apontamentos);
 
-                const porDia = {}
-                apontamentos.forEach(ap => {
-                    const dia = ap.data_hora_inicio.toISOString().split('T')[0]
-                    porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa
-                })
-
-                const valores = Object.values(porDia)
-                const mediaDiaria = valores.length > 0
-                    ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
-                    : 0
-
-                return Object.entries(producaoPorSetorDia).map(([setor, dias]) => {
-                    const valores = Object.values(dias)
-                    const mediaDiaria = Math.round(
-                        valores.reduce((a, b) => a + b, 0) / valores.length
-                    )
-                    return { setor: setor, media: mediaDiaria }
-                }).sort((a, b) => b.media - a.media);
+            const porDia = {};
+            apontamentos.forEach(ap => {
+                // Extrai apenas a data (YYYY-MM-DD)
+                const dia = ap.data_hora_inicio.toISOString().split('T')[0];
+                porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa;
             });
-        } catch (error) {
-            console.error('Erro ao contar a produção média de usuários por dia por setor no banco de dados:', error);
-            throw error;
-        }
+
+            const valores = Object.values(porDia);
+            const mediaDiaria = valores.length > 0
+                ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
+                : 0;
+
+            return { 
+                setor: nomeSetor, 
+                media: mediaDiaria 
+            };
+        });
+
+        // Ordena do setor com maior média para o menor
+        return resultado.sort((a, b) => b.media - a.media);
+
+    } catch (error) {
+        console.error('Erro ao calcular produção média por setor:', error);
+        throw error;
     }
+}
 
     static async rotatividade(id_empresa) {
         try {
@@ -864,37 +868,6 @@ class UsuarioModel {
         return { atual, ideal: Math.max(atual, 1) };
     }
 
-    static async producaoPorHoraOperador(id_empresa, id_usuario) {
-        try {
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
-            const amanha = new Date(hoje);
-            amanha.setDate(hoje.getDate() + 1);
-
-            const apontamentos = await prisma.apontamento.findMany({
-                where: {
-                    id_empresa,
-                    id_operador: id_usuario,
-                    data_hora_inicio: { gte: hoje, lt: amanha }
-                },
-                select: {
-                    data_hora_inicio: true,
-                    qtd_boa: true
-                }
-            });
-
-            const porHora = Array.from({ length: 24 }, (_, i) => ({ hora: `${i}h`, pecas: 0 }));
-            apontamentos.forEach(ap => {
-                const hora = new Date(ap.data_hora_inicio).getHours();
-                porHora[hora].pecas += ap.qtd_boa;
-            });
-
-            return porHora;
-        } catch (error) {
-            console.error('Erro ao buscar produção por hora do operador:', error);
-            throw error;
-        }
-    }
 
     static async produtividadeDiaOperador(id_empresa, id_usuario) {
         try {

@@ -1,6 +1,7 @@
 import UsuarioModel from '../models/UsuarioModel.js'
 import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
 import SetorModel from '../models/SetorModel.js';
+import MaquinaModel from '../models/MaquinaModel.js'
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 import prisma from '../config/prisma.js';
 
@@ -575,8 +576,9 @@ class UsuarioController {
     static async metaProducao(req, res) {
         try {
             const id_usuario = parseInt(req.params.id) || req.body.id_usuario || req.user.id_usuario;
-            const id_maquina = req.body.id_maquina; // Pode vir do body ou ser buscado se necessário
-            const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario, id_maquina)
+            const id_empresa = req.user.id_empresa
+            const id_maquina = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const dados = await UsuarioModel.metaProducao(id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Meta de Produção', error)
@@ -586,9 +588,10 @@ class UsuarioController {
 
     static async tempoParadoTempoProduzindoUsuario(req, res) {
         try {
-            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
-            const id_maquina = req.body.id_maquina;
-            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_usuario, id_maquina)
+            const id_usuario = parseInt(req.params.id) ;
+            const id_empresa = req.user.id_empresa
+            const id_maquina = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo da máquina do operador', error)
@@ -599,7 +602,7 @@ class UsuarioController {
     // --------------- Operador --------------------- //
     static async getProducaoPorHora(req, res) {
         try {
-            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const id_usuario = parseInt(req.params.id) ;
             const dados = await UsuarioModel.producaoPorHoraOperador(req.user.id_empresa, id_usuario);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {

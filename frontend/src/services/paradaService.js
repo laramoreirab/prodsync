@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api";
-import { MotivosFrequentesArraySchema, MediaParadasDiaSchema } from "@/features/paradas/schemas/paradasSchema";
+import { MotivosFrequentesArraySchema } from "@/features/paradas/schemas/paradasSchema";
+import { MediaParadasDiaArraychema } from '@/features/paradas/schemas/paradasSchema'
 
 export const paradaService = {
   async getParadas() {
@@ -11,7 +12,7 @@ export const paradaService = {
 export const paradasPorDiaService = {
   async getParadasDia() {
     const data = await apiFetch("/api/dashboard/media-paradas-por-dia");
-    return MediaParadasDiaSchema.parse(data.dados);
+    return MediaParadasDiaArraychema.parse(data.dados);
   },
 };
 
