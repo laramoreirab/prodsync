@@ -24,10 +24,10 @@ export default function DashboardGeralGestor() {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">
+    <div className="mx-auto flex w-full flex-col gap-4 pb-10">
       <div className="mb-2 flex justify-start">
-        <h1 className="inline-block border-b-4 border-[var(--secondary-foreground)] pb-0 text-4xl font-semibold text-black">
-          Dashboard do Meu Setor
+        <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+          Dashboard Geral do Setor
         </h1>
       </div>
 

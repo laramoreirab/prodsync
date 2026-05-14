@@ -6,20 +6,20 @@ const cards = [
   {
     key: "emProducao",
     label: "Em Produção",
-    border: "border-emerald-200",
-    accent: "text-emerald-700",
+    background: "bg-green-50",
+    accent: "text-[#369948]",
   },
   {
     key: "emSetup",
     label: "Em Setup",
-    border: "border-amber-200",
-    accent: "text-amber-700",
+    background: "bg-yellow-50",
+    accent: "text-[#ffac1e]",
   },
   {
     key: "emParada",
     label: "Em Parada",
-    border: "border-red-400",
-    accent: "text-rose-700",
+    background: "bg-red-50",
+    accent: "text-[#b30000]"
   },
 ];
 
@@ -33,17 +33,22 @@ export function AndonStatusWidget({ scope = "factory", title }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-semibold text-slate-950">{heading}</p>
-
-      <div className="grid gap-3 sm:grid-cols-3">
-        {cards.map(({ key, label, border, accent }) => (
+      <p className="text-md font-semibold text-slate-950">{heading}</p>
+      <div className="grid gap-4 grid-cols-3 w-full max-w-2xl mx-auto">
+        {cards.map(({ key, label, background, accent}) => (
           <div
             key={key}
-            className={`flex min-h-28 flex-col items-center justify-center gap-2 rounded-lg border ${border} bg-white px-4 py-5 text-center`}>
-            <span className="text-xs font-semibold text-slate-500">{label}</span>
-            <span className={`text-5xl font-medium tracking-tight text-black`}>
-              {data[key]}
+            className={`flex aspect-square flex-col items-center rounded-xl ${background} p-4 text-center shadow-sm`}
+          >
+            <span className={`text-lg font-semibold ${accent} leading-tight`}>
+              {label}
             </span>
+
+            <div className="flex flex-1 items-center justify-center">
+              <span className={`text-4xl font-bold text-blacl`}>
+                {data[key]}
+              </span>
+            </div>
           </div>
         ))}
       </div>

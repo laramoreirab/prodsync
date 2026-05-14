@@ -19,97 +19,196 @@ import {
   mockOPCargaSetor,
   mockOPStatus,
   mockOPConcluidasDia,
-  mockUSE_MOCK,
+  mockOPProgresso,
   mockOPOEEDetalhe,
 } from "./mockData";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const opAtivasService = {
   async getKPI() {
     if (USE_MOCK) return OPKPISchema.parse(mockOPAtivasKPI);
-    const data = await apiFetch("/ordens/ativas_kpi");
-    return OPKPISchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/kpi/ativas");
+      return OPKPISchema.parse({
+        titulo: "OPs Ativas",
+        valor: response.resultado
+      });
+    } catch (error) {
+      console.error('Erro ao buscar OPs ativas:', error);
+      return OPKPISchema.parse(mockOPAtivasKPI);
+    }
   },
 };
 
 export const opAtrasadasService = {
   async getKPI() {
     if (USE_MOCK) return OPKPISchema.parse(mockOPAtrasadasKPI);
-    const data = await apiFetch("/ordens/atrasadas_kpi");
-    return OPKPISchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/kpi/atrasadas");
+      return OPKPISchema.parse({
+        titulo: "OPs Atrasadas",
+        valor: response.resultado
+      });
+    } catch (error) {
+      console.error('Erro ao buscar OPs atrasadas:', error);
+      return OPKPISchema.parse(mockOPAtrasadasKPI);
+    }
   },
 };
 
 export const opPecasBoasService = {
   async getKPI() {
     if (USE_MOCK) return OPKPISchema.parse(mockOPPecasBoas);
-    const data = await apiFetch("/ordens/pecas_boas_kpi");
-    return OPKPISchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/kpi/pecas-boas");
+      return OPKPISchema.parse({
+        titulo: "Peças Boas",
+        valor: response.resultado._sum.qtd_boa || 0
+      });
+    } catch (error) {
+      console.error('Erro ao buscar peças boas:', error);
+      return OPKPISchema.parse(mockOPPecasBoas);
+    }
   },
 };
 
 export const opRefugoKPIService = {
   async getKPI() {
     if (USE_MOCK) return OPKPISchema.parse(mockOPRefugoKPI);
-    const data = await apiFetch("/ordens/refugo_kpi");
-    return OPKPISchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/kpi/refugo");
+      return OPKPISchema.parse({
+        titulo: "Refugo Total",
+        valor: response.resultado._sum.qtd_refugo || 0
+      });
+    } catch (error) {
+      console.error('Erro ao buscar refugo:', error);
+      return OPKPISchema.parse(mockOPRefugoKPI);
+    }
   },
 };
 
 export const opEficienciaService = {
   async getEficiencia() {
     if (USE_MOCK) return OPEficienciaSchema.parse(mockOPEficiencia);
-    const data = await apiFetch("/ordens/eficiencia");
-    return OPEficienciaSchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/dashboard/eficiencia");
+      return OPEficienciaSchema.parse(response.dados);
+    } catch (error) {
+      console.error('Erro ao buscar eficiência:', error);
+      return OPEficienciaSchema.parse(mockOPEficiencia);
+    }
   },
 };
 
 export const opTopRefugoService = {
   async getTopRefugo() {
     if (USE_MOCK) return OPRefugoArraySchema.parse(mockOPTopRefugo);
-    const data = await apiFetch("/ordens/top_refugo");
-    return OPRefugoArraySchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/dashboard/top-refugo");
+      const dados = response.dados.map(item => ({
+        op: item.label,
+        refugo: item.qtd_refugo
+      }));
+      return OPRefugoArraySchema.parse(dados);
+    } catch (error) {
+      console.error('Erro ao buscar top refugo:', error);
+      return OPRefugoArraySchema.parse(mockOPTopRefugo);
+    }
   },
 };
 
 export const opCargaSetorService = {
   async getCargaSetor() {
     if (USE_MOCK) return OPCargaSetorArraySchema.parse(mockOPCargaSetor);
-    const data = await apiFetch("/ordens/carga_por_setor");
-    return OPCargaSetorArraySchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/dashboard/carga-setor");
+      const dados = response.dados.map(item => ({
+        setor: item.setor,
+        carga: item.qtd_ops
+      }));
+      return OPCargaSetorArraySchema.parse(dados);
+    } catch (error) {
+      console.error('Erro ao buscar carga por setor:', error);
+      return OPCargaSetorArraySchema.parse(mockOPCargaSetor);
+    }
   },
 };
 
 export const opStatusService = {
   async getStatus() {
     if (USE_MOCK) return OPStatusArraySchema.parse(mockOPStatus);
-    const data = await apiFetch("/ordens/status");
-    return OPStatusArraySchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/dashboard/status");
+      const dados = response.dados.map(item => ({
+        name: item.status,
+        value: item.quantidade
+      }));
+      return OPStatusArraySchema.parse(dados);
+    } catch (error) {
+      console.error('Erro ao buscar status das OPs:', error);
+      return OPStatusArraySchema.parse(mockOPStatus);
+    }
   },
 };
 
 export const opConcluidasDiaService = {
   async getConcluidasDia() {
     if (USE_MOCK) return OPConcluidasDiaArraySchema.parse(mockOPConcluidasDia);
-    const data = await apiFetch("/ordens/concluidas_por_dia");
-    return OPConcluidasDiaArraySchema.parse(data);
+    try {
+      const response = await apiFetch("/ordens/dashboard/concluidas-dia");
+      const dados = response.dados.map(item => ({
+        dia: item.dia,
+        total: item.ops_concluidas
+      }));
+      return OPConcluidasDiaArraySchema.parse(dados);
+    } catch (error) {
+      console.error('Erro ao buscar OPs concluídas por dia:', error);
+      return OPConcluidasDiaArraySchema.parse(mockOPConcluidasDia);
+    }
   },
 };
  
 export const opProgressoService = {
   async getProgresso(opId) {
     if (USE_MOCK) return OPProgressoSchema.parse(mockOPProgresso);
-    const data = await apiFetch(`/ordens/${opId}/progresso`);
-    return OPProgressoSchema.parse(data);
+    try {
+      const response = await apiFetch(`/ordens/dashboard/progresso/${opId}`);
+      const [produzido, aProduzir] = response.dados;
+      return OPProgressoSchema.parse({
+        produzidos: produzido.valor,
+        aProduzir: aProduzir.valor
+      });
+    } catch (error) {
+      console.error('Erro ao buscar progresso da OP:', error);
+      return OPProgressoSchema.parse(mockOPProgresso);
+    }
   },
 };
  
 export const opOEEDetalheService = {
-  async getOEE(opId) {
+  async getOEE(opId, maquinaId) {
     if (USE_MOCK) return OPOEEDetalheSchema.parse(mockOPOEEDetalhe);
-    const data = await apiFetch(`/ordens/${opId}/oee`);
-    return OPOEEDetalheSchema.parse(data);
+    try {
+      // Se não tiver maquinaId, precisamos buscar a OP primeiro para descobrir a máquina
+      let id_maquina = maquinaId;
+      if (!id_maquina) {
+        const opResponse = await apiFetch(`/ordens?pagina=1&limite=50`);
+        const op = opResponse.dados?.find(o => o.id_ordem === Number(opId));
+        id_maquina = op?.id_maquina;
+      }
+
+      if (!id_maquina) {
+        console.warn(`Não foi possível encontrar a máquina para a OP ${opId}`);
+        return OPOEEDetalheSchema.parse(mockOPOEEDetalhe);
+      }
+
+      const response = await apiFetch(`/oee/maquinas/${id_maquina}/ordens/${opId}`);
+      return OPOEEDetalheSchema.parse(response.dados);
+    } catch (error) {
+      console.error('Erro ao buscar OEE da OP:', error);
+      return OPOEEDetalheSchema.parse(mockOPOEEDetalhe);
+    }
   },
 };
- 

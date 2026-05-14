@@ -15,11 +15,11 @@ import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorT
 
 export default function DashboardGeralPage() {
   return (
-     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-10">
+     <div className="mx-auto flex w-full p-8 flex-col gap-4 pb-10">
         
         {/* Cabeçalho */}
         <div className="mb-2 flex justify-start">
-          <h1 className="inline-block border-b-4 border-[var(--secondary-foreground)] pb-0 text-4xl font-semibold text-black">
+          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
             Dashboard Geral da Empresa
           </h1>
         </div>

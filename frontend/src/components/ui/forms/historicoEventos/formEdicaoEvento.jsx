@@ -14,14 +14,7 @@ const OPCOES_MAQUINA = [
     { label: "Torno CNC", value: 3 },
 ];
 const OPCOES_OP = ["#000000 (Injetora 1)", "#000001 (Injetora 2)"];
-// id_motivo_parada — número — backend: id_motivo_parada
-const OPCOES_MOTIVO = [
-    { label: "Falta de Energia", value: 1 },
-    { label: "Manutenção Preventiva", value: 2 },
-    { label: "Manutenção Corretiva", value: 3 },
-    { label: "Falta de Material", value: 4 },
-    { label: "Outros", value: 5 },
-];
+
 
 export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
@@ -31,7 +24,14 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
     const [idMotivoPrincipal, setIdMotivoPrincipal] = useState(""); // id_motivo_parada — backend: id_motivo_parada
     const [observacao, setObservacao] = useState(""); // observacao — backend: observacao
-
+    // id_motivo_parada — número — backend: id_motivo_parada
+    const [opcoesMotivo, setOpcoesMotivo] = useState([
+        { label: "Falta de Energia", value: 1 },
+        { label: "Manutenção Preventiva", value: 2 },
+        { label: "Manutenção Corretiva", value: 3 },
+        { label: "Falta de Material", value: 4 },
+        { label: "Outros", value: 5 },
+    ]);
     // período do evento
     const [inicioData, setInicioData] = useState(""); // inicio — backend: inicio
     const [inicioHora, setInicioHora] = useState("");
@@ -71,9 +71,9 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
         e.preventDefault();
 
         const payload = {
-            id_evento: eventoId,                                         // backend: id_evento
+            id_evento: eventoId, // backend: id_evento
             id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null, // backend: id_motivo_parada
-            observacao,                                                  // backend: observacao
+            observacao, // backend: observacao
         };
 
         try {
@@ -103,6 +103,10 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     setFimData(dados.fim.split('T')[0]);
                     setFimHora(dados.fim.split('T')[1]?.slice(0, 5));
                 }
+
+                // busca motivos dinamicamente
+                const motivos = await eventosCrudService.getMotivos();
+                setOpcoesMotivo(motivos.map(m => ({ label: m.descricao, value: m.id_motivo })));
             } catch (error) {
                 toast.error("Erro ao carregar dados do evento.");
             }
@@ -353,7 +357,7 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                                     className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
                                 >
                                     <option value="" disabled>Selecione o motivo</option>
-                                    {OPCOES_MOTIVO.map((motivo) => (
+                                    {opcoesMotivo.map((motivo) => (
                                         // id_motivo_parada — número — backend: id_motivo_parada
                                         <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
                                     ))}

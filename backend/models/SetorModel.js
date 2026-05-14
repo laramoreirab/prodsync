@@ -228,6 +228,85 @@ class SetorModel {
         }
     }
 
+    // Associa operadores a um setor atualizando suas escalas de trabalho
+    static async associarOperadores(id_setor, ids_operadores, id_empresa) {
+        try {
+            const setor = await prisma.setores.findFirst({
+                where: { id_setor, id_empresa }
+            });
+
+            if (!setor) {
+                throw new Error('Setor não encontrado ou não pertence à empresa');
+            }
+
+            // Atualiza o id_setor em todas as escalas de trabalho dos operadores selecionados
+            const resultado = await prisma.escalaTrabalho.updateMany({
+                where: {
+                    id_operador: { in: ids_operadores },
+                    id_empresa: id_empresa
+                },
+                data: {
+                    id_setor: id_setor
+                }
+            });
+
+            return resultado;
+        } catch (error) {
+            console.error('Erro ao associar operadores ao setor:', error);
+            throw error;
+        }
+    }
+
+    // Remove a associação de um operador com um setor deletando sua escala correspondente
+    static async removerOperador(id_setor, id_operador, id_empresa) {
+        try {
+            // Como id_setor é obrigatório na EscalaTrabalho, remover o operador do setor implica em remover sua escala de trabalho vinculada a este setor.
+            return await prisma.escalaTrabalho.deleteMany({
+                where: {
+                    id_setor,
+                    id_operador,
+                    id_empresa
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao remover operador do setor:', error);
+            throw error;
+        }
+    }
+
+    // Lista operadores de um setor via EscalaTrabalho
+    static async listarOperadoresDoSetor(id_setor, id_empresa) {
+        try {
+            const escalas = await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_setor,
+                    id_empresa
+                },
+                include: {
+                    operador: {
+                        select: { id_usuario: true, nome: true, email: true, tipo: true }
+                    }
+                }
+            });
+
+            // Retornar apenas os operadores únicos
+            const operadoresUnicos = [];
+            const idsVistos = new Set();
+
+            for (const escala of escalas) {
+                if (!idsVistos.has(escala.id_operador)) {
+                    operadoresUnicos.push(escala.operador);
+                    idsVistos.add(escala.id_operador);
+                }
+            }
+
+            return operadoresUnicos;
+        } catch (error) {
+            console.error('Erro ao listar operadores do setor:', error);
+            throw error;
+        }
+    }
+
     // Lista setores de um gestor
     static async listarSetoresDoGestor(id_gestor, id_empresa) {
         try {
@@ -317,7 +396,7 @@ class SetorModel {
                     id_setor: true,
                     nome_setor: true,
                     ordens_producao: {
-                        where: { status_op: 'Em_Andamento' },
+                        where: { status_op: "Em_Andamento" },
                         select: {
                             qtd_planejada: true,
                             apontamentos: {
@@ -376,7 +455,7 @@ class SetorModel {
             });
 
             return setores.map(setor => ({
-                id_setor: setor.id_setor,
+                // id_setor: setor.id_setor,
                 setor: setor.nome_setor,
                 qtd: setor.maquinas.length
             })).sort((a, b) => b.qtd - a.qtd);
@@ -420,11 +499,11 @@ class SetorModel {
             const setoresPorId = new Map(setores.map(setor => [setor.id_setor, setor.nome_setor]));
 
             return paradas.map(parada => ({
-                id_setor: parada.setor_afetado,
+                // id_setor: parada.setor_afetado,
                 setor: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
                 minutos: Number((parada._avg.duracao ?? 0).toFixed(1)),
-                tempo_total_minutos: parada._sum.duracao ?? 0,
-                total_eventos: parada._count.id_evento
+                // tempo_total_minutos: parada._sum.duracao ?? 0,
+                // total_eventos: parada._count.id_evento
             })).sort((a, b) => b.minutos - a.minutos);
         } catch (error) {
             console.error('Erro ao obter tempo medio de parada por setor:', error);
@@ -478,12 +557,12 @@ class SetorModel {
                 const defeito = total > 0 ? Number(((setor.defeitos / total) * 100).toFixed(1)) : 0;
 
                 return {
-                    id_setor: setor.id_setor,
+                    // id_setor: setor.id_setor,
                     setor: setor.setor,
                     produzidas,
                     defeito,
-                    total_produzido: total,
-                    total_refugo: setor.defeitos
+                    // total_produzido: total,
+                    // total_refugo: setor.defeitos
                 };
             }).sort((a, b) => b.total_refugo - a.total_refugo);
         } catch (error) {
@@ -494,39 +573,33 @@ class SetorModel {
 
     // Quantidade de operadores escalados por setor
 
-    static async obterQuantidadeOperadoresPorSetor(id_empresa) {
+    static async obterMediaOperadoresPorSetor(id_empresa) {
         try {
-            // Busca setores da empresa com a contagem de operadores únicos na escala
-            const [escalasAgrupadas, setores] = await Promise.all([
-                prisma.escalaTrabalho.groupBy({
-                    by: ['id_setor'],
-                    where: { id_empresa },
-                    _count: {
-                        id_operador: true
-                    }
+            const [totalOperadoresEscalados, totalSetores] = await Promise.all([
+                // 1. Conta o total de registros na tabela de escalas para a empresa
+                prisma.escalaTrabalho.count({
+                    where: { id_empresa }
                 }),
-                prisma.setores.findMany({
-                    where: { id_empresa },
-                    select: { id_setor: true, nome_setor: true }
+                // 2. Conta quantos setores a empresa possui no total
+                prisma.setores.count({
+                    where: { id_empresa }
                 })
             ]);
 
-            // Mapa id_setor → nome
-            const setoresPorId = new Map(setores.map(s => [s.id_setor, s.nome_setor]));
+            // Evita divisão por zero caso a empresa não tenha setores cadastrados
+            if (totalSetores === 0) return 0;
 
-            // Garante que setores sem nenhum operador escalado apareçam com qtd 0
-            const resultado = setores.map(setor => {
-                const escala = escalasAgrupadas.find(e => e.id_setor === setor.id_setor);
-                return {
-                    id_setor: setor.id_setor,
-                    setor: setor.nome_setor,
-                    qtdOperadores: escala?._count.id_operador ?? 0
-                };
-            });
+            // Calcula a média
+            const media = totalOperadoresEscalados / totalSetores;
 
-            return resultado.sort((a, b) => b.qtdOperadores - a.qtdOperadores);
+            // Retorna apenas o número (formatado com 1 casa decimal, por exemplo)
+            return {
+                titulo: "Número de operadores por setor (média)",
+                subtitulo: "Atualizado em tempo real",
+                valor: Number(media.toFixed(1))
+            }
         } catch (error) {
-            console.error('Erro ao obter quantidade de operadores por setor:', error);
+            console.error('Erro ao calcular média de operadores por setor:', error);
             throw error;
         }
     }
@@ -544,6 +617,84 @@ class SetorModel {
             throw error;
         }
     }
+
+    static async totalDeSetores(id_empresa) {
+        try {
+            const resposta = await prisma.setores.count({
+                where: {
+                    id_empresa: id_empresa
+                }
+            })
+            return {
+                titulo: "Número Total de Setores",
+                subtitulo: "Atualizado em tempo real",
+                valor: String(resposta)
+            }
+
+        } catch (error) {
+            console.error('Erro ao obter total de setores:', error);
+            throw error;
+        }
+    }
+
+    // ---------------------------------------Pagina de Gestor -----------------------------------------------
+     static async motivosParadaSetor(id_setor, id_empresa) {
+    const resultado = await prisma.historico_Eventos.groupBy({
+      by:    ['id_motivo_parada'],
+      where: {
+        id_empresa,
+        setor_afetado:  Number(id_setor),
+        id_motivo_parada: { not: null },
+        status_atual:    { in: ['Parada', 'Setup'] }
+      },
+      _count:  { id_evento: true },
+      orderBy: { _count: { id_evento: 'desc' } },
+      take:    5
+    })
+
+    const ids     = resultado.map(r => r.id_motivo_parada)
+    const motivos = await prisma.motivos_Parada.findMany({
+      where:  { id_motivo: { in: ids } },
+      select: { id_motivo: true, descricao: true }
+    })
+
+    const nomeMotivo = Object.fromEntries(
+      motivos.map(m => [m.id_motivo, m.descricao])
+    )
+
+    return resultado.map(r => ({
+      motivo: nomeMotivo[r.id_motivo_parada] ?? 'Sem motivo',
+      qtd:    r._count.id_evento
+    }))
+  }
+
+  static async top5OperadoresSetor(id_setor, id_empresa) {
+    const resultado = await prisma.apontamento.groupBy({
+      by:    ['id_operador'],
+      where: {
+        id_empresa,
+        maquina: { id_setor }
+      },
+      _sum:    { qtd_boa: true, qtd_refugo: true },
+      orderBy: { _sum: { qtd_boa: 'desc' } },
+      take:    5
+    })
+
+    const ids      = resultado.map(r => r.id_operador)
+    const usuarios = await prisma.usuarios.findMany({
+      where:  { id_usuario: { in: ids } },
+      select: { id_usuario: true, nome: true }
+    })
+
+    const nomeUsuario = Object.fromEntries(
+      usuarios.map(u => [u.id_usuario, u.nome])
+    )
+
+    return resultado.map(r => ({
+      operador:  nomeUsuario[r.id_operador] ?? 'Desconhecido',
+      qtd: (r._sum.qtd_boa ?? 0) + (r._sum.qtd_refugo ?? 0)
+    }))
+  }
 
 }
 

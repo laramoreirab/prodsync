@@ -18,6 +18,8 @@ import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario"
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import { usuariosCrudService } from "@/services/usuariosCrudService";
+import { apiFetch } from "@/lib/api";
 
 const colunasUsuario = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
@@ -50,6 +52,7 @@ const colunasUsuario = [
 export default function ProducaoOperadorPage({ params }) {
   const { id } = use(params);
   const operadorId = Number(id);
+  const [usuario, setUsuario] = useState(null);
   const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
   const [buscaApontamento, setBuscaApontamento] = useState("");
 
@@ -67,6 +70,20 @@ export default function ProducaoOperadorPage({ params }) {
   useEffect(() => {
     setDadosApontamentoState(dadosOriginais);
   }, []);
+
+  useEffect(() => {
+    async function carregarUsuario() {
+      const [usuarioDados, apontamentosResp] = await Promise.all([
+        usuariosCrudService.getById(operadorId),
+        apiFetch(`/api/usuarios/${operadorId}/apontamentos`, { method: "GET" }),
+      ]);
+
+      setUsuario(usuarioDados);
+      setDadosApontamentoState(apontamentosResp.dados || []);
+    }
+
+    carregarUsuario().catch((error) => console.error("Erro ao carregar usuÃ¡rio:", error));
+  }, [operadorId]);
 
   const opcoesOrdenacaoApontamento = [
     { label: 'ID Crescente', value: 'id_asc' },
@@ -149,24 +166,13 @@ export default function ProducaoOperadorPage({ params }) {
     const termo = buscaApontamento.toLowerCase();
 
     return (
-      a.op.toLowerCase().includes(termo) ||
+      String(a.op).toLowerCase().includes(termo) ||
       String(a.id).includes(termo)
     );
   });
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-
-
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         <Link className="flex items-center" href="/adm/usuarios">
@@ -174,11 +180,11 @@ export default function ProducaoOperadorPage({ params }) {
           <p className="text-xl font-semibold text-gray-800">Voltar para Usuários </p>
         </Link>
 
-        <section id="infos_op" className="flex flex-col">
+        <section id="infos_user" className="flex flex-col">
           <div className="flex justify-between items-start">
             <div className="flex">
               <Image
-                src="/jose.svg"
+                src={usuario?.imagem_perfil ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}` : "/userdefault.svg"}
                 alt="Demo Maquina"
                 className="rounded-xl"
                 width={250}
@@ -186,36 +192,36 @@ export default function ProducaoOperadorPage({ params }) {
               />
 
               <div className="flex flex-col ml-5">
-                <h1 className="text-3xl font-bold text-black">Nome: José Adamastor Alves da Silva Souza</h1>
+                <h1 className="text-3xl font-bold text-black">Nome: {usuario?.nome || "-"}</h1>
                 <div className="flex gap-10">
 
                   <div className="flex flex-col gap-5 mt-2">
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                      <p className="text-xl font-medium text-black">00000</p>
+                      <p className="text-xl font-medium text-black">{usuario?.id_usuario || operadorId}</p>
                     </div>
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">Email:</p>
-                      <p className="text-xl font-medium text-black">josezinho@gmail.com</p>
+                      <p className="text-xl font-medium text-black">{usuario?.email || "-"}</p>
                     </div>
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">CPF:</p>
-                      <p className="text-xl font-medium text-black">443.651.730-65</p>
+                      <p className="text-xl font-medium text-black">{usuario?.cpf || "-"}</p>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-5 mt-2">
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">Setor:</p>
-                      <p className="text-xl font-medium text-black">Engrenagens</p>
+                      <p className="text-xl font-medium text-black">{usuario?.setor?.nome_setor || "-"}</p>
                     </div>
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">Função:</p>
-                      <p className="text-xl font-medium text-black">Operador</p>
+                      <p className="text-xl font-medium text-black">{usuario?.tipo || usuario?.funcao || "-"}</p>
                     </div>
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">Turno:</p>
-                      <p className="text-xl font-medium text-black">Noite</p>
+                      <p className="text-xl font-medium text-black">{usuario?.turno?.nome_turno || "-"}</p>
                     </div>
                   </div>
                 </div>
@@ -228,7 +234,7 @@ export default function ProducaoOperadorPage({ params }) {
                   <Pencil size={36} className="mr-1" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormEdicaoUsuario />
+                  <FormEdicaoUsuario usuarioId={operadorId} />
                 </DialogContent>
               </Dialog>
 
@@ -237,7 +243,7 @@ export default function ProducaoOperadorPage({ params }) {
                   <Trash2 className=" w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormExclusaoUsuario />
+                  <FormExclusaoUsuario usuarioId={operadorId} />
                 </DialogContent>
               </Dialog>
             </div>
@@ -247,23 +253,23 @@ export default function ProducaoOperadorPage({ params }) {
 
         <section id="maquina_responsavel" className="mt-5">
           <h1 className="font-bold text-3xl">Responsável por:</h1>
-          <Link href="/adm/maquinas/{maquina.id}" >
+          <Link href={usuario?.maquina?.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"} >
             <div className="bg-white w-full shadow-md border rounded-lg flex justify-between items-start p-8 mt-6">
               <div className="flex">
                 <Image src="/demo_maq.png" alt="Demo Maquina" className="rounded-lg" width={200} height={150} />
                 <div className="ml-8 flex flex-col gap-2">
-                  <h1 className="text-3xl font-bold text-[#212e4b] uppercase">THAK-12345</h1>
+                  <h1 className="text-3xl font-bold text-[#212e4b] uppercase">{usuario?.maquina?.nome || "-"}</h1>
                   <div className="flex items-center">
                     <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                    <p className="text-xl font-medium text-black">00000</p>
+                    <p className="text-xl font-medium text-black">{usuario?.maquina?.id_maquina || "-"}</p>
                   </div>
                   <div className="flex items-center">
                     <p className="text-xl font-semibold text-black mr-2">Série:</p>
-                    <p className="text-xl font-medium text-black">SX-900</p>
+                    <p className="text-xl font-medium text-black">{usuario?.maquina?.serie || "-"}</p>
                   </div>
                   <div className="flex items-center">
                     <p className="text-xl font-semibold text-black mr-2">Data de Aquisição:</p>
-                    <p className="text-xl font-medium text-black">01/01/2023</p>
+                    <p className="text-xl font-medium text-black">{usuario?.maquina?.data_aquisicao ? new Date(usuario.maquina.data_aquisicao).toLocaleDateString("pt-BR") : "-"}</p>
                   </div>
                   <div className="flex items-center">
                     <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
@@ -272,7 +278,7 @@ export default function ProducaoOperadorPage({ params }) {
                 </div>
               </div>
 
-              <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">Parada</p>
+              <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">{usuario?.maquina?.status_atual || "-"}</p>
             </div>
           </Link>
         </section>
@@ -280,85 +286,86 @@ export default function ProducaoOperadorPage({ params }) {
 
         {/* Gráficos */}
         <h1 className="font-bold text-3xl mt-8">Produção</h1>
-        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
-          <OEEOperadorWidget operadorId={operadorId} />
-        </section>
+        <div className="flex flex-col gap-4 ">
+          <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+            <OEEOperadorWidget operadorId={operadorId} />
+          </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <PecasPorDiaWidget operadorId={operadorId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center">
-            <MetaProducaoWidget operadorId={operadorId} />
-          </div>
-        </section>
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <PecasPorDiaWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center">
+              <MetaProducaoWidget operadorId={operadorId} />
+            </div>
+          </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <EficienciaMaquinaWidget operadorId={operadorId} />
-          </div>
-        </section>
-
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <EficienciaMaquinaWidget operadorId={operadorId} />
+            </div>
+          </section>
+        </div>
 
         {/* Listagem */}
         <div className="flex items-center gap-5">
-          <h1 className="text-4xl w-[125] font-semibold">Histórico de Apontamentos Feitos pelo Usuário</h1>
-          
-        </div>
-        {/* Busca */}
-        <div className="flex searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-            <input
-              type="search"
-              className="p-2 w-full outline-none bg-transparent"
-              placeholder="Busque por nome ou id..."
-              value={buscaApontamento}
-              onChange={(e) => setBuscaApontamento(e.target.value)}
-            />
-            <button className="outline-none cursor-pointer mr-2"><Search /></button>
+          <h1 className="text-4xl font-bold">Histórico de Apontamentos Feitos pelo Usuário</h1>
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid   items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por nome ou id..."
+                value={buscaApontamento}
+                onChange={(e) => setBuscaApontamento(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            </div>
           </div>
-        </div>
 
-        <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-          <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
 
-          <div className="flex items-center gap-4 mb-3">
-            <OrdenarDropdown
-              label="Ordenar por"
-              options={opcoesOrdenacaoApontamento}
-              onSortChange={handleSortApontamento}
-            />
+            <div className="flex items-center gap-4 mb-3">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacaoApontamento}
+                onSortChange={handleSortApontamento}
+              />
 
-            <FilterDropdown
-              filtersConfig={apontamentoFilter}
-              onApply={aplicarFiltrosApontamento}
-            />
+              <FilterDropdown
+                filtersConfig={apontamentoFilter}
+                onApply={aplicarFiltrosApontamento}
+              />
+            </div>
           </div>
+          <section>
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosApontamentosFiltrados}
+              columns={colunasUsuario}
+              acoesDropdown={(usuario) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver OP relacionada
+                    </Link>
+
+                  </DropdownMenuItem>
+                </>
+              )}
+            />
+          </section>
         </div>
-        <section>
-          <TableListagens
-            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-            data={dadosApontamentosFiltrados}
-            columns={colunasUsuario}
-            acoesDropdown={(usuario) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver OP relacionada
-                  </Link>
-                  
-                </DropdownMenuItem>
-              </>
-            )}
-          />
-        </section>
+
       </div>
     </main>
   );

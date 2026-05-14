@@ -15,12 +15,12 @@ import {
 
 import { Plus, Search, Pencil, EyeIcon, BellRing, Loader2 } from "lucide-react";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
 
 import { useState, useMemo, useEffect } from "react";
 
 import { useEventos } from "@/hooks/useEventos";
 
-//imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 
@@ -51,22 +51,22 @@ import {
 } from "@/components/ui/tabs";
 
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 
 const colunasEventos = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'id', key: 'id', label: 'ID', className: 'w-25 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
     id: 'tipo', key: 'tipo', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Setup": {variant: "setup",},
-        "Parada": {variant: "parada"}
+        "Setup": { variant: "setup", },
+        "Parada": { variant: "parada" }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -77,12 +77,19 @@ const colunasEventos = [
       );
     }
   },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
+  {
+    id: 'data',
+    key: 'data',
+    label: 'Data (Início - Fim)',
+    icone: (valor, row) => (
+      <DataEvento inicio={row.inicio} fim={row.fim} />
+    )
+  },
   {
     id: 'duracao', key: 'duracao', label: 'Duração',
     icone: (valor, row) => (
-    <DuracaoEvento inicio={row.inicio} fim={row.fim} />
-  )
+      <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+    )
   },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
   { id: 'observacao', key: 'observacao', label: 'Observação' },
@@ -342,8 +349,6 @@ export default function HistoricoEventos() {
             </TabsList>
           </div>
 
-
-
           <div className="flex searchbar">
             <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
               <input
@@ -395,7 +400,7 @@ export default function HistoricoEventos() {
 
 
           {/* Tab paradas justificadas */}
-          <TabsContent value="justificadas">
+          <TabsContent value="justificadas" className="text-md">
             {paradasJustificadas.length > 0 ? (
               <TableListagens
                 data={paradasJustificadas}
@@ -412,7 +417,7 @@ export default function HistoricoEventos() {
 
 
           {/* Tab paradas não justificadas */}
-          <TabsContent value="nao-justificadas">
+          <TabsContent value="nao-justificadas" className="text-md">
             {paradasNaoJustificadas.length > 0 ? (
               <TableListagens
                 data={paradasNaoJustificadas}

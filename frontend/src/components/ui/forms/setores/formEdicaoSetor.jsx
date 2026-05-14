@@ -28,7 +28,8 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
         const buscarDadosDoSetor = async () => {
             setCarregando(true);
             try {
-                const dados = await setorCrudService.getById(setorId);
+                const resposta = await setorCrudService.getById(setorId);
+                const dados = resposta.dados || resposta;
 
                 // Preenchendo os estados com os dados retornados
                 setNomeSetor(dados.nome_setor || '');

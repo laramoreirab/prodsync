@@ -1,94 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, X as XIcon, ChevronDown } from "lucide-react";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { setorCrudService } from "@/services/setorCrudService";
+import { apiFetch } from "@/lib/api";
 
 export default function FormCadastroSetor({ onCadastroSucesso }) {
-    // estados das informações básicas
-    const [nomeSetor, setNomeSetor] = useState("");          // backend: nome_setor
-    const [localizacao, setLocalizacao] = useState("");      // backend: localizacao
-
-    // estados da máquina
+    const [nomeSetor, setNomeSetor] = useState("");
+    const [localizacao, setLocalizacao] = useState("");
     const [maquinaSelecionada, setMaquinaSelecionada] = useState("");
-    const [listaMaquinas, setListaMaquinas] = useState([]);  // ids_maquinas — backend: ids_maquinas (array)
-
-    // estados da equipe
+    const [listaMaquinas, setListaMaquinas] = useState([]);
+    const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]);
     const [usuarioSelecionado, setUsuarioSelecionado] = useState("");
     const [funcaoSelecionada, setFuncaoSelecionada] = useState("");
     const [listaEquipe, setListaEquipe] = useState([]);
+    const [equipeSelecionada, setEquipeSelecionada] = useState([]);
 
-    // funções para adicionar e remover máquinas
-    const adicionarMaquina = (e) => {
-        e.preventDefault(); // evita recarregar a página ao clicar no botão
-        if (maquinaSelecionada && !listaMaquinas.find(m => m.value === maquinaSelecionada)) {
-            const opcao = OPCOES_MAQUINAS.find(o => o.value === maquinaSelecionada);
-            setListaMaquinas([...listaMaquinas, opcao]);
-            setMaquinaSelecionada(""); // reseta o select
+    useEffect(() => {
+        async function carregarMaquinas() {
+            try {
+                const dados = await apiFetch(`/api/maquinas/`, { method: "GET" });
+                setListaMaquinas(dados.dados || []);
+            } catch (error) {
+                console.log(error);
+                toast.error("Erro ao carregar maquinas.");
+            }
         }
-    };
-    const removerMaquina = (value) => {
-        setListaMaquinas(listaMaquinas.filter((m) => m.value !== value));
+        carregarMaquinas();
+    }, []);
+
+    useEffect(() => {
+        async function carregarEquipe() {
+            try {
+                const dados = await apiFetch(`/api/usuarios/listarSemAdms`, { method: "GET" });
+                setListaEquipe(dados.dados || []);
+            } catch (error) {
+                console.log(error);
+                toast.error("Erro ao carregar usuarios.");
+            }
+        }
+        carregarEquipe();
+    }, []);
+
+    const adicionarMaquina = (e) => {
+        e.preventDefault();
+        const idMaquina = Number(maquinaSelecionada);
+        if (!idMaquina || maquinasSelecionadas.some(m => m.id_maquina === idMaquina)) return;
+
+        const maquina = listaMaquinas.find(m => m.id_maquina === idMaquina);
+        if (maquina) setMaquinasSelecionadas([...maquinasSelecionadas, maquina]);
+        setMaquinaSelecionada("");
     };
 
-    // funções para adicionar e remover colaboradores
+    const removerMaquina = (id_maquina) => {
+        setMaquinasSelecionadas(maquinasSelecionadas.filter(m => m.id_maquina !== id_maquina));
+    };
+
     const adicionarColaborador = (e) => {
         e.preventDefault();
-        if (usuarioSelecionado && funcaoSelecionada) {
-            setListaEquipe([
-                ...listaEquipe,
-                { usuario: usuarioSelecionado, funcao: funcaoSelecionada }
-            ]);
-            setUsuarioSelecionado(""); // reseta os selects
-            setFuncaoSelecionada("");
-        }
+        const idUsuario = Number(usuarioSelecionado);
+        if (!idUsuario || !funcaoSelecionada || equipeSelecionada.some(u => u.id_usuario === idUsuario)) return;
+
+        const usuario = listaEquipe.find(u => u.id_usuario === idUsuario);
+        if (usuario) setEquipeSelecionada([...equipeSelecionada, { ...usuario, funcao: funcaoSelecionada }]);
+        setUsuarioSelecionado("");
+        setFuncaoSelecionada("");
     };
+
     const removerColaborador = (indexParaRemover) => {
-        setListaEquipe(listaEquipe.filter((_, index) => index !== indexParaRemover));
+        setEquipeSelecionada(equipeSelecionada.filter((_, index) => index !== indexParaRemover));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            // infos gerais setor — campos: nome_setor, localizacao
             const novoSetor = await setorCrudService.create({
-                nome_setor: nomeSetor,   // backend: nome_setor
-                localizacao: localizacao // backend: localizacao
+                nome_setor: nomeSetor,
+                localizacao: localizacao,
             });
 
-            // máquinas se houver — ids_maquinas (array), id do setor na URL
-            if (listaMaquinas.length > 0) {
+            if (maquinasSelecionadas.length > 0) {
                 await setorCrudService.associarMaquinas(
-                    novoSetor.id,
-                    listaMaquinas.map(m => m.value)
+                    novoSetor.id_setor,
+                    maquinasSelecionadas.map(m => m.id_maquina)
                 );
             }
 
-            // gestor se houver — id_gestor no body, id do setor na URL
-            const gestor = listaEquipe.find(m => m.funcao === "Gestor");
+            const gestor = equipeSelecionada.find(m => m.funcao === "Gestor");
             if (gestor) {
-                await setorCrudService.associarGestor(novoSetor.id, gestor.id_usuario);
+                await setorCrudService.associarGestor(novoSetor.id_setor, gestor.id_usuario);
             }
 
-            //operadores quando o backend implementar o endpoint
-            const operadores = listaEquipe.filter(m => m.funcao === "Operador");
+            const operadores = equipeSelecionada.filter(m => m.funcao === "Operador");
             if (operadores.length > 0) {
                 await setorCrudService.associarOperadores(
-                    novoSetor.id,
+                    novoSetor.id_setor,
                     operadores.map(o => o.id_usuario)
                 );
             }
 
             toast.success("Setor criado com sucesso!");
-            // limpar formulário
             setNomeSetor("");
             setLocalizacao("");
-            setListaMaquinas([]);
-            setListaEquipe([]);
+            setMaquinaSelecionada("");
+            setMaquinasSelecionadas([]);
+            setUsuarioSelecionado("");
+            setFuncaoSelecionada("");
+            setEquipeSelecionada([]);
             if (onCadastroSucesso) onCadastroSucesso();
         } catch (error) {
             console.error("Erro ao criar setor:", error);
@@ -106,10 +128,8 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
-
-                {/* infos gerais — nome_setor e localizacao */}
                 <div>
-                    <h2 className="text-2xl font-semibold text-black mb-4">1. Informações Básicas</h2>
+                    <h2 className="text-2xl font-semibold text-black mb-4">1. Informacoes Basicas</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xl font-medium text-gray-700 mb-1">Nome do Setor</label>
@@ -122,12 +142,12 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                             />
                         </div>
                         <div>
-                            <label className="block text-xl font-medium text-gray-700 mb-1">Localização Física</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1">Localizacao Fisica</label>
                             <input
                                 type="text"
                                 value={localizacao}
                                 onChange={(e) => setLocalizacao(e.target.value)}
-                                placeholder="Galpão B - Corredor 3"
+                                placeholder="Galpao B - Corredor 3"
                                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 placeholder-gray-300 outline-none shadow-sm text-lg"
                             />
                         </div>
@@ -136,10 +156,9 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
 
                 <Separator className="bg-gray-200" />
 
-                {/* máquinas do setor — ids_maquinas (array) */}
                 <div>
-                    <h2 className="text-2xl font-semibold text-black">2. Máquinas do Setor</h2>
-                    <p className="text-xl text-[#545454] font-medium mb-4">Vincule os equipamentos que operarão nesse setor.</p>
+                    <h2 className="text-2xl font-semibold text-black">2. Maquinas do Setor</h2>
+                    <p className="text-xl text-[#545454] font-medium mb-4">Vincule os equipamentos que operarao nesse setor.</p>
 
                     <div className="flex items-center gap-3">
                         <div className="relative w-full max-w-md">
@@ -148,11 +167,12 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                                 onChange={(e) => setMaquinaSelecionada(e.target.value)}
                                 className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
                             >
-                                <option value="" disabled>Selecione</option>
-                                {/* id_maquina — número — backend: ids_maquinas */}
-                                <option value="1">THAK-2</option>
-                                <option value="2">Torno CNC 100</option>
-                                <option value="3">Fresa Universal</option>
+                                <option value="">Selecione...</option>
+                                {listaMaquinas.map((maquina) => (
+                                    <option key={maquina.id_maquina} value={maquina.id_maquina}>
+                                        {maquina.nome}
+                                    </option>
+                                ))}
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                                 <ChevronDown className="h-4 w-4" />
@@ -167,13 +187,12 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                         </button>
                     </div>
 
-                    {/* tags das máquinas já adicionadas */}
                     <div className="flex flex-wrap gap-2 mt-4">
-                        {listaMaquinas.map((maquina) => (
-                            <div key={maquina.value} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                <span>{maquina.label}</span>
+                        {maquinasSelecionadas.map((maquina) => (
+                            <div key={maquina.id_maquina} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                <span>{maquina.nome}</span>
                                 <button
-                                    onClick={(e) => { e.preventDefault(); removerMaquina(maquina.value); }}
+                                    onClick={(e) => { e.preventDefault(); removerMaquina(maquina.id_maquina); }}
                                     className="text-gray-500 focus:outline-none"
                                 >
                                     <XIcon className="h-4 w-4" />
@@ -185,24 +204,25 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
 
                 <Separator className="bg-gray-200" />
 
-                {/* equipe e responsabilidades — id_gestor */}
                 <div>
                     <h2 className="text-2xl font-semibold text-black">3. Equipe e Responsabilidades</h2>
                     <p className="text-xl text-[#545454] font-medium mb-4">Adicione os colaboradores e defina suas responsabilidades.</p>
 
                     <div className="flex items-end gap-3 max-w-4xl">
                         <div className="flex-1">
-                            <label className="block text-xl font-medium text-gray-700 mb-1">Selecione o Usuário</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1">Selecione o Usuario</label>
                             <div className="relative">
                                 <select
                                     value={usuarioSelecionado}
                                     onChange={(e) => setUsuarioSelecionado(e.target.value)}
                                     className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 bg-white focus:outline-none shadow-sm text-gray-400 text-lg"
                                 >
-                                    <option value="" disabled>Selecione...</option>
-                                    <option value="Carlos Mendes">Carlos Mendes</option>
-                                    <option value="Luis Mariz">Luis Mariz</option>
-                                    <option value="Ana Souza">Ana Souza</option>
+                                    <option value="">Selecione...</option>
+                                    {listaEquipe.map((usuario) => (
+                                        <option key={usuario.id_usuario} value={usuario.id_usuario}>
+                                            {usuario.nome}
+                                        </option>
+                                    ))}
                                 </select>
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                                     <ChevronDown className="h-4 w-4" />
@@ -211,7 +231,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex-1">
-                            <label className="block text-xl font-medium text-gray-700 mb-1">Definir Função</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1">Definir Funcao</label>
                             <div className="relative">
                                 <select
                                     value={funcaoSelecionada}
@@ -236,14 +256,13 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                         </button>
                     </div>
 
-                    {/* tags dos usuários já adicionados */}
-                    {listaEquipe.length > 0 && (
+                    {equipeSelecionada.length > 0 && (
                         <div className="mt-6">
                             <h4 className="text-xl font-medium text-black mb-3">Colaboradores Vinculados:</h4>
                             <div className="flex flex-wrap gap-3">
-                                {listaEquipe.map((membro, index) => (
-                                    <div key={index} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                        <span>{membro.usuario} ({membro.funcao})</span>
+                                {equipeSelecionada.map((membro, index) => (
+                                    <div key={membro.id_usuario} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                        <span>{membro.nome} ({membro.funcao})</span>
                                         <button
                                             onClick={(e) => { e.preventDefault(); removerColaborador(index); }}
                                             className="text-gray-500 hover:text-red-500 focus:outline-none"

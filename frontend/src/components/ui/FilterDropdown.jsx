@@ -227,7 +227,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
           </div>
 
           {activeTags.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2 border-t border-[#c3c7c8] pt-3">
+            <div className="flex flex-wrap gap-2 pt-3">
               {activeTags.map((tag) => (
                 <span key={tag.key} className="flex items-center gap-1 rounded-md bg-[#e2e2e2] px-2 py-1 text-xs font-medium text-[#23304c]">
                   {tag.label}

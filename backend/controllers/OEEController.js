@@ -108,6 +108,20 @@ class OEEController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
+
+    // --------------------------------------OEE gestor ------------------------------------------------
+
+    static async evolucaoOEESetor(req, res) {
+    try {
+        const id_setor = Number(req.params.id_setor)
+        const id_empresa = req.user.id_empresa
+      const dados = await OEEModel.evolucaoOEESetor(id_setor,id_empresa)
+      return res.status(200).json({ sucesso: true, dados })
+    } catch (error) {
+      console.error('Erro no gráfico evolucao OEE do setor:', error)
+      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    }
+  }
 }
 
 export default OEEController;

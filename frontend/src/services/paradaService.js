@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch } from "@/lib/api";
 import { MotivosFrequentesArraySchema } from "@/features/paradas/schemas/paradasSchema";
 import { mockMotivosFrequentesParadas } from "./mockData";
 
@@ -10,20 +10,21 @@ const USE_MOCK = false;
 export const paradaService = {
   async getParadas() {
     if (USE_MOCK) return MotivosFrequentesArraySchema.parse(mockMotivosFrequentesParadas);
-    const data = await apiFetch("/api/maquinas/status");
-    return MaquinaStatusArraySchema.parse(data);
+    const data = await apiFetch("/api/dashboard/top-motivos-parada");
+    console.log("ARRAY DO MOTIVOS FREQUENTES", data.dados)
+    return MotivosFrequentesArraySchema.parse(data.dados);
   },
 };
 
 export const paradasPorDiaService = {
   async getParadasDia() {
     if (USE_MOCK) return MediaParadasDiaArraychema.parse(mockMediaParadasDia);
-    const data = await apiFetch("/maquinas/parada_dia");
-    return MediaParadasDiaArraychema.parse(data);
+    const data = await apiFetch("/api/dashboard/media-paradas-por-dia");
+    return MediaParadasDiaArraychema.parse(data.dados);
   }
 }
 
-// import { apiFetch } from "./api";
+// import { apiFetch } from "@/lib/api";
 // import {
 //MaquinaStatusSchema
 // } from "@features/maquinas/schemas/maquinaSchema";

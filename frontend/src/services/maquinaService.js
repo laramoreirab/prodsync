@@ -29,39 +29,39 @@ export const maquinaStatusService = {
 export const maquinaAtivaPorTurnoService = {
   async getMaquinaAtivaPorTurnoService() {
     if (USE_MOCK) return MaquinaAtivaPorTurnoSchema.parse(mockMaquinaAtivaPorTurno);
-    const data = await apiFetch("/maquinas/ativa_por_turno");
-    return MaquinaAtivaPorTurnoSchema.parse(data);
+    const data = await apiFetch("/api/turnos/kpis/turno-atual")
+    return MaquinaAtivaPorTurnoSchema.parse(data.dados.cards.maquinasAtivas);
   },
 };
 
 export const qtdMaquinasPorSetorService = {
   async getQtdPorSetor() {
     if (USE_MOCK) return QtdMaquinaPorSetorArraySchema.parse(mockQtdMaquinasPorSetor);
-    const data = await apiFetch("/maquinas/quantidade_por_setor");
-    return QtdMaquinaPorSetorArraySchema.parse(data);
+    const data = await apiFetch("/api/setores/obterQuantidadeMaquinasPorSetor");
+    return QtdMaquinaPorSetorArraySchema.parse(data.dados);
   },
 };
 
 export const tempoMedioParadaService = {
   async getTempoMedio() {
     if (USE_MOCK) return TempoMedioParadaArraySchema.parse(mockTempoMedioParada);
-    const data = await apiFetch("/maquinas/tempo_medio_parada");
-    return TempoMedioParadaArraySchema.parse(data);
+    const data = await apiFetch("/api/setores/obterTempoMedioParadaPorSetor");
+    return TempoMedioParadaArraySchema.parse(data.dados);
   },
 };
 
 export const producaoDefeitosService = {
   async getProducaoDefeitos() {
     if (USE_MOCK) return ProducaoDefeitoPorSetorArraySchema.parse(mockProducaoDefeitos);
-    const data = await apiFetch("/maquinas/producao_defeitos");
-    return ProducaoDefeitoPorSetorArraySchema.parse(data);
+    const data = await apiFetch("/api/setores/obterProducaoDefeitosPorSetor");
+    return ProducaoDefeitoPorSetorArraySchema.parse(data.dados);
   },
 };
 
 export const maquinasPorTurnoService = {
   async getMaquinasPorTurno() {
     if (USE_MOCK) return MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
-    const data = await apiFetch("/maquinas/status_por_turno");
-    return MaquinaPorTurnoArraySchema.parse(data);
+    const data = await apiFetch("/api/turnos/status-maquinas-por-turno");
+    return MaquinaPorTurnoArraySchema.parse(data.dados);
   },
 };

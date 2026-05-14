@@ -151,163 +151,167 @@ export default function Usuarios() {
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
 
-      <section className="graphs_cadastro">
-        {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
-        <div className="flex justify-between p-8">
-          <div className="title_tela">
-            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-              Usuários
-            </h1>
-          </div>
-
-          {/* Modal de Cadastrar Usuário */}
-          <Dialog>
-            <DialogTrigger
-              className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
-            >
-              <Plus className="mr-2" />
-              Cadastrar
-            </DialogTrigger>
-
-            <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
-              <FormCadastroUsuario onCadastroSucesso={refresh} />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Gráficos */}
-      </section>
-
-      {/* SEÇÃO 1: Charts */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border rounded-xl p-4">
-            <QtdUsuariosWidget />
-          </div>
-          <div className="bg-white border rounded-xl p-4">
-            <QtdUsuariosPorSetorWidget />
-          </div>
-          <div className="bg-white border rounded-xl p-4">
-            <TopOperadoresWidget />
-          </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: Charts */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white border rounded-xl p-6">
-            <TempoSessaoWidget />
-          </div>
-          <div className="bg-white border rounded-xl p-4">
-            <RotatividadeWidget />
-          </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO 3: Charts */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white border rounded-xl p-4">
-            <CumprimentoMetaSetorWidget />
-          </div>
-          <div className="bg-white border rounded-xl p-4">
-            <ProducaoMediaSetorWidget />
-          </div>
-        </div>
-      </section>
-
-      {/* Listagem */}
-      <section id="listagem_usuarios" className='px-8'>
-        <div className="flex items-center py-8 gap-5">
-          <h1 className="text-4xl w-[125] font-semibold">Listagem de Usuários</h1>
-          <hr className="bg-black flex-1 h-1" />
-        </div>
-
-        {/* Busca */}
-        <div className="flex searchbar">
-          <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-            <input
-              type="search"
-              className="p-2 w-full outline-none bg-transparent"
-              placeholder="Busque por nome ou id..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-            />
-            <button className="outline-none cursor-pointer mr-2"><Search /></button>
-          </div>
-        </div>
-
-        {/* Linha de quantidade total de usuários e filtrar e ordenar funcional */}
-        <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-          <p>{dadosExibidos.length} usuários encontrados</p>
-
-          <div className="flex gap-4 items-center">
-            <OrdenarDropdown
-              label="Ordenar por"
-              options={opcoesOrdenacao}
-              onSortChange={handleSort}
-            />
-            <FilterDropdown
-              filtersConfig={usuariosFilter}
-              onApply={aplicarFiltros}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col flex-1 items-center w-full mt-4">
-          {dadosExibidos.length > 0 ? (
-            <TableListagens
-              data={dadosExibidos}
-              columns={colunasUsuarios}
-              acoesDropdown={(user) => (
-                <>
-                  {/* link*/}
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`usuarios/${user.id}`}>
-                      <EyeIcon className="mr-2 h-10 w-10" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
-
-                  {/* editar */}
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
-                      <FormEdicaoUsuario usuarioId={user.id} onEdicaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
-
-                  {/* excluir */}
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-            />
-          ) : (
-            //caso não encontre nada correspondente
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
-              <p>Não encontramos nenhum resultado para "{busca}".</p>
+      <div className="px-8 py-3">
+        <section className="graphs_cadastro">
+          {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
+          <div className="flex justify-between py-3">
+            <div className="title_tela">
+              <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+                Usuários
+              </h1>
             </div>
-          )}
-        </div>
-      </section>
+
+            {/* Modal de Cadastrar Usuário */}
+            <Dialog>
+              <DialogTrigger
+                className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
+              >
+                <Plus className="mr-2" />
+                Cadastrar
+              </DialogTrigger>
+
+              <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
+                <FormCadastroUsuario onCadastroSucesso={refresh} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Gráficos */}
+        </section>
+
+        {/* SEÇÃO 1: Charts */}
+        <section className="py-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="border rounded-xl p-4">
+              <QtdUsuariosWidget />
+            </div>
+            <div className="border rounded-xl p-4">
+              <QtdUsuariosPorSetorWidget />
+            </div>
+            <div className="border rounded-xl p-4">
+              <TopOperadoresWidget />
+            </div>
+          </div>
+        </section>
+
+        {/* SEÇÃO 2: Charts */}
+        <section className="py-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border rounded-xl p-6">
+              <TempoSessaoWidget />
+            </div>
+            <div className="border rounded-xl p-4">
+              <RotatividadeWidget />
+            </div>
+          </div>
+        </section>
+
+        {/* SEÇÃO 3: Charts */}
+        <section className="py-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border rounded-xl p-4">
+              <CumprimentoMetaSetorWidget />
+            </div>
+            <div className="border rounded-xl p-4">
+              <ProducaoMediaSetorWidget />
+            </div>
+          </div>
+        </section>
+
+        {/* Listagem */}
+        <section id="listagem_usuarios" >
+          <div className="flex items-center py-4 gap-5">
+            <h1 className="text-4xl w-[125] font-semibold">Listagem de Usuários</h1>
+            <hr className="bg-black flex-1 h-1" />
+          </div>
+
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por nome ou id..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            </div>
+          </div>
+
+          {/* Linha de quantidade total de usuários e filtrar e ordenar funcional */}
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosExibidos.length} usuários encontrados</p>
+
+            <div className="flex gap-4 items-center">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacao}
+                onSortChange={handleSort}
+              />
+              <FilterDropdown
+                filtersConfig={usuariosFilter}
+                onApply={aplicarFiltros}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col flex-1 items-center w-full mt-4">
+            {dadosExibidos.length > 0 ? (
+              <TableListagens
+                data={dadosExibidos}
+                columns={colunasUsuarios}
+                acoesDropdown={(user) => (
+                  <>
+                    {/* link*/}
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`usuarios/${user.id}`}>
+                        <EyeIcon className="mr-2 h-10 w-10" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
+
+                    {/* editar */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
+                        <FormEdicaoUsuario usuarioId={user.id} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+
+                    {/* excluir */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              //caso não encontre nada correspondente
+              <div className="flex flex-col items-center justify-center text-gray-500">
+                <Search className="w-12 h-12 mb-4 text-gray-300" />
+                <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
+                <p>Não encontramos nenhum resultado correpondente para busca ou filtro.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+
+
     </main>
   );
 }

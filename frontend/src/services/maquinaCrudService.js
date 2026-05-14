@@ -1,21 +1,22 @@
-import { maquinasMockService } from "@/mocks/maquinasMock";
+// import { maquinasMockService } from "@/mocks/maquinasMock";
+import { apiFetch } from "@/lib/api";
 
 // trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const API_URL = "/api/maquinas";
 
-const apiService = {
+// const apiService = {
+
+  export const maquinaCrudService = {
   getAll: async () => {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Erro ao buscar máquinas");
-    return await response.json();
+    const options = { method: "GET" };
+    return await apiFetch(`${API_URL}/`);
   },
 
   getById: async (id) => {
-    const response = await fetch(`${API_URL}/${id}`);
-    if (!response.ok) throw new Error("Erro ao buscar detalhes da máquina");
-    return await response.json();
+    const options = { method: "GET" };
+    return await apiFetch(`${API_URL}/${id}`,options);
   },
 
   create: async (dados) => {
@@ -26,9 +27,10 @@ const apiService = {
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
-    const response = await fetch(API_URL, options);
-    if (!response.ok) throw new Error("Erro ao cadastrar máquina");
-    return await response.json();
+    // if (dados instanceof FormData && dados.has("status")) {
+    //   dados.set("status_atual", dados.get("status"));
+    // }
+    return await apiFetch(`${API_URL}/criarMaquina`, options);
   },
 
   update: async (id, dados) => {
@@ -39,22 +41,17 @@ const apiService = {
       options.headers = { "Content-Type": "application/json" };
       options.body = JSON.stringify(dados);
     }
-    const response = await fetch(`${API_URL}/${id}`, options);
-    if (!response.ok) throw new Error("Erro ao atualizar máquina");
-    return await response.json();
+    return await apiFetch(`${API_URL}/${id}`, options);
   },
 
   delete: async (id) => {
-    const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    if (!response.ok) throw new Error("Erro ao excluir máquina");
-    return true;
+    return await apiFetch(`${API_URL}/${id}`, { method: "DELETE" });
   },
 };
 
 
 //remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
-export const maquinaCrudService = USE_MOCK ? maquinasMockService : apiService;
+// export const maquinaCrudService = USE_MOCK ? maquinasMockService : apiService;
 
 //após a conexão com o backend, remover o arquivo maquinasMock.js e o USE_MOCK do service
 //além disso, coloque o que está dentro da const apiService dentro de:
-//export const maquinaCrudService ={o que ta dentro de apiService aqui dentro}

@@ -152,9 +152,9 @@ export const mockProducaoDefeitos = [
 ];
 
 export const mockMaquinasPorTurno = [
-  { turno: "Manhã", ativas: 80, paradas: 12, manutencao: 8  },
-  { turno: "Tarde", ativas: 72, paradas: 18, manutencao: 10 },
-  { turno: "Noite", ativas: 65, paradas: 20, manutencao: 15 },
+  { turno: "Manhã", ativas: 80, paradas: 12, setup: 8  },
+  { turno: "Tarde", ativas: 72, paradas: 18, setup: 10 },
+  { turno: "Noite", ativas: 65, paradas: 20, setup: 15 },
 ];
 
 // ProducaoTotal — três datasets para os filtros de período
@@ -216,8 +216,8 @@ export const mockTopOperadores = [
 ];
 
 export const mockTempoSessaoPerfil = [
-  { perfil: "Gestores",   horas: 1.42, label: "01:25 h" },
-  { perfil: "Operadores", horas: 0.50, label: "00:30 h" },
+  { perfil: "Gestores",   minutos: 1.42, label: "01:25 h" },
+  { perfil: "Operadores", minutos: 0.50, label: "00:30 h" },
 ];
 
 export const mockRotatividade = [
@@ -660,8 +660,8 @@ export const mockAndonRanking = mockAndonFactoryRanking;
 
 
 export const mockProducaoPorMaquinaSetor = [
-  { setor: "THAK-002", qtd: 80 },
-  { setor: "THAK-004", qtd: 60 },
-  { setor: "THAK-005", qtd: 40 },
-  { setor: "THAK-008", qtd: 25 },
+  { maquina: "THAK-002", qtd: 80 },
+  { maquina: "THAK-004", qtd: 60 },
+  { maquina: "THAK-005", qtd: 40 },
+  { maquina: "THAK-008", qtd: 25 },
 ];

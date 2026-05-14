@@ -1,17 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { DialogTitle } from "@/components/ui/dialog";
 import { Plus, ChevronDown, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
+import turnoCrudService from '@/services/turnoCrudService';
 
 const DIAS_DA_SEMANA = [
     'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'
 ];
 
-export default function FormCadastroTurnoSetor() {
+export default function FormCadastroTurnoSetor({ onSuccess }) {
+    const { id: id_setor } = useParams();
     //estados que controla a abertura do dropdown e os dias selecionados
     const [isOpen, setIsOpen] = useState(false);
     const [diasSelecionados, setDiasSelecionados] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     //referência para detectar cliques fora do componente e fechar o menu
     const dropdownRef = useRef(null);
@@ -40,6 +44,43 @@ export default function FormCadastroTurnoSetor() {
         setDiasSelecionados((prev) => prev.filter((d) => d !== dia));
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const nome = formData.get('nome');
+        const inicio = formData.get('horario_inicio');
+        const fim = formData.get('horario_fim');
+
+        if (diasSelecionados.length === 0) {
+            toast.error('Selecione pelo menos um dia da semana');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const payload = {
+                nome_turno: nome,
+                hora_inicio: inicio,
+                hora_fim: fim,
+                dias_semana: diasSelecionados,
+                id_setor: id_setor
+            };
+
+            const response = await turnoCrudService.create(payload);
+            if (response?.sucesso) {
+                toast.success('Turno(s) criado(s) com sucesso!');
+                if (onSuccess) onSuccess();
+            } else {
+                toast.error(response.erro || 'Erro ao criar turno');
+            }
+        } catch (error) {
+            console.error('Erro ao criar turno:', error);
+            toast.error('Erro de conexão com o servidor');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <div className="flex items-center">
@@ -50,7 +91,7 @@ export default function FormCadastroTurnoSetor() {
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
 
-            <form className="px-8 pb-8 pt-4 flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5">
                     <label htmlFor="nome" className="text-xl font-medium text-[#545454]">Nome</label>
                     <input type="text" id="nome" name="nome" className="w-full border border-[#e0e0e0] rounded-md px-3 py-2.5 text-xl text-[#333] outline-none transition-colors duration-200 focus:border-[#a0a0a0]" required />
@@ -126,8 +167,12 @@ export default function FormCadastroTurnoSetor() {
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg ">
-                        Criar
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-50"
+                    >
+                        {loading ? 'Criando...' : 'Criar'}
                     </button>
                 </div>
 

@@ -1,33 +1,63 @@
 // src/features/maquinas/ProducaoTotalWidget.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AreaChartBase } from "@/components/ui/charts/components/AreaChart";
 import { producaoTotalConfig } from "./config/maquinaChartConfig";
-import {
-  mockProducaoTotal3Meses,
-  mockProducaoTotal30Dias,
-  mockProducaoTotal7Dias,
-} from "@services/mockData";
+import { apiFetch } from "@/lib/api"
+// import {
+//   mockProducaoTotal3Meses,
+//   mockProducaoTotal30Dias,
+//   mockProducaoTotal7Dias,
+// } from "@services/mockData";
 
-// Em produção, trocar os mocks por chamadas à API com o período como parâmetro:
-// const data = await apiFetch(`/maquinas/producao_total?periodo=${periodo}`)
 
 const PERIODOS = [
-  { label: "Últimos 3 meses", key: "3meses",  mock: mockProducaoTotal3Meses  },
-  { label: "Últimos 30 dias", key: "30dias",  mock: mockProducaoTotal30Dias  },
-  { label: "Últimos 7 dias",  key: "7dias",   mock: mockProducaoTotal7Dias   },
+  { label: "Últimos 3 meses", dias: 90 },
+  { label: "Últimos 30 dias", dias: 30 },
+  { label: "Últimos 7 dias", dias: 7 },
 ];
 
 export function ProducaoTotalWidget() {
-  const [periodoKey, setPeriodoKey] = useState("3meses");
 
-  const periodoAtual = PERIODOS.find((p) => p.key === periodoKey);
-  const data = periodoAtual.mock;
+  const [diasSelecionados, setDiasSelecionados] = useState(90);
+
+  const [data, setData] = useState([]);
+
+  async function carregarDados() {
+    try {
+
+      const response = await apiFetch(
+        `/api/maquinas/dashboard/obter-producao-total-maquinas?dias=${diasSelecionados}`
+      );
+
+      setData(response.dados);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    carregarDados();
+  }, [diasSelecionados]);
+
+  const dadosGrafico = data.map(item => ({
+    ...item,
+    data: new Date(item.data).toLocaleDateString("pt-BR", {
+      day: "numeric",
+      month: "short",
+    }),
+  }));
+
+  // const [periodoKey, setPeriodoKey] = useState("3meses");
+
+  // const periodoAtual = PERIODOS.find((p) => p.key === periodoKey);
+  // const data = periodoAtual.mock;
 
   return (
     <div>
-   
+
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
         <div>
           <p className="text-sm font-semibold text-black">Produção total das máquinas</p>
@@ -35,15 +65,14 @@ export function ProducaoTotalWidget() {
         </div>
 
         <div className="flex gap-2 flex-shrink-0">
-          {PERIODOS.map(({ label, key }) => (
+          {PERIODOS.map(({ label, dias }) => (
             <button
-              key={key}
-              onClick={() => setPeriodoKey(key)}
-              className={`h-8 rounded-lg border px-3 text-xs font-semibold transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] ${
-                periodoKey === key
-                  ? "border-[#00357a] bg-[#00357a] text-[#f8f8f8] shadow-sm dark:border-[#a9b9dc] dark:bg-[#a9b9dc] dark:text-[#0b1020]"
-                  : "border-[#c3c7c8] bg-[#f8f8f8] text-[#23304c] hover:border-[#7d95c6] hover:bg-[#eef2f8] dark:border-[#7d95c6]/45 dark:bg-[#0f172a] dark:text-[#f8f8f8] dark:hover:bg-[#1b2740]"
-              }`}
+              key={dias}
+              onClick={() => setDiasSelecionados(dias)}
+              className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${diasSelecionados === dias
+                  ? "bg-[var(--secondary-foreground)] text-white shadow-sm"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
             >
               {label}
             </button>
@@ -51,7 +80,7 @@ export function ProducaoTotalWidget() {
         </div>
       </div>
       <AreaChartBase
-        data={data}
+        data={dadosGrafico}
         xKey="data"
         yKey="total"
         config={producaoTotalConfig}

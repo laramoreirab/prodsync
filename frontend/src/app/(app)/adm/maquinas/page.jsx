@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, Loader2 } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import React, { useState, useEffect } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import {
@@ -27,6 +27,7 @@ import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DataUltimaParada } from "@/components/ui/dataUltimaParada";
 
 
 
@@ -37,7 +38,7 @@ const maquinasFilter = [
 ];
 
 const colunasMaquinas = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
+  { id: 'id_maquina', key: 'id_maquina', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'nome', key: 'nome', label: 'Nome' },
   { id: 'setor', key: 'id_setor', label: 'Setor' },
   {
@@ -47,18 +48,9 @@ const colunasMaquinas = [
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm border-none dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
-        },
-        "Setup": {
-          variant: "outline",
-          className: "!border-amber-300 !bg-amber-100 !text-amber-900 text-sm border-none dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm border-none dark:!border-red-300/35 dark:!bg-red-500/20 dark:!text-red-100"
-        }
+        "Produzindo": { variant: "produzindo" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -71,28 +63,14 @@ const colunasMaquinas = [
   },
   {
     id: 'ultimaParada', key: 'ultimaParada', label: 'Última parada',
-    icone: (valor) => {
-      const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm font-semibold dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
-        },
-        "Setup": {
-          variant: "outline",
-          className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "!border-red-500/30 !bg-red-100 !text-red-800 font-semibold text-sm dark:!border-red-300/35 dark:!bg-red-300/20 dark:!text-red-100"
-        }
-      };
+    icone: (valor, row) => {
+      const eventos = row.historico_eventos;
 
-      const estilo = config[valor] || { variant: "outline", className: "" };
-      return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
-          {valor}
-        </Badge>
-      )
+      const ultimaParada = (eventos && eventos.length > 0)
+        ? eventos[0].termino
+        : null;
+
+      return <DataUltimaParada ultimaParada={ultimaParada} />;
     }
   },
 ];
@@ -106,6 +84,7 @@ export default function Maquinas() {
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(maquinas);
+    console.log(maquinas)
   }, [maquinas]);
 
   //lógica de ordenação
@@ -114,8 +93,8 @@ export default function Maquinas() {
 
     dadosCopiados.sort((a, b) => {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'id_asc') return a.id_maquina - b.id_maquina;
+      if (criterio === 'id_desc') return b.id_maquina - a.id_maquina;
       if (criterio === 'setor') return a.id_setor.localeCompare(b.id_setor);
       return 0;
     });
@@ -168,7 +147,7 @@ export default function Maquinas() {
     const termo = busca.toLowerCase();
     return (
       maq.nome.toLowerCase().includes(termo) ||
-      maq.id.toString().includes(termo)
+      maq.id_maquina.toString().includes(termo)
     );
   });
 
@@ -187,178 +166,184 @@ export default function Maquinas() {
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
 
-      <section className="graphs_cadastro">
-        {/* Título da tela e do botão que leva ao modal de cadastro de máquina */}
-        <div className="flex flex-wrap justify-between p-8">
-          <div className="title_tela">
-            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-              Máquinas
-            </h1>
+      <div className="px-8 py-3">
+        <section className="graphs_cadastro">
+          {/* Título da tela e do botão que leva ao modal de cadastro de máquina */}
+          <div className="flex flex-wrap justify-between py-4">
+            <div className="title_tela">
+              <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+                Máquinas
+              </h1>
+            </div>
+            {/* Modal de Cadastro */}
+            <div className="modal_cadastro">
+              <Dialog>
+                <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                  <Plus className="mr-2" />
+                  Cadastrar
+                </DialogTrigger>
+
+                <FormCadastroMaquina onCadastroSucesso={refresh} />
+              </Dialog>
+            </div>
           </div>
-          {/* Modal de Cadastro */}
-          <div className="modal_cadastro">
-            <Dialog>
-              <DialogTrigger className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-[#00357a] px-4 py-2 text-base font-semibold text-[#f8f8f8] shadow-sm transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]">
-                <Plus className="size-5" />
-                Cadastrar
-              </DialogTrigger>
+        </section>
 
-              <FormCadastroMaquina onCadastroSucesso={refresh} />
-            </Dialog>
+
+        {/* Gráficos */}
+        {/* SEÇÃO 1: Graphs */}
+        <section className="py-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            {/* Status Operacional */}
+            <div className=" bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
+              <p className="text-sm font-semibold text-black self-start">
+                Status Operacional das Máquinas
+              </p>
+              <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">
+                *Atualizado em tempo real
+              </p>
+
+              <div className="w-full">
+                <MaquinaStatusDonutWidget />
+              </div>
+            </div>
+
+            {/* Quantidade por Setor */}
+            <div className=" bg-white border rounded-xl p-4">
+
+              <MaquinasPorSetorWidget />
+            </div>
+
+            {/* Tempo Médio de Parada */}
+            <div className="border bg-white rounded-xl p-4">
+              <TempoMedioParadaWidget />
+            </div>
+
           </div>
-        </div>
-      </section>
+        </section>
 
+        {/* SEÇÃO 2: Graphs */}
+        <section className="py-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      {/* Gráficos */}
-      {/* SEÇÃO 1: Graphs */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Produção vs Defeitos por setor */}
+            <div className="border bg-white rounded-xl p-4">
+              <ProducaoDefeitosWidget />
+            </div>
 
-          {/* Status Operacional */}
-          <div className=" bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
-            <p className="text-sm font-semibold text-black self-start">
-              Status Operacional das Máquinas
-            </p>
-            <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">
-              *Atualizado em tempo real
-            </p>
+            {/* Status por Turno */}
+            <div className="border bg-white rounded-xl p-4">
+              <MaquinasPorTurnoWidget />
+            </div>
 
-            <div className="w-full">
-              <MaquinaStatusDonutWidget />
+          </div>
+        </section>
+
+        {/* SEÇÃO 3:Graphs*/}
+        <section className="py-3">
+          <div className="border bg-white rounded-xl p-4">
+            <ProducaoTotalWidget />
+          </div>
+        </section>
+
+        {/* LISTAGEM MAQUINAS */}
+        <section id="listagem_maquinas">
+          <div className="flex items-center py-4 gap-5">
+            <h1 className="text-4xl w-[125] font-semibold">Inventário de Máquinas</h1>
+            <hr className="bg-black flex-1 h-1" />
+          </div>
+
+          {/* Busca */}
+          <div className="flex py-2 searchbar">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por nome ou id..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
             </div>
           </div>
 
-          {/* Quantidade por Setor */}
-          <div className=" bg-white border rounded-xl p-4">
-            <MaquinasPorSetorWidget />
-          </div>
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosExibidos.length} máquinas encontradas</p>
 
-          {/* Tempo Médio de Parada */}
-          <div className="border bg-white rounded-xl p-4">
-            <TempoMedioParadaWidget />
-          </div>
+            <div className="flex items-center gap-4">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacao}
+                onSortChange={handleSort}
+              />
 
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: Graphs */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Produção vs Defeitos por setor */}
-          <div className="border bg-white rounded-xl p-4">
-            <ProducaoDefeitosWidget />
-          </div>
-
-          {/* Status por Turno */}
-          <div className="border bg-white rounded-xl p-4">
-            <MaquinasPorTurnoWidget />
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 3:Graphs*/}
-      <section className="p-6">
-        <div className="border bg-white rounded-xl p-4">
-          <ProducaoTotalWidget />
-        </div>
-      </section>
-
-      {/* LISTAGEM MAQUINAS */}
-      <section id="listagem_maquinas">
-        <div className="flex items-center p-8 gap-5">
-          <h1 className="text-4xl w-[125] font-semibold">Inventário de Máquinas</h1>
-          <hr className="bg-black flex-1 h-1" />
-        </div>
-
-        {/* Busca */}
-        <div className="flex px-8 searchbar">
-          <div className="contrast-control flex searchid items-center w-full justify-between rounded-md border border-[#7d95c6] bg-[#f8f8f8] px-2 py-1 shadow-sm focus-within:border-[#00357a] focus-within:ring-2 focus-within:ring-[#7d95c6]/30">
-            <input
-              type="search"
-              className="w-full bg-transparent p-2 text-[#23304c] outline-none placeholder:text-[#636f87]"
-              placeholder="Busque por nome ou id..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-            />
-            <button className="mr-2 cursor-pointer text-[#23304c] outline-none hover:text-[#00357a]" aria-label="Buscar máquinas"><Search className="size-5" /></button>
-          </div>
-        </div>
-
-        <div className="row_ord_fil_cont flex items-center justify-between px-8 mt-3">
-          <p>{dadosExibidos.length} máquinas encontradas</p>
-
-          <div className="flex items-center gap-4">
-            <OrdenarDropdown
-              label="Ordenar por"
-              options={opcoesOrdenacao}
-              onSortChange={handleSort}
-            />
-
-            <FilterDropdown
-              filtersConfig={maquinasFilter}
-              onApply={aplicarFiltros}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
-          {dadosExibidos.length > 0 ? (
-
-            <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-              data={dadosExibidos} columns={colunasMaquinas}
-              acoesDropdown={(maquina) => (
-                <>
-
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`maquinas/${maquina.id}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoMaquina />
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormExclusaoMaquina />
-                    </DialogContent>
-                  </Dialog>
-
-                </>
-              )}
-
-            />
-          ) : (
-            //caso não encontre nada correspondente
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-              <p>Não encontramos nenhuma máquina "{busca}".</p>
+              <FilterDropdown
+                filtersConfig={maquinasFilter}
+                onApply={aplicarFiltros}
+              />
             </div>
-          )}
-        </div>
-      </section>
+          </div>
 
+          <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
+            {dadosExibidos.length > 0 ? (
+
+              <TableListagens
+                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+                data={dadosExibidos} columns={colunasMaquinas}
+                acoesDropdown={(maquina) => (
+                  <>
+
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`maquinas/${maquina.id_maquina}`}>
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormExclusaoMaquina
+                          maquinaId={maquina.id_maquina}
+                          onExcluir={excluirMaquina}
+                        />
+                      </DialogContent>
+                    </Dialog>
+
+                  </>
+                )}
+
+              />
+            ) : (
+              //caso não encontre nada correspondente
+              <div className="flex flex-col items-center justify-center text-gray-500">
+                <Search className="w-12 h-12 mb-4 text-gray-300" />
+                <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
+                <p>Não encontramos nenhuma máquina correspondente ao filtro ou busca.</p>
+              </div>
+            )}
+          </div>
+        </section>
+        
+      </div>
     </main >
   );
 }

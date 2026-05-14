@@ -1,5 +1,5 @@
-// import { apiFetch } from "./api";
-
+// src/services/usuarioService.js
+import { apiFetch } from "@/lib/api";
 import {
   QtdUsuariosPorPerfilArraySchema,
   QtdUsuariosPorSetorArraySchema,
@@ -24,55 +24,55 @@ const USE_MOCK = false;
 export const qtdUsuariosPerfilService = {
   async getQtdPorPerfil() {
     if (USE_MOCK) return QtdUsuariosPorPerfilArraySchema.parse(mockQtdUsuariosPorPerfil);
-    const data = await apiFetch("/usuarios/quantidade_por_perfil");
-    return QtdUsuariosPorPerfilArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/qtdUsuariosPorTipo");
+    return QtdUsuariosPorPerfilArraySchema.parse(data.dados);
   },
 };
 
 export const qtdUsuariosSetorService = {
   async getQtdPorSetor() {
     if (USE_MOCK) return QtdUsuariosPorSetorArraySchema.parse(mockQtdUsuariosPorSetor);
-    const data = await apiFetch("/usuarios/quantidade_por_setor");
-    return QtdUsuariosPorSetorArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/qtdUsuariosPorSetor");
+    return QtdUsuariosPorSetorArraySchema.parse(data.dados);
   },
 };
 
 export const topOperadoresService = {
   async getTopOperadores() {
     if (USE_MOCK) return TopOperadoresArraySchema.parse(mockTopOperadores);
-    const data = await apiFetch("/usuarios/top_operadores");
-    return TopOperadoresArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/top5Operadores");
+    return TopOperadoresArraySchema.parse(data.dados);
   },
 };
 
 export const tempoSessaoService = {
   async getTempoSessao() {
     if (USE_MOCK) return TempoSessaoPerfilArraySchema.parse(mockTempoSessaoPerfil);
-    const data = await apiFetch("/usuarios/tempo_sessao");
-    return TempoSessaoPerfilArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/tempo-medio-sessao-perfil");
+    return TempoSessaoPerfilArraySchema.parse(data.dados);
   },
 };
 
 export const rotatividadeService = {
   async getRotatividade() {
     if (USE_MOCK) return RotatividadeArraySchema.parse(mockRotatividade);
-    const data = await apiFetch("/usuarios/rotatividade");
-    return RotatividadeArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/rotatividadeUsuarios");
+    return RotatividadeArraySchema.parse(data.dados);
   },
 };
 
 export const CumprimentoMetaSetorService = {
   async getCumprimentoMetaSetor() {
     if (USE_MOCK) return CumprimentoMetaSetorArraySchema.parse(mockCumprimentoMetaSetor);
-    const data = await apiFetch("/usuarios/cumprimento_meta_por_setor");
-    return CumprimentoMetaSetorArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/metaProducaoPorSetor");
+    return CumprimentoMetaSetorArraySchema.parse(data.dados);
   },
 };
 
 export const producaoMediaSetorService = {
   async getProducaoMedia() {
     if (USE_MOCK) return ProducaoMediaSetorArraySchema.parse(mockProducaoMediaSetor);
-    const data = await apiFetch("/usuarios/producao_media_por_setor");
-    return ProducaoMediaSetorArraySchema.parse(data);
+    const data = await apiFetch("/api/usuarios/dashboard/producaoMediaPorSetor");
+    return ProducaoMediaSetorArraySchema.parse(data.dados);
   },
 };

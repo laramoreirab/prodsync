@@ -69,7 +69,7 @@ export const SetorProducaoSemanalSchema = z.object({
   qtd: z.number(),
 });
 export const SetorProducaoMaquinaSchema = z.object({
-  setor: z.string(),
+  maquina: z.string(),
   qtd:   z.number(),
 });
 

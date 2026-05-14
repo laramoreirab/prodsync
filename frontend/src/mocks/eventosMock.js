@@ -7,15 +7,16 @@ export let eventosMock = [
     tipo: "Setup",
     status_maquina: "Setup",
     setor_afetado: "Roscas",
-    maquinas: [1, 2, 3],
+    op_afetada: "Tal OP",
+    maquinas: [1],
     inicio: "2026-05-05T14:08:00.000Z",
     fim: null,
     id_motivo_parada: 1,
-    motivo: "Troca de Molde",
-    observacao: "AAAAAAAAAAAAAAAAAAAAAAA",
+    motivo: "Aguardando Justificativa",
+    observacao: "-",
     data: "26/03 (14:08 - Ativo)",
     duracao: "20:08",
-    justificada: true,
+    justificada: false,
   },
   {
     id: 2,
@@ -23,6 +24,7 @@ export let eventosMock = [
     tipo: "Parada",
     status_maquina: "Parada",
     setor_afetado: "Engrenagens",
+    op_afetada: "Outra OP",
     maquinas: [2],
     inicio: "2026-05-06T13:09:00.000Z",
     fim: null,
@@ -31,7 +33,7 @@ export let eventosMock = [
     observacao: "BBBBBBBBBBBBBBBBBBBBBBBB",
     data: "26/03 (13:09 - 13:40)",
     duracao: "13:09",
-    justificada: false,
+    justificada: true,
   },
   {
     id: 3,
@@ -39,6 +41,7 @@ export let eventosMock = [
     tipo: "Setup",
     status_maquina: "Setup",
     setor_afetado: "Roscas",
+    op_afetada: "Tal OP",
     maquinas: [3],
     inicio: "2024-03-26T06:30:00.000Z",
     fim: "2024-03-26T19:06:00.000Z",
@@ -55,9 +58,10 @@ export let eventosMock = [
     tipo: "Parada",
     status_maquina: "Parada",
     setor_afetado: "Engrenagens",
+    op_afetada: "Tal OP",
     maquinas: [4],
     inicio: "2024-03-26T14:10:00.000Z",
-    fim: "2024-03-26T14:45:00.000Z",
+    fim: "2024-03-30T14:45:00.000Z",
     id_motivo_parada: 3,
     motivo: "Falta de Material",
     observacao: "Aguardando reposição",
@@ -71,6 +75,7 @@ export let eventosMock = [
     tipo: "Setup",
     status_maquina: "Setup",
     setor_afetado: "Roscas",
+    op_afetada: "Tal OP",
     maquinas: [5],
     inicio: "2024-03-26T14:10:00.000Z",
     fim: "2024-03-26T14:45:00.000Z",
@@ -160,14 +165,47 @@ export const eventosMockService = {
     if (index === -1) throw new Error("Evento não encontrado");
     if (eventosMock[index].justificada) throw new Error("Evento já possui justificativa");
 
+    // busca a descrição real do motivo
+    const MOTIVOS = {
+      1: "Falta de Energia",
+      2: "Troca de Molde",
+      3: "Falta de Material",
+      4: "Limpeza",
+      5: "Outros",
+    };
+
     eventosMock[index] = {
       ...eventosMock[index],
       id_motivo_parada: dados.id_motivo_parada,
-      motivo: "Justificativa registrada",
+      motivo: MOTIVOS[dados.id_motivo_parada] ?? "Justificativa registrada", // ← descrição real
       observacao: dados.observacao || "",
       justificada: true,
     };
 
     return { ...eventosMock[index] };
+  },
+
+  getEventoPendente: async () => {
+    await delay();
+    const pendente = eventosMock.find(e => !e.justificada);
+    if (!pendente) return null;
+    return {
+      id_evento: pendente.id,
+      status_atual: pendente.status_maquina,
+      maquina: { nome: pendente.maquina },
+      inicio_formatado: pendente.data,
+      duracao: calcularDuracao(pendente.inicio, pendente.fim),
+    };
+  },
+
+  getMotivos: async () => {
+    await delay();
+    return [
+      { id_motivo: 1, descricao: "Falta de Energia" },
+      { id_motivo: 2, descricao: "Troca de Molde" },
+      { id_motivo: 3, descricao: "Falta de Material" },
+      { id_motivo: 4, descricao: "Limpeza" },
+      { id_motivo: 5, descricao: "Outros" },
+    ];
   },
 };

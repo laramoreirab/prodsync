@@ -147,6 +147,10 @@
   }
 }
 
+input{
+  outline: none;
+}
+
 .dark body {
   background: #0b1020;
   color: #f8f8f8;

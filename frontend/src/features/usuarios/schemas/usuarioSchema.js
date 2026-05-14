@@ -21,7 +21,7 @@ export const TopOperadoresSchema = z.object({
 // Tempo médio de sessão por perfil 
 export const TempoSessaoPerfilSchema = z.object({
   perfil: z.string(),  //Gestores e Operadores
-  horas:  z.number(),  //valor numérico para a barra
+  minutos:  z.number(),  //valor numérico para a barra
   label:  z.string(),  //01:25 h — texto exibido
 });
 
