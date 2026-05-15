@@ -46,18 +46,18 @@ const colunasUsuarios = [
   { id: 'nome', key: 'nome', label: 'Nome', className: 'w-1/4' },
   { id: 'id', key: 'id', label: 'ID', className: 'w-40' },
   {
-    id: 'id_setor',
-    key: 'id_setor',
+    id: 'setor',
+    key: 'setor',
     label: 'Setor',
     className: 'w-2/9',
-    icone: (valor) => setorLabel[valor] || valor
+    icone: (valor) => setorLabel[String(valor)] || valor
   },
   { id: 'funcao', key: 'funcao', label: 'Função' },
   {
-    id: 'id_turno',
-    key: 'id_turno',
+    id: 'turno',
+    key: 'turno',
     label: 'Turno',
-    icone: (valor) => turnoLabel[valor] || valor
+    icone: (valor) => turnoLabel[String(valor)] || valor
   },
 ];
 
@@ -80,9 +80,9 @@ export default function Usuarios() {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'turno') return String(a.id_turno).localeCompare(String(b.id_turno));
+      if (criterio === 'turno') return String(a.turno).localeCompare(String(b.turno));
       if (criterio === 'funcao') return a.funcao.localeCompare(b.funcao);
-      if (criterio === 'setor') return String(a.id_setor).localeCompare(String(b.id_setor));
+      if (criterio === 'setor') return String(a.setor).localeCompare(String(b.setor));
       return 0;
     });
 
@@ -94,9 +94,9 @@ export default function Usuarios() {
     let dadosFiltrados = [...usuarios];
 
     // setor
-    if (filtrosSelecionados.id_setor?.length > 0) {
+    if (filtrosSelecionados.setor?.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(user =>
-        filtrosSelecionados.id_setor.includes(setorLabel[user.id_setor])
+        filtrosSelecionados.setor.includes(user.setor)
       );
     }
 
@@ -108,9 +108,9 @@ export default function Usuarios() {
     }
 
     // turno
-    if (filtrosSelecionados.id_turno?.length > 0) {
+    if (filtrosSelecionados.turno?.length > 0) {
       dadosFiltrados = dadosFiltrados.filter(user =>
-        filtrosSelecionados.id_turno.includes(turnoLabel[user.id_turno])
+        filtrosSelecionados.turno.includes(user.turno)
       );
     }
 
