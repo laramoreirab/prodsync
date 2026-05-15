@@ -44,7 +44,7 @@ export default function FormExclusaoUsuario({ usuarioId, onExclusaoSucesso }) {
                     <h2 className='font-bold text-2xl text-center'>
                         Você tem certeza que deseja <br />excluir este usuário?
                     </h2>
-                    <p className='text-center font-medium text-[var(--text-soft)]'>
+                    <p className='text-center font-medium text-[#7c7c81]'>
                         As informações serão excluídas <b>PERMANENTEMENTE</b> <br /> e não poderão ser restauradas após excluí-las!
                     </p>
                 </div>

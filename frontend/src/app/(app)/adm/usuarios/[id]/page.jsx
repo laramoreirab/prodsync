@@ -10,7 +10,7 @@ import { use, useState, useEffect } from "react";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { ChevronDown, EyeIcon, Pencil, Trash2 } from "lucide-react";
+import { EyeIcon, Pencil, Trash2, ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -21,55 +21,33 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 import { apiFetch } from "@/lib/api";
 
-// Layout geral
-import { PageLayout, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
-
-// Componentes de detalhe
-import {
-  DetailPageContainer,
-  DetailBackLink,
-  UserProfileCard,
-  DetailSectionTitle,
-  DetailWidgetGrid,
-  DetailWidgetCard,
-  SectionHighlight,
-  DetailListingSection,
-  DetailActions,
-} from "@/components/DetailComponents";
-
-const colunasApontamento = [
+const colunasUsuario = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
   { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
   {
     id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
-    icone: (valor) => (
-      <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
-        {valor}
-      </Badge>
-    ),
+    icone: (valor) => {
+      return (
+        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+          {valor}
+        </Badge>
+      );
+    }
   },
   {
     id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-    icone: (valor) => (
-      <Badge variant="destructive" className="font-semibold text-sm border-none">
-        {valor}
-      </Badge>
-    ),
+    icone: (valor) => {
+      return (
+        <Badge variant="destructive" className="font-semibold text-sm border-none">
+          {valor}
+        </Badge>
+      );
+    }
   },
   { id: 'observacao', key: 'observacao', label: 'Observação' },
 ];
 
-const dadosOriginais = [
-  { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
-  { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
-  { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-  { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-  { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
-  { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
-  { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', produzido: '20', refugo: '5', observacao: 'Falta de material' },
-  { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
-];
 
 export default function ProducaoOperadorPage({ params }) {
   const { id } = use(params);
@@ -77,6 +55,17 @@ export default function ProducaoOperadorPage({ params }) {
   const [usuario, setUsuario] = useState(null);
   const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
   const [buscaApontamento, setBuscaApontamento] = useState("");
+
+  const dadosOriginais = [
+    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
+    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
+    { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
+    { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
+    { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
+    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
+    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
+    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
+  ];
 
   useEffect(() => {
     setDadosApontamentoState(dadosOriginais);
@@ -93,7 +82,7 @@ export default function ProducaoOperadorPage({ params }) {
       setDadosApontamentoState(apontamentosResp.dados || []);
     }
 
-    carregarUsuario().catch((error) => console.error("Erro ao carregar usuário:", error));
+    carregarUsuario().catch((error) => console.error("Erro ao carregar usuÃ¡rio:", error));
   }, [operadorId]);
 
   const opcoesOrdenacaoApontamento = [
@@ -104,29 +93,38 @@ export default function ProducaoOperadorPage({ params }) {
     { label: 'Produzido Crescente', value: 'produzido_asc' },
     { label: 'Produzido Decrescente', value: 'produzido_desc' },
     { label: 'Refugo Crescente', value: 'refugo_asc' },
-    { label: 'Refugo Decrescente', value: 'refugo_desc' },
+    { label: 'Refugo Decrescente', value: 'refugo_desc' }
   ];
 
+  //lógica de ordenação de Apontamentos
   const handleSortApontamento = (criterio) => {
-    const copia = [...dadosApontamentoState];
-    copia.sort((a, b) => {
+    const dadosCopiados = [...dadosApontamentoState];
+
+    dadosCopiados.sort((a, b) => {
       if (criterio === 'id_asc') return a.id - b.id;
       if (criterio === 'id_desc') return b.id - a.id;
+
       if (criterio === 'opAfetada_asc') return Number(a.op) - Number(b.op);
       if (criterio === 'opAfetada_desc') return Number(b.op) - Number(a.op);
-      if (criterio === 'produzido_asc') return Number(a.produzido) - Number(b.produzido);
-      if (criterio === 'produzido_desc') return Number(b.produzido) - Number(a.produzido);
-      if (criterio === 'refugo_asc') return Number(a.refugo) - Number(b.refugo);
-      if (criterio === 'refugo_desc') return Number(b.refugo) - Number(a.refugo);
+
+      if (criterio === 'produzido_asc') return a.produzido - b.produzido;
+      if (criterio === 'produzido_desc') return b.produzido - a.produzido;
+
+      if (criterio === 'refugo_asc') return a.refugo - b.refugo;
+      if (criterio === 'refugo_desc') return b.refugo - a.refugo;
+
       return 0;
     });
-    setDadosApontamentoState(copia);
+
+    setDadosApontamentoState(dadosCopiados);
   };
 
+
+  //filtros para apontamentos
   const apontamentoFilter = [
     { id: "data", label: "Data", type: "date-range" },
     { id: "produzido", label: "Produzido", type: "number-range" },
-    { id: "refugo", label: "Refugo", type: "number-range" },
+    { id: "refugo", label: "Refugo", type: "number-range" }
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
@@ -174,8 +172,8 @@ export default function ProducaoOperadorPage({ params }) {
   });
 
   return (
-    <PageLayout>
-      <DetailPageContainer>
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+      <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         <Link className="flex items-center" href="/adm/usuarios">
           <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
@@ -285,80 +283,90 @@ export default function ProducaoOperadorPage({ params }) {
           </Link>
         </section>
 
-        {/* Seção de Produção */}
-        <DetailSectionTitle title="Produção" />
 
-        <SectionHighlight>
-          <OEEOperadorWidget operadorId={operadorId} />
-        </SectionHighlight>
+        {/* Gráficos */}
+        <h1 className="font-bold text-3xl mt-8">Produção</h1>
+        <div className="flex flex-col gap-4 ">
+          <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+            <OEEOperadorWidget operadorId={operadorId} />
+          </section>
 
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard>
-            <PecasPorDiaWidget operadorId={operadorId} />
-          </DetailWidgetCard>
-          <DetailWidgetCard>
-            <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
-          </DetailWidgetCard>
-          <DetailWidgetCard centered>
-            <MetaProducaoWidget operadorId={operadorId} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <PecasPorDiaWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center">
+              <MetaProducaoWidget operadorId={operadorId} />
+            </div>
+          </section>
 
-        <DetailWidgetGrid cols={2}>
-          <DetailWidgetCard>
-            <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
-          </DetailWidgetCard>
-          <DetailWidgetCard>
-            <EficienciaMaquinaWidget operadorId={operadorId} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
+            </div>
+            <div className="bg-white border rounded-xl p-4 shadow-sm">
+              <EficienciaMaquinaWidget operadorId={operadorId} />
+            </div>
+          </section>
+        </div>
 
-        {/* Listagem de Apontamentos */}
-        <DetailListingSection
-          id="listagem_apontamentos"
-          title="Apontamentos"
-          search={
-            <SearchBar
-              value={buscaApontamento}
-              onChange={(e) => setBuscaApontamento(e.target.value)}
-              placeholder="Busque por OP ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosApontamentosFiltrados.length}
-              label="apontamentos"
-              actions={
-                <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
-                  <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
-                </>
-              }
-            />
-          }
-        >
-          {dadosApontamentosFiltrados.length > 0 ? (
+        {/* Listagem */}
+        <div className="flex items-center gap-5">
+          <h1 className="text-4xl font-bold">Histórico de Apontamentos Feitos pelo Usuário</h1>
+          {/* Busca */}
+          <div className="flex searchbar">
+            <div className="flex searchid   items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por nome ou id..."
+                value={buscaApontamento}
+                onChange={(e) => setBuscaApontamento(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            </div>
+          </div>
+
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
+
+            <div className="flex items-center gap-4 mb-3">
+              <OrdenarDropdown
+                label="Ordenar por"
+                options={opcoesOrdenacaoApontamento}
+                onSortChange={handleSortApontamento}
+              />
+
+              <FilterDropdown
+                filtersConfig={apontamentoFilter}
+                onApply={aplicarFiltrosApontamento}
+              />
+            </div>
+          </div>
+          <section>
             <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
               data={dadosApontamentosFiltrados}
-              columns={colunasApontamento}
+              columns={colunasUsuario}
               acoesDropdown={(usuario) => (
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver OP relacionada
-                  </Link>
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver OP relacionada
+                    </Link>
+
+                  </DropdownMenuItem>
+                </>
               )}
             />
-          ) : (
-            <EmptyState
-              title="Nenhum apontamento encontrado"
-              message={`Não encontramos resultados para "${buscaApontamento}".`}
-            />
-          )}
-        </DetailListingSection>
+          </section>
+        </div>
 
-      </DetailPageContainer>
-    </PageLayout>
+      </div>
+    </main>
   );
 }

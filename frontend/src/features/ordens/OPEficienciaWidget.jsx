@@ -1,17 +1,17 @@
 "use client";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useOPEficiencia } from "./hooks/useOPEficiencia";
-import { eficienciaConfig } from "../operador/config/operadorConfig";
 
+const eficienciaConfig = {
+  value: { label: "Eficiência", color: "#00357a" },
+};
 
-export function OPEficienciaWidget({ setorId = null }) {
-  const { data, loading, error } = useOPEficiencia(setorId);
+export function OPEficienciaWidget() {
+  const { data, loading, error } = useOPEficiencia();
 
-   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
- if (error)   return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
- if (!data)   return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
- if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
- 
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (error)   return <p className="text-sm text-destructive">Erro ao carregar eficiência.</p>;
+
   return (
     <div className="flex flex-col h-full">
       <p className="text-sm font-semibold text-black">Eficiências Geral das OPs</p>
@@ -19,7 +19,7 @@ export function OPEficienciaWidget({ setorId = null }) {
       <div className="flex-1 flex items-center justify-center">
         <GaugeSemicircular
           title="Eficiência"
-          data={[{ value: data?.eficiencia, fill: "var(--chart-primary)" }]}
+          data={[{ value: data?.eficiencia, fill: "#00357a" }]}
           size="lg"
           config={eficienciaConfig}
         />

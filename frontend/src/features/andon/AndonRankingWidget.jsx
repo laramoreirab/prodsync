@@ -6,7 +6,7 @@ import { useAndonRanking } from "./hooks/useAndonRanking";
 const rankingConfig = {
   produtividade: {
     label: "Produtividade",
-    color: "var(--chart-ranking)",
+    color: "#8aa1d1",
   },
 };
 

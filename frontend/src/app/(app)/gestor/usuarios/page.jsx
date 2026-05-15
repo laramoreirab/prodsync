@@ -15,12 +15,12 @@ import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsua
 import { useUsuarios } from "@/hooks/useUsuarios";
 
 import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
-import { TurnosOperadoresWidget } from "@/features/usuarios/TurnosOperadoresWidget";
+import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSetorWidget";
 import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
 import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
-import { ProducaoMediaUsuarioSetorWidget } from "@/features/usuarios/ProducaoMediaUsuarioSetorWidget";
-import { UsuarioTaxaRefugoWidget } from "@/features/usuarios/UsuarioTaxaRefugoWidget";
+import { CumprimentoMetaSetorWidget } from "@/features/usuarios/CumprimentoMetaSetorWidget";
+import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
 
 const turnoLabel = { "1": "Manha", "2": "Tarde", "3": "Noite" };
 
@@ -36,6 +36,24 @@ const colunasUsuarios = [
   },
 ];
 
+function getSetorIdFromToken() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.id_setor ?? payload?.idSetor ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizarOperador(usuario) {
+  return {
+    ...usuario,
+    maquina: usuario.maquina?.nome || usuario.maquina || "Sem maquina",
+  };
+}
+
 export default function UsuariosGestor() {
   const { usuarios, loading, refresh } = useUsuarios();
   const [setorId, setSetorId] = useState(null);
@@ -43,22 +61,17 @@ export default function UsuariosGestor() {
   const [busca, setBusca] = useState("");
 
   useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
-    } catch {
-      setSetorId(null);
-    }
+    setSetorId(getSetorIdFromToken());
   }, []);
 
   const operadoresDoSetor = useMemo(() => {
-    return (usuarios || []).filter((usuario) => {
-      const mesmoSetor = !setorId || String(usuario.id_setor) === String(setorId);
-      return mesmoSetor && usuario.funcao === "Operador";
-    });
+    return (usuarios || [])
+      .filter((usuario) => {
+        const mesmoSetor = !setorId || String(usuario.id_setor) === String(setorId);
+        const funcao = usuario.funcao || usuario.tipo;
+        return mesmoSetor && funcao === "Operador";
+      })
+      .map(normalizarOperador);
   }, [usuarios, setorId]);
 
   useEffect(() => {
@@ -119,35 +132,43 @@ export default function UsuariosGestor() {
           </Dialog>
         </div>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
-            <QtdUsuariosWidget />
-          </div>
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
-            <TurnosOperadoresWidget setorId={setorId} />
-          </div>
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm min-h-[300px]">
-            <TopOperadoresWidget setorId={setorId} />
-          </div>
-        </section>
+        <div className="flex flex-col gap-4">
+          <section className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="border rounded-xl p-4">
+                <QtdUsuariosWidget />
+              </div>
+              <div className="border rounded-xl p-4">
+                <QtdUsuariosPorSetorWidget />
+              </div>
+              <div className="border rounded-xl p-4">
+                <TopOperadoresWidget />
+              </div>
+            </div>
+          </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <TempoSessaoWidget setorId={setorId} />
-          </div>
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <RotatividadeWidget setorId={setorId} />
-          </div>
-        </section>
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border rounded-xl p-6">
+                <TempoSessaoWidget />
+              </div>
+              <div className="border rounded-xl p-4">
+                <RotatividadeWidget />
+              </div>
+            </div>
+          </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <ProducaoMediaUsuarioSetorWidget setorId={setorId} />
-          </div>
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <UsuarioTaxaRefugoWidget setorId={setorId} />
-          </div>
-        </section>
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border rounded-xl p-4">
+                <CumprimentoMetaSetorWidget />
+              </div>
+              <div className="border rounded-xl p-4">
+                <ProducaoMediaSetorWidget />
+              </div>
+            </div>
+          </section>
+        </div>
 
         <section>
           <div className="flex items-center py-6 gap-5">

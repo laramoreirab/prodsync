@@ -70,7 +70,7 @@ export function AndonMachineCard({ machine }) {
               className="relative h-5 overflow-hidden rounded-sm bg-slate-200"
               role="progressbar">
               <div
-                className="absolute inset-y-0 left-0 bg-[var(--chart-progress)] transition-[width]"
+                className="absolute inset-y-0 left-0 bg-[#6f87ba] transition-[width]"
                 style={{ width: `${oeePercentage}%` }}
               />
             </div>

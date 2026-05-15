@@ -246,7 +246,11 @@ export default function OrdensDeProducaoGestor() {
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <FormExclusaoOp opId={op.id} onExclusaoSucesso={() => excluirOp(op.id)} />
+                    <FormExclusaoOp
+                      opId={op.id}
+                      idMaquina={op.id_maquina}
+                      onExclusaoSucesso={() => excluirOp(op.id, op.id_maquina)}
+                    />
                   </DialogContent>
                 </Dialog>
               </>

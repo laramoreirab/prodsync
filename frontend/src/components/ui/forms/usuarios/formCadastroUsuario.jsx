@@ -162,7 +162,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                     </DialogTitle>
                 </div>
             </div>
-            <Separator className="m-2 bg-[var(--border-soft)]" />
+            <Separator className="m-2 bg-[#a6a6a6]" />
 
             <form onSubmit={handleSubmitIndividual} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className="flex justify-end">
@@ -179,7 +179,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                     <DialogTitle className="text-3xl text-white">Criar Usuários em Lote</DialogTitle>
                                 </div>
                             </div>
-                            <Separator className="m-2 bg-[var(--border-soft)]" />
+                            <Separator className="m-2 bg-[#a6a6a6]" />
 
                             <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
                                 <input
@@ -202,7 +202,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center w-full">
-                                            <div className="flex items-center bg-[var(--info-bg)] text-[var(--info-text)] px-3 py-2 rounded-md w-full">
+                                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
                                                 <File className="w-4 h-4 mr-2 shrink-0" />
                                                 <span className="text-sm truncate">{arquivoLote.nome}</span>
                                             </div>
@@ -216,7 +216,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                 </div>
 
                                 <div className="flex justify-center mt-4">
-                                    <button type="button" onClick={handleSubmitLote} className="bg-[var(--button-primary)] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                                    <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
                                         Criar em Lote
                                     </button>
                                 </div>
@@ -251,7 +251,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                 alt="Preview"
                                 className="w-32 h-32 object-cover rounded-lg mb-2 border"
                             />
-                            <div className="flex items-center bg-[var(--info-bg)] text-[var(--info-text)] px-3 py-2 rounded-md w-full">
+                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
                                 <File className="w-4 h-4 mr-2 shrink-0" />
                                 <span className="text-sm truncate">{fotoPerfil.nome}</span>
                             </div>

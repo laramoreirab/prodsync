@@ -8,19 +8,11 @@ import {
   SetorMaquinaStatusSchema,
   SetorOEEMedioSchema,
   SetorOEEEvolucaoArraySchema,
-  SetorOEEPanelSchema,
   SetorTopOperadoresArraySchema,
   SetorMotivosParadaArraySchema,
   SetorProducaoSemanalArraySchema,
   SetorProducaoMaquinaArraySchema,
-  SetorProducaoDiariaArraySchema,
 } from "@features/setores/schemas/setorSchema";
-import {
-  ProducaoPorHoraArraySchema,
-} from "@features/producao/schemas/producaoSchema";
-
-
-const USE_MOCK = false;
 
 export const setorService = {
   async getSetores() {
@@ -53,7 +45,7 @@ export const oeeSetorService = {
 export const refugoSetorService = {
   async getRefugoPorSetor() {
     const listaDados = await apiFetch("/api/setores/obterProducaoDefeitosPorSetor");
-    const dadosOriginais = listaDados.dados;
+    const dadosOriginais = listaDados.dados || [];
     const data = dadosOriginais.map((item) => ({
       setor: item.setor,
       refugo: item.defeito,
@@ -113,17 +105,6 @@ export const setorProducaoSemanalService = {
   async getProducaoSemanal(setorId) {
     const data = await apiFetch(`/api/maquinas/dashboard/pecasProduzidas7dias/${setorId}`);
     return SetorProducaoSemanalArraySchema.parse(data.dados);
-  },
-};
-
-export const setorProducaoDiariaService = {
-  async getProducaoDiaria(setorId) {
-    const data = await apiFetch(`/api/maquinas/dashboard/pecasProduzidas7dias/${setorId}`);
-    const dados = (data.dados || []).map((item) => ({
-      hora: item.dia,
-      pcs: item.qtd,
-    }));
-    return SetorProducaoDiariaArraySchema.parse(dados);
   },
 };
 

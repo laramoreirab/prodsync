@@ -52,13 +52,6 @@ export const SetorOEEEvolucaoSchema = z.object({
   oee: z.number().min(0).max(100),
 });
 export const SetorOEEEvolucaoArraySchema = z.array(SetorOEEEvolucaoSchema);
-
-export const SetorOEEPanelSchema = z.object({
-  disponibilidade: z.number().min(0).max(100),
-  performance: z.number().min(0).max(100),
-  qualidade: z.number().min(0).max(100),
-  oee: z.number().min(0).max(100),
-});
  
 export const SetorTopOperadoresSchema = z.object({
   operador: z.string(),
