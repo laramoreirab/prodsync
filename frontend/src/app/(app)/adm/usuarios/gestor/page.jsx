@@ -8,83 +8,61 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
 
+import { OEEOperadorWidget } from "@/features/operador/OEEOperadorWidget";
+import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
+import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
+import { SetorMaquinaStatusWidget } from "@/features/setores/SetorMaquinaStatusWidget";
+import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
+import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
+import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaquinaWidget";
+import { useEffect, useState } from "react";
+
+// Layout geral
+import { PageLayout } from "@/components/AnimatedComponents";
+
+// Componentes de detalhe
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  UserProfileCard,
+  DetailSectionTitle,
+  DetailActions,
+  SectionHighlight,
+  DetailWidgetGrid, DetailWidgetCard
+} from "@/components/DetailComponents";
+
 
 export default function ProducaoGestorPage({ params }) {
   const { id } = use(params);
   const gestorId = Number(id);
+  const [setorId, setSetorId] = useState(null); //usei para ver 
 
   return (
-    <main
-      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundImage: "url('/bg_app.svg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <PageLayout>
+      <DetailPageContainer>
 
+        {/* Voltar */}
+        <DetailBackLink href="/adm/usuarios" label="Voltar para Usuários" />
 
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
-
-        <Link className="flex items-center" href="/adm/usuarios">
-          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Usuários </p>
-        </Link>
-
-        <section id="infos_op" className="flex flex-col">
-          <div className="flex justify-between items-start">
-            <div className="flex">
-              <Image
-                src="/estevao.svg"
-                alt="Foto do usuário"
-                className="rounded-xl"
-                width={250}
-                height={250}
-              />
-
-              <div className="flex flex-col ml-5">
-                <h1 className="text-3xl font-bold text-black">Nome: Estevão Ferreira</h1>
-                <div className="flex gap-10">
-
-                  <div className="flex flex-col gap-5 mt-2">
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                      <p className="text-xl font-medium text-black">00000</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Email:</p>
-                      <p className="text-xl font-medium text-black">estevaozinho@gmail.com</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">CPF:</p>
-                      <p className="text-xl font-medium text-black">443.651.730-65</p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-5 mt-2">
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Setor:</p>
-                      <p className="text-xl font-medium text-black">Engrenagens</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Função:</p>
-                      <p className="text-xl font-medium text-black">Gestor</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Turno:</p>
-                      <p className="text-xl font-medium text-black">Noite</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
+        {/* Card de perfil do gestor */}
+        <UserProfileCard
+          imageSrc="/estevao.svg"
+          name="Estevão Ferreira"
+          fieldsLeft={[
+            { label: "ID", value: "00000" },
+            { label: "Email", value: "estevaozinho@gmail.com" },
+            { label: "CPF", value: "443.651.730-65" },
+          ]}
+          fieldsRight={[
+            { label: "Setor", value: "Engrenagens" },
+            { label: "Função", value: "Gestor" },
+            { label: "Turno", value: "Noite" },
+          ]}
+          actions={
+            <DetailActions>
               <Dialog>
                 <DialogTrigger className="text-[#122f60] cursor-pointer">
-                  <Pencil size={36} className="mr-1" />
+                  <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
                   <FormEdicaoUsuario />
@@ -93,20 +71,51 @@ export default function ProducaoGestorPage({ params }) {
 
               <Dialog>
                 <DialogTrigger className="text-[#b30000] cursor-pointer">
-                  <Trash2 className=" w-9 h-9" />
+                  <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
                   <FormExclusaoUsuario />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
+            </DetailActions>
+          }
+        />
 
-        </section>
+        {/* Seção de dados do setor gerenciado */}
+        <DetailSectionTitle title="Dados do Setor que Gerencia" />
 
-        {/* Gráficos */}
-        <h1 className="font-bold text-3xl mt-8">Dados do Setor que Gerencia</h1>
-        </div>
-        </main>
-    );      
+        <SectionHighlight>
+          <OEEOperadorWidget operadorId={gestorId} />
+        </SectionHighlight>
+
+        <DetailWidgetGrid cols={2}>
+          <DetailWidgetCard>
+            <SetorProducaoSemanalWidget setorId={setorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <SetorTopOperadoresWidget setorId={setorId} />
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
+
+        <DetailWidgetGrid cols={2}>
+          <DetailWidgetCard>
+            <SetorMaquinaStatusWidget setorId={setorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <SetorProducaoMaquinaWidget setorId={setorId} />
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
+
+        <DetailWidgetGrid cols={2}>
+          <DetailWidgetCard>
+            <SetorMotivosParadaWidget setorId={setorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <SetorOEEEvolucaoWidget setorId={setorId} />
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
+
+      </DetailPageContainer>
+    </PageLayout>
+  );
 }      
