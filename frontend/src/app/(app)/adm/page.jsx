@@ -292,7 +292,7 @@ export default function MaquinaDetalhePage({ params }) {
     return String(a.op || "").toLowerCase().includes(t) || a.id?.toString().includes(t);
   });
 
-  if (loadingMaquina) {
+  if (loading) {
     return (
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
         <div className="flex flex-col items-center">

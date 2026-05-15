@@ -98,7 +98,7 @@ export function PageLayout({ children, className, padded = true, bg }) {
         "bg-cover bg-fixed bg-center bg-no-repeat",
         className
       )}
-      style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
+      style={{ backgroundImage: bg ?? "url('/bg_app.svg') dark:bg-[#0b1020] dark:bg-none" }}
     >
       <div className={cn("flex flex-col flex-1", padded && "px-4 sm:px-6 lg:px-8 pb-12")}>
         {children}

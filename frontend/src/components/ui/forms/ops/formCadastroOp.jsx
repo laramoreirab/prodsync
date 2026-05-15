@@ -80,10 +80,10 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
 
                 {/* 1. infos gerais */}
                 <div className="flex flex-col gap-3">
-                    <h3 className="text-2xl font-semibold text-black">1. Informações Gerais da OP</h3>
+                    <h3 className="text-2xl font-semibold text-black dark:text-white">1. Informações Gerais da OP</h3>
                     <div className="flex gap-4">
                         <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Código do Lote</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Código do Lote</label>
                             <input
                                 type="text"
                                 value={codigoLote}
@@ -92,7 +92,7 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                             />
                         </div>
                         <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Prioridade</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Prioridade</label>
                             <div className="relative">
                                 <select
                                     value={prioridade}
@@ -112,10 +112,10 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
 
                 {/* 2. roteiro de prod — id_setor e id_maquina */}
                 <div className="flex flex-col gap-3">
-                    <h3 className="text-2xl font-semibold text-black">2. Roteiro de Produção</h3>
+                    <h3 className="text-2xl font-semibold text-black dark:text-white">2. Roteiro de Produção</h3>
                     <div className="flex gap-4">
                         <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Setor</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Setor</label>
                             <div className="relative">
                                 <select
                                     value={idSetor}
@@ -132,7 +132,7 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Máquina</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Máquina</label>
                             <div className="relative">
                                 <select
                                     value={idMaquina}
@@ -153,10 +153,10 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
 
                 {/* 3. metas e cronograma */}
                 <div className="flex flex-col gap-3">
-                    <h3 className="text-2xl font-semibold text-black">3. Metas e Cronograma</h3>
+                    <h3 className="text-2xl font-semibold text-black dark:text-white">3. Metas e Cronograma</h3>
                     <div className="flex gap-4 mb-2">
                         <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Quantidade Planejada</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Quantidade Planejada</label>
                             <input
                                 type="number"
                                 value={qtdPlanejada}
@@ -165,7 +165,7 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                             />
                         </div>
                         <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Peça a ser produzida</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Peça a ser produzida</label>
                             <input
                                 type="text"
                                 value={produto}
@@ -178,7 +178,7 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                     <div className="flex flex-col gap-4">
                         {/* data_inicio */}
                         <div className="flex flex-col w-full">
-                            <label className="block text-lg text-gray-700 font-medium mb-1 mt-2">Data Inicial</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 mt-2 dark:text-slate-300">Data Inicial</label>
                             <div className="flex gap-4">
                                 <div className="relative w-[48%]">
                                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700 w-4 h-4" />
@@ -203,7 +203,7 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
 
                         {/* data_fim */}
                         <div className="flex flex-col w-full">
-                            <label className="block text-lg text-gray-700 font-medium mb-1">Data Final</label>
+                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Data Final</label>
                             <div className="flex gap-4">
                                 <div className="relative w-[48%]">
                                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700 w-4 h-4" />
@@ -230,9 +230,9 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
 
                 {/* 4. instruções — observacao_op */}
                 <div className="flex flex-col gap-3">
-                    <h3 className="text-2xl font-semibold text-black">4. Instruções</h3>
+                    <h3 className="text-2xl font-semibold text-black dark:text-white">4. Instruções</h3>
                     <div className="flex flex-col">
-                        <label className="block text-lg text-gray-700 font-medium mb-1">Observação (Opcional):</label>
+                        <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Observação (Opcional):</label>
                         <textarea
                             rows={3}
                             value={observacaoOp}
