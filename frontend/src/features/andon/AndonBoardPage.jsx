@@ -50,7 +50,7 @@ export function AndonBoardPage({ scope = "factory" }) {
       ) : null}
 
       {error ? (
-        <section className="rounded-lg border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700">
+        <section className="rounded-lg border border-slate-200 bg-white/80 p-6 text-sm text-destructive">
           Erro ao carregar os setores do Andon.
         </section>
       ) : null}
