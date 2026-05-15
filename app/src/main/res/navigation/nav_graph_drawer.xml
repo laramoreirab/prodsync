@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_drawer"
+    app:startDestination="@id/maquinasFragment">
+<!-- "startDestination" primeiro que vai aparecer será o homeFragment-->
+
+
+    <fragment
+        android:id="@+id/maquinasFragment"
+        android:name="com.senai.prodsync.MaquinasFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/PerfilFragment"
+        android:name="com.senai.prodsync.UsuariosFragment"
+        android:label="Perfil" />
+
+    <fragment
+    android:id="@+id/ConfigFragment"
+    android:name="com.senai.prodsync.OpsFragment"
+    android:label="Configurações" />
+
+</navigation>
