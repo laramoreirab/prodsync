@@ -29,11 +29,16 @@ import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 
 import {
-  PageLayout, PageHeader, SectionDivider,
-  StaggerWrapper, FadeUpItem, AnimatedTitle,
-  KPIGrid, ContentGrid, WidgetCard,
-  SearchBar, FilterRow, EmptyState, LoadingState,
-  PageSection,
+  PageLayout,
+  PageHeader,
+  KPIGrid,
+  ContentGrid,
+  WidgetCard,
+  SectionDivider,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  LoadingState,
 } from "@/components/AnimatedComponents";
 
 
@@ -271,7 +276,6 @@ export default function OrdensDeProducao() {
 
   return (
     <PageLayout>
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
 
         <PageHeader title="Ordens de Produção" action={
 
@@ -343,98 +347,75 @@ export default function OrdensDeProducao() {
           </WidgetCard>
         </ContentGrid>
 
-        
-     {/* Listagem */}
-        <section id="listagem_ops">
-          <div className="flex items-center py-8 gap-5">
-            <h1 className="text-4xl w-125 font-semibold">OPs</h1>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
 
-          {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id, nome ou lote..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center py-3 justify-between mt-3">
-            <p>{dadosExibidos.length} OPs encontradas</p>
-
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacao}
-                onSortChange={handleSort}
-              />
-              <FilterDropdown
-                filtersConfig={opsFilter}
-                onApply={aplicarFiltros}
-              />
-            </div>
-          </div>
-
-          {/* Tabela */}
-          <TableListagens
-            data={dadosExibidos}
-            columns={colunasOrdemProd}
-            enableSelection={true}
-            acoesDropdown={(op) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`ordensDeProducao/${op.id}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver Detalhes
-                  </Link>
-                </DropdownMenuItem>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="cursor-pointer"
-                    >
-                      <Pencil className="mr-2 h-4 w-4 text-primary" />
-                      Editar OP
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="cursor-pointer"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormExclusaoOp
-                      opId={op.id}
-                      idMaquina={op.id_maquina}
-                      onExclusaoSucesso={refresh}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-          />
-        </section>
-      </div>
+       {/* Listagem */}
+      <SectionDivider title="OPs" className="mt-8" />
+ 
+      <SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por id ou nome..."
+      />
+ 
+      <FilterRow
+        count={dadosExibidos.length}
+        label="OPs"
+        actions={
+          <>
+            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+            <FilterDropdown filtersConfig={opsFilter} onApply={aplicarFiltros} />
+          </>
+        }
+      />
+ 
+      {dadosExibidos.length > 0 ? (
+        <TableListagens
+          data={dadosExibidos}
+          columns={colunasOrdemProd}
+          enableSelection={true}
+          acoesDropdown={(op) => (
+            <>
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href={`ordensDeProducao/${op.id}`}>
+                  <EyeIcon className="mr-2 h-4 w-4" />
+                  Ver Detalhes
+                </Link>
+              </DropdownMenuItem>
+ 
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <Pencil className="mr-2 h-4 w-4 text-primary" />
+                    Editar OP
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
+                </DialogContent>
+              </Dialog>
+ 
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent>
+                  <FormExclusaoOp opId={op.id} idMaquina={op.id_maquina} onExclusaoSucesso={refresh} />
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+        />
+      ) : (
+        <EmptyState
+          title="Nenhum resultado encontrado"
+          message="Ajuste seus filtros ou termo de busca."
+        />
+      )}
+ 
     </PageLayout>
   );
-} 
+}
+

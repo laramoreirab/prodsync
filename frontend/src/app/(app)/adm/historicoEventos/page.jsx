@@ -54,7 +54,6 @@ import {
   ContentGrid,
 } from "@/components/AnimatedComponents";
 
-// ─── Colunas ───────────────────────────────────────────────────────────────
 
 const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-25 text-center justify-center' },
@@ -86,7 +85,6 @@ const colunasEventos = [
   { id: 'observacao', key: 'observacao', label: 'Observação' },
 ];
 
-// ─── Configurações estáticas ───────────────────────────────────────────────
 
 const historicoEventosFilter = [
   { id: "tipo", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
@@ -102,7 +100,6 @@ const opcoesOrdenacao = [
   { label: 'Duração Decrescente', value: 'duracao_desc' },
 ];
 
-// ─── Página ────────────────────────────────────────────────────────────────
 
 export default function HistoricoEventos() {
   const { eventos, loading, error, refresh } = useEventos();

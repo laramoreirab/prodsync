@@ -55,6 +55,19 @@ import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoE
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormCadastroEventoGestor from "@/components/ui/forms/historicoEventos/formCadastroEventoGestor";
 
+import {
+  PageLayout,
+  PageHeader,
+  SectionDivider,
+  FadeUpItem,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  LoadingState,
+  WidgetCard,
+  ContentGrid,
+} from "@/components/AnimatedComponents";
+
 
 const colunasEventos = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-25 text-center justify-center' },
@@ -284,7 +297,7 @@ export default function HistoricoEventosGestor() {
 
 
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosEventos]; 
+    let dadosFiltrados = [...dadosEventos];
 
     //filtro por tipo
     if (filtrosSelecionados.tipo && filtrosSelecionados.tipo.length > 0) {
@@ -393,114 +406,94 @@ export default function HistoricoEventosGestor() {
   );
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="px-8">
+    <PageLayout>
+      <PageHeader
+        title="Histórico de Eventos"
+        action={
+          <Dialog>
+            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <Plus className="mr-2" />
+              Registrar Evento
+            </DialogTrigger>
 
-        <div className="py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-              Histórico de Eventos
-            </h1>
-            <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                <Plus className="mr-2" />
-                Registrar Evento  
-              </DialogTrigger>
+            <DialogContent>
+              <FormCadastroEventoGestor />
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
-              <DialogContent>
-                <FormCadastroEventoGestor />
-              </DialogContent>
-            </Dialog>
-          </div>
+      {/* Gráficos  */}
+      <ContentGrid cols={3} className="mt-2">
+        <WidgetCard colSpan="md:col-span-1">
+          <ParadasComparadasWidget />
+        </WidgetCard>
+        <WidgetCard colSpan="md:col-span-2">
+          <TopMotivosTempoWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-          {/* Gráficos  */}
-          <section className="py-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white border rounded-xl p-4 md:col-span-1">
-                <ParadasComparadasWidget />
-              </div>
-              <div className="bg-white border rounded-xl p-4 md:col-span-2">
-                <TopMotivosTempoWidget />
-              </div>
-            </div>
-          </section>
+
+      {/* Listagem de eventos */}
+      {/* Listagem */}
+      <SectionDivider title="Listagem de Eventos" className="mt-4" />
+
+
+      <Tabs defaultValue="todos" className="w-full">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="view-selector" className="sr-only">
+            Visualizar
+          </Label>
+        </div>
+        <Select defaultValue="todos">
+          <SelectTrigger className="flex w-fit sm:hidden" size="sm" id="view-selector">
+            <SelectValue placeholder="Selecione o filtro" />
+          </SelectTrigger>
+
+
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="justificadas">Justificadas</SelectItem>
+              <SelectItem value="nao-justificadas">Não Justificadas</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+
+        {/* Telas maiores */}
+        <div className="flex">
+          <TabsList className="hidden sm:flex">
+            <TabsTrigger value="todos" className="cursor-pointer">Todos</TabsTrigger>
+            <TabsTrigger value="justificadas" className="cursor-pointer">Justificadas</TabsTrigger>
+            <TabsTrigger value="nao-justificadas" className="cursor-pointer">Não Justificadas</TabsTrigger>
+          </TabsList>
         </div>
 
-        {/* Listagem de eventos */}
-        <section id="listagem_eventos">
-          <div className="flex items-center gap-5 mb-4">
-            <h1 className="text-4xl font-semibold">Listagem de Eventos</h1>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
+        {/* Busca */}
+        <SearchBar
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Busque por id do evento ou máquina..."
+          className="mt-3"
+        />
 
+        {/* Linha de Quantidade e Ordenar e Filtrar */}
+        <FilterRow
+          count={dadosExibidos.length}
+          label="eventos"
+          actions={
+            <>
+              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+              <FilterDropdown filtersConfig={historicoEventosFilter} onApply={aplicarFiltros} />
+            </>
+          }
+        />
 
-          <Tabs defaultValue="todos" className="w-full">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="view-selector" className="sr-only">
-                Visualizar
-              </Label>
-            </div>
-            <Select defaultValue="todos">
-              <SelectTrigger className="flex w-fit sm:hidden" size="sm" id="view-selector">
-                <SelectValue placeholder="Selecione o filtro" />
-              </SelectTrigger>
-
-
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="justificadas">Justificadas</SelectItem>
-                  <SelectItem value="nao-justificadas">Não Justificadas</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
-
-            {/* Telas maiores */}
-            <div className="flex">
-              <TabsList className="hidden sm:flex">
-                <TabsTrigger value="todos" className="cursor-pointer">Todos</TabsTrigger>
-                <TabsTrigger value="justificadas" className="cursor-pointer">Justificadas</TabsTrigger>
-                <TabsTrigger value="nao-justificadas" className="cursor-pointer">Não Justificadas</TabsTrigger>
-              </TabsList>
-            </div>
-
-            {/* Busca */}
-            <div className="flex searchbar">
-              <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-                <input
-                  type="search"
-                  className="p-2 w-full outline-none bg-transparent"
-                  placeholder="Busque por id do evento ou máquina..."
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                />
-                <button className="outline-none cursor-pointer mr-2">
-                  <Search />
-                </button>
-              </div>
-            </div>
-
-            {/* Linha de Quantidade e Ordenar e Filtrar */}
-            <div className="row_ord_fil_cont flex items-center justify-between mt-2">
-              <p>{dadosExibidos.length} eventos encontrados</p>
-
-              <div className="flex items-center gap-4">
-                <OrdenarDropdown
-                  label="Ordenar por"
-                  options={opcoesOrdenacao}
-                  onSortChange={handleSort}
-                />
-                <FilterDropdown
-                  filtersConfig={historicoEventosFilter}
-                  onApply={aplicarFiltros}
-                />
-              </div>
-            </div>
-
-            {/* Tab todos */}
-            <TabsContent value="todos" className="text-md">
-
+        {/* Tab todos */}
+        <TabsContent value="todos" className="text-md">
+          <FadeUpItem>
+            {dadosExibidos.length > 0 ? (
               <TableListagens
                 data={dadosExibidos}
                 columns={colunasEventos}
@@ -509,12 +502,18 @@ export default function HistoricoEventosGestor() {
                 onSelectedChange={setSelecionados}
                 solicitarJustificativa={modalJustificativa}
               />
+            ) : (
+              <EmptyState title="Nenhum evento encontrado" message={`Sem resultados para "${busca}".`} />
+            )}
+          </FadeUpItem>
 
-            </TabsContent>
+        </TabsContent>
 
 
-            {/* Tab paradas justificadas */}
-            <TabsContent value="justificadas" className="text-md">
+        {/* Tab paradas justificadas */}
+        <TabsContent value="justificadas" className="text-md">
+          <FadeUpItem>
+            {paradasJustificadas.length > 0 ? (
 
               <TableListagens
                 data={paradasJustificadas}
@@ -524,11 +523,17 @@ export default function HistoricoEventosGestor() {
                 onSelectedChange={setSelecionados}
                 solicitarJustificativa={modalJustificativa}
               />
-            </TabsContent>
+            ) : (
+              <EmptyState title="Nenhuma parada justificada encontrada" />
+            )}
+          </FadeUpItem>
+        </TabsContent>
 
 
-            {/* Tab paradas não justificadas */}
-            <TabsContent value="nao-justificadas" className="text-md">
+        {/* Tab paradas não justificadas */}
+        <TabsContent value="nao-justificadas" className="text-md">
+          <FadeUpItem>
+            {paradasNaoJustificadas.length > 0 ? (
               <TableListagens
                 data={paradasNaoJustificadas}
                 columns={colunasEventos}
@@ -537,13 +542,13 @@ export default function HistoricoEventosGestor() {
                 onSelectedChange={setSelecionados}
                 solicitarJustificativa={modalJustificativa}
               />
-            </TabsContent>
-          </Tabs>
+            ) : (
+              <EmptyState title="Nenhuma parada não justificada encontrada" />
+            )}
+          </FadeUpItem>
+        </TabsContent>
+      </Tabs>
 
-        </section>
-
-
-      </div>
-    </main>
+    </PageLayout>
   );
 }

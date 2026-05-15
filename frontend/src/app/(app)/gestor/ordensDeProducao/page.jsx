@@ -237,51 +237,72 @@ export default function OrdensDeProducaoGestor() {
   }
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="p-8">
+    <PageLayout>
 
-        <div className="w-full space-y-4">
-          {/* TÍTULO */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-              Ordens de Produção
-            </h1>
+        <PageHeader title="Ordens de Produção" action={
 
+          <Dialog>
+            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+              <Plus className="mr-2" />
+              Criar OP
+            </DialogTrigger>
+            <DialogContent>
+              <FormCadastroOp onCadastroSucesso={refresh} />
+            </DialogContent>
+          </Dialog>
 
-            {/* Modal de Criação de OP */}
-            <div className="modal_cadastro">
-              <Dialog>
-                <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
-                  <Plus className="mr-2" />
-                  Criar OP
-                </DialogTrigger>
-                <DialogContent>
-                  <FormCadastroOp onCadastroSucesso={refresh} />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
+        } />
 
 
           {/* GRÁFICOS */}
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white border rounded-xl p-4"><OPAtivasKPIWidget /></div>
-            <div className="bg-white border rounded-xl p-4"><OPAtrasadasKPIWidget /></div>
-            <div className="bg-white border rounded-xl p-4"><OPPecasBoasKPIWidget /></div>
-            <div className="bg-white border rounded-xl p-4"><OPRefugoKPIWidget /></div>
-          </section>
 
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget /></div>
-            <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget /></div>
-            <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget /></div>
-          </section>
+        <KPIGrid cols={4} className="mt-4">
 
-          <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget /></div>
-            <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget /></div>
-          </section>
-        </div>
+          <WidgetCard>
+            <OPAtivasKPIWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPAtrasadasKPIWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPPecasBoasKPIWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPRefugoKPIWidget />
+          </WidgetCard>
+
+
+        </KPIGrid>
+
+        <KPIGrid cols={3} className="mt-4">
+
+          <WidgetCard>
+            <OPEficienciaWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPTopRefugoWidget />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPCargaSetorWidget />
+          </WidgetCard>
+
+
+        </KPIGrid>
+
+        <ContentGrid cols={2} className="mt-6">
+          <WidgetCard>
+            <OPStatusWidget />
+          </WidgetCard>
+          <WidgetCard>
+            <OPConcluidasDiaWidget />
+          </WidgetCard>
+        </ContentGrid>
+
 
         {/* Listagem de OPs */}
         <section>
@@ -379,8 +400,6 @@ export default function OrdensDeProducaoGestor() {
             </div>
           )}
         </section>
-
-      </div>
-    </main>
+    </PageLayout>
   );
 }

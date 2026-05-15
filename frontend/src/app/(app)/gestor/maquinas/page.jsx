@@ -227,161 +227,128 @@ export default function MaquinasGestor() {
     );
   }
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="p-8">
-        <div className="flex justify-between items-center">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-            Máquinas
-          </h1>
-          <Dialog>
-            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-              <Plus className="mr-2" />
-              Cadastrar
-            </DialogTrigger>
+    <PageLayout>
+      <PageHeader title="Máquinas" action={
+        <Dialog>
+          <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+            <Plus className="mr-2" />
+            Cadastrar
+          </DialogTrigger>
 
-            <DialogContent>
-              <FormCadastroMaquina />
-            </DialogContent>
-          </Dialog>
+          <FormCadastroMaquina onCadastroSucesso={refresh} />
+        </Dialog>
+      } />
+      {/* Gráficos */}
+      <KPIGrid cols={3} className="mt-4">
+
+        <WidgetCard>
+          <MaquinaStatusDonutWidget />
+        </WidgetCard>
+
+        <WidgetCard>
+          <MaquinasPorSetorWidget />
+        </WidgetCard>
+
+        <WidgetCard>
+          <TempoMedioParadaWidget />
+        </WidgetCard>
+
+      </KPIGrid>
+
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <ProducaoDefeitosWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <MaquinasPorTurnoWidget />
+        </WidgetCard>
+      </ContentGrid>
+
+
+      <FadeUpItem>
+        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+          <ProducaoTotalWidget />
         </div>
+      </FadeUpItem>
 
-        {/* Gráficos */}
-        <div className="flex flex-col gap-4 ">
-          <section className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white border rounded-xl p-4 flex flex-col items-center justify-start h-full">
-                <p className="text-sm font-semibold text-black self-start">Status Operacional das Máquinas</p>
-                <p className="text-xs text-gray-400 font-semibold mt-1 self-start mb-2">*Atualizado em tempo real</p>
-                <div className="w-full">
-                  <MaquinaStatusDonutWidget />
-                </div>
-              </div>
-              <div className="bg-white border rounded-xl p-4">
-                <MaquinasPorSetorWidget />
-              </div>
-              <div className="border bg-white rounded-xl p-4">
-                <TempoMedioParadaWidget />
-              </div>
-            </div>
-          </section>
+      {/* LISTAGEM MAQUINAS */}
+      <SectionDivider title="Listagem" className="mt-8" />
 
-          <section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border bg-white rounded-xl p-4">
-                <ProducaoDefeitosWidget />
-              </div>
-              <div className="border bg-white rounded-xl p-4">
-                <MaquinasPorTurnoWidget />
-              </div>
-            </div>
-          </section>
+      {/* Busca */}
+      <SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por nome ou id..."
+      />
 
-          <section>
-            <div className="border bg-white rounded-xl p-4">
-              <ProducaoTotalWidget />
-            </div>
-          </section>
-        </div>
+      <FilterRow
+        count={dadosExibidos.length}
+        label="maquinas"
+        actions={
+          <>
+            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+            <FilterDropdown filtersConfig={aplicarFiltros} onApply={aplicarFiltros} />
+          </>
+        }
+      />
 
+      {/* Tabela */}
+      <FadeUpItem className="mt-4">
+        {dadosExibidos.length > 0 ? (
 
-        {/* LISTAGEM MAQUINAS */}
-        <section id="listagem_maquinas">
-          <div className="flex items-center gap-5 mt-8">
-            <h1 className="text-4xl font-semibold">Inventário de Máquinas</h1>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
+          <TableListagens
+            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+            data={dadosExibidos} columns={colunasMaquinas}
+            acoesDropdown={(maquina) => (
+              <>
 
-          {/* Busca */}
-          <div className="flex searchbar mt-4">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full font-medium outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`maquinas/${maquina.id_maquina}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver Detalhes
+                  </Link>
+                </DropdownMenuItem>
 
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosExibidos.length} máquinas encontradas</p>
-
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacao}
-                onSortChange={handleSort}
-              />
-
-              <FilterDropdown
-                filtersConfig={maquinasFilter}
-                onApply={aplicarFiltros}
-              />
-            </div>
-          </div>
-
-          {/* Tabela */}
-          <div className="flex flex-col flex-1 items-center w-full mt-4">
-            {dadosExibidos.length > 0 ? (
-
-              <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                data={dadosExibidos} columns={colunasMaquinas}
-                acoesDropdown={(maquina) => (
-                  <>
-
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`maquinas/${maquina.id_maquina}`}>
-                        <EyeIcon className="mr-2 h-4 w-4" />
-                        Ver Detalhes
-                      </Link>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar
                     </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
+                  </DialogContent>
+                </Dialog>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <Pencil className="mr-2 h-4 w-4 text-primary" />
-                          Editar
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
-                      </DialogContent>
-                    </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormExclusaoMaquina
+                      maquinaId={maquina.id_maquina}
+                      onExcluir={excluirMaquina}
+                    />
+                  </DialogContent>
+                </Dialog>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                          Excluir
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <FormExclusaoMaquina
-                          maquinaId={maquina.id_maquina}
-                          onExcluir={excluirMaquina}
-                        />
-                      </DialogContent>
-                    </Dialog>
-
-                  </>
-                )}
-
-              />
-            ) : (
-              //caso não encontre nada correspondente
-              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                <p>Não encontramos nenhuma máquina com o filtro ou busca.</p>
-              </div>
+              </>
             )}
-          </div>
-        </section>
 
-      </div>
-    </main >
+          />
+        ) : (
+          //caso não encontre nada correspondente
+          <EmptyState
+            title="Nenhuma máquina encontrada"
+            message={`Não encontramos nenhum resultado para "${busca}".`}
+          />
+        )}
+      </FadeUpItem>
+
+    </PageLayout >
   );
 }

@@ -293,7 +293,7 @@ export default function Maquinas() {
           </div>
         ) : (
           <EmptyState
-            title="Nenhum usuário encontrado"
+            title="Nenhuma máquina encontrada"
             message={`Não encontramos nenhum resultado para "${busca}".`}
           />
         )}
