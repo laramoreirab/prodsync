@@ -365,18 +365,18 @@ export function SearchBar({ value, onChange, placeholder = "Buscar...", classNam
   return (
     <FadeUpItem
       className={cn(
-        "flex items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]",
+        "flex items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF] dark:bg-slate-800",
         className
       )}
     >
       <input
         type="search"
-        className="p-2 w-full outline-none bg-transparent font-medium text-sm"
+        className="p-2 w-full outline-none bg-transparent font-medium text-sm rounded-sm"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
       />
-      <span className="mr-2 text-muted-foreground">
+      <span className="m-2 text-muted-foreground">
         <Search className="w-4 h-4" />
       </span>
     </FadeUpItem>
