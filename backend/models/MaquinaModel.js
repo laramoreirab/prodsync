@@ -71,31 +71,32 @@ class MaquinaModel {
     static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem) {
         try {
             const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
-            const statusNormalizado = statusValidos.includes(status) ? status : undefined;
+            const statusNormalizado = statusValidos.includes(status) ? status : 'Parada';
+            const idSetorNormalizado = id_setor ? Number(id_setor) : null;
+            const idOperadorNormalizado = id_operador ? Number(id_operador) : null;
             const maquina = await prisma.maquinas.create({
                 data: {
-                    id_empresa: id_empresa,
-                    id_setor: id_setor ? parseInt(id_setor) : null,
-                    categoria: categoria,
+                    id_empresa: Number(id_empresa),
+                    id_setor: idSetorNormalizado,
+                    categoria: categoria || null,
                     nome: nome,
-                    serie: serie,
-                    capacidade: capacidade,
-                    status: status,
+                    serie: serie || null,
+                    capacidade: capacidade || null,
                     status_atual: statusNormalizado,
                     data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
-                    id_operador: id_operador ? parseInt(id_operador) : null,
-                    imagem: imagem
+                    id_operador: idOperadorNormalizado,
+                    imagem: imagem || null
                 }
             });
-            if (id_operador) {
+            if (idOperadorNormalizado) {
                 await prisma.escalaTrabalho.updateMany({
                     where: {
                         id_empresa: Number(id_empresa),
-                        id_operador: Number(id_operador)
+                        id_operador: idOperadorNormalizado
                     },
                     data: {
                         id_maquina: maquina.id_maquina,
-                        ...(id_setor ? { id_setor: Number(id_setor) } : {})
+                        ...(idSetorNormalizado ? { id_setor: idSetorNormalizado } : {})
                     }
                 });
             }

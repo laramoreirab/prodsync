@@ -66,7 +66,21 @@ class MaquinaController {
 
         } catch (error) {
             console.error('Erro ao buscar máquina:', error);
-            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+            if (error.code === 'P2002') {
+                return res.status(409).json({
+                    sucesso: false,
+                    erro: 'Dados duplicados',
+                    mensagem: 'Já existe uma máquina cadastrada com estes dados.'
+                });
+            }
+            if (error.code === 'P2003') {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Relacionamento inválido',
+                    mensagem: 'Setor ou operador informado não existe.'
+                });
+            }
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor', mensagem: error.message });
         }
     }
 
@@ -98,7 +112,25 @@ class MaquinaController {
         } catch (error) {
             console.error('Erro ao criar máquina:', error);
             if (req.file) removerArquivoAntigo(req.file.filename);
-            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+            if (error.code === 'P2002') {
+                return res.status(409).json({
+                    sucesso: false,
+                    erro: 'Dados duplicados',
+                    mensagem: 'Já existe uma máquina cadastrada com estes dados.'
+                });
+            }
+            if (error.code === 'P2003') {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Relacionamento invÃ¡lido',
+                    mensagem: 'Setor ou operador informado nÃ£o existe.'
+                });
+            }
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: error.message
+            });
         }
     }
 
