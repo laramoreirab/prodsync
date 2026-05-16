@@ -34,9 +34,9 @@ public class CadastroActivity extends AppCompatActivity {
         tilNome = findViewById(R.id.til_nome);
         tilCNPJ = findViewById(R.id.til_cnpj);
         tilTelefone = findViewById(R.id.til_telefone);
-        tilEndereco = findViewById(R.id.til_telefone);
+        tilEndereco = findViewById(R.id.til_endereco);
         tilRepresentante = findViewById(R.id.til_nome_representante);
-        tilCPF = findViewById(R.id.et_cpf);
+        tilCPF = findViewById(R.id.til_cpf);
         tilEmail = findViewById(R.id.til_email);
         tilSenha = findViewById(R.id.til_senha);
 

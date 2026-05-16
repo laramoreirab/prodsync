@@ -1,29 +1,33 @@
 package com.senai.prodsync;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.ui.AppBarConfiguration;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.senai.prodsync.ui.adm.UsuariosFragment;
+import com.senai.prodsync.ui.shared.MaquinasFragment;
+import com.senai.prodsync.ui.shared.OpsFragment;
+import com.senai.prodsync.ui.shared.PerfilFragment;
 
 public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private BottomNavigationView bottomNav;
     private MaterialToolbar toolbar;
-    private NavController navController;
-    private AppBarConfiguration appBarConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,31 +35,63 @@ public class HomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
         
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        drawerLayout = findViewById(R.id.main);
+        navigationView = findViewById(R.id.navigation_view);
+        bottomNav = findViewById(R.id.bottomNav);
+        toolbar = findViewById(R.id.toolbar);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        // Configurar a Toolbar para abrir o Drawer
+        toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+
+        // Recebe o cargo do usuário
+        String userRole = getIntent().getStringExtra("USER_ROLE");
+        if (userRole == null) userRole = "operador";
+
+        setupMenus(userRole);
         
-        // Define o fragmento inicial
+        // Fragmento inicial
         replaceFragment(new MaquinasFragment());
+    }
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_maquinas) {
-                replaceFragment(new MaquinasFragment());
-                return true;
-            } else if (itemId == R.id.nav_ops) {
-                replaceFragment(new OpsFragment());
-                return true;
-            } else if (itemId == R.id.nav_perfil) {
-                replaceFragment(new PerfilFragment());
-                return true;
-            }
-            return false;
+    private void setupMenus(String role) {
+        bottomNav.getMenu().clear();
+        navigationView.getMenu().clear();
+
+        if ("adm".equals(role) || "gestor".equals(role)) {
+            bottomNav.inflateMenu(R.menu.menu_bottom_adm);
+            navigationView.inflateMenu(R.menu.menu_drawer_adm);
+        } else {
+            bottomNav.inflateMenu(R.menu.menu_bottom_operador);
+            navigationView.inflateMenu(R.menu.menu_drawer_operador);
+        }
+
+        // Listeners para BottomNav
+        bottomNav.setOnItemSelectedListener(this::onNavigationItemSelected);
+        
+        // Listeners para Drawer
+        navigationView.setNavigationItemSelectedListener(item -> {
+            boolean handled = onNavigationItemSelected(item);
+            if (handled) drawerLayout.closeDrawers();
+            return handled;
         });
+    }
+
+    private boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_maquinas) {
+            replaceFragment(new MaquinasFragment());
+            return true;
+        } else if (itemId == R.id.nav_ops) {
+            replaceFragment(new OpsFragment());
+            return true;
+        } else if (itemId == R.id.nav_usuarios) {
+            replaceFragment(new UsuariosFragment());
+            return true;
+        } else if (itemId == R.id.nav_perfil) {
+            replaceFragment(new PerfilFragment());
+            return true;
+        }
+        return false;
     }
 
     private void replaceFragment(Fragment fragment) {

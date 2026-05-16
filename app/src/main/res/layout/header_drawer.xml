@@ -12,6 +12,6 @@
         android:layout_height="104dp"
         android:src="@drawable/s_logo"
         android:tint="@color/white"
-        android:contentDescription="Usuário" />
+    />
 
 </LinearLayout>
