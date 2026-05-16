@@ -31,6 +31,27 @@ class SetorModel {
                     id_setor: id_setor
                 }
             });
+            const maquinas = await prisma.maquinas.findMany({
+                where: {
+                    id_maquina: { in: ids_maquinas },
+                    id_empresa,
+                    id_operador: { not: null }
+                },
+                select: { id_maquina: true, id_operador: true }
+            });
+
+            await Promise.all(maquinas.map(maquina =>
+                prisma.escalaTrabalho.updateMany({
+                    where: {
+                        id_empresa,
+                        id_operador: maquina.id_operador
+                    },
+                    data: {
+                        id_setor,
+                        id_maquina: maquina.id_maquina
+                    }
+                })
+            ));
             return resultado;
         } catch (error) {
             console.error('Erro ao associar máquinas ao setor:', error);
@@ -133,6 +154,11 @@ class SetorModel {
     // Deleta um setor
     static async deletarSetor(id_setor, id_empresa) {
         try {
+            await prisma.maquinas.updateMany({
+                where: { id_setor, id_empresa },
+                data: { id_setor: null }
+            });
+
             const result = await prisma.setores.deleteMany({
                 where: {
                     id_setor: id_setor,
@@ -390,49 +416,52 @@ class SetorModel {
             inicioBusca.setHours(limites.horaInicio, limites.minutoInicio, 0, 0);
             const fimBusca = new Date(inicioBusca.getTime() + (24 * 60 * 60 * 1000));
 
-            const setoresComProducao = await prisma.setores.findMany({
-                where: { id_empresa },
-                select: {
-                    id_setor: true,
-                    nome_setor: true,
-                    ordens_producao: {
-                        where: { status_op: "Em_Andamento" },
-                        select: {
-                            qtd_planejada: true,
-                            apontamentos: {
-                                where: {
-                                    data_hora_fim: {
-                                        gte: inicioBusca,
-                                        lt: fimBusca
-                                    }
-                                },
-                                select: { qtd_boa: true }
+            const [setores, apontamentos] = await Promise.all([
+                prisma.setores.findMany({
+                    where: { id_empresa },
+                    select: {
+                        id_setor: true,
+                        nome_setor: true
+                    }
+                }),
+                prisma.apontamento.findMany({
+                    where: {
+                        id_empresa,
+                        data_hora_fim: {
+                            gte: inicioBusca,
+                            lt: fimBusca
+                        }
+                    },
+                    select: {
+                        qtd_boa: true,
+                        maquina: {
+                            select: {
+                                id_setor: true
                             }
                         }
                     }
-                }
-            });
+                })
+            ]);
 
-            const resultado = setoresComProducao.map(setor => {
-                let totalPlanejado = 0;
-                let totalProduzido = 0;
+            const producaoPorSetor = new Map(
+                setores.map(setor => [
+                    setor.id_setor,
+                    {
+                        setor: setor.nome_setor,
+                        qtd: 0
+                    }
+                ])
+            );
 
-                setor.ordens_producao.forEach(op => {
-                    totalPlanejado += op.qtd_planejada;
-                    const produzidoNaOP = op.apontamentos.reduce((sum, ap) => sum + (ap.qtd_boa || 0), 0);
-                    totalProduzido += produzidoNaOP;
-                });
+            for (const apontamento of apontamentos) {
+                const id_setor = apontamento.maquina?.id_setor;
+                if (!id_setor || !producaoPorSetor.has(id_setor)) continue;
 
-                // let porcentagem = 0;
-                // if (totalPlanejado > 0) {
-                //     porcentagem = (totalProduzido / totalPlanejado) * 100;
-                // }
+                const setor = producaoPorSetor.get(id_setor);
+                setor.qtd += apontamento.qtd_boa ?? 0;
+            }
 
-                return {
-                    setor: setor.nome_setor,
-                    qtd: totalProduzido
-                };
-            });
+            const resultado = Array.from(producaoPorSetor.values());
 
             return resultado
 
@@ -442,10 +471,13 @@ class SetorModel {
         }
     }
 
-    static async obterQuantidadeMaquinasPorSetor(id_empresa) {
+    static async obterQuantidadeMaquinasPorSetor(id_empresa, setorId = null) {
         try {
             const setores = await prisma.setores.findMany({
-                where: { id_empresa },
+                where: {
+                    id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {})
+                },
                 include: {
                     maquinas: {
                         where: { ativo: true },
@@ -455,8 +487,10 @@ class SetorModel {
             });
 
             return setores.map(setor => ({
-                // id_setor: setor.id_setor,
+                id_setor: setor.id_setor,
+                id: setor.id_setor,
                 setor: setor.nome_setor,
+                quantidade: setor.maquinas.length,
                 qtd: setor.maquinas.length
             })).sort((a, b) => b.qtd - a.qtd);
         } catch (error) {
@@ -465,7 +499,7 @@ class SetorModel {
         }
     }
 
-    static async obterTempoMedioParadaPorSetor(id_empresa, dias = null) {
+    static async obterTempoMedioParadaPorSetor(id_empresa, dias = null, setorId = null) {
         try {
             const [paradas, setores] = await Promise.all([
                 prisma.historico_Eventos.groupBy({
@@ -475,6 +509,7 @@ class SetorModel {
                         status_atual: {
                             in: ['Parada', 'Manutencao', 'Setup']
                         },
+                        ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                         duracao: {
                             not: null
                         },
@@ -500,7 +535,10 @@ class SetorModel {
 
             return paradas.map(parada => ({
                 // id_setor: parada.setor_afetado,
+                id_setor: parada.setor_afetado,
+                setorId: parada.setor_afetado,
                 setor: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
+                maquina: setoresPorId.get(parada.setor_afetado) ?? 'Sem setor',
                 minutos: Number((parada._avg.duracao ?? 0).toFixed(1)),
                 // tempo_total_minutos: parada._sum.duracao ?? 0,
                 // total_eventos: parada._count.id_evento
@@ -511,11 +549,12 @@ class SetorModel {
         }
     }
 
-    static async obterProducaoDefeitosPorSetor(id_empresa, dias = null) {
+    static async obterProducaoDefeitosPorSetor(id_empresa, dias = null, setorId = null) {
         try {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     ...this.montarFiltroPeriodo('data_hora_fim', dias)
                 },
                 select: {
@@ -558,7 +597,10 @@ class SetorModel {
 
                 return {
                     // id_setor: setor.id_setor,
+                    id_setor: setor.id_setor,
+                    setorId: setor.id_setor,
                     setor: setor.setor,
+                    maquina: setor.setor,
                     produzidas,
                     defeito,
                     // total_produzido: total,

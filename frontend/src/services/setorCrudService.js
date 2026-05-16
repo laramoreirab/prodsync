@@ -1,14 +1,8 @@
-// import { setorMockService } from "@/mocks/setorMock";
 import { apiFetch } from "@/lib/api";
-
-// trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = false;
 
 const API_URL = "/api/setores";
 
-// const apiService = {
-
-export const setorCrudService ={
+export const setorCrudService = {
   // buscar todos os setores
   getAll: async () => {
     const options = { method: "GET" };
@@ -89,9 +83,3 @@ export const setorCrudService ={
     });
   },
 };
-
-//remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
-// export const setorCrudService = USE_MOCK ? setorMockService : apiService;
-//após a conexão com o backend, remover o arquivo setorMock.js e o USE_MOCK do service
-//além disso, coloque o que está dentro da const apiService dentro de:
-//export const setorCrudService ={o que ta dentro de apiService aqui dentro}

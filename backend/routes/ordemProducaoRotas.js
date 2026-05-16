@@ -8,12 +8,6 @@ const router = Router();
 router.use(authMiddleware);
 
 // Rotas de CRUD básico
-router.get('/', paginacaoMiddleware, OrdemProducaoController.listarTodos);
-router.post('/', OrdemProducaoController.criar);
-router.put('/:id_ordem', OrdemProducaoController.atualizar);
-router.delete('/:id_ordem', OrdemProducaoController.deletar);
-
-// Rotas de KPIs
 router.get('/kpi/ativas', OrdemProducaoController.totalOPsAtivas);
 router.get('/kpi/atrasadas', OrdemProducaoController.totalOPsAtrasadas);
 router.get('/kpi/pecas-boas', OrdemProducaoController.totalPecasBoas);
@@ -25,7 +19,12 @@ router.get('/dashboard/eficiencia', OrdemProducaoController.eficienciaGeral);
 router.get('/dashboard/top-refugo', OrdemProducaoController.top3OPsMaiorRefugo);
 router.get('/dashboard/carga-setor', OrdemProducaoController.cargaPorSetor);
 router.get('/dashboard/status', OrdemProducaoController.statusOPs);
-router.get('/dashboard/concluidas-dia', OrdemProducaoController.opsConcluídasPorDia);
+router.get('/dashboard/concluidas-dia', OrdemProducaoController.opsConcluidasPorDia);
 
+router.get('/', paginacaoMiddleware, OrdemProducaoController.listarTodos);
+router.post('/', OrdemProducaoController.criar);
+router.get('/:id_ordem', OrdemProducaoController.buscarPorId);
+router.put('/:id_ordem', OrdemProducaoController.atualizar);
+router.delete('/:id_ordem', OrdemProducaoController.deletar);
 
 export default router;

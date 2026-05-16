@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { setorCrudService } from "@/services/setorCrudService"; 
 
-export default function FormExclusaoSetor({ setorId, onExclusaoSucesso }) {
+export default function FormExclusaoSetor({ setorId, setorIds = [], onExclusaoSucesso }) {
     const [carregando, setCarregando] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -16,8 +16,14 @@ export default function FormExclusaoSetor({ setorId, onExclusaoSucesso }) {
 
         try {
             // id vai na URL — backend: deletarSetor
-            await setorCrudService.delete(setorId);
-            toast.success("Setor excluído com sucesso!");
+            const ids = setorId ? [setorId] : setorIds.filter(Boolean);
+            if (ids.length === 0) {
+                toast.error("Selecione pelo menos um setor.");
+                return;
+            }
+
+            await Promise.all(ids.map((id) => setorCrudService.delete(id)));
+            toast.success(ids.length === 1 ? "Setor excluído com sucesso!" : "Setores excluídos com sucesso!");
             if (onExclusaoSucesso) onExclusaoSucesso();
         } catch (error) {
             console.error("Erro ao excluir setor:", error);

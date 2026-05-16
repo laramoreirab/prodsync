@@ -1,6 +1,7 @@
 import UsuarioModel from '../models/UsuarioModel.js'
 import EscalaTrabalhoModel from '../models/EscalaTrabalhoModel.js'
 import SetorModel from '../models/SetorModel.js';
+import MaquinaModel from '../models/MaquinaModel.js'
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 import prisma from '../config/prisma.js';
 
@@ -17,21 +18,9 @@ class UsuarioController {
 
             // Normaliza o retorno: a query é sobre escalaTrabalho (inclui operador, turno, setor)
             // O frontend espera: { id, nome, funcao, id_setor, id_turno, id_maquina, email, cpf, imagem_perfil }
-            const dadosNormalizados = (resultado.dados || []).map(escala => ({
-                id: escala.operador?.id_usuario ?? escala.id_operador,
-                nome: escala.operador?.nome ?? '',
-                email: escala.operador?.email ?? '',
-                cpf: escala.operador?.cpf ?? '',
-                funcao: escala.operador?.tipo ?? '',
-                imagem_perfil: escala.operador?.imagem_perfil ?? null,
-                id_setor: escala.id_setor,
-                id_turno: escala.id_turno,
-                id_maquina: escala.id_maquina ?? null,
-            }));
-
             return res.status(200).json({
                 sucesso: true,
-                dados: dadosNormalizados,
+                dados: resultado.dados || [],
                 meta: resultado.meta
             });
 
@@ -81,7 +70,7 @@ class UsuarioController {
 
     //GET api/usuarios/:id - busca de usuário por id (via params ou token)
     static async buscarPorId(req, res) {
-        try 
+        try {
             // Aceita id via params (rota /:id) ou fallback para o usuário logado
             const id_usuario = req.params.id ? parseInt(req.params.id) : req.user.id_usuario;
             const id_empresa = req.user.id_empresa;
@@ -139,7 +128,8 @@ class UsuarioController {
     static async criarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+            const { nome, cpf, email, id_setor, id_turno, id_maquina } = req.body;
+            const funcao = String(req.body.funcao || '').trim().toLowerCase() === 'gestor' ? 'Gestor' : 'Operador';
 
             const erros = [];
             // Validar nome
@@ -196,7 +186,7 @@ class UsuarioController {
 
             //validação do setor
             if (!id_setor) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Setor é obrigatório',
                     mensagem: 'O setor é obrigatório!'
@@ -205,7 +195,7 @@ class UsuarioController {
 
             //validação do turno
             if (funcao !== 'Gestor' && !id_turno) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
                     mensagem: 'O turno é obrigatório!'
@@ -213,7 +203,7 @@ class UsuarioController {
             };
             //validação funcao
             if (!funcao || funcao.trim() == '') {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
                     mensagem: 'O turno é obrigatório!'
@@ -221,7 +211,7 @@ class UsuarioController {
             };
             //validação maquina
             if (funcao === 'Operador' && !id_maquina) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Turno é obrigatório',
                     mensagem: 'O turno é obrigatório!'
@@ -572,11 +562,42 @@ class UsuarioController {
 
     // ------------------------------------Dashboard da página específica de usuário----------------------------------------------------------------
 
+    static async turnosOperadores(req, res) {
+        try {
+            const dados = await UsuarioModel.turnosOperadores(req.user.id_empresa, req.query.setorId)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no grafico Operadores por turno:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    static async taxaRefugo(req, res) {
+        try {
+            const dados = await UsuarioModel.taxaRefugo(req.user.id_empresa, req.query.setorId)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no grafico Taxa de refugo por usuario:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    static async producaoMediaPorUsuario(req, res) {
+        try {
+            const dados = await UsuarioModel.producaoMediaPorUsuario(req.user.id_empresa, req.query.setorId)
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no grafico Producao media por usuario:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
     static async metaProducao(req, res) {
         try {
             const id_usuario = parseInt(req.params.id) || req.body.id_usuario || req.user.id_usuario;
-            const id_maquina = req.body.id_maquina; // Pode vir do body ou ser buscado se necessário
-            const dados = await UsuarioModel.metaProducao(req.user.id_empresa, id_usuario, id_maquina)
+            const id_empresa = req.user.id_empresa
+            const id_maquina = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const dados = await UsuarioModel.metaProducao(id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Meta de Produção', error)
@@ -586,9 +607,10 @@ class UsuarioController {
 
     static async tempoParadoTempoProduzindoUsuario(req, res) {
         try {
-            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
-            const id_maquina = req.body.id_maquina;
-            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(req.user.id_empresa, id_usuario, id_maquina)
+            const id_usuario = parseInt(req.params.id) ;
+            const id_empresa = req.user.id_empresa
+            const id_maquina = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo da máquina do operador', error)
@@ -599,7 +621,7 @@ class UsuarioController {
     // --------------- Operador --------------------- //
     static async getProducaoPorHora(req, res) {
         try {
-            const id_usuario = parseInt(req.params.id) || req.user.id_usuario;
+            const id_usuario = parseInt(req.params.id) ;
             const dados = await UsuarioModel.producaoPorHoraOperador(req.user.id_empresa, id_usuario);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {

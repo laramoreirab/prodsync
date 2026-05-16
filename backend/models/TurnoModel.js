@@ -323,7 +323,7 @@ class TurnoModel {
                 where: {
                     id_turno: Number(id_turno),
                     id_ordemProducao: {
-                        not: null
+                        not: 0
                     },
                     ...(id_empresa ? { id_empresa } : {}),
                     ...(dataInicio || dataFim ? {
@@ -406,10 +406,13 @@ class TurnoModel {
         }
     }
 
-    static async obterStatusMaquinasPorTurno(id_empresa) {
+    static async obterStatusMaquinasPorTurno(id_empresa, setorId = null) {
     try {
         const turnos = await prisma.turno.findMany({
-            where: { id_empresa },
+            where: {
+                id_empresa,
+                ...(setorId ? { id_setor: Number(setorId) } : {})
+            },
             include: {
                 escalas: {
                     include: {
@@ -466,7 +469,9 @@ class TurnoModel {
                 turno: String(grupo.turno),
                 ativas,
                 paradas,
-                setup
+                manutencao: setup,
+                setup,
+                setorId: setorId ? Number(setorId) : undefined
             };
         });
 

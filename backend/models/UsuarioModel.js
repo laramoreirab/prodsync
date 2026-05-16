@@ -6,57 +6,71 @@ import { gerarIdUsuario } from '../dev-utils/gerarIdUsuario.js';
 class UsuarioModel {
     //Listar todos os usuários com paginacção
     static async listarTodos(id_empresa, paginacao) {
-    try {
-        const regrasDaBusca = {
-            where: {
-                id_empresa,
-                tipo: { in: ['Gestor', 'Operador'] }  // exclui Adm da listagem
-            },
-            select: {
-                id_usuario:    true,
-                nome:          true,
-                tipo:          true,
-                email:         true,
-                imagem_perfil: true,
-                escalas: {
-                    select: {
-                        id_turno: true,
-                        id_setor: true,
-                        turno: { select: { nome_turno: true } },
-                        setor: { select: { nome_setor:  true } }
+        try {
+            const regrasDaBusca = {
+                where: {
+                    id_empresa,
+                    tipo: { in: ['Gestor', 'Operador'] }  // exclui Adm da listagem
+                },
+                select: {
+                    id_usuario: true,
+                    nome: true,
+                    tipo: true,
+                    cpf: true,
+                    email: true,
+                    imagem_perfil: true,
+                    escalas: {
+                        select: {
+                            id_turno: true,
+                            id_setor: true,
+                            id_maquina: true,
+                            turno: { select: { nome_turno: true } },
+                            setor: { select: { nome_setor: true } },
+                            maquina: { select: { nome: true, serie: true } }
+                        },
+                        take: 1
                     },
-                    take: 1
-                }
-            },
-            orderBy: { id_usuario: 'asc' }
+                    setores_geridos: {
+                        select: {
+                            id_setor: true,
+                            setor: { select: { nome_setor: true } }
+                        },
+                        take: 1
+                    }
+                },
+                orderBy: { id_usuario: 'asc' }
+            }
+
+            const resultadoPaginado = await paginarPrisma(
+                prisma.usuarios,
+                regrasDaBusca,
+                paginacao
+            )
+
+            return {
+                ...resultadoPaginado,
+                dados: resultadoPaginado.dados.map(u => ({
+                    id: u.id_usuario,
+                    id_usuario: u.id_usuario,
+                    nome: u.nome,
+                    email: u.email,
+                    cpf: u.cpf,
+                    funcao: u.tipo,
+                    id_setor: u.escalas[0]?.id_setor ?? u.setores_geridos[0]?.id_setor ?? null,
+                    id_turno: u.escalas[0]?.id_turno ?? null,
+                    id_maquina: u.escalas[0]?.id_maquina ?? null,
+                    setor: u.escalas[0]?.setor?.nome_setor ?? u.setores_geridos[0]?.setor?.nome_setor ?? 'Sem setor',
+                    turno: u.escalas[0]?.turno?.nome_turno ?? 'Sem turno',
+                    maquina: u.escalas[0]?.maquina?.serie ?? u.escalas[0]?.maquina?.nome ?? 'Sem maquina',
+                    imagem_perfil: u.imagem_perfil
+                }))
+            }
+
+        } catch (error) {
+            console.error('Erro ao listar usuários:', error)
+            throw error
         }
-
-        const resultadoPaginado = await paginarPrisma(
-            prisma.usuarios,
-            regrasDaBusca,
-            paginacao
-        )
-
-        return {
-            ...resultadoPaginado,
-            dados: resultadoPaginado.dados.map(u => ({
-                id:        u.id_usuario,
-                nome:      u.nome,
-                email:     u.email,
-                funcao:    u.tipo,
-                id_setor:  u.escalas[0]?.id_setor  ?? null,
-                id_turno:  u.escalas[0]?.id_turno  ?? null,
-                setor:     u.escalas[0]?.setor?.nome_setor  ?? 'Sem setor',
-                turno:     u.escalas[0]?.turno?.nome_turno  ?? 'Sem turno',
-                imagem_perfil: u.imagem_perfil
-            }))
-        }
-
-    } catch (error) {
-        console.error('Erro ao listar usuários:', error)
-        throw error
     }
-}
 
     static async listarSemAdms(id_empresa) {
         try {
@@ -424,52 +438,57 @@ class UsuarioModel {
     }
 
     static async producaoMediaPorDiaSetor(id_empresa) {
-        try {
-            const setores = await prisma.setores.findMany({
-                where: { id_empresa },
-                select: {
-                    id_setor: true,
-                    nome_setor: true,
-                    maquinas: {
-                        select: {
-                            apontamentos: {
-                                select: {
-                                    data_hora_inicio: true,
-                                    qtd_boa: true
-                                }
+    try {
+        const setores = await prisma.setores.findMany({
+            where: { 
+                id_empresa: Number(id_empresa) // Proteção de tipo para o Prisma
+            },
+            select: {
+                id_setor: true,
+                nome_setor: true,
+                maquinas: {
+                    select: {
+                        apontamentos: {
+                            select: {
+                                data_hora_inicio: true,
+                                qtd_boa: true
                             }
                         }
                     }
                 }
-            })
+            }
+        });
 
-            return setores.map(s => {
-                const setor = s.nome_setor
-                const apontamentos = s.maquinas.flatMap(m => m.apontamentos)
+        const resultado = setores.map(s => {
+            const nomeSetor = s.nome_setor;
+            const apontamentos = s.maquinas.flatMap(m => m.apontamentos);
 
-                const porDia = {}
-                apontamentos.forEach(ap => {
-                    const dia = ap.data_hora_inicio.toISOString().split('T')[0]
-                    porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa
-                })
+            const porDia = {};
+            apontamentos.forEach(ap => {
+                // Extrai apenas a data (YYYY-MM-DD)
+                const dia = ap.data_hora_inicio.toISOString().split('T')[0];
+                porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa;
+            });
 
-                const valores = Object.values(porDia)
-                const mediaDiaria = valores.length > 0
-                    ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
-                    : 0
+            const valores = Object.values(porDia);
+            const mediaDiaria = valores.length > 0
+                ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
+                : 0;
 
-            return Object.entries(producaoPorSetorDia).map(([setor, dias]) => {
-                const valores = Object.values(dias)
-                const mediaDiaria = Math.round(
-                    valores.reduce((a, b) => a + b, 0) / valores.length
-                )
-                return { setor: setor, media: mediaDiaria }
-            }).sort((a, b) => b.media - a.media)
-        } catch (error) {
-            console.error('Erro ao contar a produção média de usuários por dia por setor no banco de dados:', error);
-            throw error;
-        }
+            return { 
+                setor: nomeSetor, 
+                media: mediaDiaria 
+            };
+        });
+
+        // Ordena do setor com maior média para o menor
+        return resultado.sort((a, b) => b.media - a.media);
+
+    } catch (error) {
+        console.error('Erro ao calcular produção média por setor:', error);
+        throw error;
     }
+}
 
     static async rotatividade(id_empresa) {
         try {
@@ -560,7 +579,7 @@ class UsuarioModel {
 
                 dadosAtuais.produzido += ap.qtd_boa ?? 0;
                 // Somamos o planejado da ordem vinculada a este apontamento
-                dadosAtuais.planejado += ap.ordemProducao?.qtd_planejada ?? 0;
+                dadosAtuais.planejado += ap.ordem_producao?.qtd_planejada ?? 0;
 
                 consolidadoPorSetor.set(nomeSetor, dadosAtuais);
             }
@@ -581,147 +600,243 @@ class UsuarioModel {
             console.error('Erro ao calcular meta de produção por setor:', error);
             throw error;
         }
-}
+    }
 
     // ------------------------------------------------------Dashboard da página específica de usuário-------------------------------------------------------------
 
-    static async metaProducao(id_empresa, id_usuario, id_maquina) {
-    try {
-        const maquinaId = Number(id_maquina) || await this.obterMaquinaAtualOperador(id_empresa, id_usuario)
-        if (!maquinaId) return { completo: 0, restante: 100 }
+    static async turnosOperadores(id_empresa, setorId = null) {
+        const where = {
+            id_empresa: Number(id_empresa),
+            ...(setorId ? { id_setor: Number(setorId) } : {})
+        };
 
-        const ultimaOrdem = await prisma.apontamento.findFirst({
-            where: {
-                id_empresa,
-                id_operador: Number(id_usuario),
-                id_maquina: maquinaId,
-            },
-            orderBy: {
-                data_hora_fim: "desc"
-            },
-            select: {
-                id_ordemProducao: true
-            }
-        })
+        const resultado = await prisma.escalaTrabalho.groupBy({
+            by: ['id_turno', 'id_setor'],
+            where,
+            _count: { id_operador: true }
+        });
 
-        if (!ultimaOrdem) return { completo: 0, restante: 100 }
+        const turnos = await prisma.turno.findMany({
+            where: { id_empresa: Number(id_empresa) },
+            select: { id_turno: true, nome_turno: true }
+        });
+        const nomes = Object.fromEntries(turnos.map(t => [t.id_turno, t.nome_turno]));
 
-        const totais = await prisma.apontamento.aggregate({
-            where: {
-                id_empresa,
-                id_operador: Number(id_usuario),
-                id_maquina: maquinaId,
-                id_ordemProducao: ultimaOrdem.id_ordemProducao
-            },
-            _sum: { qtd_boa: true }
-        })
-
-        const metaTotal = await prisma.ordemProducao.findFirst({
-            where: {
-                id_ordem: ultimaOrdem.id_ordemProducao,
-                id_empresa: id_empresa
-            },
-            select: {
-                qtd_planejada: true
-            }
-        })
-
-        const planejado = metaTotal?.qtd_planejada ?? 0
-        const produzido = totais._sum.qtd_boa ?? 0
-        const completo = planejado > 0 ? Math.min(100, Number(((produzido / planejado) * 100).toFixed(1))) : 0
-
-        return { completo, restante: Number((100 - completo).toFixed(1)) }
-
-    } catch (error) {
-        console.error('Erro ao retornar meta de produção alcançada no banco de dados:', error);
-        throw error;
+        return resultado.map(item => ({
+            turno: nomes[item.id_turno] ?? `Turno ${item.id_turno}`,
+            value: item._count.id_operador,
+            setorId: item.id_setor
+        }));
     }
-}
 
-    static async tempoParadoTempoProduzindoUsuario(id_empresa, id_usuario, id_maquina) {
-    try {
-        function semanaAtual() {
-            const hoje = new Date()
-            const diaSemana = hoje.getDay()
-            const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
+    static async taxaRefugo(id_empresa, setorId = null) {
+        const resultado = await prisma.apontamento.groupBy({
+            by: ['id_operador'],
+            where: {
+                id_empresa: Number(id_empresa),
+                ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {})
+            },
+            _sum: { qtd_boa: true, qtd_refugo: true },
+            orderBy: { _sum: { qtd_refugo: 'desc' } },
+            take: 8
+        });
 
-            const inicio = new Date(hoje)
-            inicio.setDate(hoje.getDate() - diasParaSegunda)
-            inicio.setHours(0, 0, 0, 0)
+        const ids = resultado.map(r => r.id_operador);
+        const usuarios = await prisma.usuarios.findMany({
+            where: { id_empresa: Number(id_empresa), id_usuario: { in: ids } },
+            select: { id_usuario: true, nome: true }
+        });
+        const nomes = Object.fromEntries(usuarios.map(u => [u.id_usuario, u.nome]));
 
-            const fim = new Date(inicio)
-            fim.setDate(inicio.getDate() + 6)
-            fim.setHours(23, 59, 59, 999)
+        return resultado.map(item => {
+            const boas = item._sum.qtd_boa ?? 0;
+            const refugo = item._sum.qtd_refugo ?? 0;
+            const total = boas + refugo;
 
-            return { inicio, fim }
-        }
+            return {
+                operador: nomes[item.id_operador] ?? `Usuario ${item.id_operador}`,
+                taxa: total > 0 ? Number(((refugo / total) * 100).toFixed(1)) : 0,
+                setorId: setorId ? Number(setorId) : undefined
+            };
+        });
+    }
 
-        const maquinaId = Number(id_maquina) || await this.obterMaquinaAtualOperador(id_empresa, id_usuario)
-        if (!maquinaId) return []
-
-        const { inicio, fim } = semanaAtual()
-        const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
-
-
-        // busca apontamentos da semana — tempo produzido
+    static async producaoMediaPorUsuario(id_empresa, setorId = null) {
         const apontamentos = await prisma.apontamento.findMany({
             where: {
-                id_empresa,
-                id_maquina: maquinaId,
-                data_hora_inicio: { gte: inicio, lte: fim }
+                id_empresa: Number(id_empresa),
+                ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {})
             },
             select: {
+                id_operador: true,
+                qtd_boa: true,
                 data_hora_inicio: true,
-                data_hora_fim: true
+                operador: { select: { nome: true } },
+                maquina: { select: { id_setor: true } }
             }
-        })
+        });
 
-        // busca paradas da semana — tempo parado
-        const paradas = await prisma.historico_Eventos.findMany({
-            where: {
-                id_empresa,
-                id_maquina: maquinaId,
-                status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
-                inicio: { gte: inicio, lte: fim },
-                duracao: { not: null }
-            },
-            select: {
-                inicio: true,
-                duracao: true  // já em minutos
-            }
-        })
-
-        // agrupa por dia
-        const agrupado = {}
-
+        const porUsuario = new Map();
         for (const ap of apontamentos) {
-            if (!ap.data_hora_fim) continue  // ← pula se ainda não terminou
-
-            const dia = diasSemana[new Date(ap.data_hora_inicio).getDay()]
-            const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
-
-            if (!agrupado[dia]) agrupado[dia] = { dia, produzindo: 0, parada: 0 }
-            agrupado[dia].produzindo += Math.round(minutos)
+            const dia = ap.data_hora_inicio.toISOString().slice(0, 10);
+            const atual = porUsuario.get(ap.id_operador) ?? {
+                usuario: ap.operador?.nome ?? `Usuario ${ap.id_operador}`,
+                total: 0,
+                dias: new Set(),
+                setorId: ap.maquina?.id_setor
+            };
+            atual.total += ap.qtd_boa ?? 0;
+            atual.dias.add(dia);
+            porUsuario.set(ap.id_operador, atual);
         }
 
-        for (const parada of paradas) {
-            const dia = diasSemana[new Date(parada.inicio).getDay()]
-
-            if (!agrupado[dia]) agrupado[dia] = { dia, produzindo: 0, parada: 0 }
-            agrupado[dia].parada += parada.duracao
-        }
-
-        // ordena de Seg a Dom e retorna só dias que tiveram dados
-        const ordem = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
-        return ordem
-            .filter(dia => agrupado[dia])
-            .map(dia => agrupado[dia])
-
-    } catch (error) {
-        console.error('Erro ao retornar Tempo Total Parado x Tempo Total Produzindo da máquina do usuário no banco de dados:', error);
-        throw error;
+        return Array.from(porUsuario.values())
+            .map(item => ({
+                usuario: item.usuario,
+                media: item.dias.size > 0 ? Math.round(item.total / item.dias.size) : 0,
+                setorId: item.setorId
+            }))
+            .sort((a, b) => b.media - a.media)
+            .slice(0, 8);
     }
-}
+
+    static async metaProducao(id_empresa, id_usuario, id_maquina) {
+        try {
+            const maquinaId = Number(id_maquina) || await this.obterMaquinaAtualOperador(id_empresa, id_usuario)
+            if (!maquinaId) return { completo: 0, restante: 100 }
+
+            const ultimaOrdem = await prisma.apontamento.findFirst({
+                where: {
+                    id_empresa,
+                    id_operador: Number(id_usuario),
+                    id_maquina: maquinaId,
+                },
+                orderBy: {
+                    data_hora_fim: "desc"
+                },
+                select: {
+                    id_ordemProducao: true
+                }
+            })
+
+            if (!ultimaOrdem) return { completo: 0, restante: 100 }
+
+            const totais = await prisma.apontamento.aggregate({
+                where: {
+                    id_empresa,
+                    id_operador: Number(id_usuario),
+                    id_maquina: maquinaId,
+                    id_ordemProducao: ultimaOrdem.id_ordemProducao
+                },
+                _sum: { qtd_boa: true }
+            })
+
+            const metaTotal = await prisma.ordemProducao.findFirst({
+                where: {
+                    id_ordem: ultimaOrdem.id_ordemProducao,
+                    id_empresa: id_empresa
+                },
+                select: {
+                    qtd_planejada: true
+                }
+            })
+
+            const planejado = metaTotal?.qtd_planejada ?? 0
+            const produzido = totais._sum.qtd_boa ?? 0
+            const completo = planejado > 0 ? Math.min(100, Number(((produzido / planejado) * 100).toFixed(1))) : 0
+
+            return { completo, restante: Number((100 - completo).toFixed(1)) }
+
+        } catch (error) {
+            console.error('Erro ao retornar meta de produção alcançada no banco de dados:', error);
+            throw error;
+        }
+    }
+
+    static async tempoParadoTempoProduzindoUsuario(id_empresa, id_usuario, id_maquina) {
+        try {
+            function semanaAtual() {
+                const hoje = new Date()
+                const diaSemana = hoje.getDay()
+                const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1
+
+                const inicio = new Date(hoje)
+                inicio.setDate(hoje.getDate() - diasParaSegunda)
+                inicio.setHours(0, 0, 0, 0)
+
+                const fim = new Date(inicio)
+                fim.setDate(inicio.getDate() + 6)
+                fim.setHours(23, 59, 59, 999)
+
+                return { inicio, fim }
+            }
+
+            const maquinaId = Number(id_maquina) || await this.obterMaquinaAtualOperador(id_empresa, id_usuario)
+            if (!maquinaId) return []
+
+            const { inicio, fim } = semanaAtual()
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
+
+
+            // busca apontamentos da semana — tempo produzido
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_empresa,
+                    id_maquina: maquinaId,
+                    data_hora_inicio: { gte: inicio, lte: fim }
+                },
+                select: {
+                    data_hora_inicio: true,
+                    data_hora_fim: true
+                }
+            })
+
+            // busca paradas da semana — tempo parado
+            const paradas = await prisma.historico_Eventos.findMany({
+                where: {
+                    id_empresa,
+                    id_maquina: maquinaId,
+                    status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
+                    inicio: { gte: inicio, lte: fim },
+                    duracao: { not: null }
+                },
+                select: {
+                    inicio: true,
+                    duracao: true  // já em minutos
+                }
+            })
+
+            // agrupa por dia
+            const agrupado = {}
+
+            for (const ap of apontamentos) {
+                if (!ap.data_hora_fim) continue  // ← pula se ainda não terminou
+
+                const dia = diasSemana[new Date(ap.data_hora_inicio).getDay()]
+                const minutos = (new Date(ap.data_hora_fim) - new Date(ap.data_hora_inicio)) / 1000 / 60
+
+                if (!agrupado[dia]) agrupado[dia] = { dia, produzindo: 0, parada: 0 }
+                agrupado[dia].produzindo += Math.round(minutos)
+            }
+
+            for (const parada of paradas) {
+                const dia = diasSemana[new Date(parada.inicio).getDay()]
+
+                if (!agrupado[dia]) agrupado[dia] = { dia, produzindo: 0, parada: 0 }
+                agrupado[dia].parada += parada.duracao
+            }
+
+            // ordena de Seg a Dom e retorna só dias que tiveram dados
+            const ordem = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
+            return ordem
+                .filter(dia => agrupado[dia])
+                .map(dia => agrupado[dia])
+
+        } catch (error) {
+            console.error('Erro ao retornar Tempo Total Parado x Tempo Total Produzindo da máquina do usuário no banco de dados:', error);
+            throw error;
+        }
+    }
 
     static async obterMaquinaAtualOperador(id_empresa, id_usuario) {
         const escala = await prisma.escalaTrabalho.findFirst({
@@ -860,37 +975,6 @@ class UsuarioModel {
         return { atual, ideal: Math.max(atual, 1) };
     }
 
-    static async producaoPorHoraOperador(id_empresa, id_usuario) {
-        try {
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
-            const amanha = new Date(hoje);
-            amanha.setDate(hoje.getDate() + 1);
-
-            const apontamentos = await prisma.apontamento.findMany({
-                where: {
-                    id_empresa,
-                    id_operador: id_usuario,
-                    data_hora_inicio: { gte: hoje, lt: amanha }
-                },
-                select: {
-                    data_hora_inicio: true,
-                    qtd_boa: true
-                }
-            });
-
-            const porHora = Array.from({ length: 24 }, (_, i) => ({ hora: `${i}h`, pecas: 0 }));
-            apontamentos.forEach(ap => {
-                const hora = new Date(ap.data_hora_inicio).getHours();
-                porHora[hora].pecas += ap.qtd_boa;
-            });
-
-            return porHora;
-        } catch (error) {
-            console.error('Erro ao buscar produção por hora do operador:', error);
-            throw error;
-        }
-    }
 
     static async produtividadeDiaOperador(id_empresa, id_usuario) {
         try {
@@ -1023,7 +1107,7 @@ class UsuarioModel {
 
             const OEEModel = (await import('./OEEModel.js')).default;
             const oee = await OEEModel.obterOeeMaquina(escala.id_maquina, id_empresa);
-            
+
             return [{
                 oee: oee.oee || 0,
                 disponibilidade: oee.disponibilidade || 0,

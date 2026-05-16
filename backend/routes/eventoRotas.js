@@ -17,9 +17,11 @@ router.post('/sistema', EventoController.registrarEventoSistema);
 router.post('/maquina', EventoController.registrarEventoMaquina);
 router.post('/justificar', EventoController.justificarEvento);
 router.post('/:id/justificar', EventoController.justificarEvento);
+router.put('/:id', EventoController.atualizarEvento);
 
 router.get('/tempo_parado_produzindo', EventoController.tempoParadoTempoProduzindoEvento);
 router.get('/top_motivos_tempo', EventoController.obterTopMotivosTempo);
 router.get('/top3-motivos-parada', EventoController.top3MotivosParada);
+router.get('/:id', EventoController.buscarPorId);
 
 export default router;

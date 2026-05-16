@@ -1,49 +1,42 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function apiFetch(rota, opcoes = {}) {
+  const token = localStorage.getItem("token");
 
-  const token = localStorage.getItem("token")
-
-    const headers = {
-    "Authorization": `Bearer ${token}`,
-    ...opcoes.headers
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    ...opcoes.headers,
   };
-  
-  // só adiciona application/json se NÃO for FormData
+
   if (!(opcoes.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
 
   const res = await fetch(`${API_URL}${rota}`, {
     ...opcoes,
-    headers
+    headers,
   });
 
-  // token expirado — manda pro login
   if (res.status === 401) {
-    localStorage.removeItem("token")
-    window.location.href = "/"
-    return
+    localStorage.removeItem("token");
+    window.location.href = "/";
+    return;
   }
 
   if (!res.ok) {
     const erroDados = await res.json().catch(() => ({}));
-    throw new Error(erroDados.message || "Erro na requisição");
+    const detalhes = Array.isArray(erroDados.detalhes)
+      ? erroDados.detalhes.map((item) => `${item.campo}: ${item.mensagem}`).join("; ")
+      : null;
+
+    throw new Error(
+      erroDados.message ||
+      erroDados.mensagem ||
+      detalhes ||
+      erroDados.erro ||
+      "Erro na requisicao"
+    );
   }
 
   return await res.json();
 }
-
-//o que deve ter em toda página que fará um fetch 
-
-// import { apiFetch } from "@/lib/api"
-
-// // exemplo para GET
-// const res  = await apiFetch("/api/funcionarios")
-// const data = await res.json()
-
-// // exemplo para POST
-// const res = await apiFetch("/api/funcionarios", {
-//   method: "POST",
-//   body:   JSON.stringify({ nome, cargo })
-// })

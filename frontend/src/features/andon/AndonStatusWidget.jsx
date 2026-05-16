@@ -23,8 +23,8 @@ const cards = [
   },
 ];
 
-export function AndonStatusWidget({ scope = "factory", title }) {
-  const { data, loading, error } = useAndonStatus(scope);
+export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) {
+  const { data, loading, error } = useAndonStatus(scope, idSetor);
   const heading = title ?? (scope === "sector" ? "Status das Máquinas do Setor" : "Status das Máquinas");
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
