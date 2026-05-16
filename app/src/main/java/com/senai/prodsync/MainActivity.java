@@ -1,9 +1,9 @@
 package com.senai.prodsync;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,46 +15,47 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
+    private LinearLayout btnCadastrar;
+    private TextView tvCadastro;
+    private Button btnLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Configuração dos Insets (Mantendo o que você já tinha)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // 1. Referenciar os componentes do XML
-        LinearLayout btnCadastrar = findViewById(R.id.btn_cadastrar);
-        TextView tvCadastroLink = findViewById(R.id.tv_cadastro);
+        // Inicializando os componentes
+        btnCadastrar = findViewById(R.id.btn_cadastrar);
+        tvCadastro = findViewById(R.id.tv_cadastro);
+        btnLogin = findViewById(R.id.btn_login);
 
-        // 2. Definir a URL do seu site
-        String urlSite = "https://canva.com";
-
-        btnCadastrar.setOnClickListener(new View.OnClickListener() {
+        // Listener compartilhado para ir para a tela de cadastro
+        View.OnClickListener navToCadastro = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                abrirSite(urlSite);
+                Intent intent = new Intent(MainActivity.this, CadastroActivity.class);
+                startActivity(intent);
             }
-        });
+        };
 
-        // 4. Configurar o clique para o texto "Não tem uma conta? Cadastre-se"
-        tvCadastroLink.setOnClickListener(new View.OnClickListener() {
+        // Configurando os cliques
+        btnCadastrar.setOnClickListener(navToCadastro);
+        tvCadastro.setOnClickListener(navToCadastro);
+
+        // Configurando o clique do login (para ir para a Home)
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                abrirSite(urlSite);
+                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                startActivity(intent);
             }
         });
-    }
-
-    // Método auxiliar para evitar repetição de código
-    private void abrirSite(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        startActivity(intent);
     }
 }
