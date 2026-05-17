@@ -29,6 +29,23 @@ import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 
+
+// Layout geral
+import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid } from "@/components/AnimatedComponents";
+
+// Componentes de detalhe
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  UserProfileCard,
+  DetailSectionTitle,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  SectionHighlight,
+  DetailListingSection,
+  DetailActions,
+} from "@/components/DetailComponents";
+
 const colunasOrdemProd = [
   {
     id: "id",
@@ -305,45 +322,28 @@ export default function OrdensDeProducaoGestor() {
 
 
         {/* Listagem de OPs */}
-        <section>
-          <div className="flex items-center py-8 gap-5">
-            <h1 className="text-4xl font-semibold">OPs</h1>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
+<SectionDivider title="OPs" className="mt-8" />
 
           {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none font-medium bg-transparent"
-                placeholder="Busque por id ou nome ..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
+<SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por id ou nome..."
+      />
 
-          <div className="row_ord_fil_cont flex items-center py-3 justify-between mt-3">
-            <p>{dadosExibidos.length} OPs encontradas</p>
-
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacao}
-                onSortChange={handleSort}
-              />
-              <FilterDropdown
-                filtersConfig={opsFilter}
-                onApply={aplicarFiltros}
-              />
-            </div>
-          </div>
+      <FilterRow
+        count={dadosExibidos.length}
+        label="OPs"
+        actions={
+          <>
+            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+            <FilterDropdown filtersConfig={opsFilter} onApply={aplicarFiltros} />
+          </>
+        }
+      />
 
           {/* Tabela */}
+          <FadeUpItem className="mt-4">
           {dadosExibidos.length > 0 ? (
             <TableListagens
               data={dadosExibidos}
@@ -393,13 +393,12 @@ export default function OrdensDeProducaoGestor() {
               )}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
-              <Search className="w-12 h-12 text-gray-300 mb-3" />
-              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
-              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
-            </div>
+            <EmptyState
+                      title="Nenhum resultado encontrado"
+                      message="Ajuste seus filtros ou termo de busca."
+                    />
           )}
-        </section>
+          </FadeUpItem>
     </PageLayout>
   );
 }

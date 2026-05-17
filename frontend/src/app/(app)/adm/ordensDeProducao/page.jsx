@@ -367,7 +367,7 @@ export default function OrdensDeProducao() {
           </>
         }
       />
- 
+      <FadeUpItem className="mt-4">
       {dadosExibidos.length > 0 ? (
         <TableListagens
           data={dadosExibidos}
@@ -414,6 +414,7 @@ export default function OrdensDeProducao() {
           message="Ajuste seus filtros ou termo de busca."
         />
       )}
+      </FadeUpItem>
  
     </PageLayout>
   );

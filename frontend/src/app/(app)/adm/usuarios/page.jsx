@@ -216,7 +216,7 @@ export default function Usuarios() {
       </ContentGrid>
 
       {/* Listagem */}
-      {/* Listagem de usuários */}
+
       <SectionDivider title="Listagem" className="mt-8" />
 
       <SearchBar

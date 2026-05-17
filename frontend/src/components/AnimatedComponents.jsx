@@ -151,8 +151,7 @@ export function PageHeader({ title, action, className, underline = true, subtitl
         </div>
     </motion.div>
   );
-}
-// ─────────────────────────────────────────────
+}// ─────────────────────────────────────────────
 // SECTION DIVIDER
 // Linha horizontal com título — padrão das páginas
 // ─────────────────────────────────────────────
@@ -163,29 +162,32 @@ export function PageHeader({ title, action, className, underline = true, subtitl
  * @param {string}    className — classes extras
  */
 export function SectionDivider({ title, action, className }) {
-    return (
-      <motion.div
-        className={cn(
-          "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6",
-          className
-        )}
-      >
-        <div className="flex items-center gap-5 flex-1 min-w-0">
-          <h2 className="text-3xl sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap">
-            {title}
-          </h2>
-          <hr className="hidden sm:block bg-black flex-1 h-[3px] rounded-full" />
+  return (
+    <motion.div
+      variants={VARIANTS.fadeUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      className={cn(
+        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6",
+        className
+      )}
+    >
+      <div className="flex items-center gap-5 flex-1 min-w-0">
+        <h2 className="text-3xl sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap">
+          {title}
+        </h2>
+        <hr className="hidden sm:block bg-black flex-1 h-[3px] rounded-full" />
+      </div>
+      
+      {action && (
+        <div className="flex-shrink-0 w-full sm:w-auto">
+          {action}
         </div>
-        
-        {action && (
-          <div className="flex-shrink-0 w-full sm:w-auto">
-            {action}
-          </div>
-        )}
-      </motion.div> 
-    );
-  }
-
+      )}
+    </motion.div> 
+  );
+}
 // ─────────────────────────────────────────────
 // STAGGER WRAPPER
 // Container que aciona animação cascata nos filhos

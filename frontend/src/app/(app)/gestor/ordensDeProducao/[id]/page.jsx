@@ -24,6 +24,32 @@ import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoE
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormCadastroEventoGestor from "@/components/ui/forms/historicoEventos/formCadastroEventoGestor";
 
+// AnimatedComponents
+import {
+  PageLayout,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  WidgetCard,
+  FadeUpItem
+} from "@/components/AnimatedComponents";
+ 
+// DetailComponents
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  DetailHeader,
+  DetailActions,
+  DetailInfoCard,
+  DetailInfoColumn,
+  DetailInfoField,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  DetailListingSection,
+  StatusBadge,
+} from "@/components/DetailComponents";
+ 
+
 
 
 export default function OPDetalheGestor({ params }) {
@@ -444,19 +470,17 @@ export default function OPDetalheGestor({ params }) {
   });
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
+    <PageLayout>
+        <DetailPageContainer>
+          <DetailBackLink
+            href="/gestor/ordensDeProducao"
+            label="Voltar para Ordens de Produção"
+          />
 
-        <Link className="flex items-center" href="/adm/ordensDeProducao">
-          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Ordens de Produção </p>
-        </Link>
-
-        <section id="infos_op" className="flex flex-col">
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold">Ordem de Produção #AAA550 </h1>
-
-            <div className="flex space-x-2">
+          <DetailHeader
+            title="Ordem de Produção #AAA550"
+            actions={
+              <DetailActions>
               <Dialog>
                 <DialogTrigger className="text-[#122f60] cursor-pointer">
                   <Pencil size={36} className="mr-1" />
@@ -474,127 +498,121 @@ export default function OPDetalheGestor({ params }) {
                   <FormExclusaoOp />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-        </section>
+              </DetailActions>
+            }
+          />
 
         {/* Seção 1: Info card + Progresso */}
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div className="md:col-span-2">
-              <div className="flex items-center">
-                <div className="flex gap-2 bg-white border rounded-xl shadow-sm w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4">
-                  <Image src="/demo_maq.png" className="rounded-lg" alt="MÃ¡quina" width={150} height={150} />
-                  <p className="text-2xl">THAK-90334</p>
-                  <p className="text-[#7c7c81] text-2xl font-semibold">Meta: 300 peças</p>
-                </div>
+          <DetailWidgetGrid cols="2-1">
+            <DetailWidgetCard colSpan="md:col-span-2">
+              <DetailInfoCard layout="row">
+                <DetailInfoColumn>
+                  <DetailInfoField
+                    label="Setor"
+                    value={
+                      <Link
+                        href="/adm/setores/1"
+                        className="hover:underline text-primary font-semibold"
+                      >
+                        Rosca
+                      </Link>
+                    }
+                  />
 
-                <div>
-                  <div className="py-3 font-semibold text-gray-900 text-2xl">
-                    <div className="flex flex-col gap-3">
-                      <p>
-                        Setor:
-                        <Link href="/adm/setores/1" className="font-medium hover:underline ml-2">
-                          Rosca
-                        </Link>
-                      </p>
+                  <DetailInfoField
+                    label="Status"
+                    value={<StatusBadge status="Produzindo" />}
+                  />
 
-                      <p>
-                        Status:
-                        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none ml-2">Produzindo</Badge>
-                      </p>
+                  <DetailInfoField
+                    label="Prioridade"
+                    value={
+                      <Badge
+                        variant="outline"
+                        className="border border-vermelho-vivido bg-transparent text-black text-sm font-medium"
+                      >
+                        <Flame className="text-vermelho-vivido mr-1" />
+                        Crítica
+                      </Badge>
+                    }
+                  />
 
-                      <p>
-                        Prioridade:
-                        <Badge variant="outline" className="ml-2 border border-vermelho-vivido bg-transparent text-black text-sm font-medium"><Flame className="text-vermelho-vivido" />Crítica</Badge>
-                      </p>
+                  <DetailInfoField
+                    label="Operador"
+                    value={
+                      <Link
+                        href="/adm/usuarios/1"
+                        className="hover:underline text-primary font-semibold"
+                      >
+                        João Silva
+                      </Link>
+                    }
+                  />
 
-                      <div className="flex">Operador:
-                        <Link href="/adm/usuarios/1" className="font-medium hover:underline ml-2">
-                          João Silva
-                        </Link>
-                      </div>
+                  <DetailInfoField label="Início" value="26/03/2024 08:00" />
+                  <DetailInfoField
+                    label="Prazo Final"
+                    value="26/03/2024 18:00"
+                  />
+                </DetailInfoColumn>
+              </DetailInfoCard>
+            </DetailWidgetCard>
 
-                      <div className="flex">
-                        <p>Início:</p>
-                        <p id="" className="text-2xl font-medium ml-2">
-                          26/03/2024 08:00
-                        </p>
-                      </div>
-
-                      <div className="flex">
-                        <p>Prazo Final:</p>
-                        <p id="" className="text-2xl font-medium ml-2">
-                          26/03/2024 18:00
-                        </p>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
+            <DetailWidgetCard colSpan="md:col-span-1">
               <OPProgressoWidget opId={opId} />
-            </div>
-          </div>
-        </section>
+            </DetailWidgetCard>
+          </DetailWidgetGrid>
 
-        <section className="bg-white border rounded-xl p-6 shadow-sm">
-          <OPOEEDetalheWidget opId={opId} />
-        </section>
+          <DetailWidgetCard>
+            <OPOEEDetalheWidget opId={opId} />
+          </DetailWidgetCard>
 
         {/* Listagens */}
-        {/* Listagem de Histórico de Eventos da OP */}
-        <section id="listagem_histEventos">
-          <div className="flex items-center justify-between gap-5 mt-6 mb-3">
-            <h1 className="text-4xl font-semibold">Histórico de Eventos da OP</h1>
+<DetailListingSection
+            id="listagem_histEventos"
+            title="Histórico de Eventos da OP"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-2xl gap-2">
+                  <Plus size={28} className="text-white cursor-pointer" />
+                  Cadastrar
+                </DialogTrigger>
 
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-xl gap-2">
-                <Plus size={26} className="text-white cursor-pointer" />
-                Cadastrar
-              </DialogTrigger>
-
-              <DialogContent>
-                <FormCadastroEventoGestor />
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
+                <DialogContent>
+                  <FormCadastroEventoGestor />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
                 value={buscaEvento}
                 onChange={(e) => setBuscaEvento(e.target.value)}
+                placeholder="Busque por nome ou id..."
               />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosExibidos.length} eventos encontrados</p>
-
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoEventos}
-                onSortChange={handleSortEventos}
+            }
+            filterRow={
+              <FilterRow
+                count={dadosExibidos.length}
+                label="eventos"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoEventos}
+                      onSortChange={handleSortEventos}
+                    />
+                    <FilterDropdown
+                      filtersConfig={eventosFilter}
+                      onApply={aplicarFiltrosEventos}
+                    />
+                  </>
+                }
               />
-
-              <FilterDropdown
-                filtersConfig={eventosFilter}
-                onApply={aplicarFiltrosEventos}
-              />
-            </div>
-          </div>
+            }
+          >
 
           {/* Tabela */}
+                    <FadeUpItem>
           {dadosExibidos.length > 0 ? (
             <TableListagens
               data={dadosExibidos}
@@ -642,52 +660,47 @@ export default function OPDetalheGestor({ params }) {
               )}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
-              <Search className="w-12 h-12 text-gray-300 mb-3" />
-              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
-              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
-            </div>
+            <EmptyState
+                  title="Nenhum evento encontrado"
+                  message="Ajuste os filtros ou o termo de busca."
+                />
           )}
 
-        </section>
+        </FadeUpItem>
+        </DetailListingSection>
 
         {/* Listagem de Histórico de Apontamentos da OP  */}
-        <section id="listagem_histApontamentos">
-          <div className="flex items-center justify-between gap-5 mt-5">
-            <h1 className="text-4xl w-[125] font-semibold">Histórico de Apontamentos da OP</h1>
-          </div>
-
-          {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
-                value={buscaApontamento}
-                onChange={(e) => setBuscaApontamento(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoApontamento}
-                onSortChange={handleSortApontamento}
-              />
-
-              <FilterDropdown
-                filtersConfig={apontamentoFilter}
-                onApply={aplicarFiltrosApontamento}
-              />
-            </div>
-          </div>
-
+        <FadeUpItem>
+            <DetailListingSection
+              id="listagem_histApontamentos"
+              title="Histórico de Apontamentos da OP"
+              search={
+                <SearchBar
+                  value={buscaApontamento}
+                  onChange={(e) => setBuscaApontamento(e.target.value)}
+                  placeholder="Busque por nome ou id..."
+                />
+              }
+              filterRow={
+                <FilterRow
+                  count={dadosApontamentosFiltrados.length}
+                  label="apontamentos"
+                  actions={
+                    <>
+                      <OrdenarDropdown
+                        label="Ordenar por"
+                        options={opcoesOrdenacaoApontamento}
+                        onSortChange={handleSortApontamento}
+                      />
+                      <FilterDropdown
+                        filtersConfig={apontamentoFilter}
+                        onApply={aplicarFiltrosApontamento}
+                      />
+                    </>
+                  }
+                />
+              }
+            >
           {/* Tabela */}
           {dadosApontamentosFiltrados.length > 0 ? (
             <TableListagens
@@ -695,15 +708,16 @@ export default function OPDetalheGestor({ params }) {
               columns={colunasApontamento}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
-              <Search className="w-12 h-12 text-gray-300 mb-3" />
-              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
-              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
-            </div>
+<EmptyState
+                  title="Nenhum apontamento encontrado"
+                  message="Ajuste os filtros ou o termo de busca."
+                />
           )}
-        </section>
+          </DetailListingSection>
+        </FadeUpItem>
+      </DetailPageContainer>
 
-      </div>
-    </main>
+  </PageLayout>
+
   );
 }

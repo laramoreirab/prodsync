@@ -157,7 +157,7 @@ export default function ProducaoOperadorPage({ params }) {
   });
 
   return (
-    <PageLayout>
+   <PageLayout> 
       <DetailPageContainer>
 
         {/* Voltar */}

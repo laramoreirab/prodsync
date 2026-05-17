@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SetorMaquinaStatusWidget }  from "@/features/setores/SetorMaquinaStatusWidget";
-import { SetorOEEMedioWidget }       from "@/features/setores/SetorOEEMedioWidget";
-import { SetorOEEEvolucaoWidget }    from "@/features/setores/SetorOEEEvolucaoWidget";
-import { SetorTopOperadoresWidget }  from "@/features/setores/SetorTopOperadoresWidget";
-import { SetorMotivosParadaWidget }  from "@/features/setores/SetorMotivosParadaWidget";
-import { SetorProducaoSemanalWidget} from "@/features/setores/SetorProducaoSemanalWidget";
+import { SetorMaquinaStatusWidget } from "@/features/setores/SetorMaquinaStatusWidget";
+import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
+import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
+import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
+import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
+import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
+
+
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+
 
 export default function DashboardGeralGestor() {
   const [setorId, setSetorId] = useState(null);
@@ -20,43 +24,38 @@ export default function DashboardGeralGestor() {
     } catch {
       // token ausente ou malformado
     }
-    //O SETORID VEM PELO TOKEN
   }, []);
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-4 pb-10">
-      <div className="mb-2 flex justify-start">
-        <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-          Dashboard Geral do Setor
-        </h1>
-      </div>
+    <PageLayout>
+      <PageHeader title="Dashboard Geral do Setor" />
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
+      <ContentGrid cols={3}>
+        <WidgetCard colSpan="md:col-span-2">
           <SetorMaquinaStatusWidget setorId={setorId} />
-        </div>
-        <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm flex flex-col items-center justify-center">
+        </WidgetCard>
+        <WidgetCard centered>
           <SetorOEEMedioWidget setorId={setorId} />
-        </div>
-      </section>
+        </WidgetCard>
+      </ContentGrid>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
+      <ContentGrid cols={3}>
+        <WidgetCard colSpan="md:col-span-2">
           <SetorProducaoSemanalWidget setorId={setorId} />
-        </div>
-        <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
+        </WidgetCard>
+        <WidgetCard>
           <SetorTopOperadoresWidget setorId={setorId} />
-        </div>
-      </section>
+        </WidgetCard>
+      </ContentGrid>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
+      <ContentGrid cols={3}>
+        <WidgetCard>
           <SetorMotivosParadaWidget setorId={setorId} />
-        </div>
-        <div className="md:col-span-2 bg-white border rounded-xl p-6 shadow-sm">
+        </WidgetCard>
+        <WidgetCard colSpan="md:col-span-2">
           <SetorOEEEvolucaoWidget setorId={setorId} />
-        </div>
-      </section>
-    </div>
+        </WidgetCard>
+      </ContentGrid>
+    </PageLayout>
   );
 }
