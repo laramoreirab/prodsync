@@ -1,3 +1,5 @@
+import e from "express";
+
 export * from "./AreaChart";
 export * from "./LineChart";
 export * from "./GaugeSemicircular";
@@ -11,3 +13,4 @@ export * from "./BarComLimite";
 export * from "./BarComValorETopo";
 export * from "./LineMultiplasSeries";
 export * from "./KPI";
+export * from "./KPIRetangulo";

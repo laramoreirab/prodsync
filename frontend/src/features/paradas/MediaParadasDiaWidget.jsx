@@ -1,5 +1,5 @@
 "use client"
-import { KPIRetangulo } from "@/components/ui/charts/components";
+import { KPI } from "@/components/ui/charts/components";
 import { useMediaParadasDia } from "./hooks/useMediaParadasDia";
 
 export function MediaParadasDiaWidget(){
@@ -11,7 +11,7 @@ export function MediaParadasDiaWidget(){
       if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
       
       return (
-        <KPIRetangulo
+        <KPI
           title={data?.titulo}
           value={data?.valor}
         />

@@ -1,24 +1,45 @@
 "use client";
 
-export function KPI({ title, value }) {
-  return (
-     <div className="w-full h-full aspect-square min-h-[180px] flex flex-col">
+import { useEffect, useState } from "react";
 
+export function KPI({ title, value }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const target = Number(value) || 0;
+    let start = 0;
+    const duration = 1000; // 1 segundo
+    const startTime = performance.now();
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Efeito de desaceleração (easeOutQuad)
+      const ease = progress * (2 - progress);
+      
+      setDisplayValue(Math.floor(ease * target));
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [value]);
+
+  return (
+    <div className="w-full h-full aspect-square min-h-[180px] flex flex-col">
       <div className="flex flex-col items-start justify-start">
-        <p className="text-sm font-semibold text-black leading-tight">
-          {title}
-        </p>
-        <p className="text-xs text-gray-400 font-semibold mt-1">
-          *Atualizado em tempo real
-        </p>
+        <p className="text-sm font-semibold text-black leading-tight">{title}</p>
+        <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
       </div>
 
       <div className="flex-1 flex items-center justify-center">
         <h2 className="text-5xl font-medium text-black tracking-tight">
-          {value}
+          {displayValue}
         </h2>
       </div>
-      
     </div>
   );
 }
