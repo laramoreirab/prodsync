@@ -3,7 +3,7 @@ import Header from "@/components/ui/topbar"
 
 export default function AdminLayout({ children }) {
   return (
-    <div className="min-h-screen w-full bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat">
+    <div data-app-shell className="min-h-screen w-full bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat dark:bg-[#0b1020] dark:bg-none">
       <Header showSidebarTrigger />
 
       <div className="flex w-full gap-4 px-4 pb-8 pt-20 sm:px-6 lg:px-8">

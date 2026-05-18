@@ -24,7 +24,7 @@ export function OEECriticoWidget() {
         <div className="flex flex-col items-center">
           <GaugeSemicircular
             title={data.setor}
-            data={[{ value: data.oee, fill: "#00357a" }]}
+            data={[{ value: data.oee, fill: "var(--color-grafico-area)" }]}
             size="lg"
             config={{
               value: { label: data.setor },
