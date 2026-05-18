@@ -243,7 +243,10 @@ export default function PageSetores() {
               onSelectedChange={setSelecionados}
               excluirLote={
                 <DialogContent>
-                  <FormExclusaoSetor />
+                  <FormExclusaoSetor
+                    setorIds={selecionados.map((setor) => setor.id_setor ?? setor.id)}
+                    onExclusaoSucesso={refresh}
+                  />
                 </DialogContent>
               }
               acoesDropdown={(setor) => (

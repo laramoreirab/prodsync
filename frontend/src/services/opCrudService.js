@@ -1,61 +1,97 @@
-import { opMockService } from "@/mocks/opMock";
+import { apiFetch } from "@/lib/api";
 
-// trocar para false quando o backend estiver pronto p integração!!
-const USE_MOCK = true;
+const API_URL = "/api/ordens";
 
-const API_URL = "/api/ordens-producao";
+const prioridadeParaBackend = {
+  "Crítica": "Critica",
+  "Critica": "Critica",
+  "Média": "Media",
+  "Media": "Media",
+  Alta: "Alta",
+  Baixa: "Baixa",
+};
 
-const apiService = {
-  //buscar todas as OPs
+const prioridadeParaTela = {
+  Critica: "Crítica",
+  Media: "Média",
+  Alta: "Alta",
+  Baixa: "Baixa",
+};
+
+const statusParaTela = {
+  Em_Andamento: "Produzindo",
+  Parada: "Parada",
+  Setup: "Setup",
+  Finalizada: "Concluída",
+};
+
+const extrairDados = (response) => response?.dados ?? response;
+
+const normalizarPayload = (dados) => {
+  const payload = {
+    ...dados,
+    prioridade: prioridadeParaBackend[dados.prioridade] ?? dados.prioridade,
+  };
+
+  if (dados.id_setor !== undefined && dados.id_setor !== "") payload.id_setor = Number(dados.id_setor);
+  if (dados.id_maquina !== undefined && dados.id_maquina !== "") payload.id_maquina = Number(dados.id_maquina);
+  if (dados.qtd_planejada !== undefined && dados.qtd_planejada !== "") payload.qtd_planejada = Number(dados.qtd_planejada);
+
+  return payload;
+};
+
+const normalizarOp = (op) => {
+  if (!op) return op;
+
+  const produzido = op.produzido ?? op.qtd_produzida ?? 0;
+  const planejado = Number(op.qtd_planejada) || 0;
+  const progressoNumero = planejado > 0 ? Math.round((produzido / planejado) * 100) : 0;
+
+  return {
+    ...op,
+    id: op.id ?? op.id_ordem,
+    nome: op.nome ?? op.codigo_lote ?? op.produto,
+    setor: op.setor ?? op.maquina?.setor?.nome_setor ?? op.id_setor,
+    prioridade: prioridadeParaTela[op.prioridade] ?? op.prioridade,
+    status_op: statusParaTela[op.status_op] ?? op.status_op,
+    progresso: op.progresso ?? progressoNumero,
+  };
+};
+
+const normalizarRespostaLista = (response) => ({
+  ...response,
+  dados: (response?.dados ?? []).map(normalizarOp),
+});
+
+export const opCrudService = {
   getAll: async () => {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Erro ao buscar ordens de produção");
-    return await response.json();
+    const response = await apiFetch(`${API_URL}?pagina=1&limite=100`);
+    return normalizarRespostaLista(response);
   },
 
-  //buscar op por id
   getById: async (id) => {
-    const response = await fetch(`${API_URL}/${id}`);
-    if (!response.ok) throw new Error("Erro ao buscar ordem de produção");
-    return await response.json();
+    const response = await apiFetch(`${API_URL}/${id}`);
+    return normalizarOp(extrairDados(response));
   },
 
-  //criar nova OP
   create: async (dados) => {
-    const response = await fetch(API_URL, {
+    const response = await apiFetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dados),
+      body: JSON.stringify(normalizarPayload(dados)),
     });
-    if (!response.ok) throw new Error("Erro ao criar ordem de produção");
-    return await response.json();
+    return normalizarOp(extrairDados(response));
   },
 
-  //atualizar OP
   update: async (id, dados) => {
-    const response = await fetch(API_URL, {
+    const response = await apiFetch(`${API_URL}/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_ordem: id, ...dados }),
+      body: JSON.stringify(normalizarPayload(dados)),
     });
-    if (!response.ok) throw new Error("Erro ao atualizar ordem de produção");
-    return await response.json();
+    return normalizarOp(extrairDados(response));
   },
 
-  //deletar OP
-  delete: async (id, id_maquina) => {
-    const response = await fetch(API_URL, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_ordem: id, id_maquina }),
-    });
-    if (!response.ok) throw new Error("Erro ao excluir ordem de produção");
+  delete: async (id) => {
+    await apiFetch(`${API_URL}/${id}`, { method: "DELETE" });
     return true;
   },
 };
-
-//remover essa linha pós conexão com o backend e seguir as instruções no final do arquivo
-export const opCrudService = USE_MOCK ? opMockService : apiService;
-//após a conexão com o backend, remover o arquivo opMock.js e o USE_MOCK do service
-//além disso, coloque o que está dentro da const apiService dentro de:
-//export const opCrudService ={o que ta dentro de apiService aqui dentro}

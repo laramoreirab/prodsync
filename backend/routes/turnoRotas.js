@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import TurnoController from '../controllers/TurnoController.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js';
+import { aplicarEscopoGestor, autorizarSetorParam } from '../middlewares/setorAccessMiddleware.js';
 
 const router = Router();
 
@@ -10,10 +11,10 @@ router.use(authMiddleware);
 router.post('/criarTurno', adminMiddleware, TurnoController.criarTurno)
 
 // Obter todos os turnos da empresa
-router.get('/listarTurnos',TurnoController.obterTurnosPorEmpresa)
+router.get('/listarTurnos', aplicarEscopoGestor, TurnoController.obterTurnosPorEmpresa)
 
 // Obter turno atual
-router.get('/turno/atual',TurnoController.obterTurnoAtual)
+router.get('/turno/atual', aplicarEscopoGestor, TurnoController.obterTurnoAtual)
 
 // Verificar conflito de horário
 router.get('/operadores/:id_operador/conflito',TurnoController.verificarConflitoTurno)
@@ -21,13 +22,13 @@ router.get('/operadores/:id_operador/conflito',TurnoController.verificarConflito
 // ---------------KPIs--------------------
 
 // KPIs do turno atual
-router.get('/kpis/turno-atual',TurnoController.obterKpisTurnoAtual)
+router.get('/kpis/turno-atual', aplicarEscopoGestor, TurnoController.obterKpisTurnoAtual)
 
 // Status de máquinas por turno
-router.get('/status-maquinas-por-turno',TurnoController.obterStatusMaquinasPorTurno)
+router.get('/status-maquinas-por-turno', aplicarEscopoGestor, TurnoController.obterStatusMaquinasPorTurno)
 
 // Comparativo entre turnos
-router.get('/comparativo/producao',TurnoController.obterComparativoTurnos)
+router.get('/comparativo/producao', aplicarEscopoGestor, TurnoController.obterComparativoTurnos)
 
 // KPIs de um turno específico
 router.get('/kpis/:idTurno',TurnoController.obterKpisTurno)

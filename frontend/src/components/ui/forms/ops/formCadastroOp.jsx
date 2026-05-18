@@ -5,7 +5,9 @@ import {
 import { Plus, ChevronDown, Calendar, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
-import { opCrudService } from '@/services/opCrudService'; 
+import { opCrudService } from '@/services/opCrudService';
+import { useSetores } from '@/hooks/useSetores';
+import { useMaquinas } from '@/hooks/useMaquinas';
 
 export default function FormCadastroOp({ onCadastroSucesso }) {
 
@@ -23,6 +25,18 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
     const [fimData, setFimData] = useState('');                  // backend: data_fim
     const [fimHora, setFimHora] = useState('');
     const [observacaoOp, setObservacaoOp] = useState('');        // backend: observacao_op
+
+    const { setores } = useSetores();
+    const { maquinas } = useMaquinas();
+
+    const maquinasFiltradas = idSetor
+        ? maquinas.filter((maquina) => String(maquina.id_setor) === String(idSetor))
+        : maquinas;
+
+    const handleSetorChange = (value) => {
+        setIdSetor(value);
+        setIdMaquina('');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -119,13 +133,15 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                             <div className="relative">
                                 <select
                                     value={idSetor}
-                                    onChange={(e) => setIdSetor(e.target.value)}
+                                    onChange={(e) => handleSetorChange(e.target.value)}
                                     className="w-full border text-lg shadow-md border-gray-100 rounded-lg p-2 appearance-none text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-200 bg-white"
                                 >
                                     <option value="">Selecione...</option>
-                                    {/* id_setor — número — backend: id_setor */}
-                                    <option value="1">Roscas</option>
-                                    <option value="2">Engrenagens</option>
+                                    {setores.map((setor) => (
+                                        <option key={setor.id} value={setor.id}>
+                                            {setor.nome_setor ?? setor.setor ?? setor.nome ?? `Setor ${setor.id}`}
+                                        </option>
+                                    ))}
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
                             </div>
@@ -140,10 +156,11 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                                     className="w-full border text-lg shadow-md border-gray-100 rounded-lg p-2 appearance-none text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-200 bg-white"
                                 >
                                     <option value="">Selecione...</option>
-                                    {/* id_maquina — número — backend: id_maquina */}
-                                    <option value="1">Torno CNC Alpha</option>
-                                    <option value="2">Fresadora Beta</option>
-                                    <option value="3">Retificadora Gama</option>
+                                    {maquinasFiltradas.map((maquina) => (
+                                        <option key={maquina.id_maquina} value={maquina.id_maquina}>
+                                            {maquina.nome ?? maquina.nome_maquina ?? `Máquina ${maquina.id_maquina}`}
+                                        </option>
+                                    ))}
                                 </select>
                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
                             </div>

@@ -1,73 +1,39 @@
-// // src/services/producaoService.js
-// // Aqui ficam as funções específicas de produção, que usam o apiFetch genérico do api.js. Elas também fazem a validação dos dados usando os schemas do zod.
-// import { apiFetch } from "@/lib/api";
-// import {
-//   ProducaoPorHoraArraySchema,
-//   ProducaoPorSetorArraySchema,
-// } from "@features/producao/schemas/producaoSchema";
-
-// export const producaoService = {
-//   async getPorHora() {
-//     const data = await apiFetch("/api/dashboard/producao-dia");
-//     return ProducaoPorHoraArraySchema.parse(data); 
-//   },
-
-//   async getPorSetor() {
-//     const data = await apiFetch("/api/setores/obterProducaoPorSetor");
-//     return ProducaoPorSetorArraySchema.parse(data);
-//   },
-// };
-//   async getOEE() {
-//     const data = await apiFetch("/api/oee/geral");
-//     return OEESchema.parse(data);
-//   },
-// };
-
-
-//Mock para desenvolvimento sem backend
 import { apiFetch } from "@/lib/api";
 import {
   OEESchema,
   ProducaoPorHoraArraySchema,
   ProducaoPorSetorArraySchema,
   PecasPorMinutoSchema,
-  ProducaoPorTurnoLotesSchema
+  ProducaoPorTurnoLotesSchema,
 } from "@features/producao/schemas/producaoSchema";
-import { mockProducaoPorSetor, mockProducaoPorHora, mockOEE, mockPecasPorMinuto, mockProducaoPorTurnoLotes } from "./mockData";
 
-const USE_MOCK = false; 
 export const producaoService = {
   async getPorHora() {
-    if (USE_MOCK) return ProducaoPorHoraArraySchema.parse(mockProducaoPorHora);
     const data = await apiFetch("/api/dashboard/producao-dia");
     return ProducaoPorHoraArraySchema.parse(data.dados);
   },
 
   async getPorSetor() {
-    if (USE_MOCK) return ProducaoPorSetorArraySchema.parse(mockProducaoPorSetor);
     const data = await apiFetch("/api/setores/obterProducaoPorSetor");
     return ProducaoPorSetorArraySchema.parse(data.dados);
   },
-   async getOEE() {
-    if (USE_MOCK) return OEESchema.parse(mockOEE);
+
+  async getOEE() {
     const data = await apiFetch("/api/oee/geral");
     return OEESchema.parse(data.dados);
   },
-  
 };
 
 export const pecasPorMinutosService = {
-  async getPecasPorMinuto(){
-    if (USE_MOCK) return PecasPorMinutoSchema.parse(mockPecasPorMinuto);
+  async getPecasPorMinuto() {
     const data = await apiFetch("/api/maquinas/dashboard/obter-pecas-por-minuto");
     return PecasPorMinutoSchema.parse(data.dados);
-  }
+  },
 };
 
 export const producaoPorTurnoLotesService = {
-  async getProducaoPorTurnoLotes(){
-    if (USE_MOCK) return ProducaoPorTurnoLotesSchema.parse(mockProducaoPorTurnoLotes);
+  async getProducaoPorTurnoLotes() {
     const data = await apiFetch("/api/turnos/kpis/turno-atual");
     return ProducaoPorTurnoLotesSchema.parse(data.dados.cards.producaoLotes);
-  }
+  },
 };

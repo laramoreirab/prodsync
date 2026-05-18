@@ -72,7 +72,12 @@ export const SetorProducaoMaquinaSchema = z.object({
   maquina: z.string(),
   qtd:   z.number(),
 });
+export const SetorProducaoDiariaSchema = z.object({
+  hora: z.string(),
+  pcs: z.number(),
+});
 
 export const SetorProducaoMaquinaArraySchema = z.array(SetorProducaoMaquinaSchema);
 export const SetorMotivosParadaArraySchema = z.array(SetorMotivosParadaSchema);
 export const SetorProducaoSemanalArraySchema = z.array(SetorProducaoSemanalSchema);
+export const SetorProducaoDiariaArraySchema = z.array(SetorProducaoDiariaSchema);
