@@ -1,5 +1,6 @@
 import MaquinaModel from '../models/MaquinaModel.js';
 import SetorModel from '../models/SetorModel.js';
+import OEEModel from '../models/OEEModel.js';
 
 class SetorController {
 
@@ -68,10 +69,27 @@ class SetorController {
         try {
             const id_empresa = req.user.id_empresa;
 
-            const setores = req.query.setorId
-                ? [await SetorModel.obterSetorPorId(Number(req.query.setorId), id_empresa)].filter(Boolean)
-                : await SetorModel.listarSetoresPorEmpresa(id_empresa);
-            res.status(200).json({ sucesso: true, dados: setores });
+            const [setores, dadosOEE] = await Promise.all([
+            SetorModel.listarSetoresPorEmpresa(Number(id_empresa)),
+            OEEModel.mediaPorSetor(Number(id_empresa)) 
+        ]);
+
+        const mapaOEE = Object.fromEntries(
+            (dadosOEE || []).map(oee => [oee.id_setor, oee.media ? `${oee.media}%` : "-"])
+        );
+        
+        const dadosFormatados = setores.map(setor => ({
+            id_setor: setor.id_setor,
+            nome_setor: setor.nome_setor,
+            localizacao: setor.localizacao,
+            gestores: setor.gestores,
+            qtd_de_maquinas: setor._count.maquinas,
+            qtd_de_operadores: setor._count.escalas,
+            // Busca o OEE correspondente ao ID do setor no mapa que criamos
+            oee_medio: mapaOEE[setor.id_setor] ?? "-"
+        }));
+
+        return res.status(200).json({ sucesso: true, dados: dadosFormatados });
         } catch (error) {
             console.error('Erro ao listar setores:', error);
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });

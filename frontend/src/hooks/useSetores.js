@@ -9,10 +9,12 @@ export function useSetores() {
   const normalizarSetor = (setor) => ({
     ...setor,
     id: setor.id ?? setor.id_setor,
+    // Pega o nome do primeiro gestor vinculado, se houver
     gestor: setor.gestor ?? setor.gestores?.[0]?.gestor?.nome ?? "-",
-    oee_medio: setor.oee_medio ?? setor.oeeMedio ?? "-",
-    qtd_de_maquinas: setor.qtd_de_maquinas ?? setor.maquinas?.length ?? 0,
-    qtd_de_operadores: setor.qtd_de_operadores ?? setor.operadores?.length ?? 0,
+    // Como esses campos já vêm calculados do backend, apenas garantimos um valor padrão
+    oee_medio: setor.oee_medio ?? "-",
+    qtd_de_maquinas: setor.qtd_de_maquinas ?? 0,
+    qtd_de_operadores: setor.qtd_de_operadores ?? 0,
   });
 
   //carregar todos os setores

@@ -389,30 +389,43 @@ class UsuarioModel {
         }
     }
 
-    static async qtdPorSetor(id_empresa, setorId = null) {
-        try {
+    static async qtdPorSetor(id_empresa) {
+    try {
+        const qtdOperadores = await prisma.escalaTrabalho.groupBy({
+            by: ['id_setor'],
+            where: { id_empresa },
+            _count: { id_operador: true }
+        })
 
-            const resultado = await prisma.escalaTrabalho.groupBy({
-                by: ['id_setor'],
-                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
-                _count: { id_operador: true }
-            })
+        const qtdGestores = await prisma.setor_Gestor.groupBy({
+            by: ['id_setor'],
+            where: { id_empresa },
+            _count: { id_gestor: true }
+        })
 
-            const setores = await prisma.setores.findMany({
-                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
-                select: { id_setor: true, nome_setor: true }
-            })
+        // 1. Buscamos os setores primeiro para ter a lista real de setores e seus nomes
+        const setores = await prisma.setores.findMany({
+            where: { id_empresa },
+            select: { id_setor: true, nome_setor: true }
+        })
 
-            const nomeSetor = Object.fromEntries(
-                setores.map(s => [s.id_setor, s.nome_setor])
-            )
+        // 2. Criamos mapas para busca rápida (O(1)) dos contadores
+        const mapOperadores = Object.fromEntries(qtdOperadores.map(o => [o.id_setor, o._count.id_operador]))
+        const mapGestores = Object.fromEntries(qtdGestores.map(g => [g.id_setor, g._count.id_gestor]))
 
-            return resultado
-                .map(r => ({
-                    setor: nomeSetor[r.id_setor] ?? 'Sem setor',
-                    qtd: r._count.id_operador
-                }))
-                .sort((a, b) => b.qtd - a.qtd)
+        // 3. Montamos o resultado final baseando-se nos setores reais da empresa
+        const resultado = setores.map(setor => {
+            const totalOperadores = mapOperadores[setor.id_setor] || 0;
+            const totalGestores = mapGestores[setor.id_setor] || 0;
+
+            return {
+                setor: setor.nome_setor,
+                qtd: totalGestores + totalOperadores
+            }
+        })
+
+        return resultado.sort((a, b) => b.qtd - a.qtd)
+
         } catch (error) {
             console.error('Erro ao contar quantidade de usuários por setor no banco de dados:', error);
             throw error;
