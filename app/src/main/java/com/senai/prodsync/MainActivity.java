@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                 // Simulando o envio do cargo (em um app real, isso viria da validação do banco)
-                intent.putExtra("USER_ROLE", "operador");
+                intent.putExtra("USER_ROLE", "adm");
                 startActivity(intent);
             }
         });

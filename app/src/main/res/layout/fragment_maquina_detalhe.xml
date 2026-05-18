@@ -11,16 +11,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="32dp">
 
-        <ImageView
-            android:id="@+id/iv_bg_pattern"
-            android:layout_width="306dp"
-            android:layout_height="350dp"
-            android:src="@drawable/bg_s_logo"
-            android:translationY="-75dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
-
         <TextView
             android:id="@+id/tv_nome_maquina_detalhe"
             android:layout_width="wrap_content"
