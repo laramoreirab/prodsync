@@ -14,7 +14,7 @@ class UsuarioController {
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
 
-            const resultado = await UsuarioModel.listarTodos(id_empresa, paginacao);
+            const resultado = await UsuarioModel.listarTodos(id_empresa, paginacao, req.query.setorId);
 
             // Normaliza o retorno: a query é sobre escalaTrabalho (inclui operador, turno, setor)
             // O frontend espera: { id, nome, funcao, id_setor, id_turno, id_maquina, email, cpf, imagem_perfil }
@@ -129,7 +129,9 @@ class UsuarioController {
         try {
             const id_empresa = req.user.id_empresa;
             const { nome, cpf, email, id_setor, id_turno, id_maquina } = req.body;
-            const funcao = String(req.body.funcao || '').trim().toLowerCase() === 'gestor' ? 'Gestor' : 'Operador';
+            const funcao = req.user.tipo === 'Gestor'
+                ? 'Operador'
+                : (String(req.body.funcao || '').trim().toLowerCase() === 'gestor' ? 'Gestor' : 'Operador');
 
             const erros = [];
             // Validar nome
@@ -495,7 +497,7 @@ class UsuarioController {
 
     static async qtdDeUsuariosTipo(req, res) {
         try {
-            const dados = await UsuarioModel.qtdPorTipo(req.user.id_empresa)
+            const dados = await UsuarioModel.qtdPorTipo(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({
                 sucesso: true,
                 dados
@@ -507,7 +509,7 @@ class UsuarioController {
     }
     static async tempoMedioSessaoTipo(req, res) {
         try {
-            const dados = await UsuarioModel.tempoMedioSessaoPorTipo(req.user.id_empresa)
+            const dados = await UsuarioModel.tempoMedioSessaoPorTipo(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Médio de Sessão por Perfil:', error)
@@ -516,7 +518,7 @@ class UsuarioController {
     }
     static async qtdUsuariosPorSetor(req, res) {
         try {
-            const dados = await UsuarioModel.qtdPorSetor(req.user.id_empresa)
+            const dados = await UsuarioModel.qtdPorSetor(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Quantidade de Usuários por Setor:', error)
@@ -525,7 +527,7 @@ class UsuarioController {
     }
     static async top5Operadores(req, res) {
         try {
-            const dados = await UsuarioModel.top5Operadores(req.user.id_empresa)
+            const dados = await UsuarioModel.top5Operadores(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Top 5 Operadores Com Mais Peças Produzidas:', error)
@@ -534,7 +536,7 @@ class UsuarioController {
     }
     static async producaoMediaPorDiaSetor(req, res) {
         try {
-            const dados = await UsuarioModel.producaoMediaPorDiaSetor(req.user.id_empresa)
+            const dados = await UsuarioModel.producaoMediaPorDiaSetor(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Produção Média de Usuário Por Dia Por Setor:', error)
@@ -543,7 +545,7 @@ class UsuarioController {
     }
     static async rotatividade(req, res) {
         try {
-            const dados = await UsuarioModel.rotatividade(req.user.id_empresa)
+            const dados = await UsuarioModel.rotatividade(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Rotatividade De Usuários:', error)
@@ -552,7 +554,7 @@ class UsuarioController {
     }
     static async metaProducaoPorSetor(req, res){
         try {
-             const dados = await UsuarioModel.metaProducaoPorSetor(req.user.id_empresa)
+             const dados = await UsuarioModel.metaProducaoPorSetor(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
                console.error('Erro no gráfico Meta de Produção por Setor:', error)

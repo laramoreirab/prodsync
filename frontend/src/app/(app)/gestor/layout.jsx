@@ -1,17 +1,20 @@
 import { AppSidebar } from "@/components/sidebar-components/sidebar-gestor/app-sidebar"
+import RoleGuard from "@/components/auth/RoleGuard"
 import Header from "@/components/ui/topbar"
 
 export default function AdminLayout({ children }) {
   return (
-    <div data-app-shell className="min-h-screen w-full bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat dark:bg-[#0b1020] dark:bg-none">
-      <Header showSidebarTrigger />
+    <RoleGuard allowedRoles={["Gestor"]}>
+      <div className="min-h-screen w-full bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat">
+        <Header showSidebarTrigger />
 
-      <div className="flex w-full gap-4 px-4 pb-8 pt-24 sm:px-6 lg:px-8">
-        <AppSidebar />
-        <main className="min-w-0 flex-1">
-          {children}
-        </main>
+        <div className="flex w-full gap-4 px-4 pb-8 pt-24 sm:px-6 lg:px-8">
+          <AppSidebar />
+          <main className="min-w-0 flex-1">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </RoleGuard>
   )
 }

@@ -3,11 +3,12 @@ import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 
 class OrdemProducaoModel {
 
-    static async listarTodos(id_empresa, paginacao) {
+    static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                 },
                 include: {
                     maquina: {

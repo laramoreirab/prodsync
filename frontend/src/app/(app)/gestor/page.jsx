@@ -1,27 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { SetorMaquinaStatusWidget }  from "@/features/setores/SetorMaquinaStatusWidget";
 import { SetorOEEMedioWidget }       from "@/features/setores/SetorOEEMedioWidget";
 import { SetorOEEEvolucaoWidget }    from "@/features/setores/SetorOEEEvolucaoWidget";
 import { SetorTopOperadoresWidget }  from "@/features/setores/SetorTopOperadoresWidget";
 import { SetorMotivosParadaWidget }  from "@/features/setores/SetorMotivosParadaWidget";
 import { SetorProducaoSemanalWidget} from "@/features/setores/SetorProducaoSemanalWidget";
+import { usePerfil } from "@/hooks/usePerfil";
 
 export default function DashboardGeralGestor() {
-  const [setorId, setSetorId] = useState(null);
-
-  useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
-    } catch {
-      // token ausente ou malformado
-    }
-    //O SETORID VEM PELO TOKEN
-  }, []);
+  const { setorId } = usePerfil();
 
   return (
     <div className="mx-auto flex w-full flex-col gap-4 pb-10">

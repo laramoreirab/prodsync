@@ -23,6 +23,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
+import { usePerfil } from "@/hooks/usePerfil";
 
 const colunasOrdemProd = [
   { id: "id", key: "id", label: "ID", className: "w-1/7" },
@@ -86,26 +87,11 @@ const filtrosOps = [
   { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Media", "MÃ©dia", "Alta", "Critica", "CrÃ­tica"] },
 ];
 
-function getSetorIdFromToken() {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload?.id_setor ?? payload?.idSetor ?? null;
-  } catch {
-    return null;
-  }
-}
-
 export default function OrdensDeProducaoGestor() {
-  const [setorId, setSetorId] = useState(null);
+  const { setorId } = usePerfil();
   const { ops, loading, refresh, excluirOp } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
-
-  useEffect(() => {
-    setSetorId(getSetorIdFromToken());
-  }, []);
 
   const opsDoSetor = useMemo(() => {
     return (ops || []).filter((op) => !setorId || String(op.id_setor) === String(setorId));
