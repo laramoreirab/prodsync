@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useSetorOEEMedio } from "./hooks/useSetorOEEMedio";
 
@@ -9,6 +10,17 @@ const oeeConfig = {
 
 export function SetorOEEMedioWidget({ setorId }) {
   const { data, loading, error } = useSetorOEEMedio(setorId);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const checkDark = () => setIsDark(document.documentElement.classList.contains("dark"));
+    checkDark();
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const fillColor = isDark ? "#7d95c6" : "#00357a";
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
@@ -24,7 +36,7 @@ export function SetorOEEMedioWidget({ setorId }) {
       <div className="flex items-center justify-center py-2">
         <GaugeSemicircular
           title={data.setor}
-          data={[{ value: data.oee, fill: "#00357a" }]}
+          data={[{ value: data.oee, fill: fillColor }]}
           size="lg"
           config={oeeConfig}
         />
