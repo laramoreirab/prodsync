@@ -13,10 +13,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Imagem Decorativa no Canto Superior Direito -->
+        <ImageView
+            android:id="@+id/iv_bg_pattern"
+            android:layout_width="306dp"
+            android:layout_height="364dp"
+            android:src="@drawable/bg_s_logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="80dp"
+            android:background="@android:color/transparent"
             app:navigationIcon="@drawable/ic_menu"
             app:navigationIconTint="@color/black"
             app:layout_constraintTop_toTopOf="parent"

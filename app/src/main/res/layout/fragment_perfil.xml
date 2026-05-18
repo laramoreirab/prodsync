@@ -4,14 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+
     tools:context=".ui.shared.PerfilFragment">
+
+    <ImageView
+        android:id="@+id/iv_bg_pattern"
+        android:layout_width="306dp"
+        android:layout_height="250dp"
+        android:src="@drawable/bg_s_logo"
+        android:translationY="-50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/tv_titulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Perfil"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="16dp"
+        android:text="Configurações"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
