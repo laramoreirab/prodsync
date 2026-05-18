@@ -8,15 +8,14 @@ import { Button } from "@/components/ui/button";
 
 export const title = "Password Validation";
 
-const InputSenha = () => {
-  const [password, setPassword] = useState("");
+const InputSenha = ({ value, onChange }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const validations = [
-    { text: "At least 8 characters", valid: password.length >= 8 },
-    { text: "Contains a number", valid: /\d/.test(password) },
-    { text: "Contains uppercase letter", valid: /[A-Z]/.test(password) },
-    { text: "Contains special character", valid: /[!@#$%^&*]/.test(password) },
+    { text: "At least 8 characters", valid: value.length >= 8 },
+    { text: "Contains a number", valid: /\d/.test(value) },
+    { text: "Contains uppercase letter", valid: /[A-Z]/.test(value) },
+    { text: "Contains special character", valid: /[!@#$%^&*]/.test(value) },
   ];
 
 /*   const strength = validations.filter((v) => v.valid).length;
@@ -54,10 +53,10 @@ const InputSenha = () => {
         <div className="relative">
           <Input
             className="bg-transparent [&::-ms-reveal]:hidden h-10"
-            id="password-realtime"
-            onChange={(e) => setPassword(e.target.value)}
+            id="confirm-password"
+            onChange={onChange}
             type={showPassword ? "text" : "password"}
-            value={password} />
+            value={value} />
           <Button
             className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
             onClick={() => setShowPassword(!showPassword)}

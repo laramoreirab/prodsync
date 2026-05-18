@@ -21,7 +21,7 @@ class MaquinaController {
         try {
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
-            const resultado = await MaquinaModel.listarMaquinasPaginadas(id_empresa, paginacao);
+            const resultado = await MaquinaModel.listarMaquinasPaginadas(id_empresa, paginacao, req.query.setorId);
 
             return res.status(200).json({
                 sucesso: true,
@@ -249,7 +249,7 @@ class MaquinaController {
                 });
             }
 
-            const maquinas = await MaquinaModel.listarMaquinasPorStatus(id_empresa, status.trim());
+            const maquinas = await MaquinaModel.listarMaquinasPorStatus(id_empresa, status.trim(), req.query.setorId);
 
             res.status(200).json({
                 sucesso: true,
@@ -317,7 +317,7 @@ class MaquinaController {
     //dashboard novo da tela de usuário adm 
     static async taxaCumprimentoMetaPorSetor(req, res) {
         try {
-            const dados = await MaquinaModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa)
+            const dados = await MaquinaModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Cumprimento de Meta de Produção Por Setor', error)
@@ -361,7 +361,7 @@ class MaquinaController {
     static async obterMediaParadasPorDia(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : 7;
-            const dados = await MaquinaModel.obterMediaParadasPorDia(req.user.id_empresa, dias);
+            const dados = await MaquinaModel.obterMediaParadasPorDia(req.user.id_empresa, dias, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -377,7 +377,7 @@ class MaquinaController {
     static async obterPecasPorMinuto(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : 7;
-            const dados = await MaquinaModel.obterPecasPorMinuto(req.user.id_empresa, dias);
+            const dados = await MaquinaModel.obterPecasPorMinuto(req.user.id_empresa, dias, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {

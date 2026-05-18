@@ -269,7 +269,6 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                 onChange={(e) => setStatus(e.target.value)}
                             >
                                 <option value="">Selecione...</option>
-                                <option value="Produzindo">Produzindo</option>
                                 <option value="Parada">Parada</option>
                                 <option value="Setup">Setup</option>
                             </select>

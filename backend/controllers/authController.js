@@ -4,6 +4,16 @@ import EmpresaModel from '../models/EmpresaModel.js';
 import { JWT_CONFIG } from '../config/jwt.js'
 
 class AuthController {
+    static montarDadosAutenticacao(usuario) {
+        const id_setor = usuario.id_setor ?? usuario.setor?.id_setor ?? null;
+
+        return {
+            id_empresa: usuario.id_empresa,
+            id_usuario: usuario.id_usuario,
+            tipo: usuario.tipo,
+            ...(id_setor ? { id_setor } : {})
+        };
+    }
 
     //POST api/auth/login - Fazer login
     static async login(req, res) {
@@ -38,12 +48,11 @@ class AuthController {
                 })
             };
 
+            const perfil = await UsuarioModel.buscarPorId(usuario.id_usuario, usuario.id_empresa);
+            const dadosToken = AuthController.montarDadosAutenticacao(perfil ?? usuario);
+
             //gerar token
-            const token = jwt.sign({
-                id_empresa: usuario.id_empresa,
-                id_usuario: usuario.id_usuario,
-                tipo: usuario.tipo
-            },
+            const token = jwt.sign(dadosToken,
                 JWT_CONFIG.secret,
                 { expiresIn: JWT_CONFIG.expiresIn }
             );
@@ -54,10 +63,12 @@ class AuthController {
                 mensagem: 'Login realizado com sucesso!',
                 dados: {
                     token,
-                    id_empresa: usuario.id_empresa,
-                    nome: usuario.nome,
-                    id_usuario: usuario.id_usuario,
-                    tipo: usuario.tipo
+                    id_empresa: dadosToken.id_empresa,
+                    nome: perfil?.nome ?? usuario.nome,
+                    id_usuario: dadosToken.id_usuario,
+                    tipo: dadosToken.tipo,
+                    id_setor: dadosToken.id_setor ?? null,
+                    setor: perfil?.setor ?? null
                 }
             });
 
@@ -272,7 +283,7 @@ class AuthController {
     //GET api/auth/perfil - Obter perfil do usuário logado
     static async obterPerfil(req, res) {
         try {
-            const usuario = await UsuarioModel.buscarPorId(req.user.id_usuario);
+            const usuario = await UsuarioModel.buscarPorId(req.user.id_usuario, req.user.id_empresa);
 
             if (!usuario) {
                 return res.status(404).json({
@@ -328,12 +339,10 @@ class AuthController {
                     mensagem: 'Identificador não encontrado'
                 })
             }
+            const dadosToken = AuthController.montarDadosAutenticacao(usuario);
+
             //gerar token
-            const token = jwt.sign({
-                id_empresa: usuario.id_empresa,
-                id_usuario: usuario.id_usuario,
-                tipo: usuario.tipo
-            },
+            const token = jwt.sign(dadosToken,
                 JWT_CONFIG.secret,
                 { expiresIn: JWT_CONFIG.expiresIn }
             );
@@ -344,7 +353,7 @@ class AuthController {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha já criada para o identificador',
-                    mensagem: 'Senha já criada para o identificado'
+                    mensagem: 'Senha já criada para o identificador'
                 })
             };
 
@@ -356,7 +365,9 @@ class AuthController {
                     id_empresa: usuario.id_empresa,
                     nome: usuario.nome,
                     id_usuario: usuario.id_usuario,
-                    tipo: usuario.tipo
+                    tipo: usuario.tipo,
+                    id_setor: dadosToken.id_setor ?? null,
+                    setor: usuario.setor ?? null
                 }
             });   
 
@@ -373,10 +384,10 @@ class AuthController {
     //POST api/auth/registroSenha- registrar a senha de primeiro acesso do usuário
     static async registroSenha(req, res) {
         try {
-            const { id } = req.user.id_usuario;
-            const { senha, senhaConfirmada } = req.body;
+            const id = req.user.id_usuario;
+            const { password, confirmPassword } = req.body;
 
-            if (!senha || senha.trim() === '') {
+            if (!password || password.trim() === '') {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha obrigatória',
@@ -384,7 +395,7 @@ class AuthController {
                 })
             };
 
-            if (!senhaConfirmada || senhaConfirmada.trim() === '') {
+            if (!confirmPassword || confirmPassword.trim() === '') {
                 return res.status(400).json({
                     sucesso: false,
                     erro: 'Senha confirmada obrigatória',
@@ -392,7 +403,7 @@ class AuthController {
                 })
             };
 
-            const comparacao = await UsuarioModel.comparacaoDeSenhas(senha, senhaConfirmada);
+            const comparacao = await UsuarioModel.comparacaoDeSenhas(password, confirmPassword);
 
             if (comparacao === false) {
                 return res.status(400).json({
@@ -403,7 +414,7 @@ class AuthController {
             };
 
             //registrar senha do usuário no banco
-            const registrarSenha = await UsuarioModel.atualizar(id, senha)
+            const registrarSenha = await UsuarioModel.atualizar(id, req.user.id_empresa, { senha: password })
             if (!registrarSenha) {
                 return res.status(400).json({
                     sucesso: false,

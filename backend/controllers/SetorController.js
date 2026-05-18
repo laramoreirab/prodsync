@@ -280,7 +280,7 @@ class SetorController {
 
     static async obterProducaoPorSetor(req, res) {
         try {
-            const dados = await SetorModel.obterProducaoPorSetor(req.user.id_empresa);
+            const dados = await SetorModel.obterProducaoPorSetor(req.user.id_empresa, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados});
         } catch (error) {
             console.error('Erro ao obter producao por setor:', error);
@@ -326,7 +326,7 @@ class SetorController {
     // Resposta: [{ id_setor, setor, qtdOperadores }]
     static async obterQuantidadeOperadoresPorSetor(req, res) {
         try {
-            const dados = await SetorModel.obterMediaOperadoresPorSetor(req.user.id_empresa);
+            const dados = await SetorModel.obterMediaOperadoresPorSetor(req.user.id_empresa, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter quantidade de operadores por setor:', error);
@@ -337,7 +337,7 @@ class SetorController {
     static async totalDeSetores(req, res){
         try {
             const id_empresa = req.user.id_empresa
-            const dados = await SetorModel.totalDeSetores(id_empresa)
+            const dados = await SetorModel.totalDeSetores(id_empresa, req.query.setorId)
             return res.status(200).json({
                 sucesso: true,
                 dados

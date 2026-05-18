@@ -31,7 +31,8 @@ const authMiddleware = (req, res, next) => {
         req.user = {
             id_empresa: decoded.id_empresa,
             id_usuario: decoded.id_usuario,
-            tipo: decoded.tipo
+            tipo: decoded.tipo,
+            id_setor: decoded.id_setor ?? decoded.idSetor ?? null
         };
 
         next();

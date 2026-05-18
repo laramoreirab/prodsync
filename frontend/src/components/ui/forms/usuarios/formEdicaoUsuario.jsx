@@ -10,6 +10,7 @@ import { usuariosCrudService } from '@/services/usuariosCrudService'; // Importa
 export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const fileInputFotoRef = useRef(null);
+    const [setores, setSetores] = useState([]);
 
     // Estados para gerenciar os dados do formulário
     const [carregando, setCarregando] = useState(true);
@@ -78,6 +79,21 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
         if (usuarioId) buscarDadosDoUsuario();
     }, [usuarioId]);
+
+        useEffect(() => {
+            async function carregarSetores() {
+                try {
+                    const dados = await setorCrudService.getAll();
+                    setSetores(dados.dados);
+                } catch (error) {
+                    console.log(error)
+                    toast.error("Erro ao carregar setores.");
+                }
+    
+            }
+    
+            carregarSetores();
+        }, []);
 
     // Função que lida com o envio do form usando FormData
     const handleSubmitIndividual = async (e) => {
@@ -207,9 +223,17 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required>
                             <option value="">Selecione...</option>
-                            <option value="1">Roscas</option>
-                            <option value="2">Brocas</option>
-                        </select>
+                                 {setores.map((setor) => (
+
+                                    <option
+                                        key={setor.id_setor}
+                                        value={setor.id_setor}
+                                    >
+                                        {setor.nome_setor}
+                                    </option>
+
+                                ))}
+                            </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
