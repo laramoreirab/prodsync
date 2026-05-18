@@ -2,6 +2,7 @@
 import Link from "next/link"; import Image from "next/image";
 import { use, useState, useEffect } from "react";
 
+
 import TableListagens from "@/components/table";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { DataEvento } from "@/components/ui/dataEvento";

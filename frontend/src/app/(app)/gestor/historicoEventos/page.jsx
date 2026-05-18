@@ -267,6 +267,16 @@ export default function HistoricoEventosGestor() {
   useEffect(() => {
     setDados(dadosEventos);
   }, []);
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_setor) setSetorId(payload.id_setor);
+    } catch {
+      // token ausente ou malformado
+    }
+  }, []);
 
   const handleSort = (criterio) => {
     const dadosCopiados = [...dadosEventos];
@@ -426,15 +436,13 @@ export default function HistoricoEventosGestor() {
       {/* Gráficos  */}
       <ContentGrid cols={3} className="mt-2">
         <WidgetCard colSpan="md:col-span-1">
-          <ParadasComparadasWidget />
+          <ParadasComparadasWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard colSpan="md:col-span-2">
-          <TopMotivosTempoWidget />
+          <TopMotivosTempoWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
-
-      {/* Listagem de eventos */}
       {/* Listagem */}
       <SectionDivider title="Listagem de Eventos" className="mt-4" />
 

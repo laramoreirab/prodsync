@@ -276,19 +276,19 @@ export default function OrdensDeProducaoGestor() {
         <KPIGrid cols={4} className="mt-4">
 
           <WidgetCard>
-            <OPAtivasKPIWidget />
+            <OPAtivasKPIWidget setorId={setorId} />
           </WidgetCard>
 
           <WidgetCard>
-            <OPAtrasadasKPIWidget />
+            <OPAtrasadasKPIWidget setorId={setorId}/>
           </WidgetCard>
 
           <WidgetCard>
-            <OPPecasBoasKPIWidget />
+            <OPPecasBoasKPIWidget setorId={setorId}/>
           </WidgetCard>
 
           <WidgetCard>
-            <OPRefugoKPIWidget />
+            <OPRefugoKPIWidget setorId={setorId}/>
           </WidgetCard>
 
 
@@ -297,15 +297,15 @@ export default function OrdensDeProducaoGestor() {
         <KPIGrid cols={3} className="mt-4">
 
           <WidgetCard>
-            <OPEficienciaWidget />
+            <OPEficienciaWidget setorId={setorId}/>
           </WidgetCard>
 
           <WidgetCard>
-            <OPTopRefugoWidget />
+            <OPTopRefugoWidget setorId={setorId}/>
           </WidgetCard>
 
           <WidgetCard>
-            <OPCargaSetorWidget />
+            <OPCargaSetorWidget setorId={setorId}/>
           </WidgetCard>
 
 
@@ -313,10 +313,10 @@ export default function OrdensDeProducaoGestor() {
 
         <ContentGrid cols={2} className="mt-6">
           <WidgetCard>
-            <OPStatusWidget />
+            <OPStatusWidget setorId={setorId}/>
           </WidgetCard>
           <WidgetCard>
-            <OPConcluidasDiaWidget />
+            <OPConcluidasDiaWidget setorId={setorId}/>
           </WidgetCard>
         </ContentGrid>
 

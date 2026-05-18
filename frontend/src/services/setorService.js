@@ -14,6 +14,14 @@ import {
     SetorMotivosParadaArraySchema,
     SetorProducaoSemanalArraySchema,
     SetorProducaoMaquinaArraySchema,
+     SetorMaquinaStatusSchema,
+  SetorOEEMedioSchema,
+  SetorOEEEvolucaoArraySchema,
+  SetorOEEPanelSchema,
+  SetorTopOperadoresArraySchema,
+  SetorMotivosParadaArraySchema,
+  SetorProducaoSemanalArraySchema,
+  SetorProducaoMaquinaArraySchema,
   } from "@features/setores/schemas/setorSchema";
 import {
   mockSetores,

@@ -73,6 +73,13 @@ export const SetorProducaoMaquinaSchema = z.object({
   qtd:   z.number(),
 });
 
+export const SetorOEEPanelSchema = z.object({
+  disponibilidade: z.number().min(0).max(100),
+  performance: z.number().min(0).max(100),
+  qualidade: z.number().min(0).max(100),
+  oee: z.number().min(0).max(100),
+});
+
 export const SetorProducaoMaquinaArraySchema = z.array(SetorProducaoMaquinaSchema);
 export const SetorMotivosParadaArraySchema = z.array(SetorMotivosParadaSchema);
 export const SetorProducaoSemanalArraySchema = z.array(SetorProducaoSemanalSchema);

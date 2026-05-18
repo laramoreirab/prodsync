@@ -165,6 +165,19 @@ export default function MaquinasGestor() {
   const [dados, setDados] = useState(dadosEstaticos);
   const [busca, setBusca] = useState("");
   const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
+  const [setorId, setSetorId] = useState(null);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.id_setor) setSetorId(payload.id_setor);
+    } catch {
+      // token ausente ou malformado
+    }
+  }, []);
+
 
   // //sincronizar dados da API com estado local
   // useEffect(() => {
@@ -228,7 +241,7 @@ export default function MaquinasGestor() {
   }
   return (
     <PageLayout>
-      <PageHeader title="Máquinas" action={
+      <PageHeader title={`Máquinas do Setor ${setorId || 'Desconhecido'}`} action={
         <Dialog>
           <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
             <Plus className="mr-2" />
@@ -242,22 +255,22 @@ export default function MaquinasGestor() {
       <KPIGrid cols={3} className="mt-4">
 
         <WidgetCard>
-          <MaquinaStatusDonutWidget />
+          <MaquinaStatusDonutWidget setorId={setorId} />
         </WidgetCard>
 
         <WidgetCard>
-          <MaquinasPorSetorWidget />
+          <MaquinasPorSetorWidget setorId={setorId}/>
         </WidgetCard>
 
         <WidgetCard>
-          <TempoMedioParadaWidget />
+          <TempoMedioParadaWidget setorId={setorId}/>
         </WidgetCard>
 
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
-          <ProducaoDefeitosWidget />
+          <ProducaoDefeitosWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
           <MaquinasPorTurnoWidget />

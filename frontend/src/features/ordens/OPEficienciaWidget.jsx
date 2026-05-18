@@ -6,8 +6,8 @@ const eficienciaConfig = {
   value: { label: "Eficiência", color: "#00357a" },
 };
 
-export function OPEficienciaWidget() {
-  const { data, loading, error } = useOPEficiencia();
+export function OPEficienciaWidget({ setorId = null }) {
+  const { data, loading, error } = useOPEficiencia(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar eficiência.</p>;

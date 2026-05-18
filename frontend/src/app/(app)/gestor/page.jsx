@@ -1,14 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SetorMaquinaStatusWidget } from "@/features/setores/SetorMaquinaStatusWidget";
+import { SetorProducaoDiariaWidget } from "@/features/setores/SetorProducaoDiariaWidget";
 import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
 import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
 import { SetorTopOperadoresWidget } from "@/features/setores/SetorTopOperadoresWidget";
 import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
-import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
-
-
+import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaquinaWidget";
+import { SetorStatusDonutWidget } from "@/features/setores/SetorStatusDonutWidget";
+import { TendendiaRefugoWidget } from "@/features/refugo/TendenciaRefugoWidget";
+import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget";
+import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
+import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
+import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
 
 
@@ -32,7 +36,7 @@ export default function DashboardGeralGestor() {
 
       <ContentGrid cols={3}>
         <WidgetCard colSpan="md:col-span-2">
-          <SetorMaquinaStatusWidget setorId={setorId} />
+          <SetorProducaoDiariaWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard centered>
           <SetorOEEMedioWidget setorId={setorId} />
@@ -41,7 +45,7 @@ export default function DashboardGeralGestor() {
 
       <ContentGrid cols={3}>
         <WidgetCard colSpan="md:col-span-2">
-          <SetorProducaoSemanalWidget setorId={setorId} />
+          <SetorOEEEvolucaoWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
           <SetorTopOperadoresWidget setorId={setorId} />
@@ -50,12 +54,21 @@ export default function DashboardGeralGestor() {
 
       <ContentGrid cols={3}>
         <WidgetCard>
-          <SetorMotivosParadaWidget setorId={setorId} />
+          <SetorProducaoMaquinaWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard colSpan="md:col-span-2">
-          <SetorOEEEvolucaoWidget setorId={setorId} />
+          <SetorStatusDonutWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
-    </PageLayout>
+
+          <TendendiaRefugoWidget setorId={setorId} />
+
+          <MediaParadasDiaWidget />
+          <PecasPorMinutoWidget />
+          <MaquinaAtivaPorTurnoWidget />
+          <ProducaoPorTurnoLotesWidget />
+
+          </PageLayout>
+
   );
 }

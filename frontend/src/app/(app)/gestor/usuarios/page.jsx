@@ -5,13 +5,14 @@ import Link from "next/link";
 
 import { EyeIcon, Pencil, Trash2, Search, Plus, Loader2 } from "lucide-react";
 
+import { useEffect, useState } from "react";
 import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
-import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSetorWidget";
+import { TurnosOperadoresWidget } from "@/features/usuarios/TurnosOperadoresWidget";
 import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
 import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
-import { CumprimentoMetaSetorWidget } from "@/features/usuarios/CumprimentoMetaSetorWidget";
-import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
+import { ProducaoMediaUsuarioSetorWidget } from "@/features/usuarios/ProducaoMediaUsuarioSetorWidget";
+import { UsuarioTaxaRefugoWidget } from "@/features/usuarios/UsuarioTaxaRefugoWidget";
 
 import TableListagens from "@/components/table";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -274,29 +275,29 @@ export default function UsuariosGestor() {
         </WidgetCard>
 
         <WidgetCard>
-          <QtdUsuariosPorSetorWidget />
+          <TurnosOperadoresWidget setorId={setorId} />
         </WidgetCard>
 
         <WidgetCard>
-          <TopOperadoresWidget />
+          <TopOperadoresWidget  setorId={setorId}/>
         </WidgetCard>
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
-          <TempoSessaoWidget />
+          <TempoSessaoWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
-          <RotatividadeWidget />
+           <RotatividadeWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
-          <CumprimentoMetaSetorWidget />
+          <ProducaoMediaUsuarioSetorWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
-          <ProducaoMediaSetorWidget />
+          <UsuarioTaxaRefugoWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 

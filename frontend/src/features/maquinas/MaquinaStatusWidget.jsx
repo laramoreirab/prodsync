@@ -3,8 +3,8 @@ import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useMaquinaStatus } from "./hooks/useMaquinaStatus";
 import { maquinaStatusConfig } from "./config/maquinaChartConfig";
 
-export function MaquinaStatusWidget() {
-  const { data, loading, error } = useMaquinaStatus();
+export function useMaquinaStatus(setorId = null) {
+  return useChartData(maquinaStatusService.getStatus, setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar status.</p>;
