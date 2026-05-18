@@ -48,7 +48,7 @@ class EventoController {
         try {
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
-            const resultado = await EventoModel.listarJustificadas(id_empresa, paginacao);
+            const resultado = await EventoModel.listarJustificadas(id_empresa, paginacao, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, ...resultado });
         } catch (error) {
@@ -65,7 +65,7 @@ class EventoController {
         try {
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
-            const resultado = await EventoModel.listarNaoJustificadas(id_empresa, paginacao);
+            const resultado = await EventoModel.listarNaoJustificadas(id_empresa, paginacao, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, ...resultado });
         } catch (error) {
@@ -265,7 +265,7 @@ class EventoController {
     static async obterMotivosParadaFrequentes(req, res) {
         try {
             const limite = req.query.limite ? Number(req.query.limite) : 10;
-            const dados = await EventoModel.obterMotivosParadaFrequentes(req.user.id_empresa, limite);
+            const dados = await EventoModel.obterMotivosParadaFrequentes(req.user.id_empresa, limite, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -312,7 +312,7 @@ class EventoController {
 
     static async obterParadasJustificadasComparativo(req, res) {
         try {
-            const dados = await EventoModel.obterParadasJustificadasComparativo(req.user.id_empresa);
+            const dados = await EventoModel.obterParadasJustificadasComparativo(req.user.id_empresa, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -345,7 +345,7 @@ class EventoController {
     }
     static async top3MotivosParada(req, res){
         try {
-            const dados = await EventoModel.top3MotivosParada(req.user.id_empresa)
+            const dados = await EventoModel.top3MotivosParada(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({sucesso: true, dados})
         } catch (error) {
             console.error('Erro no gráfico Top 3 Motivos de Parada:', error)

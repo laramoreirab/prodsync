@@ -21,6 +21,7 @@ import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhes
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormCadastroEventoGestor from "@/components/ui/forms/historicoEventos/formCadastroEventoGestor";
+import { usePerfil } from "@/hooks/usePerfil";
 
 const colunasEventos = [
   { id: "id", key: "id", label: "ID", className: "w-25 text-center justify-center" },
@@ -71,27 +72,12 @@ const opcoesOrdenacao = [
   { label: "Data Decrescente", value: "data_desc" },
 ];
 
-function getSetorIdFromToken() {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload?.id_setor ?? payload?.idSetor ?? null;
-  } catch {
-    return null;
-  }
-}
-
 export default function HistoricoEventosGestor() {
   const { eventos, loading, refresh } = useEventos();
-  const [setorId, setSetorId] = useState(null);
+  const { setorId } = usePerfil();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
-
-  useEffect(() => {
-    setSetorId(getSetorIdFromToken());
-  }, []);
 
   const eventosDoSetor = useMemo(() => {
     return (eventos || []).filter((evento) => !setorId || String(evento.setor_afetado) === String(setorId));

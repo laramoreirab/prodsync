@@ -75,25 +75,29 @@ class SetorModel {
 
     // Lista todos os setores de uma empresa
     static async listarSetoresPorEmpresa(id_empresa) {
-        try {
-            const setores = await prisma.setores.findMany({
-                where: { id_empresa: id_empresa },
-                include: {
-                    empresa: true,
-                    maquinas: {
-                        where: { ativo: true },
-                        select: { id_maquina: true, nome: true, status_atual: true }
-                    },
-                    gestores: {
-                        include: {
-                            gestor: {
-                                select: { id_usuario: true, nome: true, email: true }
-                            }
+    try {
+        const setores = await prisma.setores.findMany({
+            where: { id_empresa: id_empresa },
+            include: {
+                empresa: true,
+                gestores: {
+                    include: {
+                        gestor: {
+                            select: { id_usuario: true, nome: true, email: true }
                         }
                     }
+                },
+                // O Prisma faz a contagem rápida direto no banco
+                _count: {
+                    select: {
+                        maquinas: true,
+                        escalas: true // Quantidade de operadores vinculados pela escala
+                    }
                 }
-            });
-            return setores;
+            }
+        });
+
+        return setores;
         } catch (error) {
             console.error('Erro ao listar setores:', error);
             throw error;
@@ -399,7 +403,7 @@ class SetorModel {
         };
     }
 
-    static async obterProducaoPorSetor(id_empresa) {
+    static async obterProducaoPorSetor(id_empresa, setorId = null) {
         try {
             const limites = await this.obterLimitesDiaIndustrial(id_empresa);
 
@@ -418,7 +422,7 @@ class SetorModel {
 
             const [setores, apontamentos] = await Promise.all([
                 prisma.setores.findMany({
-                    where: { id_empresa },
+                    where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
                     select: {
                         id_setor: true,
                         nome_setor: true
@@ -427,6 +431,7 @@ class SetorModel {
                 prisma.apontamento.findMany({
                     where: {
                         id_empresa,
+                        ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                         data_hora_fim: {
                             gte: inicioBusca,
                             lt: fimBusca
@@ -615,16 +620,16 @@ class SetorModel {
 
     // Quantidade de operadores escalados por setor
 
-    static async obterMediaOperadoresPorSetor(id_empresa) {
+    static async obterMediaOperadoresPorSetor(id_empresa, setorId = null) {
         try {
             const [totalOperadoresEscalados, totalSetores] = await Promise.all([
                 // 1. Conta o total de registros na tabela de escalas para a empresa
                 prisma.escalaTrabalho.count({
-                    where: { id_empresa }
+                    where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) }
                 }),
                 // 2. Conta quantos setores a empresa possui no total
                 prisma.setores.count({
-                    where: { id_empresa }
+                    where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) }
                 })
             ]);
 
@@ -660,11 +665,12 @@ class SetorModel {
         }
     }
 
-    static async totalDeSetores(id_empresa) {
+    static async totalDeSetores(id_empresa, setorId = null) {
         try {
             const resposta = await prisma.setores.count({
                 where: {
-                    id_empresa: id_empresa
+                    id_empresa: id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {})
                 }
             })
             return {

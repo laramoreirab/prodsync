@@ -13,6 +13,7 @@ import FormCadastroOperadorGestor from "@/components/ui/forms/usuarios/formCadas
 import FormEdicaoOperadorGestor from "@/components/ui/forms/usuarios/formEdicaoOperadorGestor";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
 import { useUsuarios } from "@/hooks/useUsuarios";
+import { usePerfil } from "@/hooks/usePerfil";
 
 import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
 import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSetorWidget";
@@ -36,17 +37,6 @@ const colunasUsuarios = [
   },
 ];
 
-function getSetorIdFromToken() {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload?.id_setor ?? payload?.idSetor ?? null;
-  } catch {
-    return null;
-  }
-}
-
 function normalizarOperador(usuario) {
   return {
     ...usuario,
@@ -56,13 +46,9 @@ function normalizarOperador(usuario) {
 
 export default function UsuariosGestor() {
   const { usuarios, loading, refresh } = useUsuarios();
-  const [setorId, setSetorId] = useState(null);
+  const { setorId } = usePerfil();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
-
-  useEffect(() => {
-    setSetorId(getSetorIdFromToken());
-  }, []);
 
   const operadoresDoSetor = useMemo(() => {
     return (usuarios || [])

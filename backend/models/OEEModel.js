@@ -271,9 +271,9 @@ class OEEModel {
         };
     }
 
-    static async mediaPorSetor(id_empresa) {
+    static async mediaPorSetor(id_empresa, setorId = null) {
         const setores = await prisma.setores.findMany({
-            where: { id_empresa }
+            where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) }
         });
 
         return Promise.all(

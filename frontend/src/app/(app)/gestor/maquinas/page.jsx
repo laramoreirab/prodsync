@@ -14,6 +14,7 @@ import FormCadastroMaquina from "@/components/ui/forms/maquinas/formCadastroMaqu
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import { useMaquinas } from "@/hooks/useMaquinas";
+import { usePerfil } from "@/hooks/usePerfil";
 
 import { MaquinaStatusDonutWidget } from "@/features/maquinas/MaquinaStatusDonutWidget";
 import { MaquinasPorSetorWidget } from "@/features/maquinas/MaquinasPorSetorWidget";
@@ -60,17 +61,6 @@ const opcoesOrdenacao = [
   { label: "Status", value: "status" },
 ];
 
-function getSetorIdFromToken() {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload?.id_setor ?? payload?.idSetor ?? null;
-  } catch {
-    return null;
-  }
-}
-
 function normalizarMaquina(maquina) {
   return {
     ...maquina,
@@ -81,14 +71,10 @@ function normalizarMaquina(maquina) {
 }
 
 export default function MaquinasGestor() {
-  const [setorId, setSetorId] = useState(null);
+  const { setorId } = usePerfil();
   const { maquinas, loading, refresh, excluirMaquina } = useMaquinas();
   const [busca, setBusca] = useState("");
   const [dados, setDados] = useState([]);
-
-  useEffect(() => {
-    setSetorId(getSetorIdFromToken());
-  }, []);
 
   const maquinasDoSetor = useMemo(() => {
     return (maquinas || [])
