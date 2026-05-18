@@ -1,9 +1,15 @@
+// src/features/maquinas/ProducaoTotalWidget.jsx
 "use client";
+
 import { useState, useEffect } from "react";
 import { AreaChartBase } from "@/components/ui/charts/components/AreaChart";
 import { producaoTotalConfig } from "./config/maquinaChartConfig";
-import { apiFetch } from "@/lib/api";
-// import { useProducaoTotal } from "./hooks/useProducaoTotal";
+import { apiFetch } from "@/lib/api"
+// import {
+//   mockProducaoTotal3Meses,
+//   mockProducaoTotal30Dias,
+//   mockProducaoTotal7Dias,
+// } from "@services/mockData";
 
 
 const PERIODOS = [
@@ -12,7 +18,8 @@ const PERIODOS = [
   { label: "Últimos 7 dias", dias: 7 },
 ];
 
-export function ProducaoTotalWidget({ setorId }) {
+export function ProducaoTotalWidget() {
+
   const [diasSelecionados, setDiasSelecionados] = useState(90);
 
   const [data, setData] = useState([]);
@@ -47,14 +54,16 @@ export function ProducaoTotalWidget({ setorId }) {
 
   // const periodoAtual = PERIODOS.find((p) => p.key === periodoKey);
   // const data = periodoAtual.mock;
- 
+
   return (
     <div>
+
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
         <div>
           <p className="text-sm font-semibold text-black">Produção total das máquinas</p>
           <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
         </div>
+
         <div className="flex gap-2 flex-shrink-0">
           {PERIODOS.map(({ label, dias }) => (
             <button
@@ -70,7 +79,12 @@ export function ProducaoTotalWidget({ setorId }) {
           ))}
         </div>
       </div>
-      <AreaChartBase data={dadosGrafico} xKey="data" yKey="total" config={producaoTotalConfig} />
+      <AreaChartBase
+        data={dadosGrafico}
+        xKey="data"
+        yKey="total"
+        config={producaoTotalConfig}
+      />
     </div>
   );
 }

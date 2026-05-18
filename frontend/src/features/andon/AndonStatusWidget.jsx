@@ -6,19 +6,19 @@ const cards = [
   {
     key: "emProducao",
     label: "Em Produção",
-    border: "border-[#369948] dark:border-emerald-200",
+    background: "bg-green-50",
     accent: "text-[#369948]",
   },
   {
     key: "emSetup",
     label: "Em Setup",
-    border: "border-[#ffac1e] dark:border-amber-200",
+    background: "bg-yellow-50",
     accent: "text-[#ffac1e]",
   },
   {
     key: "emParada",
     label: "Em Parada",
-    border: "border-[#b30000] dark:border-red-400",
+    background: "bg-red-50",
     accent: "text-[#b30000]"
   },
 ];
@@ -35,10 +35,10 @@ export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) 
     <div className="space-y-4">
       <p className="text-md font-semibold text-slate-950">{heading}</p>
       <div className="grid gap-4 grid-cols-3 w-full max-w-2xl mx-auto">
-        {cards.map(({ key, label, border, accent}) => (
+        {cards.map(({ key, label, background, accent}) => (
           <div
             key={key}
-            className={`flex aspect-square flex-col items-center border ${border} rounded-xl p-4 text-center shadow-sm`}
+            className={`flex aspect-square flex-col items-center rounded-xl ${background} p-4 text-center shadow-sm`}
           >
             <span className={`text-lg font-semibold ${accent} leading-tight`}>
               {label}

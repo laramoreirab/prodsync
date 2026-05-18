@@ -11,28 +11,6 @@ import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaqu
 import { use, useEffect, useState } from "react";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 
-import {
-  PageLayout, PageHeader, SectionDivider,
-  StaggerWrapper, FadeUpItem, AnimatedTitle,
-  KPIGrid, ContentGrid, WidgetCard,
-  SearchBar, FilterRow, EmptyState, LoadingState,
-  PageSection,
-} from "@/components/AnimatedComponents";
-
-// Componentes de detalhe
-import {
-  DetailPageContainer,
-  DetailBackLink,
-  UserProfileCard,
-  DetailSectionTitle,
-  DetailWidgetGrid,
-  DetailWidgetCard,
-  SectionHighlight,
-  DetailListingSection,
-  DetailActions,
-} from "@/components/DetailComponents";
-
-
 export default function GestorDetalhePage({ params }) {
   const { id } = use(params);
   const gestorId = Number(id);
@@ -46,54 +24,57 @@ export default function GestorDetalhePage({ params }) {
   }, [gestorId]);
 
   return (
-    <PageLayout>
-      <DetailPageContainer>
+    <main
+      className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden"
+      style={{
+        backgroundImage: "url('/bg_app.svg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="w-full"><Header /></div>
 
-        {/* Voltar */}
-        <DetailBackLink href="/adm/gestor" label="Voltar para Gestores" />
-
-        <div className="w-full"><Header /></div>
-
-        <div className="w-full max-w-5xl mt-8 pb-10 px-4 space-y-4">
-          <div className="flex justify-start">
-            <h1 className="text-4xl font-semibold text-black pb-0 inline-block">
-              {gestor?.nome || `Gestor #${gestorId}`}
-            </h1>
-          </div>
-
-
-          <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
-            <OEEOperadorWidget operadorId={gestorId} />
-          </section>
-
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <SetorProducaoSemanalWidget setorId={setorId} />
-            </div>
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <SetorTopOperadoresWidget setorId={setorId} />
-            </div>
-          </section>
-
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <SetorMaquinaStatusWidget setorId={setorId} />
-            </div>
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <SetorProducaoMaquinaWidget setorId={setorId} />
-            </div>
-          </section>
-
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <SetorMotivosParadaWidget setorId={setorId} />
-            </div>
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <SetorOEEEvolucaoWidget setorId={setorId} />
-            </div>
-          </section>
+      <div className="w-full max-w-5xl mt-8 pb-10 px-4 space-y-4">
+        <div className="flex justify-start">
+          <h1 className="text-4xl font-semibold text-black pb-0 inline-block">
+            {gestor?.nome || `Gestor #${gestorId}`}
+          </h1>
         </div>
-      </DetailPageContainer>
-    </PageLayout>
+
+        
+        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+          <OEEOperadorWidget operadorId={gestorId} />
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <SetorProducaoSemanalWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <SetorTopOperadoresWidget setorId={setorId} />
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <SetorMaquinaStatusWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <SetorProducaoMaquinaWidget setorId={setorId} />
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <SetorMotivosParadaWidget setorId={setorId} />
+          </div>
+          <div className="bg-white border rounded-xl p-4 shadow-sm">
+            <SetorOEEEvolucaoWidget setorId={setorId} />
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }

@@ -149,7 +149,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
             carregarMaquinas();
         }, [formData.id_setor]);
 
-    const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block dark:text-slate-300 ";
+    const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
     const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
 
     return (

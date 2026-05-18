@@ -1,5 +1,5 @@
 export const qtdUsuariosPerfilConfig = {
-  gestores:   { label: "Gestores:",   color: "#00357a !important" },
+  gestores:   { label: "Gestores:",   color: "#00357a" },
   operadores: { label: "Operadores:", color: "#212e4b" },
 };
 

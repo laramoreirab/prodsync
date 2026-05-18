@@ -180,7 +180,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
 
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Nome</label>
+                            <label className="text-md text-cinza-escuro">Nome</label>
                             <input
                                 id="nome"
                                 type="text"
@@ -192,7 +192,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Número de Série</label>
+                            <label className="text-md text-cinza-escuro">Número de Série</label>
                             <input
                                 id="serie"
                                 type="text"
@@ -203,7 +203,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Setor</label>
+                            <label className="text-md text-cinza-escuro">Setor</label>
                             <select
                                 id="id_setor"
                                 className="border rounded-md p-2.5 outline-none bg-white"
@@ -225,7 +225,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Tipo de Máquina</label>
+                            <label className="text-md text-cinza-escuro">Tipo de Máquina</label>
                             <input
                                 id="categoria"
                                 type="text"
@@ -239,7 +239,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
 
                         {/* campos pendentes pro backend adicionar */}
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Capacidade Normal</label>
+                            <label className="text-md text-cinza-escuro">Capacidade Normal</label>
                             <input
                                 id="capacidade"
                                 type="text"
@@ -250,7 +250,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Data de Aquisição</label>
+                            <label className="text-md text-cinza-escuro">Data de Aquisição</label>
                             <input
                                 id="dataAquisicao"
                                 type="date"
@@ -261,7 +261,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1 col-span-2">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Status de Máquina</label>
+                            <label className="text-md text-cinza-escuro">Status de Máquina</label>
                             <select
                                 id="status"
                                 className="border rounded-md p-2.5 outline-none bg-white"
@@ -276,7 +276,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1 col-span-2">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Operador</label>
+                            <label className="text-md text-cinza-escuro">Operador</label>
                             <select
                                 id="operador"
                                 className="border rounded-md p-2.5 outline-none bg-white"
