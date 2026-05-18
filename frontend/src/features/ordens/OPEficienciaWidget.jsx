@@ -19,7 +19,7 @@ export function OPEficienciaWidget() {
       <div className="flex-1 flex items-center justify-center">
         <GaugeSemicircular
           title="Eficiência"
-          data={[{ value: data?.eficiencia, fill: "#00357a" }]}
+          data={[{ value: data?.eficiencia, fill: "var(--color-grafico-area)" }]}
           size="lg"
           config={eficienciaConfig}
         />

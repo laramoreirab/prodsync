@@ -4,7 +4,7 @@ import { CheckCircle2, TriangleAlert, Wrench } from "lucide-react";
 
 const statusMeta = {
   emProducao: {
-    label: "Em produÃ§Ã£o",
+    label: "Em produção",
     accent: "bg-emerald-500",
     badge: "bg-emerald-50 text-emerald-700",
     Icon: CheckCircle2,
@@ -41,21 +41,21 @@ export function AndonMachineCard({ machine }) {
 
         <div className={`h-1.5 w-full ${meta.accent}`} />
 
-        <dl className="mt-3 grid gap-1.5 text-sm text-slate-600 px-4">
+        <dl className="mt-3 grid gap-1.5 text-sm text-slate-600 dark:text-slate-300 px-4">
           <div className="grid grid-cols-[auto_1fr] gap-x-1">
-            <dt className="font-semibold text-slate-800">Status:</dt>
+            <dt className="font-semibold text-slate-800 dark:text-slate-100">Status:</dt>
             <dd className="wrap-break-word">{meta.label}</dd>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-x-1">
-            <dt className="font-semibold text-slate-800">Operador:</dt>
+            <dt className="font-semibold text-slate-800 dark:text-slate-100">Operador:</dt>
             <dd className="wrap-break-word">{machine.operador}</dd>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-x-1">
-            <dt className="font-semibold text-slate-800">{machine.detalheLabel}:</dt>
+            <dt className="font-semibold text-slate-800 dark:text-slate-100">{machine.detalheLabel}:</dt>
             <dd className="wrap-break-word">{machine.detalheValor}</dd>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-x-1">
-            <dt className="font-semibold text-slate-800">Meta:</dt>
+            <dt className="font-semibold text-slate-800 dark:text-slate-100">Meta:</dt>
             <dd className="wrap-break-word">{machine.metaDia}</dd>
           </div>
         </dl>
