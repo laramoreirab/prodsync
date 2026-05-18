@@ -1,26 +1,29 @@
-import { apiFetch } from "@/lib/api"
-import { mockTopMotivosTempo } from "./mockData";
-import { MotivoTempoArraySchema } from "@/features/eventos/shemas/eventosSchema";
-
-const mockTempoParadoProduzindo = [
-  { name: "produzindo", value: 62 },
-  { name: "parado",     value: 38 },
-];
-
-const USE_MOCK = false;
+import { apiFetch } from "@/lib/api";
+import {
+  MotivoTempoArraySchema,
+  ParadasComparadasArraySchema,
+} from "@/features/eventos/shemas/eventosSchema";
 
 export const eventosService = {
-  async getParadasComparadas() {
-    if (USE_MOCK) return mockTempoParadoProduzindo;
-    const data = await apiFetch("/eventos/tempo_parado_produzindo");
-    return data;
+  async getParadasComparadas(setorId = null) {
+    const url = setorId
+      ? `/api/eventos/tempo_parado_produzindo?setorId=${encodeURIComponent(setorId)}`
+      : "/api/eventos/tempo_parado_produzindo";
+    const data = await apiFetch(url);
+    const dados = (data.dados || data).map((item) => ({
+      name: item.name ?? item.nome,
+      value: item.value ?? item.valor,
+    }));
+    return ParadasComparadasArraySchema.parse(dados);
   },
 };
 
 export const topMotivosTempoService = {
-  async getTopMotivosTempo() {
-    if (USE_MOCK) return MotivoTempoArraySchema.parse(mockTopMotivosTempo);
-    const data = await apiFetch("/eventos/top_motivos_tempo");
-    return MotivoTempoArraySchema.parse(data);
+  async getTopMotivosTempo(setorId = null) {
+    const url = setorId
+      ? `/api/eventos/top_motivos_tempo?setorId=${encodeURIComponent(setorId)}`
+      : "/api/eventos/top_motivos_tempo";
+    const data = await apiFetch(url);
+    return MotivoTempoArraySchema.parse(data.dados || data);
   },
 };

@@ -1,21 +1,27 @@
 import { apiFetch } from "@/lib/api";
-import { eventosMockService } from "@/mocks/eventosMock";
 
-const USE_MOCK = true;
 const API_URL = "/api/eventos";
 
 const extrairDados = (resposta) => resposta?.dados ?? resposta ?? [];
 
 const formatarDuracao = (inicio, fim, duracaoMinutos) => {
-  if (duracaoMinutos !== null && duracaoMinutos !== undefined) {
-    const horas = Math.floor(Number(duracaoMinutos) / 60);
-    const minutos = Number(duracaoMinutos) % 60;
+  if (typeof duracaoMinutos === "string" && duracaoMinutos.includes(":")) {
+    return duracaoMinutos;
+  }
+
+  const duracaoNumero = Number(duracaoMinutos);
+  if (Number.isFinite(duracaoNumero)) {
+    const horas = Math.floor(duracaoNumero / 60);
+    const minutos = duracaoNumero % 60;
     return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
   }
 
   if (!inicio) return "-";
 
-  const totalMinutos = Math.max(0, Math.round((new Date(fim ?? Date.now()) - new Date(inicio)) / 1000 / 60));
+  const totalMinutos = Math.max(
+    0,
+    Math.round((new Date(fim ?? Date.now()) - new Date(inicio)) / 1000 / 60)
+  );
   const horas = Math.floor(totalMinutos / 60);
   const minutos = totalMinutos % 60;
   return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
@@ -39,14 +45,21 @@ const normalizarEvento = (evento) => {
   if (!evento) return null;
 
   const fim = evento.fim ?? evento.termino;
+  const maquinaNome =
+    typeof evento.maquina === "object"
+      ? evento.maquina?.nome ?? evento.maquina?.serie
+      : evento.maquina;
+  const tipo = evento.tipo ?? (evento.status_atual === "Setup" ? "Setup" : "Parada");
 
   return {
     ...evento,
     id: evento.id ?? evento.id_evento,
-    tipo: evento.tipo ?? evento.status_atual,
+    tipo,
+    status: evento.status ?? tipo,
     status_maquina: evento.status_maquina ?? evento.status_atual,
-    maquina: evento.maquina,
-    maquina_nome: evento.maquina?.nome ?? evento.maquina?.serie ?? evento.maquina ?? "-",
+    maquina: evento.maquina ?? maquinaNome ?? "-",
+    maquina_nome: maquinaNome ?? "-",
+    nome: evento.nome ?? maquinaNome ?? "-",
     inicio: evento.inicio,
     fim,
     motivo: evento.motivo ?? evento.motivo_parada?.descricao ?? "Aguardando Justificativa",
@@ -57,10 +70,22 @@ const normalizarEvento = (evento) => {
   };
 };
 
+const normalizarListaResposta = (resposta) => {
+  const dados = extrairDados(resposta);
+  const lista = Array.isArray(dados) ? dados.map(normalizarEvento) : [];
+
+  if (Array.isArray(resposta)) return lista;
+
+  return {
+    ...resposta,
+    dados: lista,
+  };
+};
+
 const apiService = {
-  async getAll() {
-    const response = await apiFetch(API_URL);
-    return extrairDados(response).map(normalizarEvento);
+  async getAll(pagina = 1, limite = 50) {
+    const response = await apiFetch(`${API_URL}?pagina=${pagina}&limite=${limite}`);
+    return normalizarListaResposta(response);
   },
 
   async getById(id) {
@@ -68,14 +93,14 @@ const apiService = {
     return normalizarEvento(extrairDados(response));
   },
 
-  async getJustificados() {
-    const response = await apiFetch(`${API_URL}/justificadas`);
-    return extrairDados(response).map(normalizarEvento);
+  async getJustificados(pagina = 1, limite = 50) {
+    const response = await apiFetch(`${API_URL}/justificadas?pagina=${pagina}&limite=${limite}`);
+    return normalizarListaResposta(response);
   },
 
-  async getNaoJustificados() {
-    const response = await apiFetch(`${API_URL}/nao-justificadas`);
-    return extrairDados(response).map(normalizarEvento);
+  async getNaoJustificados(pagina = 1, limite = 50) {
+    const response = await apiFetch(`${API_URL}/nao-justificadas?pagina=${pagina}&limite=${limite}`);
+    return normalizarListaResposta(response);
   },
 
   async create(dados) {
@@ -84,6 +109,14 @@ const apiService = {
       body: JSON.stringify(dados),
     });
     return extrairDados(response);
+  },
+
+  async update(id, dados) {
+    const response = await apiFetch(`${API_URL}/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(dados),
+    });
+    return normalizarEvento(extrairDados(response));
   },
 
   async justificar(dados) {
@@ -105,62 +138,4 @@ const apiService = {
   },
 };
 
-export const eventosCrudService = USE_MOCK ? eventosMockService : apiService;
-
-
-// export const eventosCrudService = {
-//   // Buscar todos os eventos (paginado)
-//   getAll: async (pagina = 1, limite = 50) => {
-//     const res = await apiFetch(`${API_URL}?pagina=${pagina}&limite=${limite}`);
-//     return res;
-//   },
-
-//   // Buscar evento por id
-//   getById: async (id) => {
-//     const res = await apiFetch(`${API_URL}/${id}`);
-//     // Backend retorna { sucesso, dados }
-//     return res.dados ?? res;
-//   },
-
-//   // Buscar eventos justificados
-//   getJustificados: async (pagina = 1, limite = 50) => {
-//     const res = await apiFetch(`${API_URL}/justificadas?pagina=${pagina}&limite=${limite}`);
-//     return res;
-//   },
-
-//   // Buscar eventos não justificados
-//   getNaoJustificados: async (pagina = 1, limite = 50) => {
-//     const res = await apiFetch(`${API_URL}/nao-justificadas?pagina=${pagina}&limite=${limite}`);
-//     return res;
-//   },
-
-//   // Registrar evento manualmente (ADM/Gestor)
-//   create: async (dados) => {
-//     return await apiFetch(`${API_URL}/sistema`, {
-//       method: "POST",
-//       body: JSON.stringify(dados),
-//     });
-//   },
-
-//   // Justificar evento existente: { id_evento, id_motivo_parada, observacao }
-//   justificar: async (dados) => {
-//     return await apiFetch(`${API_URL}/justificar`, {
-//       method: "POST",
-//       body: JSON.stringify(dados),
-//     });
-//   },
-
-//   // Buscar evento pendente de justificativa (operador logado)
-//   getEventoPendente: async () => {
-//     const res = await apiFetch(`${API_URL}/pendente`);
-//     return res.dados ?? null;
-//   },
-
-//   // Buscar motivos de parada disponíveis
-//   getMotivos: async () => {
-//     const res = await apiFetch(`${API_URL}/motivos-parada`);
-//     return res.dados ?? [];
-//   },
-// };
-
-//FIZ ESSA MUDAÇA MINIMA PARA TESTAR AS ANIMAÇÕES, DESCONSIDERAR
+export const eventosCrudService = apiService;

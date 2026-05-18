@@ -11,7 +11,7 @@ export function useOps() {
     setLoading(true);
     try {
       const data = await opCrudService.getAll();
-      setOps(data);
+      setOps(data?.dados || []);
       setError(null);
     } catch (err) {
       setError('Falha ao carregar ordens de produção');
@@ -40,7 +40,7 @@ export function useOps() {
   const editarOp = async (id, dados) => {
     try {
       const atualizada = await opCrudService.update(id, dados);
-      setOps(prev => prev.map(o => o.id === id ? atualizada : o));
+      setOps(prev => prev.map(o => String(o.id) === String(id) ? atualizada : o));
       return atualizada;
     } catch (err) {
       throw err;
@@ -51,7 +51,7 @@ export function useOps() {
   const excluirOp = async (id, id_maquina) => {
     try {
       await opCrudService.delete(id, id_maquina);
-      setOps(prev => prev.filter(o => o.id !== id));
+      setOps(prev => prev.filter(o => String(o.id) !== String(id)));
     } catch (err) {
       throw err;
     }

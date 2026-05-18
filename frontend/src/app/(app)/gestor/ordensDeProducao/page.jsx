@@ -1,4 +1,8 @@
-"use client"
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { AlertTriangle, ArrowDown, EyeIcon, Flame, Loader2, MoveHorizontal, Pencil, Plus, Search, Trash2 } from "lucide-react";
 
 import { OPAtivasKPIWidget } from "@/features/ordens/OPAtivasKPIWidget";
 import { OPAtrasadasKPIWidget } from "@/features/ordens/OPAtrasadasKPIWidget";
@@ -9,25 +13,17 @@ import { OPTopRefugoWidget } from "@/features/ordens/OPTopRefugoWidget";
 import { OPCargaSetorWidget } from "@/features/ordens/OPCargaSetorWidget";
 import { OPStatusWidget } from "@/features/ordens/OPStatusWidget";
 import { OPConcluidasDiaWidget } from "@/features/ordens/OPConcluidasDiaWidget";
-
-import { useState, useEffect } from "react";
 import { useOps } from "@/hooks/useOps";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, ArrowDown, Flame, Loader2, MoveHorizontal, Pencil, Plus, EyeIcon, Trash2, Search } from 'lucide-react';
 import TableListagens from "@/components/table";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
+import { usePerfil } from "@/hooks/usePerfil";
 
 
 // Layout geral
@@ -47,18 +43,9 @@ import {
 } from "@/components/DetailComponents";
 
 const colunasOrdemProd = [
-  {
-    id: "id",
-    key: "id",
-    label: "ID",
-    className: "w-1/7"
-  },
-  {
-    id: "codigo_lote",
-    key: "codigo_lote",
-    label: "Nome",
-    className: "w-1/5"
-  },
+  { id: "id", key: "id", label: "ID", className: "w-1/7" },
+  { id: "codigo_lote", key: "codigo_lote", label: "Lote", className: "w-1/5" },
+  { id: "produto", key: "produto", label: "Produto", className: "w-1/5" },
   {
     id: "prioridade",
     key: "prioridade",
@@ -66,194 +53,108 @@ const colunasOrdemProd = [
     className: "w-45",
     icone: (valor) => {
       const config = {
-        "Média": {
-          variant: "outline",
-          className: "border border-[var(--azul-cobalto)]",
-          icon: <MoveHorizontal className="text-azul-cobalto" />
-        },
-        "Alta": {
-          variant: "secondary",
-          className: "border border-[var(--amarelo)] bg-transparent",
-          icon: <AlertTriangle className="text-amarelo" />
-        },
-        "Crítica": {
-          variant: "destructive",
-          className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
-          icon: <Flame className="text-vermelho-vivido" />
-        },
-        "Baixa": {
-          variant: "destructive",
-          className: "border border-gray-400 text-sm bg-transparent text-black",
-          icon: <ArrowDown className="text-gray-400" />
-        }
+        "Media": { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
+        "MÃ©dia": { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
+        Alta: { className: "border border-[var(--amarelo)] bg-transparent", icon: <AlertTriangle className="text-amarelo" /> },
+        Critica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },
+        "CrÃ­tica": { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },
+        Baixa: { className: "border border-gray-400 text-sm bg-transparent text-black", icon: <ArrowDown className="text-gray-400" /> },
       };
-
-
-      const item = config[valor] || { icon: null };
+      const item = config[valor] || { icon: null, className: "" };
       return (
         <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
           {item.icon}
           {valor}
         </Badge>
       );
-    }
+    },
   },
+  { id: "setor", key: "setor", label: "Setor", className: "w-1/5" },
   {
     id: "status_op",
     key: "status_op",
-    label: 'Status',
+    label: "Status",
     className: "text-center",
     icone: (valor) => {
       const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
-        },
-        "Setup": {
-          variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm border-none"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "bg-vermelho-vivido/10 text-vermelho-vivido font-semibold text-sm border-none"
-        },
-        "Concluída": {
-          variant: "outline",
-          className: "bg-blue-500/10 text-blue-600 text-sm font-semibold border-none"
-        },
-        "Aguardando Início": {
-          variant: "outline",
-          className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
-        }
+        Produzindo: "bg-green-500/15 text-green-600",
+        Setup: "bg-[#fffbea] text-amarelo",
+        Parada: "bg-vermelho-vivido/10 text-vermelho-vivido",
+        "ConcluÃ­da": "bg-blue-500/10 text-blue-600",
       };
-      const item = config[valor] || { icon: null };
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
-          {item.icon}
-          {valor}
+        <Badge variant="outline" className={`whitespace-nowrap ${config[valor] || "bg-[#ECECEC] text-[#636F87]"} text-sm font-semibold border-none p-2.5`}>
+          {valor || "-"}
         </Badge>
       );
-    }
+    },
   },
-  {
-    id: "progresso",
-    key: "progresso",
-    label: "Progresso",
-    className: "text-center"
-  },
+  { id: "progresso", key: "progresso", label: "Progresso", className: "text-center" },
 ];
 
+const opcoesOrdenacao = [
+  { label: "ID Crescente", value: "id_asc" },
+  { label: "ID Decrescente", value: "id_desc" },
+  { label: "Prioridade", value: "prioridade" },
+  { label: "Status", value: "status" },
+];
 
+const filtrosOps = [
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "ConcluÃ­da"] },
+  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Media", "MÃ©dia", "Alta", "Critica", "CrÃ­tica"] },
+];
 
 export default function OrdensDeProducaoGestor() {
-  const { ops, loading, error, refresh } = useOps();
+  const { setorId } = usePerfil();
+  const { ops, loading, refresh, excluirOp } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
 
-  //sincronizar dados da API com estado local
+  const opsDoSetor = useMemo(() => {
+    return (ops || []).filter((op) => !setorId || String(op.id_setor) === String(setorId));
+  }, [ops, setorId]);
+
   useEffect(() => {
-    setDados(ops);
-  }, [ops]);
+    setDados(opsDoSetor);
+  }, [opsDoSetor]);
 
-
-  //lógica de ordenação
   const handleSort = (criterio) => {
-    const dadosCopiados = [...dados];
-
-
-    dadosCopiados.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'progresso_asc') return a.progresso - b.progresso;
-      if (criterio === 'progresso_desc') return b.progresso - a.progresso;
+    const ordenado = [...dados].sort((a, b) => {
+      if (criterio === "id_asc") return Number(a.id) - Number(b.id);
+      if (criterio === "id_desc") return Number(b.id) - Number(a.id);
+      if (criterio === "prioridade") return String(a.prioridade).localeCompare(String(b.prioridade));
+      if (criterio === "status") return String(a.status_op).localeCompare(String(b.status_op));
       return 0;
     });
-
-
-    setDados(dadosCopiados);
+    setDados(ordenado);
   };
-
-  const opsFilter = [
-    { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
-    { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Crítica", "Alta", "Média", "Baixa"] },
-    { id: "progresso", label: "Progresso", type: "number-range" }
-  ];
 
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...ops]; // usa o estado da API, não array estático
-
-
-    //filtro por status
-    if (filtrosSelecionados.status_op && filtrosSelecionados.status_op.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(op =>
-        filtrosSelecionados.status_op.includes(op.status_op)
-      );
+    let filtrados = [...opsDoSetor];
+    if (filtrosSelecionados.status_op?.length > 0) {
+      filtrados = filtrados.filter((op) => filtrosSelecionados.status_op.includes(op.status_op));
     }
-
-
-    //filtro por setor
-    if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(op =>
-        filtrosSelecionados.setor.includes(op.setor)
-      );
+    if (filtrosSelecionados.prioridade?.length > 0) {
+      filtrados = filtrados.filter((op) => filtrosSelecionados.prioridade.includes(op.prioridade));
     }
-
-
-    //filtro por prioridade
-    if (filtrosSelecionados.prioridade?.length) {
-      dadosFiltrados = dadosFiltrados.filter(op =>
-        filtrosSelecionados.prioridade.includes(op.prioridade)
-      );
-    }
-
-
-    //filtro por progresso (intervalo)
-    if (filtrosSelecionados.progresso) {
-      const { min, max } = filtrosSelecionados.progresso;
-      if (min !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso >= min);
-      if (max !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso <= max);
-    }
-
-
-    setDados(dadosFiltrados);
+    setDados(filtrados);
   };
 
-
-  const opcoesOrdenacao = [
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'Progresso Crescente', value: 'progresso_asc' },
-    { label: 'Progresso Decrescente', value: 'progresso_desc' },
-  ];
-
-
-  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((op) => {
-    const termo = (busca || "").toLowerCase();
-
-    const nome = op?.codigo_lote?.toLowerCase() || "";
-    const id = op?.id?.toString() || "";
-
-    return (
-      nome.includes(termo) ||
-      id.includes(termo)
-    );
+    const termo = busca.toLowerCase();
+    return String(op.id).includes(termo) || op.codigo_lote?.toLowerCase().includes(termo) || op.produto?.toLowerCase().includes(termo);
   });
 
-
-  //tela de carregamento enquanto busca os dados da API
   if (loading) {
     return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando ordens de produção...</p>
-        </div>
+      <main className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="animate-spin text-blue-900 w-12 h-12" />
       </main>
     );
   }
 
   return (
+<<<<<<< HEAD
     <PageLayout>
 
         <PageHeader title="Ordens de Produção" action={
@@ -400,5 +301,115 @@ export default function OrdensDeProducaoGestor() {
           )}
           </FadeUpItem>
     </PageLayout>
+=======
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+      <div className="p-8">
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+              Ordens de Producao
+            </h1>
+            <Dialog>
+              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+                <Plus className="mr-2" />
+                Criar OP
+              </DialogTrigger>
+              <DialogContent>
+                <FormCadastroOp onCadastroSucesso={refresh} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget setorId={setorId} /></div>
+            <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget setorId={setorId} /></div>
+            <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget setorId={setorId} /></div>
+            <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget setorId={setorId} /></div>
+          </section>
+
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget setorId={setorId} /></div>
+            <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget setorId={setorId} /></div>
+            <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget setorId={setorId} /></div>
+          </section>
+
+          <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget setorId={setorId} /></div>
+            <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget setorId={setorId} /></div>
+          </section>
+        </div>
+
+        <section>
+          <div className="flex items-center py-8 gap-5">
+            <h2 className="text-4xl w-30 font-semibold">OPs</h2>
+            <hr className="bg-black flex-1 h-1" />
+          </div>
+
+          <div className="flex searchbar mb-3">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full font-medium outline-none bg-transparent"
+                placeholder="Busque por id, lote ou produto..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+            </div>
+          </div>
+
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3 mb-4">
+            <p>{dadosExibidos.length} OPs encontradas</p>
+            <div className="flex items-center gap-4">
+              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+              <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
+            </div>
+          </div>
+
+          <TableListagens
+            data={dadosExibidos}
+            columns={colunasOrdemProd}
+            enableSelection
+            acoesDropdown={(op) => (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`ordensDeProducao/${op.id}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver Detalhes
+                  </Link>
+                </DropdownMenuItem>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar OP
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormExclusaoOp
+                      opId={op.id}
+                      idMaquina={op.id_maquina}
+                      onExclusaoSucesso={() => excluirOp(op.id, op.id_maquina)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          />
+        </section>
+      </div>
+    </main>
+>>>>>>> de02574897de67f482ec90faae0208e46d18221a
   );
 }

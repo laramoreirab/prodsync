@@ -25,7 +25,6 @@ import {
   Loader2,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
-import Link from "next/link";
 import { useEventos } from "@/hooks/useEventos";
 
 //imports da listagem

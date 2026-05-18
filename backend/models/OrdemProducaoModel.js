@@ -3,11 +3,22 @@ import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 
 class OrdemProducaoModel {
 
-    static async listarTodos(id_empresa, paginacao) {
+    static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
+                },
+                include: {
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            setor: { select: { id_setor: true, nome_setor: true } }
+                        }
+                    }
                 },
                 orderBy: {
                     id_ordem: 'asc' // Mantém a lista organizada
@@ -47,17 +58,32 @@ class OrdemProducaoModel {
         }
     }
     static async converterTimestamp(timestamp) {
+        if (!timestamp) return null
+        if (timestamp instanceof Date) return timestamp
+        const valorNumerico = Number(timestamp)
+        if (Number.isNaN(valorNumerico)) return new Date(timestamp)
         const ms = String(timestamp).length === 10
             ? timestamp * 1000   // veio em segundos → converte
             : timestamp          // veio em milissegundos → usa direto
         return new Date(ms)
         //  ex: 1711461000 → 2024-03-26T14:10:00.000Z
     }
-    static async buscarOrdem(id_ordem) {
+    static async buscarOrdem(id_ordem, id_empresa = null) {
         try {
             const resultado = await prisma.ordemProducao.findFirst({
                 where:{
-                    id_ordem: id_ordem
+                    id_ordem: Number(id_ordem),
+                    ...(id_empresa ? { id_empresa: Number(id_empresa) } : {})
+                },
+                include: {
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            setor: { select: { id_setor: true, nome_setor: true } }
+                        }
+                    }
                 }
             })
             return resultado
@@ -72,7 +98,7 @@ class OrdemProducaoModel {
             const ordem = await prisma.ordemProducao.findFirst({
                 where:{
                     id_maquina: id_maquina,
-                    status_op: 'Em Andamento'
+                    status_op: 'Em_Andamento'
                 },
                 select: {
                     id_ordem: true
@@ -88,8 +114,8 @@ class OrdemProducaoModel {
         try {
             const resultado = await prisma.ordemProducao.updateMany({
                 where:{
-                    id_ordem: id_ordem,
-                    id_empresa: id_empresa
+                    id_ordem: Number(id_ordem),
+                    id_empresa: Number(id_empresa)
                 },
                 data: {
                     ...dados
@@ -102,8 +128,18 @@ class OrdemProducaoModel {
 
             return await prisma.ordemProducao.findFirst({
                 where: {
-                    id_ordem,
-                    id_empresa
+                    id_ordem: Number(id_ordem),
+                    id_empresa: Number(id_empresa)
+                },
+                include: {
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true,
+                            serie: true,
+                            setor: { select: { id_setor: true, nome_setor: true } }
+                        }
+                    }
                 }
             });
         } catch (error) {
@@ -116,7 +152,7 @@ class OrdemProducaoModel {
             const deletar = await prisma.ordemProducao.deleteMany({
                 where: {
                     id_empresa: id_empresa,
-                    id_ordem: id_ordem
+                    id_ordem: Number(id_ordem)
                 }
             })
             return deletar
@@ -125,12 +161,13 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async totalOPsAtivas(id_empresa) {
+    static async totalOPsAtivas(id_empresa, setorId = null) {
         try {
             const res = await prisma.ordemProducao.count({
                 where: {
                     id_empresa: id_empresa,
-                    status_op: 'Em Andamento'
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
+                    status_op: 'Em_Andamento'
                 }
             })
             return res
@@ -139,11 +176,12 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async totalOPsAtrasadas(id_empresa) {
+    static async totalOPsAtrasadas(id_empresa, setorId = null) {
         try {
             const res = await prisma.ordemProducao.count({
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                     status_op: { in: ['Parada', 'Setup'] }
                 }
             })
@@ -153,11 +191,12 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async totalPecasBoas(id_empresa) {
+    static async totalPecasBoas(id_empresa, setorId = null) {
         try {
             const res = await prisma.apontamento.aggregate({
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                 },
                 _sum: { qtd_boa: true }
             })
@@ -167,11 +206,12 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async totalRefugo(id_empresa) {
+    static async totalRefugo(id_empresa, setorId = null) {
         try {
             const res = await prisma.apontamento.aggregate({
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                 },
                 _sum: { qtd_refugo: true }
             })
@@ -187,7 +227,7 @@ class OrdemProducaoModel {
     static async progressoOP(id_empresa, id_ordem) {
         try {
             const [ordem, apontamentos] = await Promise.all([
-                prisma.ordemProducao.findUnique({
+                prisma.ordemProducao.findFirst({
                     where: { id_ordem: Number(id_ordem), id_empresa },
                     select: { qtd_planejada: true, produto: true }
                 }),
@@ -217,15 +257,15 @@ class OrdemProducaoModel {
 
     // --------------------------------------------Dashboard Ordem De Produção------------------------------------------------------
 
-    static async eficienciaGeral(id_empresa) {
+    static async eficienciaGeral(id_empresa, setorId = null) {
         try {
             const [apontamentos, ordens] = await Promise.all([
                 prisma.apontamento.aggregate({
-                    where: { id_empresa },
+                    where: { id_empresa, ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}) },
                     _sum: { qtd_boa: true }
                 }),
                 prisma.ordemProducao.aggregate({
-                    where: { id_empresa },
+                    where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
                     _sum: { qtd_planejada: true }
                 })
             ])
@@ -243,11 +283,11 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async top3OPsMaiorRefugo(id_empresa) {
+    static async top3OPsMaiorRefugo(id_empresa, setorId = null) {
         try {
             const resultado = await prisma.apontamento.groupBy({
                 by: ['id_ordemProducao'],
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}) },
                 _sum: { qtd_refugo: true },
                 orderBy: { _sum: { qtd_refugo: 'desc' } },
                 take: 3
@@ -277,14 +317,15 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async cargaPorSetor(id_empresa) {
+    static async cargaPorSetor(id_empresa, setorId = null) {
         try {
-            const statusAtivos = ['Em Andamento', 'Aguardando', 'Parada', 'Setup']
+            const statusAtivos = ['Em_Andamento', 'Parada', 'Setup']
 
             const resultado = await prisma.ordemProducao.groupBy({
                 by: ['id_setor'],
                 where: {
                     id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                     status_op: { in: statusAtivos }
                 },
                 _count: { id_ordem: true }
@@ -311,11 +352,11 @@ class OrdemProducaoModel {
         }
     }
 
-    static async statusOPs(id_empresa) {
+    static async statusOPs(id_empresa, setorId = null) {
         try {
             const resultado = await prisma.ordemProducao.groupBy({
                 by: ['status_op'],
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
                 _count: { status_op: true }
             })
 
@@ -336,7 +377,7 @@ class OrdemProducaoModel {
             throw error;
         }
     }
-    static async opsConcluídasPorDia(id_empresa) {
+    static async opsConcluidasPorDia(id_empresa, setorId = null) {
         const hoje = new Date()
         hoje.setHours(23, 59, 59, 999)
 
@@ -347,6 +388,7 @@ class OrdemProducaoModel {
         const ordens = await prisma.ordemProducao.findMany({
             where: {
                 id_empresa,
+                ...(setorId ? { id_setor: Number(setorId) } : {}),
                 status_op: 'Finalizada',
                 data_fim: { gte: seteDiasAtras, lte: hoje }
             },

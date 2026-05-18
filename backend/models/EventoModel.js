@@ -97,10 +97,13 @@ class EventoModel {
         return maquina?.id_maquina ?? null;
     }
 
-    static async listarTodos(id_empresa, paginacao) {
+    static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
-                where: { id_empresa },
+                where: {
+                    id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {})
+                },
                 include: {
                     maquina: {
                         select: { id_maquina: true, nome: true, serie: true }
@@ -193,11 +196,12 @@ class EventoModel {
         }
     }
     //listar paradas não justificadas
-    static async listarNaoJustificadas(id_empresa, paginacao) {
+    static async listarNaoJustificadas(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     id_motivo_parada: {
                         equals: null
                     },
@@ -215,11 +219,12 @@ class EventoModel {
         }
     }
     //listar tabelas justificadas
-    static async listarJustificadas(id_empresa, paginacao) {
+    static async listarJustificadas(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     id_motivo_parada: {
                         not: null
                     },
@@ -265,24 +270,11 @@ class EventoModel {
             // busca a ordem de produção ativa da máquina
             const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
 
-            //atualiza status da OP na tabela de Ordem de produção 
-            const atualizaOP = await prisma.ordemProducao.update({
-                where: {
-                    id_ordem: ordemProducaoId,
-                    id_maquina: id_maquina,
-                    id_empresa: id_empresa
-                },
-                data: {
-                    status_op: status_maquina,
-                    prioridade: 'Critica'
-                }
-            })
-
             if (ordemProducaoId) {
                 await prisma.ordemProducao.update({
                     where: { id_ordem: ordemProducaoId },
                     data: {
-                        status_op: 'Parada',
+                        status_op: status_maquina === 'Setup' ? 'Setup' : 'Parada',
                         prioridade: status_maquina === 'Parada' ? 'Critica' : undefined
                     }
                 });
@@ -314,8 +306,29 @@ class EventoModel {
             const fimConvertido = this.converterTimestamp(fim)
             const duracao = this.calcularDuracao(inicio, fim)
             const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicioConvertido)
+                ?? await prisma.turno.findFirst({ where: { id_empresa } })
 
-            const eventosData = await Promise.all(maquinas.map(async (id_maquina) => {
+            if (!turno) {
+                throw new Error('Nenhum turno encontrado para registrar o evento');
+            }
+
+            const idsMaquinas = maquinas.map(Number).filter((id) => Number.isInteger(id) && id > 0);
+            if (idsMaquinas.length === 0) {
+                throw new Error('Nenhuma maquina valida informada');
+            }
+
+            const setorNumerico = Number(setor_afetado);
+            const maquinasEncontradas = await prisma.maquinas.findMany({
+                where: {
+                    id_empresa,
+                    id_maquina: { in: idsMaquinas },
+                    ativo: true
+                },
+                select: { id_maquina: true, id_setor: true }
+            });
+            const setorPorMaquina = new Map(maquinasEncontradas.map(maquina => [maquina.id_maquina, maquina.id_setor]));
+
+            const eventosData = await Promise.all(idsMaquinas.map(async (id_maquina) => {
                 const ordem = await prisma.ordemProducao.findFirst({
                     where: {
                         id_empresa,
@@ -333,7 +346,9 @@ class EventoModel {
                     id_ordemProducao: ordem?.id_ordem ?? null,
                     id_turno: turno.id_turno,
                     status_atual: status_maquina,
-                    setor_afetado: Number(setor_afetado),
+                    setor_afetado: Number.isInteger(setorNumerico)
+                        ? setorNumerico
+                        : (setorPorMaquina.get(id_maquina) ?? 0),
                     inicio: inicioConvertido,
                     termino: fimConvertido,
                     duracao,
@@ -345,7 +360,7 @@ class EventoModel {
             await prisma.historico_Eventos.createMany({ data: eventosData })
 
             await prisma.maquinas.updateMany({
-                where: { id_empresa, id_maquina: { in: maquinas } },
+                where: { id_empresa, id_maquina: { in: idsMaquinas } },
                 data: { status_atual: status_maquina }
             })
 
@@ -353,6 +368,50 @@ class EventoModel {
         } catch (error) {
             console.error('Erro registrar evento no banco de dados:', error)
             throw error
+        }
+    }
+
+    static async atualizarEventoSistema(id_empresa, id_evento, dados) {
+        try {
+            const eventoAtual = await prisma.historico_Eventos.findFirst({
+                where: { id_empresa, id_evento }
+            });
+
+            if (!eventoAtual) {
+                throw new Error('Evento nao encontrado ou nao pertence a empresa');
+            }
+
+            const inicio = dados.inicio ? this.converterTimestamp(dados.inicio) : eventoAtual.inicio;
+            const termino = dados.fim ? this.converterTimestamp(dados.fim) : (eventoAtual.termino ?? null);
+            const idMaquina = Number(dados.id_maquina ?? dados.maquinas?.[0] ?? eventoAtual.id_maquina);
+            const setorInformado = Number(dados.setor_afetado);
+            const dataUpdate = {
+                status_atual: dados.status_maquina ?? eventoAtual.status_atual,
+                id_maquina: Number.isInteger(idMaquina) && idMaquina > 0 ? idMaquina : eventoAtual.id_maquina,
+                inicio,
+                termino,
+                duracao: termino ? this.calcularDuracao(inicio, termino) : eventoAtual.duracao,
+                id_motivo_parada: dados.id_motivo_parada ? Number(dados.id_motivo_parada) : eventoAtual.id_motivo_parada,
+                observacao: dados.observacao ?? eventoAtual.observacao,
+                setor_afetado: Number.isInteger(setorInformado) ? setorInformado : eventoAtual.setor_afetado
+            };
+
+            await prisma.historico_Eventos.updateMany({
+                where: { id_empresa, id_evento },
+                data: dataUpdate
+            });
+
+            return this.formatarEvento(await prisma.historico_Eventos.findFirst({
+                where: { id_empresa, id_evento },
+                include: {
+                    maquina: { select: { id_maquina: true, nome: true, serie: true } },
+                    motivo_parada: { select: { id_motivo: true, descricao: true, tipo: true } },
+                    turno: { select: { id_turno: true, nome_turno: true } }
+                }
+            }));
+        } catch (error) {
+            console.error('Erro ao atualizar evento no banco de dados:', error);
+            throw error;
         }
     }
 
@@ -406,7 +465,7 @@ class EventoModel {
 
     // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
 
-    static async tempoParadoTempoProduzindoEvento(id_empresa) {
+    static async tempoParadoTempoProduzindoEvento(id_empresa, setorId = null) {
         function semanaAtual() {
             const hoje = new Date()
             const diaSemana = hoje.getDay()
@@ -430,6 +489,7 @@ class EventoModel {
             prisma.apontamento.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     data_hora_inicio: { gte: inicio, lte: fim }
                 },
                 select: {
@@ -441,6 +501,7 @@ class EventoModel {
             prisma.historico_Eventos.aggregate({
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
                     inicio: { gte: inicio, lte: fim },
                     duracao: { not: null }
@@ -463,12 +524,13 @@ class EventoModel {
             { nome: 'Tempo Parado', valor: tempoParado }
         ]
     }
-    static async top3MotivosParada(id_empresa) {
+    static async top3MotivosParada(id_empresa, setorId = null) {
         try {
             const resultado = await prisma.historico_Eventos.groupBy({
                 by: ['id_motivo_parada'],
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     duracao: { not: null },
                     id_motivo_parada: { not: null }
                 },
@@ -498,12 +560,13 @@ class EventoModel {
 
     // -------------- Dashboards --------------- //
 
-    static async obterMotivosParadaFrequentes(id_empresa, limite = 10) {
+    static async obterMotivosParadaFrequentes(id_empresa, limite = 10, setorId = null) {
         try {
             const agrupados = await prisma.historico_Eventos.groupBy({
                 by: ['id_motivo_parada'],
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     id_motivo_parada: {
                         not: null
                     },
@@ -703,12 +766,13 @@ class EventoModel {
         }
     }
 
-    static async obterParadasJustificadasComparativo(id_empresa) {
+    static async obterParadasJustificadasComparativo(id_empresa, setorId = null) {
         try {
             const [justificadas, naoJustificadas] = await Promise.all([
                 prisma.historico_Eventos.count({
                     where: {
                         id_empresa,
+                        ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                         id_motivo_parada: {
                             not: null
                         }
@@ -717,6 +781,7 @@ class EventoModel {
                 prisma.historico_Eventos.count({
                     where: {
                         id_empresa,
+                        ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                         id_motivo_parada: null
                     }
                 })
@@ -732,9 +797,9 @@ class EventoModel {
         }
     }
 
-    static async obterTopMotivosTempo(id_empresa, limite = 5) {
+    static async obterTopMotivosTempo(id_empresa, limite = 5, setorId = null) {
         try {
-            const motivos = await this.obterMotivosParadaFrequentes(id_empresa, limite);
+            const motivos = await this.obterMotivosParadaFrequentes(id_empresa, limite, setorId);
 
             return motivos
                 .sort((a, b) => b.duracao_total_minutos - a.duracao_total_minutos)

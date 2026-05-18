@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -6,32 +6,32 @@ import { Pencil, CheckCircle2, ChevronDown, X, Calendar, Clock, Loader2 } from "
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { eventosCrudService } from '@/services/eventosCrudService'; // Importar o serviço
-
-const OPCOES_SETOR = ["Roscas", "Engrenagens", "Usinagem"];
-const OPCOES_MAQUINA = [
-    { label: "Injetora 1", value: 1 },
-    { label: "Injetora 2", value: 2 },
-    { label: "Torno CNC", value: 3 },
-];
-const OPCOES_OP = ["#000000 (Injetora 1)", "#000001 (Injetora 2)"];
-
+import { useSetores } from '@/hooks/useSetores';
+import { useMaquinas } from '@/hooks/useMaquinas';
+import { useOps } from '@/hooks/useOps';
 
 export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
+
+    const { setores } = useSetores();
+    const { maquinas } = useMaquinas();
+    const { ops } = useOps();
 
     const [setoresSelecionados, setSetoresSelecionados] = useState([]); // setor_afetado — backend: setor_afetado
     const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]); // maquinas (array de ids) — backend: maquinas
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
     const [idMotivoPrincipal, setIdMotivoPrincipal] = useState(""); // id_motivo_parada — backend: id_motivo_parada
     const [observacao, setObservacao] = useState(""); // observacao — backend: observacao
-    // id_motivo_parada — número — backend: id_motivo_parada
-    const [opcoesMotivo, setOpcoesMotivo] = useState([
-        { label: "Falta de Energia", value: 1 },
-        { label: "Manutenção Preventiva", value: 2 },
-        { label: "Manutenção Corretiva", value: 3 },
-        { label: "Falta de Material", value: 4 },
-        { label: "Outros", value: 5 },
-    ]);
+    const [opcoesMotivo, setOpcoesMotivo] = useState([]);
+
+    const fetchMotivos = useCallback(async () => {
+        try {
+            const motivos = await eventosCrudService.getMotivos();
+            setOpcoesMotivo(motivos.map(m => ({ label: m.descricao, value: m.id_motivo })));
+        } catch (error) {
+            console.error('Erro ao carregar motivos:', error);
+        }
+    }, []);
     // período do evento
     const [inicioData, setInicioData] = useState(""); // inicio — backend: inicio
     const [inicioHora, setInicioHora] = useState("");
@@ -71,13 +71,17 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
         e.preventDefault();
 
         const payload = {
-            id_evento: eventoId, // backend: id_evento
-            id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null, // backend: id_motivo_parada
-            observacao, // backend: observacao
+            status_maquina: tipoEvento,
+            setor_afetado: setoresSelecionados[0] ?? null,
+            maquinas: maquinasSelecionadas,
+            inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000` : null,
+            fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000` : null,
+            id_motivo_parada: idMotivoPrincipal ? Number(idMotivoPrincipal) : null,
+            observacao,
         };
 
         try {
-            await eventosCrudService.justificar(payload);
+            await eventosCrudService.update(eventoId, payload);
             toast.success("Evento atualizado com sucesso!");
             if (onEdicaoSucesso) onEdicaoSucesso();
         } catch (error) {
@@ -89,10 +93,11 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     useEffect(() => {
         const buscarDados = async () => {
             try {
-                const dados = await eventosCrudService.getById(eventoId);
+                        const dados = await eventosCrudService.getById(eventoId);
                 setTipoEvento(dados.status_maquina || 'Parada');
                 setSetoresSelecionados(dados.setor_afetado ? [dados.setor_afetado] : []);
                 setMaquinasSelecionadas(dados.maquinas || []);
+                setOpsSelecionadas(dados.ops_afetadas || []);
                 setIdMotivoPrincipal(dados.id_motivo_parada || "");
                 setObservacao(dados.observacao || "");
                 if (dados.inicio) {
@@ -104,16 +109,14 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     setFimHora(dados.fim.split('T')[1]?.slice(0, 5));
                 }
 
-                // busca motivos dinamicamente
-                const motivos = await eventosCrudService.getMotivos();
-                setOpcoesMotivo(motivos.map(m => ({ label: m.descricao, value: m.id_motivo })));
+                await fetchMotivos();
             } catch (error) {
                 toast.error("Erro ao carregar dados do evento.");
             }
         };
 
         if (eventoId) buscarDados();
-    }, [eventoId]);
+    }, [eventoId, fetchMotivos]);
 
     return (
         <>
@@ -172,30 +175,38 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.setor && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {OPCOES_SETOR.map(opcao => (
-                                <label key={opcao} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
-                                    <input
-                                        type="checkbox"
-                                        checked={setoresSelecionados.includes(opcao)}
-                                        onChange={() => handleToggleSetor(opcao)}
-                                        className="rounded w-4 h-4 accent-blue-900"
-                                    />
-                                    {opcao}
-                                </label>
-                            ))}
+                            {setores.map((setor) => {
+                                const setorId = Number(setor.id ?? setor.id_setor);
+                                const setorLabel = setor.nome_setor || setor.nome || `Setor ${setorId}`;
+                                return (
+                                    <label key={setorId} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
+                                        <input
+                                            type="checkbox"
+                                            checked={setoresSelecionados.includes(setorId)}
+                                            onChange={() => handleToggleSetor(setorId)}
+                                            className="rounded w-4 h-4 accent-blue-900"
+                                        />
+                                        {setorLabel}
+                                    </label>
+                                );
+                            })}
                         </div>
                     )}
 
                     {/* tags */}
                     <div className="flex flex-wrap gap-2 mt-2 empty:mt-0">
-                        {setoresSelecionados.map(tag => (
-                            <span key={tag} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                {tag}
-                                <button type="button" onClick={() => handleToggleSetor(tag)} className="text-gray-400 hover:text-gray-600">
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
+                        {setoresSelecionados.map(id => {
+                            const setor = setores.find((setor) => Number(setor.id ?? setor.id_setor) === id);
+                            const label = setor?.nome_setor || setor?.nome || `Setor ${id}`;
+                            return (
+                                <span key={id} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                    {label}
+                                    <button type="button" onClick={() => handleToggleSetor(id)} className="text-gray-400 hover:text-gray-600">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -214,27 +225,32 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.maquina && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {OPCOES_MAQUINA.map(opcao => (
-                                <label key={opcao.value} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
-                                    <input
-                                        type="checkbox"
-                                        checked={maquinasSelecionadas.includes(opcao.value)}
-                                        onChange={() => handleToggleMaquina(opcao.value)}
-                                        className="rounded accent-blue-900 w-4 h-4"
-                                    />
-                                    {opcao.label}
-                                </label>
-                            ))}
+                            {maquinas.map((maquina) => {
+                                const maquinaId = Number(maquina.id_maquina ?? maquina.id ?? maquina.id_maquina);
+                                const maquinaLabel = maquina.nome || maquina.serie || maquina.codigo || `Máquina ${maquinaId}`;
+                                return (
+                                    <label key={maquinaId} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
+                                        <input
+                                            type="checkbox"
+                                            checked={maquinasSelecionadas.includes(maquinaId)}
+                                            onChange={() => handleToggleMaquina(maquinaId)}
+                                            className="rounded accent-blue-900 w-4 h-4"
+                                        />
+                                        {maquinaLabel}
+                                    </label>
+                                );
+                            })}
                         </div>
                     )}
 
                     {/* tags */}
                     <div className="flex flex-wrap gap-2 mt-2 empty:mt-0">
                         {maquinasSelecionadas.map(id => {
-                            const opcao = OPCOES_MAQUINA.find(o => o.value === id);
+                            const maquina = maquinas.find((m) => Number(m.id_maquina ?? m.id) === id);
+                            const label = maquina?.nome || maquina?.serie || maquina?.codigo || `Máquina ${id}`;
                             return (
                                 <span key={id} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                    {opcao?.label}
+                                    {label}
                                     <button type="button" onClick={() => handleToggleMaquina(id)} className="text-gray-400 hover:text-gray-600">
                                         <X className="w-3 h-3" />
                                     </button>
@@ -259,15 +275,15 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.op && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {OPCOES_OP.map(opcao => (
-                                <label key={opcao} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
+                            {ops.map((op) => (
+                                <label key={op.id} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
                                     <input
                                         type="checkbox"
-                                        checked={opsSelecionadas.includes(opcao)}
-                                        onChange={() => handleToggleOp(opcao)}
+                                        checked={opsSelecionadas.includes(op.id)}
+                                        onChange={() => handleToggleOp(op.id)}
                                         className="rounded accent-blue-900 w-4 h-4"
                                     />
-                                    {opcao}
+                                    {op.nome || op.codigo || `OP ${op.id}`}
                                 </label>
                             ))}
                         </div>
@@ -275,14 +291,18 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
 
                     {/* tags */}
                     <div className="flex flex-wrap gap-2 mt-2 empty:mt-0">
-                        {opsSelecionadas.map(tag => (
-                            <span key={tag} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                {tag}
-                                <button type="button" onClick={() => handleToggleOp(tag)} className="text-gray-400 hover:text-gray-600">
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
+                        {opsSelecionadas.map(id => {
+                            const op = ops.find((item) => item.id === id);
+                            const label = op?.nome || op?.codigo || `OP ${id}`;
+                            return (
+                                <span key={id} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                    {label}
+                                    <button type="button" onClick={() => handleToggleOp(id)} className="text-gray-400 hover:text-gray-600">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
 

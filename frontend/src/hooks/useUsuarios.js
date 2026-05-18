@@ -11,7 +11,7 @@ export function useUsuarios() {
     setLoading(true);
     try {
       const data = await usuariosCrudService.getAll();
-      setUsuarios(data.dados);
+      setUsuarios(data.dados || []);
       setError(null);
     } catch (err) {
       setError('Falha ao carregar usuários');
@@ -40,7 +40,7 @@ export function useUsuarios() {
   const editarUsuario = async (id, dados) => {
     try {
       const atualizado = await usuariosCrudService.update(id, dados);
-      setUsuarios(prev => prev.map(u => u.id === id ? atualizado : u));
+      setUsuarios(prev => prev.map(u => String(u.id) === String(id) ? atualizado : u));
       return atualizado;
     } catch (err) {
       throw err;
@@ -51,7 +51,7 @@ export function useUsuarios() {
   const excluirUsuario = async (id) => {
     try {
       await usuariosCrudService.delete(id);
-      setUsuarios(prev => prev.filter(u => u.id !== id));
+      setUsuarios(prev => prev.filter(u => String(u.id) !== String(id)));
     } catch (err) {
       throw err;
     }

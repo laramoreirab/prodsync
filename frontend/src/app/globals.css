@@ -140,3 +140,7 @@
     @apply font-sans;
   }
 }
+
+input{
+  outline: none;
+}

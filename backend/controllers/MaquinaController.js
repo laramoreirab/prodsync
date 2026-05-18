@@ -21,7 +21,7 @@ class MaquinaController {
         try {
             const id_empresa = req.user.id_empresa;
             const paginacao = req.paginacao;
-            const resultado = await MaquinaModel.listarMaquinasPaginadas(id_empresa, paginacao);
+            const resultado = await MaquinaModel.listarMaquinasPaginadas(id_empresa, paginacao, req.query.setorId);
 
             return res.status(200).json({
                 sucesso: true,
@@ -66,7 +66,21 @@ class MaquinaController {
 
         } catch (error) {
             console.error('Erro ao buscar máquina:', error);
-            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+            if (error.code === 'P2002') {
+                return res.status(409).json({
+                    sucesso: false,
+                    erro: 'Dados duplicados',
+                    mensagem: 'Já existe uma máquina cadastrada com estes dados.'
+                });
+            }
+            if (error.code === 'P2003') {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Relacionamento inválido',
+                    mensagem: 'Setor ou operador informado não existe.'
+                });
+            }
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor', mensagem: error.message });
         }
     }
 
@@ -98,7 +112,25 @@ class MaquinaController {
         } catch (error) {
             console.error('Erro ao criar máquina:', error);
             if (req.file) removerArquivoAntigo(req.file.filename);
-            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+            if (error.code === 'P2002') {
+                return res.status(409).json({
+                    sucesso: false,
+                    erro: 'Dados duplicados',
+                    mensagem: 'Já existe uma máquina cadastrada com estes dados.'
+                });
+            }
+            if (error.code === 'P2003') {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Relacionamento invÃ¡lido',
+                    mensagem: 'Setor ou operador informado nÃ£o existe.'
+                });
+            }
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: error.message
+            });
         }
     }
 
@@ -106,7 +138,7 @@ class MaquinaController {
     static async atualizarMaquina(req, res) {
         try {
             const { id } = req.params;
-            const { nome, serie, id_setor, id_categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
+            const { nome, serie, id_setor, categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
 
             if (!id || isNaN(id)) return res.status(400).json({ sucesso: false, erro: 'ID inválido' });
@@ -121,7 +153,7 @@ class MaquinaController {
                 nome: nome?.trim(),
                 serie: serie?.trim(),
                 id_setor,
-                id_categoria,
+                categoria: categoria?.trim(),
                 capacidade: capacidade?.trim(),
                 status: (status_atual || status)?.trim(),
                 data_aquisicao,
@@ -217,7 +249,7 @@ class MaquinaController {
                 });
             }
 
-            const maquinas = await MaquinaModel.listarMaquinasPorStatus(id_empresa, status.trim());
+            const maquinas = await MaquinaModel.listarMaquinasPorStatus(id_empresa, status.trim(), req.query.setorId);
 
             res.status(200).json({
                 sucesso: true,
@@ -285,7 +317,7 @@ class MaquinaController {
     //dashboard novo da tela de usuário adm 
     static async taxaCumprimentoMetaPorSetor(req, res) {
         try {
-            const dados = await MaquinaModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa)
+            const dados = await MaquinaModel.taxaCumprimentoMetaPorSetor(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Cumprimento de Meta de Produção Por Setor', error)
@@ -297,7 +329,7 @@ class MaquinaController {
     static async obterStatusGeralMaquinas(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const dados = await MaquinaModel.obterStatusGeralMaquinas(id_empresa);
+            const dados = await MaquinaModel.obterStatusGeralMaquinas(id_empresa, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -313,7 +345,7 @@ class MaquinaController {
     static async obterProducaoTotalMaquinas(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : 7;
-            const dados = await MaquinaModel.obterProducaoTotalMaquinas(req.user.id_empresa, dias);
+            const dados = await MaquinaModel.obterProducaoTotalMaquinas(req.user.id_empresa, dias, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -329,7 +361,7 @@ class MaquinaController {
     static async obterMediaParadasPorDia(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : 7;
-            const dados = await MaquinaModel.obterMediaParadasPorDia(req.user.id_empresa, dias);
+            const dados = await MaquinaModel.obterMediaParadasPorDia(req.user.id_empresa, dias, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -345,7 +377,7 @@ class MaquinaController {
     static async obterPecasPorMinuto(req, res) {
         try {
             const dias = req.query.dias ? Number(req.query.dias) : 7;
-            const dados = await MaquinaModel.obterPecasPorMinuto(req.user.id_empresa, dias);
+            const dados = await MaquinaModel.obterPecasPorMinuto(req.user.id_empresa, dias, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {

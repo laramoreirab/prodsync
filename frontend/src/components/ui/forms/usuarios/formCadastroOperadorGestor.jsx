@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
     Dialog,
     DialogTrigger,
@@ -9,10 +9,15 @@ import { Plus, Info, File, Upload, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/api';
 
 export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const fileInputFotoRef = useRef(null);
+    const [listaSetores, setListaSetores] = useState([]);
+    const [listaTurnos, setListaTurnos] = useState([]);
+    const [listaMaquinas, setListaMaquinas] = useState([]);
 
     const estadoInicialForm = {
         nome: "",
@@ -24,6 +29,44 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
     };
 
     const [formData, setFormData] = useState(estadoInicialForm);
+
+    useEffect(() => {
+        async function carregarSetores() {
+            try {
+                const dados = await setorCrudService.getAll();
+                setListaSetores(dados.dados || []);
+            } catch (error) {
+                console.error(error);
+                toast.error("Erro ao carregar setores.");
+            }
+        }
+
+        carregarSetores();
+    }, []);
+
+    useEffect(() => {
+        async function carregarVinculosSetor() {
+            if (!formData.id_setor) {
+                setListaTurnos([]);
+                setListaMaquinas([]);
+                return;
+            }
+
+            try {
+                const [turnos, maquinas] = await Promise.all([
+                    apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, { method: "GET" }),
+                    apiFetch(`/api/maquinas/setor/${formData.id_setor}`, { method: "GET" }),
+                ]);
+                setListaTurnos(turnos.dados || []);
+                setListaMaquinas(maquinas.dados || []);
+            } catch (error) {
+                console.error(error);
+                toast.error("Erro ao carregar turnos e maquinas.");
+            }
+        }
+
+        carregarVinculosSetor();
+    }, [formData.id_setor]);
 
     const handleFotoChange = (e) => {
         const file = e.target.files[0];
@@ -50,11 +93,11 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
         payload.append('cpf', formData.cpf);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
-        payload.append('funcao', 'operador'); //--> função SEMPRE será operador!!
+        payload.append('funcao', 'Operador');
         payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
         payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
 
-        if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+        if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
         try {
             await usuariosCrudService.create(payload);
@@ -159,8 +202,11 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Roscas</option>
-                            <option value="2">Brocas</option>
+                            {listaSetores.map((setor) => (
+                                <option key={setor.id_setor} value={setor.id_setor}>
+                                    {setor.nome_setor}
+                                </option>
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -173,9 +219,11 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Manhã</option>
-                            <option value="2">Tarde</option>
-                            <option value="3">Noite</option>
+                            {listaTurnos.map((turno) => (
+                                <option key={turno.id_turno} value={turno.id_turno}>
+                                    {turno.nome_turno}
+                                </option>
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -189,8 +237,11 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                         required
                     >
                         <option value="">Selecione...</option>
-                        <option value="1">Máquina 1</option>
-                        <option value="2">Máquina 2</option>
+                        {listaMaquinas.map((maquina) => (
+                            <option key={maquina.id_maquina} value={maquina.id_maquina}>
+                                {maquina.nome}
+                            </option>
+                        ))}
                     </select>
                     <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>

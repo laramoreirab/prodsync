@@ -1,56 +1,23 @@
-"use client"
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { BellRing, EyeIcon, Loader2, Pencil, Plus, Search } from "lucide-react";
 
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogHeader,
-  DialogFooter
-} from "@/components/ui/dialog";
-
-import { Plus, Search, Pencil, EyeIcon, BellRing, Loader2 } from "lucide-react";
-import { DuracaoEvento } from "@/components/ui/duracaoEvento";
-import { DataEvento } from "@/components/ui/dataEvento";
-
-import { useState, useMemo, useEffect } from "react";
-
 import { useEventos } from "@/hooks/useEventos";
-
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
-
-import {
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
-
-import { Label } from "@/components/ui/label"
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea";
-
-
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
-
-
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoGestor";
-import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormCadastroEventoGestor from "@/components/ui/forms/historicoEventos/formCadastroEventoGestor";
@@ -70,302 +37,112 @@ import {
 
 
 const colunasEventos = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-25 text-center justify-center' },
-  { id: 'nome', key: 'nome', label: 'Nome' }, /* nome da máquina */
+  { id: "id", key: "id", label: "ID", className: "w-25 text-center justify-center" },
+  { id: "nome", key: "nome", label: "Nome" },
   {
-    id: 'status', key: 'status', label: 'Status', className: 'text-center justify-center',
+    id: "status",
+    key: "status",
+    label: "Status",
+    className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        "Setup": { variant: "setup", },
-        "Parada": { variant: "parada" }
+        Setup: { variant: "setup" },
+        Parada: { variant: "parada" },
       };
-
       const estilo = config[valor] || { variant: "outline", className: "" };
       return (
         <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
-          {valor}
+          {valor || "-"}
         </Badge>
       );
-    }
+    },
   },
   {
-    id: 'data',
-    key: 'data',
-    label: 'Data (Início - Fim)',
-    icone: (valor, row) => (
-      <DataEvento inicio={row.inicio} fim={row.fim} />
-    )
+    id: "data",
+    key: "data",
+    label: "Data (Inicio - Fim)",
+    icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
   },
   {
-    id: 'duracao', key: 'duracao', label: 'Duração',
-    icone: (valor, row) => (
-      <DuracaoEvento inicio={row.inicio} fim={row.fim} />
-    )
+    id: "duracao",
+    key: "duracao",
+    label: "Duracao",
+    icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
-  { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  { id: 'observacao', key: 'observacao', label: 'Observação' },
+  { id: "motivo", key: "motivo", label: "Motivo" },
+  { id: "observacao", key: "observacao", label: "Observacao" },
 ];
 
-const dadosEventos = [
-  {
-    id: 501,
-    nome: "Injetora HAITIAN 120",
-    status: "Parada",
-    inicio: "2026-05-11T08:00:00",
-    fim: "2026-05-11T08:45:00",
-    motivo: "Manutenção Corretiva",
-    observacao: "Troca de mangueira hidráulica com vazamento."
-  },
-  {
-    id: 502,
-    nome: "Torno CNC Nardini",
-    status: "Setup",
-    inicio: "2026-05-11T09:15:00",
-    fim: "2026-05-11T10:30:00",
-    motivo: "Troca de Ferramental",
-    observacao: "Preparação para nova ordem de serviço (OP-44)."
-  },
-  {
-    id: 503,
-    nome: "Prensa Hidráulica 50T",
-    status: "Parada",
-    inicio: "2026-05-11T10:00:00",
-    fim: "2026-05-11T10:15:00",
-    motivo: "Falta de Material",
-    observacao: "Aguardando abastecimento de chapas de aço."
-  },
-  {
-    id: 504,
-    nome: "Corte a Laser Fiber",
-    status: "Setup",
-    inicio: "2026-05-11T11:00:00",
-    fim: "2026-05-11T11:20:00",
-    motivo: "Ajuste de Parâmetros",
-    observacao: "Calibração do foco para espessura de 10mm."
-  },
-  {
-    id: 505,
-    nome: "Solda Robotizada Kuka",
-    status: "Parada",
-    inicio: "2026-05-11T13:00:00",
-    fim: "2026-05-11T13:40:00",
-    motivo: "Erro de Software",
-    observacao: "Reinicialização do sistema de controle do braço."
-  },
-  {
-    id: 506,
-    nome: "Dobradeira CNC",
-    status: "Setup",
-    inicio: "2026-05-11T14:00:00",
-    fim: "2026-05-11T14:45:00",
-    motivo: "Troca de Matriz",
-    observacao: "Substituição de ferramentas para dobra em V."
-  },
-  {
-    id: 507,
-    nome: "Extrusora de Perfil",
-    status: "Parada",
-    inicio: "2026-05-11T15:00:00",
-    fim: "2026-05-11T16:30:00",
-    motivo: "Limpeza de Cabeçote",
-    observacao: "Resíduo de material carbonizado detectado."
-  },
-  {
-    id: 508,
-    nome: "Retífica Plana",
-    status: "Parada",
-    inicio: "2026-05-11T16:00:00",
-    fim: "2026-05-11T16:10:00",
-    motivo: "Inspeção de Qualidade",
-    observacao: "Verificação dimensional da primeira peça."
-  },
-  {
-    id: 509,
-    nome: "Torno Automático A25",
-    status: "Setup",
-    inicio: "2026-05-11T07:30:00",
-    fim: "2026-05-11T09:00:00",
-    motivo: "Abastecimento de Barra",
-    observacao: "Carga de novo lote de tarugos de alumínio."
-  },
-  {
-    id: 510,
-    nome: "Centro de Usinagem VMC",
-    status: "Parada",
-    inicio: "2026-05-11T11:20:00",
-    fim: "2026-05-11T11:55:00",
-    motivo: "Quebra de Broca",
-    observacao: "Substituição e reset de coordenadas."
-  },
-  {
-    id: 511,
-    nome: "Fresadora Universal",
-    status: "Setup",
-    inicio: "2026-05-11T13:30:00",
-    fim: "2026-05-11T14:15:00",
-    motivo: "Ajuste de Fixação",
-    observacao: "Instalação de morsa hidráulica de precisão."
-  },
-  {
-    id: 512,
-    nome: "Forno de Têmpera",
-    status: "Parada",
-    inicio: "2026-05-11T02:00:00",
-    fim: "2026-05-11T06:00:00",
-    motivo: "Resfriamento Programado",
-    observacao: "Ciclo de descanso obrigatório do refratário."
-  },
-  {
-    id: 513,
-    nome: "Envasadora Automática",
-    status: "Setup",
-    inicio: "2026-05-11T10:00:00",
-    fim: "2026-05-11T10:45:00",
-    motivo: "Troca de Produto",
-    observacao: "Sanitização para troca de envase (Lote A para B)."
-  },
-  {
-    id: 514,
-    nome: "Ponte Rolante 10T",
-    status: "Parada",
-    inicio: "2026-05-11T08:30:00",
-    fim: "2026-05-11T09:00:00",
-    motivo: "Checklist Diário",
-    observacao: "Inspeção de cabos e freios de segurança."
-  },
-  {
-    id: 515,
-    nome: "Injetora HAITIAN 120",
-    status: "Setup",
-    inicio: "2026-05-11T17:00:00",
-    fim: "2026-05-11T18:30:00",
-    motivo: "Troca de Molde",
-    observacao: "Instalação do molde de tampa de 20mm."
-  }
-];
 const historicoEventosFilter = [
   { id: "tipo", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
   { id: "data", label: "Data", type: "date-range" },
-  // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
 ];
-
 
 const opcoesOrdenacao = [
-  { label: 'ID Crescente', value: 'id_asc' },
-  { label: 'ID Decrescente', value: 'id_desc' },
-  { label: 'Data Crescente', value: 'data_asc' },
-  { label: 'Data Decrescente', value: 'data_desc' },
-  // { label: 'Duração Crescente', value: 'duracao_asc' }, --> filtro por duração não funcionou
-  // { label: 'Duração Decrescente', value: 'duracao_desc' }
+  { label: "ID Crescente", value: "id_asc" },
+  { label: "ID Decrescente", value: "id_desc" },
+  { label: "Data Crescente", value: "data_asc" },
+  { label: "Data Decrescente", value: "data_desc" },
 ];
 
-
 export default function HistoricoEventosGestor() {
+  const { eventos, loading, refresh } = useEventos();
+  const { setorId } = usePerfil();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
+
+  const eventosDoSetor = useMemo(() => {
+    return (eventos || []).filter((evento) => !setorId || String(evento.setor_afetado) === String(setorId));
+  }, [eventos, setorId]);
 
   useEffect(() => {
-    setDados(dadosEventos);
-  }, []);
-  useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
-    } catch {
-      // token ausente ou malformado
-    }
-  }, []);
+    setDados(eventosDoSetor);
+  }, [eventosDoSetor]);
 
   const handleSort = (criterio) => {
-    const dadosCopiados = [...dadosEventos];
-
-
-    dadosCopiados.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'maquina') return a.maquina.localeCompare(b.maquina);
-      if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
-      if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
-      if (criterio === 'duracao_asc') {
-        const [horasA, minutosA] = a.duracao.split(':').map(Number);
-        const [horasB, minutosB] = b.duracao.split(':').map(Number);
-        return (horasA * 60 + minutosA) - (horasB * 60 + minutosB);
-      }
-      if (criterio === 'duracao_desc') {
-        const [horasA, minutosA] = a.duracao.split(':').map(Number);
-        const [horasB, minutosB] = b.duracao.split(':').map(Number);
-        return (horasB * 60 + minutosB) - (horasA * 60 + minutosA);
-      }
+    const ordenado = [...dados].sort((a, b) => {
+      if (criterio === "id_asc") return Number(a.id) - Number(b.id);
+      if (criterio === "id_desc") return Number(b.id) - Number(a.id);
+      if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
       return 0;
     });
-
-
-    setDados(dadosCopiados);
+    setDados(ordenado);
   };
-
 
   const aplicarFiltros = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosEventos];
+    let filtrados = [...eventosDoSetor];
 
-    //filtro por tipo
-    if (filtrosSelecionados.tipo && filtrosSelecionados.tipo.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(evento =>
-        filtrosSelecionados.tipo.includes(evento.tipo)
-      );
+    if (filtrosSelecionados.tipo?.length > 0) {
+      filtrados = filtrados.filter((evento) => filtrosSelecionados.tipo.includes(evento.tipo || evento.status));
     }
 
-    //filtro por data
-    if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(evento =>
-          new Date(evento.inicio) >= new Date(filtrosSelecionados.data.start)
-        );
-      }
-      if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(evento =>
-          new Date(evento.inicio) <= new Date(filtrosSelecionados.data.end)
-        );
-      }
+    if (filtrosSelecionados.data?.start) {
+      filtrados = filtrados.filter((evento) => new Date(evento.inicio) >= new Date(filtrosSelecionados.data.start));
     }
 
-    // //filtro por duração --> não funcionou
-    //  if (filtrosSelecionados.duracao) {
-    //   const duracaoMax = filtrosSelecionados.duracao;
-    //   dadosFiltrados = dadosFiltrados.filter(evento => {    
-    //     const [horas, minutos] = evento.duracao.split(':').map(Number);
-    //     const duracaoEvento = horas * 60 + minutos;
-    //     return duracaoEvento <= duracaoMax;
-    //   });
-    // }
+    if (filtrosSelecionados.data?.end) {
+      filtrados = filtrados.filter((evento) => new Date(evento.inicio) <= new Date(filtrosSelecionados.data.end));
+    }
 
-    setDados(dadosFiltrados);
+    setDados(filtrados);
   };
 
-  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((evento) => {
     const termo = busca.toLowerCase();
-    return (
-      evento.nome.toLowerCase().includes(termo) ||
-      evento.id.toString().includes(termo)
-    );
+    return evento.nome?.toLowerCase().includes(termo) || String(evento.id).includes(termo);
   });
 
-
-
   const paradasJustificadas = useMemo(
-    () => dadosExibidos.filter(d => d.justificada === true),
+    () => dadosExibidos.filter((evento) => evento.justificada === true),
     [dadosExibidos]
   );
-
 
   const paradasNaoJustificadas = useMemo(
-    () => dadosExibidos.filter(d => d.justificada === false),
+    () => dadosExibidos.filter((evento) => evento.justificada === false),
     [dadosExibidos]
   );
-
-  const [selecionados, setSelecionados] = useState([]);
 
   const modalJustificativa = (
     <DialogContent>
@@ -375,7 +152,6 @@ export default function HistoricoEventosGestor() {
 
   const acoesDropdown = (row) => (
     <>
-
       <Dialog>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -387,7 +163,6 @@ export default function HistoricoEventosGestor() {
           <DetalhesEvento eventoId={row.id} />
         </DialogContent>
       </Dialog>
-
       <Dialog>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -396,10 +171,9 @@ export default function HistoricoEventosGestor() {
           </DropdownMenuItem>
         </DialogTrigger>
         <DialogContent>
-
+          <ModalSucessNotificacao />
         </DialogContent>
       </Dialog>
-
       <Dialog>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
@@ -408,12 +182,19 @@ export default function HistoricoEventosGestor() {
           </DropdownMenuItem>
         </DialogTrigger>
         <DialogContent>
-          <FormEdicaoEvento />
+          <FormEdicaoEvento eventoId={row.id} onEdicaoSucesso={refresh} />
         </DialogContent>
       </Dialog>
-
     </>
   );
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="animate-spin text-blue-900 w-12 h-12" />
+      </main>
+    );
+  }
 
   return (
     <PageLayout>
@@ -505,7 +286,7 @@ export default function HistoricoEventosGestor() {
               <TableListagens
                 data={dadosExibidos}
                 columns={colunasEventos}
-                enableSelection={true}
+                enableSelection
                 acoesDropdown={acoesDropdown}
                 onSelectedChange={setSelecionados}
                 solicitarJustificativa={modalJustificativa}
@@ -526,7 +307,7 @@ export default function HistoricoEventosGestor() {
               <TableListagens
                 data={paradasJustificadas}
                 columns={colunasEventos}
-                enableSelection={true}
+                enableSelection
                 acoesDropdown={acoesDropdown}
                 onSelectedChange={setSelecionados}
                 solicitarJustificativa={modalJustificativa}
@@ -545,7 +326,7 @@ export default function HistoricoEventosGestor() {
               <TableListagens
                 data={paradasNaoJustificadas}
                 columns={colunasEventos}
-                enableSelection={true}
+                enableSelection
                 acoesDropdown={acoesDropdown}
                 onSelectedChange={setSelecionados}
                 solicitarJustificativa={modalJustificativa}

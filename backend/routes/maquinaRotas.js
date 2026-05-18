@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import MaquinaController from '../controllers/MaquinaController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js';
+import { aplicarEscopoGestor, autorizarMaquinaParam, autorizarSetorParam, autorizarUsuarioParam } from '../middlewares/setorAccessMiddleware.js';
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js';
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
 
@@ -8,36 +9,36 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.get('/', paginacaoMiddleware, MaquinaController.listarMaquinas);
-router.post('/criarMaquina', uploadImagens.single('imagem'), handleUploadError, MaquinaController.criarMaquina);
+router.get('/', aplicarEscopoGestor, paginacaoMiddleware, MaquinaController.listarMaquinas);
+router.post('/criarMaquina', adminMiddleware, uploadImagens.single('imagem'), handleUploadError, MaquinaController.criarMaquina);
 
-router.get('/dashboard/status-geral', MaquinaController.obterStatusGeralMaquinas);
-router.get('/dashboard/taxa-cumprimento-meta-setor', MaquinaController.taxaCumprimentoMetaPorSetor);
-router.get('/dashboard/obter-pecas-por-minuto', MaquinaController.obterPecasPorMinuto)
-router.get('/dashboard/obter-tempo-parada-maquinas', MaquinaController.obterMediaParadasPorDia)
-router.get('/dashboard/obter-producao-total-maquinas', MaquinaController.obterProducaoTotalMaquinas)
+router.get('/dashboard/status-geral', aplicarEscopoGestor, MaquinaController.obterStatusGeralMaquinas);
+router.get('/dashboard/taxa-cumprimento-meta-setor', aplicarEscopoGestor, MaquinaController.taxaCumprimentoMetaPorSetor);
+router.get('/dashboard/obter-pecas-por-minuto', aplicarEscopoGestor, MaquinaController.obterPecasPorMinuto)
+router.get('/dashboard/obter-tempo-parada-maquinas', aplicarEscopoGestor, MaquinaController.obterMediaParadasPorDia)
+router.get('/dashboard/obter-producao-total-maquinas', aplicarEscopoGestor, MaquinaController.obterProducaoTotalMaquinas)
 
-router.get('/dashboard/pecasProduzidas7dias/:id_setor', MaquinaController.pecasProduzidas7Dias)
-router.get('/statusMaquinas/:id_setor', MaquinaController.statusMaquinas)
-router.get('/producaoMaquinas/:id_setor', MaquinaController.producaoMaquinas)
+router.get('/dashboard/pecasProduzidas7dias/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.pecasProduzidas7Dias)
+router.get('/statusMaquinas/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.statusMaquinas)
+router.get('/producaoMaquinas/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.producaoMaquinas)
 
-router.get('/status/:status', MaquinaController.listarMaquinasPorStatus);
-router.get('/setor/:id_setor', MaquinaController.listarMaquinasPorSetor);
-router.get('/obter-maquina-operador/:id_operador', MaquinaController.obterMaquinaOperador)
+router.get('/status/:status', aplicarEscopoGestor, MaquinaController.listarMaquinasPorStatus);
+router.get('/setor/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.listarMaquinasPorSetor);
+router.get('/obter-maquina-operador/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.obterMaquinaOperador)
 
-router.get('/:id/top-motivos-parada', MaquinaController.obterTopMotivosParada);
-router.get('/:id/refugo_motivos', MaquinaController.obterRefugosMaquina);
-router.get('/:id/setup_motivos', MaquinaController.obterTopMotivosParada); // Usando top-motivos por enquanto como fallback
-router.get('/:id/oee', MaquinaController.obterResumoOeeMaquina);
-router.get('/:id/oee_evolucao', MaquinaController.obterEvolucaoOeeMaquina);
-router.get('/:id/velocidade', MaquinaController.obterVelocidadeMaquina);
-router.get('/:id/historico-eventos', MaquinaController.obterHistoricoEventosTabela);
+router.get('/:id/top-motivos-parada', autorizarMaquinaParam('id'), MaquinaController.obterTopMotivosParada);
+router.get('/:id/refugo_motivos', autorizarMaquinaParam('id'), MaquinaController.obterRefugosMaquina);
+router.get('/:id/setup_motivos', autorizarMaquinaParam('id'), MaquinaController.obterTopMotivosParada); // Usando top-motivos por enquanto como fallback
+router.get('/:id/oee', autorizarMaquinaParam('id'), MaquinaController.obterResumoOeeMaquina);
+router.get('/:id/oee_evolucao', autorizarMaquinaParam('id'), MaquinaController.obterEvolucaoOeeMaquina);
+router.get('/:id/velocidade', autorizarMaquinaParam('id'), MaquinaController.obterVelocidadeMaquina);
+router.get('/:id/historico-eventos', autorizarMaquinaParam('id'), MaquinaController.obterHistoricoEventosTabela);
 
-router.get('/eficienciaMaquina/:id_operador', MaquinaController.eficienciaMaquina)
+router.get('/eficienciaMaquina/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.eficienciaMaquina)
 
-router.get('/:id', MaquinaController.buscarMaquinaPorId);
-router.put('/:id', uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
-router.put('/:id/status', MaquinaController.atualizarStatus);
-router.delete('/:id', MaquinaController.deletarMaquina);
+router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);
+router.put('/:id', adminMiddleware, uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
+router.put('/:id/status', autorizarMaquinaParam('id'), MaquinaController.atualizarStatus);
+router.delete('/:id', adminMiddleware, MaquinaController.deletarMaquina);
 
 export default router;

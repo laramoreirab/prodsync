@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -9,37 +9,37 @@ import { Plus, CheckCircle2, ChevronDown, X, Calendar, Clock } from "lucide-reac
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { eventosCrudService } from '@/services/eventosCrudService'; // Importar o serviço
+import { useSetores } from '@/hooks/useSetores';
+import { useMaquinas } from '@/hooks/useMaquinas';
+import { useOps } from '@/hooks/useOps';
 import FormCriarMotivo from './formCriarMotivo';
-
-const OPCOES_SETOR = ["Roscas", "Engrenagens", "Usinagem"];
-const OPCOES_MAQUINA = [
-    { label: "Injetora 1", value: 1 },
-    { label: "Injetora 2", value: 2 },
-    { label: "Torno CNC", value: 3 },
-];
-const OPCOES_OP = ["#000000 (Injetora 1)", "#000001 (Injetora 2)"];
-
-//lista estática para não quebrar a tela enquanto o back não vem
-const OPCOES_MOTIVO_INICIAL = [
-    { label: "Falta de Energia", value: 1 },
-    { label: "Manutenção Preventiva", value: 2 },
-    { label: "Manutenção Corretiva", value: 3 },
-    { label: "Falta de Material", value: 4 },
-];
 
 export default function FormCadastroEvento({ onCadastroSucesso }) {
     // id_motivo_parada — número — backend: id_motivo_parada
-    const [opcoesMotivo, setOpcoesMotivo] = useState(OPCOES_MOTIVO_INICIAL);
+    const [opcoesMotivo, setOpcoesMotivo] = useState([]);
     const [isModalAberto, setIsModalAberto] = useState(false);
 
-    // Função que será passada para o filho avisar que acabou
-    const atualizarListaMotivos = () => {
-        console.log("Motivo criado! Preparado para buscar do backend...");
-        // por favor, descomente esse trecho depois que a integração for implementada e exclua a linha de cima
-        //fetch('/api/motivos')
-        //  .then(res => res.json())
-        //  .then(data => setOpcoesMotivo(data))
+    const { setores } = useSetores();
+    const { maquinas } = useMaquinas();
+    const { ops } = useOps();
+
+    const fetchMotivos = async () => {
+        try {
+            const motivos = await eventosCrudService.getMotivos();
+            setOpcoesMotivo(Array.isArray(motivos) ? motivos.map(m => ({ label: m.descricao, value: m.id_motivo })) : []);
+        } catch (error) {
+            console.error('Erro ao carregar motivos:', error);
+        }
     };
+
+    // Função que será passada para o filho avisar que acabou
+    const atualizarListaMotivos = async () => {
+        await fetchMotivos();
+    };
+
+    useEffect(() => {
+        fetchMotivos();
+    }, []);
 
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
 
@@ -89,7 +89,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
         // monta o payload conforme o controller
         const payload = {
             status_maquina: tipoEvento,                          // backend: status_maquina
-            setor_afetado: setoresSelecionados[0] || "",         // backend: setor_afetado
+            setor_afetado: setoresSelecionados[0] ?? null,       // backend: setor_afetado
             maquinas: maquinasSelecionadas,                      // backend: maquinas 
             inicio: inicioData && inicioHora ? `${inicioData}T${inicioHora}:00.000` : null, // backend: inicio
             fim: fimData && fimHora ? `${fimData}T${fimHora}:00.000` : null,               // backend: fim
@@ -177,30 +177,38 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.setor && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {OPCOES_SETOR.map(opcao => (
-                                <label key={opcao} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
-                                    <input
-                                        type="checkbox"
-                                        checked={setoresSelecionados.includes(opcao)}
-                                        onChange={() => handleToggleSetor(opcao)}
-                                        className="rounded w-4 h-4 accent-blue-900"
-                                    />
-                                    {opcao}
-                                </label>
-                            ))}
+                            {setores.map((setor) => {
+                                const setorId = Number(setor.id ?? setor.id_setor);
+                                const setorLabel = setor.nome_setor || setor.nome || `Setor ${setorId}`;
+                                return (
+                                    <label key={setorId} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
+                                        <input
+                                            type="checkbox"
+                                            checked={setoresSelecionados.includes(setorId)}
+                                            onChange={() => handleToggleSetor(setorId)}
+                                            className="rounded w-4 h-4 accent-blue-900"
+                                        />
+                                        {setorLabel}
+                                    </label>
+                                );
+                            })}
                         </div>
                     )}
 
                     {/* tags */}
                     <div className="flex flex-wrap gap-2 mt-2 empty:mt-0">
-                        {setoresSelecionados.map(tag => (
-                            <span key={tag} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                {tag}
-                                <button type="button" onClick={() => handleToggleSetor(tag)} className="text-gray-400 hover:text-gray-600">
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
+                        {setoresSelecionados.map(id => {
+                            const setor = setores.find((setor) => Number(setor.id ?? setor.id_setor) === id);
+                            const label = setor?.nome_setor || setor?.nome || `Setor ${id}`;
+                            return (
+                                <span key={id} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                    {label}
+                                    <button type="button" onClick={() => handleToggleSetor(id)} className="text-gray-400 hover:text-gray-600">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -219,27 +227,32 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.maquina && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {OPCOES_MAQUINA.map(opcao => (
-                                <label key={opcao.value} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
-                                    <input
-                                        type="checkbox"
-                                        checked={maquinasSelecionadas.includes(opcao.value)}
-                                        onChange={() => handleToggleMaquina(opcao.value)}
-                                        className="rounded accent-blue-900 w-4 h-4"
-                                    />
-                                    {opcao.label}
-                                </label>
-                            ))}
+                            {maquinas.map((maquina) => {
+                                const maquinaId = Number(maquina.id_maquina ?? maquina.id ?? maquina.id_maquina);
+                                const maquinaLabel = maquina.nome || maquina.serie || maquina.codigo || `Máquina ${maquinaId}`;
+                                return (
+                                    <label key={maquinaId} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
+                                        <input
+                                            type="checkbox"
+                                            checked={maquinasSelecionadas.includes(maquinaId)}
+                                            onChange={() => handleToggleMaquina(maquinaId)}
+                                            className="rounded accent-blue-900 w-4 h-4"
+                                        />
+                                        {maquinaLabel}
+                                    </label>
+                                );
+                            })}
                         </div>
                     )}
 
                     {/* tags */}
                     <div className="flex flex-wrap gap-2 mt-2 empty:mt-0">
                         {maquinasSelecionadas.map(id => {
-                            const opcao = OPCOES_MAQUINA.find(o => o.value === id);
+                            const maquina = maquinas.find((m) => Number(m.id_maquina ?? m.id) === id);
+                            const label = maquina?.nome || maquina?.serie || maquina?.codigo || `Máquina ${id}`;
                             return (
                                 <span key={id} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                    {opcao?.label}
+                                    {label}
                                     <button type="button" onClick={() => handleToggleMaquina(id)} className="text-gray-400 hover:text-gray-600">
                                         <X className="w-3 h-3" />
                                     </button>
@@ -264,15 +277,15 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.op && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {OPCOES_OP.map(opcao => (
-                                <label key={opcao} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
+                            {ops.map((op) => (
+                                <label key={op.id} className="flex items-center gap-2 text-xl text-gray-700 cursor-pointer hover:bg-gray-100 p-1.5 rounded">
                                     <input
                                         type="checkbox"
-                                        checked={opsSelecionadas.includes(opcao)}
-                                        onChange={() => handleToggleOp(opcao)}
+                                        checked={opsSelecionadas.includes(op.id)}
+                                        onChange={() => handleToggleOp(op.id)}
                                         className="rounded accent-blue-900 w-4 h-4"
                                     />
-                                    {opcao}
+                                    {op.nome || op.codigo || `OP ${op.id}`}
                                 </label>
                             ))}
                         </div>
@@ -280,14 +293,18 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                     {/* tags */}
                     <div className="flex flex-wrap gap-2 mt-2 empty:mt-0">
-                        {opsSelecionadas.map(tag => (
-                            <span key={tag} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                {tag}
-                                <button type="button" onClick={() => handleToggleOp(tag)} className="text-gray-400 hover:text-gray-600">
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </span>
-                        ))}
+                        {opsSelecionadas.map(id => {
+                            const op = ops.find((item) => item.id === id);
+                            const label = op?.nome || op?.codigo || `OP ${id}`;
+                            return (
+                                <span key={id} className="bg-[#F2F2F2] text-[#333333] mt-1.5 font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
+                                    {label}
+                                    <button type="button" onClick={() => handleToggleOp(id)} className="text-gray-400 hover:text-gray-600">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
 

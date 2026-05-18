@@ -56,6 +56,7 @@ import {
 export default function OPDetalheGestor({ params }) {
   const { id } = use(params);
   const opId = id;
+  const handleEditBatch = () => {};
 
   const [buscaApontamento, setBuscaApontamento] = useState("");
   const parseData = (dataStr) => new Date(dataStr);
