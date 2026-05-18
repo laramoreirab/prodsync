@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <!-- Container que corta o progresso pela metade -->
+    <FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="55dp"
+        android:clipChildren="true">
+
+        <ProgressBar
+            android:id="@+id/pb_oee"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:max="200"
+            android:progress="85"
+            android:rotation="180"
+            android:progressDrawable="@drawable/gauge_progress_base" />
+
+        <TextView
+            android:id="@+id/tv_gauge_val"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="4dp"
+            android:text="85%"
+            android:textSize="20sp"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="#212e4b"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_gauge_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Disponibilidade"
+        android:textSize="12sp"
+        android:fontFamily="@font/montserrat_semibold"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textColor="#212e4b"/>
+
+</LinearLayout>

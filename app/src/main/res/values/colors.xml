@@ -7,4 +7,20 @@
     <color name="cinza_claro">#E0E0E0</color>
     <color name="cinza">#7c7c81</color>
     <color name="cinza_escuro">#545454</color>
+
+    <!-- Search Bar -->
+    <color name="search_bar_bg">#efefef</color>
+    <color name="search_bar_hint">#a6a6a6</color>
+    <color name="search_bar_icon">#000000</color>
+
+    <!-- Badges -->
+    <color name="bg_parada">#ffd8d8</color>
+    <color name="txt_parada">#b30000</color>
+    <color name="bg_produzindo">#dcfce7</color>
+    <color name="txt_produzindo">#369948</color>
+    <color name="bg_setup">#fffbea</color>
+    <color name="txt_setup">#ffd51e</color>
+    <!-- Machine List -->
+    <color name="machine_title">#212e4b</color>
+    <color name="machine_sub">#a6a6a6</color>
 </resources>

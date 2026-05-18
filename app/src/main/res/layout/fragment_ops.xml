@@ -14,7 +14,6 @@
         android:text="Ordens de Produção"
         android:textSize="28sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

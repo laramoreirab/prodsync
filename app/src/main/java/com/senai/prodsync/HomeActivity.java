@@ -6,7 +6,6 @@ import android.view.MenuItem;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -19,6 +18,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.senai.prodsync.ui.adm.UsuariosFragment;
+import com.senai.prodsync.ui.shared.MaquinaDetalheFragment;
 import com.senai.prodsync.ui.shared.MaquinasFragment;
 import com.senai.prodsync.ui.shared.OpsFragment;
 import com.senai.prodsync.ui.shared.PerfilFragment;
@@ -27,7 +27,7 @@ public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private BottomNavigationView bottomNav;
-    private MaterialToolbar toolbar;
+    private String userRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +38,23 @@ public class HomeActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.main);
         navigationView = findViewById(R.id.navigation_view);
         bottomNav = findViewById(R.id.bottomNav);
-        toolbar = findViewById(R.id.toolbar);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
 
         // Configurar a Toolbar para abrir o Drawer
         toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
         // Recebe o cargo do usuário
-        String userRole = getIntent().getStringExtra("USER_ROLE");
+        userRole = getIntent().getStringExtra("USER_ROLE");
         if (userRole == null) userRole = "operador";
 
         setupMenus(userRole);
         
         // Fragmento inicial
-        replaceFragment(new MaquinasFragment());
+        if ("operador".equals(userRole)) {
+            replaceFragment(new MaquinaDetalheFragment());
+        } else {
+            replaceFragment(new MaquinasFragment());
+        }
     }
 
     private void setupMenus(String role) {
@@ -79,7 +83,11 @@ public class HomeActivity extends AppCompatActivity {
     private boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.nav_maquinas) {
-            replaceFragment(new MaquinasFragment());
+            if ("operador".equals(userRole)) {
+                replaceFragment(new MaquinaDetalheFragment());
+            } else {
+                replaceFragment(new MaquinasFragment());
+            }
             return true;
         } else if (itemId == R.id.nav_ops) {
             replaceFragment(new OpsFragment());
