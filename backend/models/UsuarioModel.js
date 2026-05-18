@@ -5,12 +5,18 @@ import { gerarIdUsuario } from '../dev-utils/gerarIdUsuario.js';
 
 class UsuarioModel {
     //Listar todos os usuários com paginacção
-    static async listarTodos(id_empresa, paginacao) {
+    static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa,
-                    tipo: { in: ['Gestor', 'Operador'] }  // exclui Adm da listagem
+                    tipo: { in: ['Gestor', 'Operador'] },
+                    ...(setorId ? {
+                        OR: [
+                            { escalas: { some: { id_setor: Number(setorId) } } },
+                            { setores_geridos: { some: { id_setor: Number(setorId) } } }
+                        ]
+                    } : {}) // exclui Adm da listagem
                 },
                 select: {
                     id_usuario: true,
@@ -128,7 +134,7 @@ class UsuarioModel {
             const row = await prisma.usuarios.findFirst({
                 where: {
                     id_usuario: parseInt(id),
-                    id_empresa: parseInt(id_empresa)
+                    ...(id_empresa ? { id_empresa: parseInt(id_empresa) } : {})
                 },
                 include: {
                     escalas: {
@@ -228,17 +234,14 @@ class UsuarioModel {
     }
 
     //verificar se o id ainda não possui senha cadastrada
-    static async verificaSenhaUsuario(id) {
+        static async verificaSenhaUsuario(id) {
         try {
             const usuarioSenha = await prisma.usuarios.findUnique({
-                where: { id_usuario: id },
+                where: { id_usuario: Number(id) },
                 select: { senha: true }
             });
-            if (usuarioSenha && usuarioSenha.senha !== null) {
-                return true
-            } else {
-                return false
-            }
+    
+            return !!(usuarioSenha?.senha && usuarioSenha.senha.trim() !== "");
         } catch (error) {
             console.error('Erro ao verificar se o ID possui senha cadastrada:', error);
             throw error;
@@ -304,11 +307,20 @@ class UsuarioModel {
 
     // -------------------------------------------------Dashboards-------------------------------------------------
 
-    static async qtdPorTipo(id_empresa) {
+    static filtroSetorUsuario(setorId) {
+        return setorId ? {
+            OR: [
+                { escalas: { some: { id_setor: Number(setorId) } } },
+                { setores_geridos: { some: { id_setor: Number(setorId) } } }
+            ]
+        } : {};
+    }
+
+    static async qtdPorTipo(id_empresa, setorId = null) {
         try {
             const resultado = await prisma.usuarios.groupBy({
                 by: ['tipo'],
-                where: { id_empresa },
+                where: { id_empresa, ...this.filtroSetorUsuario(setorId) },
                 _count: { tipo: true }
             })
 
@@ -322,10 +334,10 @@ class UsuarioModel {
         }
     }
 
-    static async tempoMedioSessaoPorTipo(id_empresa) {
+    static async tempoMedioSessaoPorTipo(id_empresa, setorId = null) {
         try {
             const usuarios = await prisma.usuarios.findMany({
-                where: { id_empresa },
+                where: { id_empresa, ...this.filtroSetorUsuario(setorId) },
                 select: {
                     tipo: true,
                     logs: {
@@ -377,17 +389,17 @@ class UsuarioModel {
         }
     }
 
-    static async qtdPorSetor(id_empresa) {
+    static async qtdPorSetor(id_empresa, setorId = null) {
         try {
 
             const resultado = await prisma.escalaTrabalho.groupBy({
                 by: ['id_setor'],
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
                 _count: { id_operador: true }
             })
 
             const setores = await prisma.setores.findMany({
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
                 select: { id_setor: true, nome_setor: true }
             })
 
@@ -407,11 +419,11 @@ class UsuarioModel {
         }
     }
 
-    static async top5Operadores(id_empresa) {
+    static async top5Operadores(id_empresa, setorId = null) {
         try {
             const resultado = await prisma.apontamento.groupBy({
                 by: ['id_operador'],
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}) },
                 _sum: { qtd_boa: true, qtd_refugo: true },
                 orderBy: { _sum: { qtd_boa: 'desc' } },
                 take: 5
@@ -437,11 +449,12 @@ class UsuarioModel {
         }
     }
 
-    static async producaoMediaPorDiaSetor(id_empresa) {
+    static async producaoMediaPorDiaSetor(id_empresa, setorId = null) {
     try {
         const setores = await prisma.setores.findMany({
             where: { 
-                id_empresa: Number(id_empresa) // Proteção de tipo para o Prisma
+                id_empresa: Number(id_empresa), // Proteção de tipo para o Prisma
+                ...(setorId ? { id_setor: Number(setorId) } : {})
             },
             select: {
                 id_setor: true,
@@ -490,11 +503,11 @@ class UsuarioModel {
     }
 }
 
-    static async rotatividade(id_empresa) {
+    static async rotatividade(id_empresa, setorId = null) {
         try {
             // busca ids dos usuários da empresa para filtrar os logs
             const usuarios = await prisma.usuarios.findMany({
-                where: { id_empresa },
+                where: { id_empresa, ...this.filtroSetorUsuario(setorId) },
                 select: { id_usuario: true }
             })
             const ids = usuarios.map(u => u.id_usuario)
@@ -542,11 +555,11 @@ class UsuarioModel {
             throw error;
         }
     }
-    static async metaProducaoPorSetor(id_empresa) {
+    static async metaProducaoPorSetor(id_empresa, setorId = null) {
         try {
             // 1. Buscamos todos os apontamentos da empresa, trazendo o setor da máquina
             const apontamentos = await prisma.apontamento.findMany({
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}) },
                 select: {
                     qtd_boa: true,
                     ordem_producao: {

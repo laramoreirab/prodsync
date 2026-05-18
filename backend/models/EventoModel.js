@@ -196,11 +196,12 @@ class EventoModel {
         }
     }
     //listar paradas não justificadas
-    static async listarNaoJustificadas(id_empresa, paginacao) {
+    static async listarNaoJustificadas(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     id_motivo_parada: {
                         equals: null
                     },
@@ -218,11 +219,12 @@ class EventoModel {
         }
     }
     //listar tabelas justificadas
-    static async listarJustificadas(id_empresa, paginacao) {
+    static async listarJustificadas(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     id_motivo_parada: {
                         not: null
                     },
@@ -522,12 +524,13 @@ class EventoModel {
             { nome: 'Tempo Parado', valor: tempoParado }
         ]
     }
-    static async top3MotivosParada(id_empresa) {
+    static async top3MotivosParada(id_empresa, setorId = null) {
         try {
             const resultado = await prisma.historico_Eventos.groupBy({
                 by: ['id_motivo_parada'],
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     duracao: { not: null },
                     id_motivo_parada: { not: null }
                 },
@@ -763,12 +766,13 @@ class EventoModel {
         }
     }
 
-    static async obterParadasJustificadasComparativo(id_empresa) {
+    static async obterParadasJustificadasComparativo(id_empresa, setorId = null) {
         try {
             const [justificadas, naoJustificadas] = await Promise.all([
                 prisma.historico_Eventos.count({
                     where: {
                         id_empresa,
+                        ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                         id_motivo_parada: {
                             not: null
                         }
@@ -777,6 +781,7 @@ class EventoModel {
                 prisma.historico_Eventos.count({
                     where: {
                         id_empresa,
+                        ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                         id_motivo_parada: null
                     }
                 })

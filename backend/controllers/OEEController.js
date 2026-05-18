@@ -18,7 +18,9 @@ class OEEController {
 
     static async geralFabrica(req, res) {
         try {
-            const dados = await OEEModel.geralFabrica(req.user.id_empresa);
+            const dados = req.query.setorId
+                ? await OEEModel.individualSetor(Number(req.query.setorId), req.user.id_empresa)
+                : await OEEModel.geralFabrica(req.user.id_empresa);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter OEE geral da fabrica:', error);
@@ -54,7 +56,7 @@ class OEEController {
 
     static async mediaPorSetor(req, res) {
         try {
-            const dados = await OEEModel.mediaPorSetor(req.user.id_empresa);
+            const dados = await OEEModel.mediaPorSetor(req.user.id_empresa, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter OEE medio por setor:', error);
@@ -64,7 +66,9 @@ class OEEController {
 
     static async setorCritico(req, res) {
         try {
-            const dados = await OEEModel.setorCritico(req.user.id_empresa);
+            const dados = req.query.setorId
+                ? await OEEModel.individualSetor(Number(req.query.setorId), req.user.id_empresa)
+                : await OEEModel.setorCritico(req.user.id_empresa);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter setor critico por OEE:', error);

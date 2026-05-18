@@ -12,7 +12,7 @@ const prioridadeMap = {
 class OrdemProducaoController {
     static async listarTodos(req, res) {
         try {
-            const resultado = await OrdemProducaoModel.listarTodos(req.user.id_empresa, req.paginacao)
+            const resultado = await OrdemProducaoModel.listarTodos(req.user.id_empresa, req.paginacao, req.query.setorId)
             return res.status(200).json({ sucesso: true, ...resultado })
         } catch (error) {
             console.error('Erro ao listar Ordens de Producao', error)

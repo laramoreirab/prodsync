@@ -36,12 +36,13 @@ class MaquinaModel {
     }
 
     //Lista as máquinas de uma empresa com paginação
-    static async listarMaquinasPaginadas(id_empresa, paginacao) {
+    static async listarMaquinasPaginadas(id_empresa, paginacao, setorId = null) {
         try {
             // 1. Definimos APENAS as regras dessa busca específica
             const regrasDaBusca = {
                 where: {
                     id_empresa: id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                     ativo: true
                 },
                 orderBy: {
@@ -219,12 +220,13 @@ class MaquinaModel {
     }
 
     // Lista as máquinas por status
-    static async listarMaquinasPorStatus(id_empresa, status_atual) {
+    static async listarMaquinasPorStatus(id_empresa, status_atual, setorId = null) {
         try {
             const maquinas = await prisma.maquinas.findMany({
                 where: {
                     id_empresa: id_empresa,
                     status_atual: status_atual,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                     ativo: true
                 }
             });
@@ -606,11 +608,11 @@ class MaquinaModel {
     }
 
     // -------------------------------------dashboard--------------------------------------------------
-    static async taxaCumprimentoMetaPorSetor(id_empresa) {
+    static async taxaCumprimentoMetaPorSetor(id_empresa, setorId = null) {
         try {
             // busca ordens de produção agrupadas por setor com qtd planejada
             const ordens = await prisma.ordemProducao.findMany({
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
                 select: {
                     qtd_planejada: true,
                     id_setor: true
@@ -619,7 +621,7 @@ class MaquinaModel {
 
             // busca apontamentos com qtd produzida por setor
             const apontamentos = await prisma.apontamento.findMany({
-                where: { id_empresa },
+                where: { id_empresa, ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}) },
                 select: {
                     qtd_boa: true,
                     qtd_refugo: true,
@@ -772,7 +774,7 @@ class MaquinaModel {
         }
     }
 
-    static async obterMediaParadasPorDia(id_empresa, dias = 7) {
+    static async obterMediaParadasPorDia(id_empresa, dias = 7, setorId = null) {
         try {
             const quantidadeDias = Number(dias) || 7;
             const chavesDias = this.criarMapaUltimosDias(quantidadeDias);
@@ -781,6 +783,7 @@ class MaquinaModel {
             const totalParadas = await prisma.historico_Eventos.count({
                 where: {
                     id_empresa,
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
                     status_atual: {
                         in: ['Parada', 'Manutencao']
                     },
@@ -805,7 +808,7 @@ class MaquinaModel {
         }
     }
 
-    static async obterPecasPorMinuto(id_empresa, dias = 7) {
+    static async obterPecasPorMinuto(id_empresa, dias = 7, setorId = null) {
         try {
             const quantidadeDias = Number(dias) || 7;
             const chavesDias = this.criarMapaUltimosDias(quantidadeDias);
@@ -814,6 +817,7 @@ class MaquinaModel {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     data_hora_fim: {
                         gte: dataInicio
                     }
