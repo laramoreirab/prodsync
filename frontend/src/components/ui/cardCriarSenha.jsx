@@ -47,7 +47,7 @@ export default function CriarSenha() {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/primeiroAcesso`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId })
+                body: JSON.stringify({ id: userId })
             })
 
             const data = await res.json()
@@ -82,15 +82,13 @@ export default function CriarSenha() {
         }
 
         try {
-            const res = await apiFetch("/api/registroSenha", {
+            const data = await apiFetch("/api/auth/registroSenha", {
                 method: "POST",
                 body: JSON.stringify({ password, confirmPassword })
             })
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                setErro(data.mensagem || "Erro ao registrar senha.");
+            if (!data) {
+                setErro("Erro ao registrar senha.");
                 return;
             }
 
@@ -102,7 +100,7 @@ export default function CriarSenha() {
             if (localStorage.getItem("tipo") === "Operador") router.push("/operador/DashboardGeral")
 
         } catch (error) {
-            setErro("Erro de conexão com o servidor")
+            setErro(error?.message || "Erro de conexão com o servidor")
         }
 
     }
@@ -202,7 +200,7 @@ export default function CriarSenha() {
                             </div>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <form>
+                            <form onSubmit={handleCriarSenha}>
                                 <FieldGroup className="gap-6">
 
                                     <Field className="gap-0 mt-0">
@@ -255,7 +253,10 @@ export default function CriarSenha() {
                                     <div className="flex flex-col gap-4">
 
                                         <Field className="gap-0 mt-0">
-                                            <InputSenha />
+                                            <InputSenha
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
 
                                         </Field>
                                         {/* erro vindo do backend */}

@@ -10,6 +10,7 @@ export function getUserFromToken() {
   return {
     id_usuario: payload.id_usuario,
     id_empresa: payload.id_empresa,
-    tipo: payload.tipo
+    tipo: payload.tipo,
+    id_setor: payload.id_setor ?? payload.idSetor ?? null
   };
 }
