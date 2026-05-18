@@ -75,25 +75,29 @@ class SetorModel {
 
     // Lista todos os setores de uma empresa
     static async listarSetoresPorEmpresa(id_empresa) {
-        try {
-            const setores = await prisma.setores.findMany({
-                where: { id_empresa: id_empresa },
-                include: {
-                    empresa: true,
-                    maquinas: {
-                        where: { ativo: true },
-                        select: { id_maquina: true, nome: true, status_atual: true }
-                    },
-                    gestores: {
-                        include: {
-                            gestor: {
-                                select: { id_usuario: true, nome: true, email: true }
-                            }
+    try {
+        const setores = await prisma.setores.findMany({
+            where: { id_empresa: id_empresa },
+            include: {
+                empresa: true,
+                gestores: {
+                    include: {
+                        gestor: {
+                            select: { id_usuario: true, nome: true, email: true }
                         }
                     }
+                },
+                // O Prisma faz a contagem rápida direto no banco
+                _count: {
+                    select: {
+                        maquinas: true,
+                        escalas: true // Quantidade de operadores vinculados pela escala
+                    }
                 }
-            });
-            return setores;
+            }
+        });
+
+        return setores;
         } catch (error) {
             console.error('Erro ao listar setores:', error);
             throw error;
