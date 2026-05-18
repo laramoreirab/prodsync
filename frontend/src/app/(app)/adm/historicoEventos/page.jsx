@@ -82,7 +82,18 @@ const colunasEventos = [
     icone: (_, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  { id: 'observacao', key: 'observacao', label: 'Observação' },
+  //Mudança na coluna de observação para 
+  { 
+  id: 'observacao', 
+  key: 'observacao', 
+  label: 'Observação',
+  className: 'max-w-[200px]', 
+  icone: (valor) => (
+    <span className="block truncate" title={valor}>
+      {valor || "-"}
+    </span>
+  )
+},
 ];
 
 

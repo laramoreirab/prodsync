@@ -8,45 +8,29 @@ import {
   SetorMaquinaStatusSchema,
   SetorOEEMedioSchema,
   SetorOEEEvolucaoArraySchema,
-  SetorTopOperadoresArraySchema,
-  SetorMotivosParadaArraySchema,
-  SetorProducaoSemanalArraySchema,
-  SetorProducaoMaquinaArraySchema,
-} from "@features/setores/schemas/setorSchema";
-import {
-    SetorMaquinaStatusSchema,
-    SetorOEEMedioSchema,
-    SetorOEEEvolucaoArraySchema,
-    SetorTopOperadoresArraySchema,
-    SetorMotivosParadaArraySchema,
-    SetorProducaoSemanalArraySchema,
-    SetorProducaoMaquinaArraySchema,
-     SetorMaquinaStatusSchema,
-  SetorOEEMedioSchema,
-  SetorOEEEvolucaoArraySchema,
   SetorOEEPanelSchema,
   SetorTopOperadoresArraySchema,
   SetorMotivosParadaArraySchema,
   SetorProducaoSemanalArraySchema,
   SetorProducaoMaquinaArraySchema,
-  } from "@features/setores/schemas/setorSchema";
-import {
-  mockSetores,
-  mockSetorTotalKPI,
-  mockOperadoresMediaKPI,
-  mockOEEPorSetor,
-  mockRefugoPorSetor,
-  mockOEECritico,
-  mockSetorProducaoSemanal,
-  mockProducaoPorMaquinaSetor 
-} from "./mockData";
- import {
-    mockSetorMaquinaStatus,
-    mockSetorOEEMedio,
-    mockSetorOEEEvolucao,
-    mockSetorTopOperadores,
-    mockSetorMotivosParada,
-  } from "./mockData";
+} from "@features/setores/schemas/setorSchema";
+// import {
+//   mockSetores,
+//   mockSetorTotalKPI,
+//   mockOperadoresMediaKPI,
+//   mockOEEPorSetor,
+//   mockRefugoPorSetor,
+//   mockOEECritico,
+//   mockSetorProducaoSemanal,
+//   mockProducaoPorMaquinaSetor 
+// } from "./mockData";
+//  import {
+//     mockSetorMaquinaStatus,
+//     mockSetorOEEMedio,
+//     mockSetorOEEEvolucao,
+//     mockSetorTopOperadores,
+//     mockSetorMotivosParada,
+//   } from "./mockData";
 
 const USE_MOCK = false;
 

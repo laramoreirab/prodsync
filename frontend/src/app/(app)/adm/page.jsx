@@ -1,7 +1,5 @@
 "use client"
 
-import React from 'react';
-import Header from "@/components/ui/topbar";
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";
@@ -13,65 +11,57 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
-import { PageLayout, PageHeader, WidgetCard, KPIGrid } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
 
 export default function DashboardGeralPage() {
-return (
-  <PageLayout>
-    <PageHeader title="Dashboard Geral da Empresa" />
+  return (
+    <PageLayout>
+      <PageHeader title="Dashboard Geral da Empresa" />
 
-    {/* SEÇÃO 1 - Produção do Dia */}
-    <WidgetCard>
-      <ProducaoDiaWidget />
-    </WidgetCard>
+      <ContentGrid cols={1}>
+        <WidgetCard>
+          <ProducaoDiaWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-    {/* SEÇÃO 2 - Resumo OEE */}
-    <WidgetCard className="flex items-center justify-around p-8">
-      <OEEWidget />
-    </WidgetCard>
+      <ContentGrid cols={1} className="mt-6">
+        <WidgetCard centered>
+          <OEEWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-    {/* SEÇÃO 3 - Produção por Setor e Status Máquinas */}
-    <WidgetCard>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 border-r border-gray-100 pr-6">
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
           <ProducaoSetorWidget />
-        </div>
-        <div className="md:col-span-1 flex items-center justify-center">
+        </WidgetCard>
+        <WidgetCard centered>
           <MaquinaStatusWidget />
-        </div>
-      </div>
-    </WidgetCard>
+        </WidgetCard>
+      </ContentGrid>
 
-    {/* SEÇÃO 4 - Motivos e Tendência de Refugo */}
-    <WidgetCard>
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
-        <div className="md:col-span-2 border-r border-gray-100 pr-6">
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
           <MotivosFrequentesWidget />
-        </div>
-        <div className="md:col-span-4">
+        </WidgetCard>
+        <WidgetCard>
           <TendendiaRefugoWidget />
-        </div>
-      </div>
-    </WidgetCard>
+        </WidgetCard>
+      </ContentGrid>
 
-    {/* SEÇÃO 5 - KPIs Inferiores */}
-    <WidgetCard>
-      <KPIGrid cols={4}>
-        <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
+      <KPIGrid cols={4} className="mt-6 gap-6 lg:gap-8">
+        <WidgetCard>
           <MediaParadasDiaWidget />
-        </div>
-        <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
+        </WidgetCard>
+        <WidgetCard>
           <PecasPorMinutoWidget />
-        </div>
-        <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
+        </WidgetCard>
+        <WidgetCard>
           <MaquinaAtivaPorTurnoWidget />
-        </div>
-        <div className="flex flex-col">
+        </WidgetCard>
+        <WidgetCard>
           <ProducaoPorTurnoLotesWidget />
-        </div>
+        </WidgetCard>
       </KPIGrid>
-    </WidgetCard>
-
-  </PageLayout>
-);
+    </PageLayout>
+  );
 }

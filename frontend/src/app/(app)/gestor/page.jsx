@@ -33,8 +33,6 @@ export default function DashboardGeralGestor() {
   return (
     <PageLayout>
       <PageHeader title="Dashboard Geral do Setor" />
-
-
       <ContentGrid cols={1}>
         <WidgetCard>
           <SetorProducaoDiariaWidget setorId={setorId} />

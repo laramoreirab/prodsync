@@ -1,5 +1,3 @@
-import e from "express";
-
 export * from "./AreaChart";
 export * from "./LineChart";
 export * from "./GaugeSemicircular";

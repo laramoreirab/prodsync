@@ -1,8 +1,12 @@
 // Status Operacional (DonutChart/PieChart)
 export const maquinaStatusConfig = {
-ativa:  { label: "Ativa",     color: "var(--azul-cobalto)" },
-  parada: { label: "Parada",    color: "var(--chart-primary)" },
-  setup:  { label: "Setup",       color: "var(--chart-deep)" },
+  produzindo: { label: "Produzindo", color: "var(--azul-cobalto)" },
+  ativa: { label: "Ativa", color: "var(--azul-cobalto)" },
+  parada: { label: "Parada", color: "var(--chart-primary)" },
+  setup: { label: "Setup", color: "var(--chart-deep)" },
+  manutencao: { label: "Manutencao", color: "#3061c4" },
+  aguardando: { label: "Aguardando", color: "#b11711" },
+  desconhecido: { label: "Desconhecido", color: "#d4d4d8" },
 };
 
 // Quantidade de máquinas por setor (BarHorizontal)

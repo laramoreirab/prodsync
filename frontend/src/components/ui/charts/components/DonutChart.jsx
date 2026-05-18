@@ -17,7 +17,7 @@ import {
 // ============================================================
 
 
-export function DonutChart({ data, config, title, dataKey, nameKey }) {
+export function DonutChart({ data, config, title, dataKey, nameKey, compact = false }) {
   if (!data?.length) return null;
   return (
     <div>

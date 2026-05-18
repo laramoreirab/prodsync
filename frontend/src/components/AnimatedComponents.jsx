@@ -95,7 +95,7 @@ export function PageLayout({ children, className, padded = true, bg }) {
     <main
       className={cn(
         "min-h-screen flex flex-col",
-        "bg-cover bg-fixed bg-center bg-no-repeat",
+         "bg-cover bg-scroll sm:bg-fixed bg-center bg-no-repeat",
         className
       )}
       style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
@@ -126,8 +126,7 @@ export function PageHeader({ title, action, className, underline = true, subtitl
       initial="hidden"
       animate="visible"
       className={cn(
-        // Mudança aqui: flex-col por padrão (mobile) e flex-row em telas maiores
-        "flex flex-col sm:flex-row sm:items-start justify-between gap-6 sm:gap-4 pt-8 pb-4", 
+        "flex flex-col sm:flex-row sm:items-start justify-between gap-6 sm:gap-4 pt-10 pb-4", 
         className
       )}
     >
@@ -169,7 +168,7 @@ export function SectionDivider({ title, action, className }) {
       whileInView="visible"
       viewport={{ once: true }}
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6",
+        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-8",
         className
       )}
     >
@@ -289,7 +288,7 @@ export function KPIGrid({ children, cols = 4, className }) {
   const colClasses = {
     2: "grid-cols-1 sm:grid-cols-2",
     3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-2 md:grid-cols-4",
+    4: "grid-cols-2 md:grid-cols-2 md:grid-cols-4",
     5: "grid-cols-2 md:grid-cols-3 lg:grid-cols-5",
     6: "grid-cols-2 md:grid-cols-3 lg:grid-cols-6",
   };
@@ -314,13 +313,14 @@ export function KPIGrid({ children, cols = 4, className }) {
  */
 export function ContentGrid({ children, cols = 2, className }) {
   const colClasses = {
+    1: "grid-cols-1",
     2: "grid-cols-1 md:grid-cols-2",
     3: "grid-cols-1 md:grid-cols-3",
   };
 
   return (
     <StaggerWrapper
-      className={cn("grid gap-6", colClasses[cols] ?? colClasses[2], className)}
+      className={cn("grid gap-10", colClasses[cols] ?? colClasses[2], className)}
     >
       {children}
     </StaggerWrapper>
@@ -341,7 +341,7 @@ export function WidgetCard({ children, className, colSpan, centered }) {
   return (
     <FadeUpItem
       className={cn(
-        "bg-white border border-gray-100 rounded-xl p-6 shadow-sm",
+        "bg-white border border-gray-100 rounded-xl p-8 shadow-sm",
         centered && "flex flex-col items-center justify-center",
         colSpan,
         className

@@ -56,9 +56,8 @@ export function AndonBoardPage({ scope = "factory" }) {
       />
 
       <ContentGrid cols={2} className="mt-2">
-        <WidgetCard>
           <AndonStatusWidget scope={scope} title={content.statusTitle} />
-        </WidgetCard>
+
 
         <WidgetCard>
           <AndonRankingWidget scope={scope} />

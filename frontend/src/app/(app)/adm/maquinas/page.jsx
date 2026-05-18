@@ -215,8 +215,8 @@ export default function Maquinas() {
 
       {/* SEÇÃO 3:Graphs*/}
 
-      <FadeUpItem>
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+      <FadeUpItem className="mt-8">
+        <div className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
           <ProducaoTotalWidget />
         </div>
       </FadeUpItem>

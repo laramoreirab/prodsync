@@ -29,14 +29,15 @@ export function KPI({ title, value }) {
   }, [value]);
 
   return (
-    <div className="w-full h-full aspect-square min-h-[180px] flex flex-col">
-      <div className="flex flex-col items-start justify-start">
-        <p className="text-sm font-semibold text-black leading-tight">{title}</p>
+    <div className="w-full h-full min-h-[128px] flex flex-col">
+      <div className="flex flex-col items-start">
+        <p className="text-sm font-semibold text-black leading-snug">{title}</p>
         <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
       </div>
 
-      <div className="flex-1 flex items-center justify-center">
-        <h2 className="text-5xl font-medium text-black tracking-tight">
+      <div className="flex flex-1 items-center justify-between gap-6 py-6">
+        <div className="h-1.5 w-12 rounded-full bg-[var(--azul-cobalto)] md:w-16" />
+        <h2 className="text-4xl font-semibold text-black tracking-tight leading-none md:text-5xl">
           {displayValue}
         </h2>
       </div>

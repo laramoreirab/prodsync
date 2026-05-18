@@ -516,7 +516,7 @@ export function StatusBadge({ status, className }) {
 
 // ─────────────────────────────────────────────
 // SECTION HIGHLIGHT
-// Card branco de destaque (ex: OEE Principal)
+// Card branco de ue (ex: OEE Principal)
 // com borda dupla superior
 // ─────────────────────────────────────────────
 
