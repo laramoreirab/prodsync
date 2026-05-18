@@ -34,17 +34,21 @@ export default function DashboardGeralGestor() {
     <PageLayout>
       <PageHeader title="Dashboard Geral do Setor" />
 
-      <ContentGrid cols={3}>
-        <WidgetCard colSpan="md:col-span-2">
+
+      <ContentGrid cols={1}>
+        <WidgetCard>
           <SetorProducaoDiariaWidget setorId={setorId} />
         </WidgetCard>
-        <WidgetCard centered>
+      </ContentGrid>
+
+      <ContentGrid cols={1}>
+        <WidgetCard>
           <SetorOEEMedioWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={3}>
-        <WidgetCard colSpan="md:col-span-2">
+      <ContentGrid cols={2}>
+        <WidgetCard centered>
           <SetorOEEEvolucaoWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
@@ -52,23 +56,39 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={3}>
+      <ContentGrid cols={2}>
         <WidgetCard>
           <SetorProducaoMaquinaWidget setorId={setorId} />
         </WidgetCard>
-        <WidgetCard colSpan="md:col-span-2">
+        <WidgetCard>
           <SetorStatusDonutWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
+      <ContentGrid cols={2}>
+        <WidgetCard>
+          <SetorMotivosParadaWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
           <TendendiaRefugoWidget setorId={setorId} />
+        </WidgetCard>
+      </ContentGrid>
 
+      <KPIGrid cols={4}>
+        <WidgetCard>
           <MediaParadasDiaWidget />
+        </WidgetCard>
+        <WidgetCard>
           <PecasPorMinutoWidget />
+        </WidgetCard>
+        <WidgetCard>
           <MaquinaAtivaPorTurnoWidget />
+        </WidgetCard>
+        <WidgetCard>
           <ProducaoPorTurnoLotesWidget />
-
-          </PageLayout>
+        </WidgetCard>
+      </KPIGrid>
+    </PageLayout>
 
   );
 }
