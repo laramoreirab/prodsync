@@ -8,6 +8,7 @@ import setorRotas from './setorRotas.js'
 import turnoRotas from './turnoRotas.js'
 import andonRotas from './andonRotas.js'
 import eventoRotas from './eventoRotas.js'
+import ordemProducaoRotas from './ordemProducaoRotas.js'
 
 const router = Router()
 
@@ -20,6 +21,8 @@ router.use('/setores', setorRotas)
 router.use('/turnos', turnoRotas)
 router.use('/andon', andonRotas)
 router.use('/eventos', eventoRotas)
+router.use('/ordens', ordemProducaoRotas)
+router.use('/ordens-producao', ordemProducaoRotas)
 
 
 export default router

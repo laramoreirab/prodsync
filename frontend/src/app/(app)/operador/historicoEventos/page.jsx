@@ -13,37 +13,16 @@ import {
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, BellRing, Info, Loader2 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
-import Link from "next/link";
 import { useEventos } from "@/hooks/useEventos";
 
 //imports da listagem
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button"
 
 
 import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
-
-import { Label } from "@/components/ui/label"
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea";
-
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
 
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";

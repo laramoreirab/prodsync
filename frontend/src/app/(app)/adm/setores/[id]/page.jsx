@@ -87,6 +87,7 @@ export default function SetorEspecificoPage({ params }) {
   const [setor, setSetor] = useState(null);
   const [maquinas, setMaquinas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
+  const [turnos, setTurnos] = useState([]);
   const [dadosMaquina, setDadosMaquina] = useState([]);
   const [dadosExibidos, setDadosExibidos] = useState([]);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
@@ -113,10 +114,11 @@ export default function SetorEspecificoPage({ params }) {
   const refresh = useCallback(async () => {
     if (!id) return;
 
-    const [setorResp, maquinasResp, operadoresResp] = await Promise.all([
+    const [setorResp, maquinasResp, operadoresResp, turnosResp] = await Promise.all([
       setorCrudService.getById(id),
       apiFetch(`/api/maquinas/setor/${id}`, { method: "GET" }),
       setorCrudService.listarOperadores(id),
+      turnoCrudService.getBySetor(id),
     ]);
 
     const setorAtual = setorResp.dados || setorResp;
@@ -129,12 +131,14 @@ export default function SetorEspecificoPage({ params }) {
       oee_medio: "-",
     }));
     const usuariosAtualizados = [...gestoresAtualizados, ...operadoresAtualizados];
+    const turnosAtualizados = turnosResp.dados || [];
 
     setSetor(setorAtual);
     setMaquinas(maquinasAtualizadas);
     setDadosMaquina(maquinasAtualizadas);
     setUsuarios(usuariosAtualizados);
     setDadosExibidos(usuariosAtualizados);
+    setTurnos(turnosAtualizados);
   }, [id]);
 
   useEffect(() => {

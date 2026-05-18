@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AndonRankingWidget } from "./AndonRankingWidget";
 import { AndonRelogioWidget } from "./AndonRelogioWidget";
 import { AndonSectionMarquee } from "./AndonSectionMarquee";
@@ -18,8 +19,21 @@ const scopeContent = {
 };
 
 export function AndonBoardPage({ scope = "factory" }) {
+  const [idSetor, setIdSetor] = useState(null);
   const content = scopeContent[scope] ?? scopeContent.factory;
-  const { data: sections, loading, error } = useAndonSections(scope);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setIdSetor(payload?.id_setor ?? payload?.idSetor ?? null);
+    } catch {
+      setIdSetor(null);
+    }
+  }, []);
+
+  const { data: sections, loading, error } = useAndonSections(scope, idSetor);
 
   return (
     <div className="mx-auto flex w-full flex-col gap-6 p-8">
@@ -35,11 +49,11 @@ export function AndonBoardPage({ scope = "factory" }) {
 
       <section className="grid gap-4 xl:grid-cols-4">
         <div className="xl:col-span-2 rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
-          <AndonStatusWidget scope={scope} title={content.statusTitle} />
+          <AndonStatusWidget scope={scope} idSetor={idSetor} title={content.statusTitle} />
         </div>
 
         <div className="xl:col-span-2 rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
-          <AndonRankingWidget scope={scope} />
+          <AndonRankingWidget scope={scope} idSetor={idSetor} />
         </div>
       </section>
 

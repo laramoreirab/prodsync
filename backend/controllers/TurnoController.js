@@ -255,7 +255,7 @@ class TurnoController {
 
     static async obterStatusMaquinasPorTurno(req, res) {
         try {
-            const dados = await TurnoModel.obterStatusMaquinasPorTurno(req.user.id_empresa);
+            const dados = await TurnoModel.obterStatusMaquinasPorTurno(req.user.id_empresa, req.query.setorId);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao obter status de maquinas por turno:', error);

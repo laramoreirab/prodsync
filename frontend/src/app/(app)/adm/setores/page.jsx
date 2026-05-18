@@ -221,26 +221,29 @@ export default function PageSetores() {
         }
       />
 
-      <FadeUpItem className="mt-4">
-        {dadosExibidos.length > 0 ? (
-          <TableListagens
-            data={dadosExibidos}
-            columns={colunasSetores}
-            enableSelection={true}
-            onSelectedChange={setSelecionados}
-            excluirLote={
-              <DialogContent>
-                <FormExclusaoSetor />
-              </DialogContent>
-            }
-            acoesDropdown={(setor) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`setores/${setor.id_setor}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver Detalhes
-                  </Link>
-                </DropdownMenuItem>
+        <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
+          {dadosExibidos.length > 0 ? (
+            <TableListagens
+              data={dadosExibidos}
+              columns={colunasSetores}
+              enableSelection={true}
+              onSelectedChange={setSelecionados}
+              excluirLote={
+                <DialogContent>
+                  <FormExclusaoSetor
+                    setorIds={selecionados.map((setor) => setor.id_setor ?? setor.id)}
+                    onExclusaoSucesso={refresh}
+                  />
+                </DialogContent>
+              }
+              acoesDropdown={(setor) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`setores/${setor.id_setor}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
 
                 <Dialog>
                   <DialogTrigger asChild>

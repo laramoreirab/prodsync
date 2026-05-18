@@ -8,7 +8,7 @@ class EventoController {
             const paginacao = req.paginacao;
             const resultado = req.user.tipo === 'Operador'
                 ? await EventoModel.listarPorOperador(id_empresa, req.user.id_usuario, paginacao)
-                : await EventoModel.listarTodos(id_empresa, paginacao);
+                : await EventoModel.listarTodos(id_empresa, paginacao, req.query.setorId);
 
             // Normaliza para o formato esperado pelo frontend
             const dadosNormalizados = (resultado.dados || []).map(evento => ({
@@ -175,6 +175,32 @@ class EventoController {
         }
     }
 
+    static async atualizarEvento(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa;
+            const id_evento = Number(req.params.id);
+
+            if (!Number.isInteger(id_evento) || id_evento <= 0) {
+                return res.status(400).json({ sucesso: false, erro: 'ID do evento invalido' });
+            }
+
+            const dados = await EventoModel.atualizarEventoSistema(id_empresa, id_evento, req.body);
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Evento atualizado com sucesso',
+                dados
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar evento:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel atualizar o evento'
+            });
+        }
+    }
+
     static async justificarEvento(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
@@ -298,7 +324,7 @@ class EventoController {
     static async obterTopMotivosTempo(req, res) {
         try {
             const limite = req.query.limite ? Number(req.query.limite) : 5;
-            const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite);
+            const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
@@ -310,7 +336,7 @@ class EventoController {
 
     static async tempoParadoTempoProduzindoEvento(req, res) {
         try {
-            const dados = await EventoModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa)
+            const dados = await EventoModel.tempoParadoTempoProduzindoEvento(req.user.id_empresa, req.query.setorId)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro no gráfico Tempo Total Parado x Tempo total Produzindo geral da fábrica:', error)

@@ -94,16 +94,15 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         e.preventDefault();
 
         const formData = new FormData();
-        //formData.append('campo', value)
-        formData.append('nome', nome);
-        formData.append('id_setor', idSetor);
-        formData.append('categoria', categoria);
-        formData.append('serie', serie);
-        // campos pendentes pro backend adicionar:
-        formData.append('capacidade', capacidade);
-        formData.append('status', status);
-        formData.append('data_aquisicao', dataAquisicao);
-        formData.append('id_operador', operador);
+        formData.append('nome', nome.trim());
+        formData.append('categoria', categoria.trim());
+
+        if (idSetor) formData.append('id_setor', idSetor);
+        if (serie.trim()) formData.append('serie', serie.trim());
+        if (capacidade.trim()) formData.append('capacidade', capacidade.trim());
+        if (status) formData.append('status_atual', status);
+        if (dataAquisicao) formData.append('data_aquisicao', dataAquisicao);
+        if (operador) formData.append('id_operador', operador);
 
         if (arquivo && arquivo.raw) {
             formData.append('imagem', arquivo.raw);
@@ -130,7 +129,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
             }
         } catch (error) {
             console.error("Erro ao cadastrar máquina:", error);
-            toast.error("Erro ao cadastrar máquina.");
+            toast.error(error.message || "Erro ao cadastrar máquina.");
         }
     };
 
