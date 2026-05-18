@@ -1,6 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { SetorProducaoDiariaWidget } from "@/features/setores/SetorProducaoDiariaWidget";
 import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
@@ -30,18 +29,6 @@ export default function DashboardGeralGestor() {
       // token ausente ou malformado
     }
   }, []);
-=======
-import { SetorMaquinaStatusWidget }  from "@/features/setores/SetorMaquinaStatusWidget";
-import { SetorOEEMedioWidget }       from "@/features/setores/SetorOEEMedioWidget";
-import { SetorOEEEvolucaoWidget }    from "@/features/setores/SetorOEEEvolucaoWidget";
-import { SetorTopOperadoresWidget }  from "@/features/setores/SetorTopOperadoresWidget";
-import { SetorMotivosParadaWidget }  from "@/features/setores/SetorMotivosParadaWidget";
-import { SetorProducaoSemanalWidget} from "@/features/setores/SetorProducaoSemanalWidget";
-import { usePerfil } from "@/hooks/usePerfil";
-
-export default function DashboardGeralGestor() {
-  const { setorId } = usePerfil();
->>>>>>> de02574897de67f482ec90faae0208e46d18221a
 
   return (
     <PageLayout>
