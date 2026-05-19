@@ -1,7 +1,5 @@
 "use client"
 
-import React from 'react';
-import Header from "@/components/ui/topbar";
 import { ProducaoSetorWidget } from "@/features/producao/ProducaoSetorWidget";
 import { ProducaoDiaWidget } from "@/features/producao/ProducaoDiaWidget";
 import { OEEWidget } from "@/features/producao/OEEWidget";
@@ -13,73 +11,57 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+
 export default function DashboardGeralPage() {
   return (
-     <div className="mx-auto flex w-full p-8 flex-col gap-4 pb-10">
-        
-        {/* Cabeçalho */}
-        <div className="mb-2 flex justify-start">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-            Dashboard Geral da Empresa
-          </h1>
-        </div>
+    <PageLayout>
+      <PageHeader title="Dashboard Geral da Empresa" />
 
-        {/* SEÇÃO 1 - Produção do Dia (Destaque Largo) */}
-        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-          <div className="w-full">
-            <ProducaoDiaWidget />
-          </div>
-        </section>
+      <ContentGrid cols={1}>
+        <WidgetCard>
+          <ProducaoDiaWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-        {/* SEÇÃO 2 - Resumo OEE (Unificado e Espaçado) */}
-        <section className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
-          <div className="w-full flex items-center justify-around">
-            <OEEWidget />
-          </div>
-        </section>
+      <ContentGrid cols={1} className="mt-6">
+        <WidgetCard centered>
+          <OEEWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-        {/* SEÇÃO 3 - Produção por Setor e Status Máquinas (Grid 2/1) */}
-        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-2 border-r border-gray-100 pr-6">
-              <ProducaoSetorWidget />
-            </div>
-            <div className="md:col-span-1 flex items-center justify-center">
-              <MaquinaStatusWidget />
-            </div>
-          </div>
-        </section>
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <ProducaoSetorWidget />
+        </WidgetCard>
+        <WidgetCard centered>
+          <MaquinaStatusWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-        {/* SEÇÃO 4 - Motivos e Tendência de Refugo (Grid 1/2) */}
-        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-8">
-            <div className="md:col-span-2 border-r border-gray-100 pr-6">
-              <MotivosFrequentesWidget />
-            </div>
-            <div className="md:col-span-4">
-              <TendendiaRefugoWidget />
-            </div>
-          </div>
-        </section>
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <MotivosFrequentesWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <TendendiaRefugoWidget />
+        </WidgetCard>
+      </ContentGrid>
 
-        {/* SEÇÃO 5 - KPIs Inferiores (Retangulares e Largos) */}
-        <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
-              <MediaParadasDiaWidget />
-            </div>
-            <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
-              <PecasPorMinutoWidget />
-            </div>
-            <div className="flex flex-col border-r border-gray-100 last:border-0 pr-4">
-              <MaquinaAtivaPorTurnoWidget />
-            </div>
-            <div className="flex flex-col">
-              <ProducaoPorTurnoLotesWidget />
-            </div>
-          </div>
-        </section>
-
-      </div>
+      <KPIGrid cols={4} className="mt-6 gap-6 lg:gap-8">
+        <WidgetCard>
+          <MediaParadasDiaWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <PecasPorMinutoWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <MaquinaAtivaPorTurnoWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <ProducaoPorTurnoLotesWidget />
+        </WidgetCard>
+      </KPIGrid>
+    </PageLayout>
   );
 }

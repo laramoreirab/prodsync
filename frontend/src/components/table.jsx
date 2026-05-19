@@ -161,7 +161,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         </div>
       )}
 
-      <div className='overflow-hidden rounded-md border bg-white/50 backdrop-blur-sm w-full'>
+      <div className='overflow-x-auto rounded-md border bg-white/50 backdrop-blur-sm w-full'>
         <Table className="overflow-auto">
 
           <TableHeader>

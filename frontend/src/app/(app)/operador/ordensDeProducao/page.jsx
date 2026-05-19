@@ -15,6 +15,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import Link from "next/link";
+import{PageLayout, PageHeader, PageSection, SectionDivider, SearchBar, FilterRow, EmptyState, StaggerWrapper, FadeUpItem} from "@/components/AnimatedComponents";
 
 const dadosOriginais = [
   { id: 1, nome: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status: 'Produzindo', progresso: '25%' },
@@ -216,83 +217,50 @@ export default function OrdensDeProducao() {
     );
   }
 
-  return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
+return (
+  <PageLayout>
+    <PageHeader title="Ordens de Produção" />
 
-        {/* TÍTULO */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold mb-4">
-            Ordens de Produção
-          </h1>
-        </div>
+    <StaggerWrapper className="grid grid-cols-5 gap-6 w-full">
+      <FadeUpItem className="col-span-1 bg-[#efefef] p-5 flex flex-col gap-15 rounded-lg shadow-sm h-60">
+        <h1 className="text-[#545454] text-lg text-center font-semibold align-text-top">Aguardando Início</h1>
+        <span className="text-black text-center text-4xl font-bold">2</span>
+      </FadeUpItem>
 
-        {/*SEÇÃO 1: KPIS*/}
-        <div className="grid grid-cols-5 gap-6 w-full">
+      <FadeUpItem className="col-span-1 bg-[#effff5] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
+        <h1 className="text-[#369948] text-lg text-center font-semibold">Em Andamento</h1>
+        <span className="text-black text-4xl text-center font-bold">3</span>
+      </FadeUpItem>
 
-          <div className="col-span-1 bg-[#efefef] p-5 flex flex-col gap-15 rounded-lg shadow-sm h-60">
-            <h1 className="text-[#545454] text-lg text-center font-semibold align-text-top">Aguardando Início</h1>
+      <FadeUpItem className="col-span-1 bg-[#e8f0ff] p-6 flex flex-col gap-15 rounded-lg shadow-sm">
+        <h1 className="text-[#00357a] text-lg text-center font-semibold">Concluídas</h1>
+        <span className="text-black text-4xl text-center font-bold">4</span>
+      </FadeUpItem>
 
-            <span className="text-black text-center text-4xl font-bold">2</span>
+      <FadeUpItem className="col-span-2 bg-white border border-gray-100 shadow-sm p-4 rounded-lg flex flex-col justify-between gap-2">
+        {/* Aqui */}
+      </FadeUpItem>
+    </StaggerWrapper>
 
-          </div>
+    <PageSection id="listagem_ops">
+      <SectionDivider title="OPs" />
 
-          <div className="col-span-1 bg-[#effff5] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
-            <h1 className="text-[#369948] text-lg text-center font-semibold">Em Andamento</h1>
-            <span className="text-black text-4xl text-center font-bold">3</span>
-          </div>
+      <SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por id..."
+      />
 
-          <div className="col-span-1 bg-[#e8f0ff] p-6 flex flex-col gap-15 rounded-lg shadow-sm">
-            <h1 className="text-[#00357a] text-lg text-center font-semibold">Concluídas</h1>
-            <span className="text-black text-4xl text-center font-bold">4</span>
-          </div>
-
-
-          <div className="col-span-2 bg-white border border-gray-100 shadow-sm p-4 rounded-lg flex flex-col justify-between gap-2">
-
-            {/* Aqui */}
-
-          </div>
-        </div>
-
-        <section id="listagem_ops">
-          <div className="flex items-center py-8 gap-5">
-            <h1 className="text-4xl font-semibold">OPs</h1>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
-
-          {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center py-3 justify-between mt-3">
-            <p>{dadosExibidos.length} OPs encontradas</p>
-
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacao}
-                onSortChange={handleSort}
-              />
-              <FilterDropdown
-                filtersConfig={opsFilter}
-                onApply={aplicarFiltros}
-              />
-            </div>
-          </div>
-
+      <FilterRow
+        count={dadosExibidos.length}
+        label="OPs"
+        actions={
+          <>
+            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+            <FilterDropdown filtersConfig={opsFilter} onApply={aplicarFiltros} />
+          </>
+        }
+      />
           {/* Tabela */}
           {dadosExibidos.length > 0 ? (
             <TableListagens
@@ -311,14 +279,12 @@ export default function OrdensDeProducao() {
               )}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-12 rounded-md mt-4">
-              <Search className="w-12 h-12 text-gray-300 mb-3" />
-              <p className="text-xl font-semibold text-gray-500">Nenhum resultado encontrado</p>
-              <p className="text-sm text-gray-400 mt-1">Ajuste seus filtros ou termo de busca.</p>
-            </div>
+            <EmptyState
+          title="Nenhum resultado encontrado"
+          message="Ajuste seus filtros ou termo de busca."
+        />
           )}
-        </section>
-      </div>
-    </main>
+        </PageSection>
+  </PageLayout>
   );
 }

@@ -4,9 +4,9 @@ import { AreaChartBase } from "@/components/ui/charts/components/AreaChart";
 import { useOPConcluidasDia } from "./hooks/useOPConcluidasDia";
 import { opConcluidasConfig } from "./config/ordensChartConfig";
 
-export function OPConcluidasDiaWidget() {
-  const { data, loading, error } = useOPConcluidasDia();
-
+export function OPConcluidasDiaWidget({ setorId = null }) {
+  const { data, loading, error } = useOPConcluidasDia(setorId);
+  
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
 

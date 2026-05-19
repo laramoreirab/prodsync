@@ -4,8 +4,8 @@ import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useOPStatus } from "./hooks/useOPStatus";
 import { opStatusConfig } from "./config/ordensChartConfig";
 
-export function OPStatusWidget() {
-  const { data, loading, error } = useOPStatus();
+export function OPStatusWidget({ setorId = null }) {
+  const { data, loading, error } = useOPStatus(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar status.</p>;

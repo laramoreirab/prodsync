@@ -22,9 +22,9 @@ export const mockOEE = {
 };
 
 export const mockMaquinaStatus = [
-  { name: "ativa",      value: 62 },
-  { name: "parada",     value: 23 },
-  { name: "setup", value: 15 },
+{ name: "ativa", value: 62, setorId: 1 },
+  { name: "parada", value: 23, setorId: 1 },
+  { name: "setup", value: 15, setorId: 1 },
 ];
 
 export const mockMotivosFrequentesParadas = [
@@ -131,66 +131,98 @@ export const mockTopMotivosTempo = [
 
 
 export const mockQtdMaquinasPorSetor = [
-  { setor: "Engrenagens", qtd: 80 },
-  { setor: "Turbinas",    qtd: 55 },
-  { setor: "Válvulas",    qtd: 35 },
-  { setor: "Compressores",qtd: 20 },
+ { id: 1, setor: "Engrenagens", quantidade: 80 },
+  { id: 2, setor: "Turbinas", quantidade: 55 },
+  { id: 3, setor: "Válvulas", quantidade: 35 },
+  { id: 4, setor: "Compressores", quantidade: 20 },
 ];
 
 export const mockTempoMedioParada = [
-  { setor: "Compressores", minutos: 46 },
-  { setor: "Turbinas",     minutos: 38 },
-  { setor: "Válvulas",     minutos: 30 },
-  { setor: "Engrenagens",  minutos: 15 },
+  { maquina: "Prensa 01", minutos: 46, setorId: 1 },
+  { maquina: "Fresa 02", minutos: 38, setorId: 1 },
+  { maquina: "Torno 03", minutos: 30, setorId: 1 },
+  { maquina: "CNC 04", minutos: 15, setorId: 1 },
+  { maquina: "Prensa A1", minutos: 52, setorId: 2 },
+  { maquina: "Fresa B2", minutos: 41, setorId: 2 },
+  { maquina: "Torno C3", minutos: 35, setorId: 2 },
 ];
 
 export const mockProducaoDefeitos = [
-  { setor: "Engrenagens",  produzidas: 85, defeito: 15 },
-  { setor: "Turbinas",     produzidas: 72, defeito: 28 },
-  { setor: "Válvulas",     produzidas: 60, defeito: 40 },
-  { setor: "Compressores", produzidas: 55, defeito: 45 },
+  { maquina: "Prensa 01", produzidas: 85, defeito: 15, setorId: 1 },
+  { maquina: "Fresa 02", produzidas: 72, defeito: 28, setorId: 1 },
+  { maquina: "Torno 03", produzidas: 60, defeito: 40, setorId: 1 },
+  { maquina: "CNC 04", produzidas: 55, defeito: 45, setorId: 1 },
+  { maquina: "Prensa A1", produzidas: 78, defeito: 22, setorId: 2 },
+  { maquina: "Fresa B2", produzidas: 65, defeito: 35, setorId: 2 },
+  { maquina: "Torno C3", produzidas: 58, defeito: 42, setorId: 2 },
 ];
 
 export const mockMaquinasPorTurno = [
-  { turno: "Manhã", ativas: 80, paradas: 12, setup: 8  },
-  { turno: "Tarde", ativas: 72, paradas: 18, setup: 10 },
-  { turno: "Noite", ativas: 65, paradas: 20, setup: 15 },
+  { turno: "Manhã", ativas: 80, paradas: 12, manutencao: 8, setorId: 1 },
+  { turno: "Tarde", ativas: 72, paradas: 18, manutencao: 10, setorId: 1 },
+  { turno: "Noite", ativas: 65, paradas: 20, manutencao: 15, setorId: 1 },
 ];
 
 // ProducaoTotal — três datasets para os filtros de período
 export const mockProducaoTotal3Meses = [
-  { data: "Abr 2",  total: 650  },
-  { data: "Abr 9",  total: 720  },
-  { data: "15 Abr", total: 890  },
-  { data: "16 Abr", total: 1200 },
-  { data: "23 Abr", total: 980  },
-  { data: "7 Mai",  total: 750  },
-  { data: "14 Mai", total: 820  },
-  { data: "22 Mai", total: 900  },
-  { data: "6 Jun",  total: 780  },
-  { data: "13 Jun", total: 850  },
-  { data: "20 Jun", total: 770  },
+  { data: "Abr 2",  total: 650, setorId: 1 },
+  { data: "Abr 9",  total: 720, setorId: 1 },
+  { data: "15 Abr", total: 890, setorId: 1 },
+  { data: "16 Abr", total: 1200, setorId: 1 },
+  { data: "23 Abr", total: 980, setorId: 1 },
+  { data: "7 Mai",  total: 750, setorId: 1 },
+  { data: "14 Mai", total: 820, setorId: 1 },
+  { data: "22 Mai", total: 900, setorId: 1 },
+  { data: "6 Jun",  total: 780, setorId: 1 },
+  { data: "13 Jun", total: 850, setorId: 1 },
+  { data: "20 Jun", total: 770, setorId: 1 },
+  { data: "Abr 2",  total: 580, setorId: 2 },
+  { data: "Abr 9",  total: 650, setorId: 2 },
+  { data: "15 Abr", total: 780, setorId: 2 },
+  { data: "16 Abr", total: 950, setorId: 2 },
+  { data: "23 Abr", total: 820, setorId: 2 },
+  { data: "7 Mai",  total: 680, setorId: 2 },
+  { data: "14 Mai", total: 750, setorId: 2 },
+  { data: "22 Mai", total: 830, setorId: 2 },
+  { data: "6 Jun",  total: 710, setorId: 2 },
+  { data: "13 Jun", total: 780, setorId: 2 },
+  { data: "20 Jun", total: 700, setorId: 2 },
 ];
 
 export const mockProducaoTotal30Dias = [
-  { data: "28 Mai", total: 600 },
-  { data: "1 Jun",  total: 720 },
-  { data: "5 Jun",  total: 810 },
-  { data: "10 Jun", total: 750 },
-  { data: "15 Jun", total: 900 },
-  { data: "20 Jun", total: 680 },
-  { data: "25 Jun", total: 790 },
-  { data: "27 Jun", total: 820 },
+  { data: "28 Mai", total: 600, setorId: 1 },
+  { data: "1 Jun",  total: 720, setorId: 1 },
+  { data: "5 Jun",  total: 810, setorId: 1 },
+  { data: "10 Jun", total: 750, setorId: 1 },
+  { data: "15 Jun", total: 900, setorId: 1 },
+  { data: "20 Jun", total: 680, setorId: 1 },
+  { data: "25 Jun", total: 790, setorId: 1 },
+  { data: "27 Jun", total: 820, setorId: 1 },
+  { data: "28 Mai", total: 550, setorId: 2 },
+  { data: "1 Jun",  total: 650, setorId: 2 },
+  { data: "5 Jun",  total: 740, setorId: 2 },
+  { data: "10 Jun", total: 680, setorId: 2 },
+  { data: "15 Jun", total: 830, setorId: 2 },
+  { data: "20 Jun", total: 610, setorId: 2 },
+  { data: "25 Jun", total: 720, setorId: 2 },
+  { data: "27 Jun", total: 750, setorId: 2 },
 ];
 
 export const mockProducaoTotal7Dias = [
-  { data: "Seg", total: 750 },
-  { data: "Ter", total: 820 },
-  { data: "Qua", total: 690 },
-  { data: "Qui", total: 910 },
-  { data: "Sex", total: 840 },
-  { data: "Sáb", total: 600 },
-  { data: "Dom", total: 450 },
+  { data: "Seg", total: 750, setorId: 1 },
+  { data: "Ter", total: 820, setorId: 1 },
+  { data: "Qua", total: 690, setorId: 1 },
+  { data: "Qui", total: 910, setorId: 1 },
+  { data: "Sex", total: 840, setorId: 1 },
+  { data: "Sáb", total: 600, setorId: 1 },
+  { data: "Dom", total: 450, setorId: 1 },
+  { data: "Seg", total: 680, setorId: 2 },
+  { data: "Ter", total: 750, setorId: 2 },
+  { data: "Qua", total: 620, setorId: 2 },
+  { data: "Qui", total: 840, setorId: 2 },
+  { data: "Sex", total: 770, setorId: 2 },
+  { data: "Sáb", total: 530, setorId: 2 },
+  { data: "Dom", total: 380, setorId: 2 },
 ];
 
 
@@ -208,23 +240,94 @@ export const mockQtdUsuariosPorSetor = [
 
 // Top 5 operadores 
 export const mockTopOperadores = [
-  { setor: "Marcos",  media: 40 },
-  { setor: "Victória",media: 42 },
-  { setor: "Joana",   media: 22 },
-  { setor: "Andrew",  media: 18 },
-  { setor: "Mauro",   media: 30 },
-];
+  { operador: "Marcos",  media: 40, setorId: 1 },
+  { operador: "Victória", media: 42, setorId: 1 },
+  { operador: "Joana",   media: 22, setorId: 1 },
+  { operador: "Andrew",  media: 18, setorId: 1 },
+  { operador: "Mauro",   media: 30, setorId: 1 },
+  { operador: "Bruna",   media: 35, setorId: 2 },
+  { operador: "Ricardo", media: 38, setorId: 2 },
+  { operador: "Lina",    media: 28, setorId: 2 },]
 
 export const mockTempoSessaoPerfil = [
-  { perfil: "Gestores",   minutos: 1.42, label: "01:25 h" },
-  { perfil: "Operadores", minutos: 0.50, label: "00:30 h" },
+{ perfil: "Gestores",   horas: 1.42, label: "01:25 h", setorId: 1 },
+  { perfil: "Operadores", horas: 0.50, label: "00:30 h", setorId: 1 },
+  { perfil: "Gestores",   horas: 1.30, label: "01:18 h", setorId: 2 },
+  { perfil: "Operadores", horas: 0.55, label: "00:33 h", setorId: 2 },
 ];
 
 export const mockRotatividade = [
-  { mes: "Abr", novos: 14, desligados: 6  },
-  { mes: "Mai", novos: 18, desligados: 10 },
-  { mes: "Jun", novos: 25, desligados: 15 },
+  { mes: "Abr", novos: 14, desligados: 6, setorId: 1 },
+  { mes: "Mai", novos: 18, desligados: 10, setorId: 1 },
+  { mes: "Jun", novos: 25, desligados: 15, setorId: 1 },
+  { mes: "Abr", novos: 11, desligados: 4, setorId: 2 },
+  { mes: "Mai", novos: 13, desligados: 7, setorId: 2 },
+  { mes: "Jun", novos: 19, desligados: 12, setorId: 2 },
 ];
+
+export const mockUsuariosPorTurno = [
+  { turno: "Manhã", value: 28, setorId: 1 },
+  { turno: "Tarde", value: 20, setorId: 1 },
+  { turno: "Noite", value: 15, setorId: 1 },
+  { turno: "Manhã", value: 24, setorId: 2 },
+  { turno: "Tarde", value: 18, setorId: 2 },
+  { turno: "Noite", value: 12, setorId: 2 },
+];
+
+export const mockProducaoMediaUsuarioSetor = [
+  { usuario: "Marcos",   media: 56, setorId: 1 },
+  { usuario: "Victória", media: 48, setorId: 1 },
+  { usuario: "Joana",    media: 40, setorId: 1 },
+  { usuario: "Andrew",   media: 34, setorId: 1 },
+  { usuario: "Mauro",    media: 29, setorId: 1 },
+  { usuario: "Bruna",    media: 52, setorId: 2 },
+  { usuario: "Ricardo",  media: 46, setorId: 2 },
+  { usuario: "Lina",     media: 33, setorId: 2 },
+];
+
+export const mockUsuarioTaxaRefugo = [
+  { operador: "Marcos",   taxa: 12, setorId: 1 },
+  { operador: "Victória", taxa: 8, setorId: 1 },
+  { operador: "Joana",    taxa: 15, setorId: 1 },
+  { operador: "Andrew",   taxa: 10, setorId: 1 },
+  { operador: "Mauro",    taxa: 20, setorId: 1 },
+  { operador: "Bruna",    taxa: 14, setorId: 2 },
+  { operador: "Ricardo",  taxa: 11, setorId: 2 },
+  { operador: "Lina",     taxa: 18, setorId: 2 },
+];
+export const mockSetorProducaoDiaria = [
+  { hora: "00h", pcs: 8 },
+  { hora: "01h", pcs: 6 },
+  { hora: "02h", pcs: 5 },
+  { hora: "03h", pcs: 4 },
+  { hora: "04h", pcs: 3 },
+  { hora: "05h", pcs: 5 },
+  { hora: "06h", pcs: 18 },
+  { hora: "07h", pcs: 34 },
+  { hora: "08h", pcs: 52 },
+  { hora: "09h", pcs: 68 },
+  { hora: "10h", pcs: 74 },
+  { hora: "11h", pcs: 88 },
+  { hora: "12h", pcs: 102 },
+  { hora: "13h", pcs: 117 },
+  { hora: "14h", pcs: 132 },
+  { hora: "15h", pcs: 148 },
+  { hora: "16h", pcs: 145 },
+  { hora: "17h", pcs: 138 },
+  { hora: "18h", pcs: 122 },
+  { hora: "19h", pcs: 107 },
+  { hora: "20h", pcs: 89 },
+  { hora: "21h", pcs: 72 },
+  { hora: "22h", pcs: 58 },
+  { hora: "23h", pcs: 40 },
+];
+
+export const mockSetorOEEPanel = {
+  disponibilidade: 85,
+  performance: 90,
+  qualidade: 90,
+  oee: 72.5,
+};
 
 // CumprimentoMetaSetor
 export const mockCumprimentoMetaSetor = [

@@ -4,8 +4,8 @@ import { LineMultiplasSeries } from "@/components/ui/charts/components/LineMulti
 import { useRotatividade } from "./hooks/useRotatividade";
 import { rotatividadeConfig } from "./config/usuarioChartConfig";
 
-export function RotatividadeWidget() {
-  const { data, loading, error } = useRotatividade();
+export function RotatividadeWidget({ setorId }) {
+  const { data, loading, error } = useRotatividade(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
