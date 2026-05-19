@@ -90,6 +90,7 @@ class UsuarioModel {
                 select: {
                     id_usuario: true,
                     nome: true,
+                    tipo: true,
                 }
             })
             return resposta

@@ -89,9 +89,10 @@ const filtrosOps = [
 
 export default function OrdensDeProducaoGestor() {
   const { setorId } = usePerfil();
-  const { ops, loading, refresh, excluirOp } = useOps();
+  const { ops, loading, refresh } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
 
   const opsDoSetor = useMemo(() => {
     return (ops || []).filter((op) => !setorId || String(op.id_setor) === String(setorId));
@@ -205,6 +206,15 @@ export default function OrdensDeProducaoGestor() {
             data={dadosExibidos}
             columns={colunasOrdemProd}
             enableSelection
+            onSelectedChange={setSelecionados}
+            excluirLote={
+              <DialogContent>
+                <FormExclusaoOp
+                  opIds={selecionados.map((op) => op.id ?? op.id_ordem)}
+                  onExclusaoSucesso={refresh}
+                />
+              </DialogContent>
+            }
             acoesDropdown={(op) => (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
@@ -235,7 +245,7 @@ export default function OrdensDeProducaoGestor() {
                     <FormExclusaoOp
                       opId={op.id}
                       idMaquina={op.id_maquina}
-                      onExclusaoSucesso={() => excluirOp(op.id, op.id_maquina)}
+                      onExclusaoSucesso={refresh}
                     />
                   </DialogContent>
                 </Dialog>
