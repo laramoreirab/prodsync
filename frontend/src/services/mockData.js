@@ -547,34 +547,7 @@ export const mockAndonSectorStatusMaquinas = {
   emSetup:     3,
   emParada:    2,
 };
-
-export const mockMetaKPI = {
-  titulo: "Sua Meta", valor: "500", unidade: "peças"
-};
-export const mockProdutividadeDia = { 
-  produzido: 43.5, meta: 56.5 
-};
-export const mockQualidade = { 
-  pecasBoas: 68.8, refugo: 31.2 
-};
-export const mockVelocimetro = { 
-  atual: 50, ideal: 70 
-};
-
-export const mockOEEMaquinaOperador = [
-  { setor: "Média das máquinas do Setor", oee: 85 },
-  { setor: "Minha máquina",              oee: 72 },
-];
-
-export const mockOEEMaquinaDetalhes = {
-  nome_maquina:    "THAK-909816",
-  status:          "Produzindo",
-  disponibilidade: 82,
-  performance:     76,
-  qualidade:       91,
-  oee:             57,
-};
-
+ 
 export const mockAndonFactoryRanking = [
   { setor: "THAK-909816", produtividade: 95 },
   { setor: "THAK-909823", produtividade: 88 },
@@ -756,6 +729,33 @@ export const mockAndonSectorSections = [
     ],
   },
 ];
+
+export const mockMetaKPI = {
+  titulo: "Sua Meta", valor: "500", unidade: "peças"
+};
+export const mockProdutividadeDia = { 
+  produzido: 43.5, meta: 56.5 
+};
+export const mockQualidade = { 
+  pecasBoas: 68.8, refugo: 31.2 
+};
+export const mockVelocimetro = { 
+  atual: 50, ideal: 70 
+};
+
+export const mockOEEMaquinaOperador = [
+  { setor: "Média das máquinas do Setor", oee: 85 },
+  { setor: "Minha máquina",              oee: 72 },
+];
+
+export const mockOEEMaquinaDetalhes = {
+  nome_maquina:    "THAK-909816",
+  status:          "Produzindo",
+  disponibilidade: 82,
+  performance:     76,
+  qualidade:       91,
+  oee:             57,
+};
 
 export const mockAndonStatusMaquinas = mockAndonFactoryStatusMaquinas;
 

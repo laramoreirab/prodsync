@@ -19,8 +19,22 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="pt-br"
+      suppressHydrationWarning
       className={`${montserrat.variable} ${virtualFont.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+try {
+  var isAppRoute = /^\\/(adm|gestor|operador)(\\/|$)/.test(window.location.pathname);
+  var isDark = window.localStorage.getItem("prodsync-theme") === "dark";
+  document.documentElement.classList.toggle("dark", isAppRoute && isDark);
+} catch (_) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" />

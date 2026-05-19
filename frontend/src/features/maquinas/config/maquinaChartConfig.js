@@ -40,6 +40,6 @@ export const maquinasTurnoConfig = {
 export const producaoTotalConfig = {
   total: {
     label: "Peças produzidas:",
-    color: "#00357a",
+    color: "var(--color-grafico-area)",
   },
 };

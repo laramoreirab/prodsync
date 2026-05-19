@@ -133,23 +133,23 @@ const colunasOrdemProd = [
       const config = {
         "Produzindo": {
           variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+          className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm font-semibold border-none dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
         },
         "Setup": {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm border-none"
+          className: "!border-amber-300 !bg-amber-100 !text-amber-900 text-sm font-semibold border-none dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
         },
         "Parada": {
           variant: "destructive",
-          className: "bg-vermelho-vivido/10 text-vermelho-vivido font-semibold text-sm border-none"
+          className: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm font-semibold border-none dark:!border-red-300/35 dark:!bg-red-500/20 dark:!text-red-100"
         },
         "Concluída": {
           variant: "outline",
-          className: "bg-blue-500/10 text-blue-600 text-sm font-semibold border-none"
+          className: "!border-blue-300 !bg-blue-100 !text-blue-600 text-sm font-semibold border-none dark:!border-blue-300/45 dark:!bg-blue-300/20 dark:!text-blue-100"
         },
         "Aguardando Início": {
           variant: "outline",
-          className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
+          className: "!bg-[#ECECEC] !text-[#636F87] !border-slate-500/30 text-sm font-semibold border-none dark:!border-slate-300/45 dark:!bg-slate-300/20 dark:!text-slate-100"
         }
       };
       const item = config[valor] || { icon: null };
