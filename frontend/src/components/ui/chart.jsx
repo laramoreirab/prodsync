@@ -10,6 +10,18 @@ const THEMES = {
   dark: ".dark"
 }
 
+const DARK_CHART_COLORS = {
+  "#00357a": "#7d95c6",
+  "#004aad": "#00357a",
+  "#23304c": "#7d95c6",
+  "#212e4b": "#7d95c6",
+  "#122f60": "#4e506f",
+  "#7d95c6": "#636f87",
+  "#b0bfd8": "#636f87",
+  "#e2e8f0": "#4e506f",
+  "#4a7ff7": "#7d95c6",
+}
+
 const INITIAL_DIMENSION = {
   width: 320,
   height: 200
@@ -63,6 +75,17 @@ const ChartStyle = ({
 }) => {
   const colorConfig = Object.entries(config).filter(([, config]) => config.theme ?? config.color)
 
+  function getThemeColor(itemConfig, theme) {
+    const color = itemConfig.theme?.[theme] ?? itemConfig.color
+    const normalizedColor = color?.toLowerCase()
+
+    if (theme === "dark" && normalizedColor && !itemConfig.theme?.dark) {
+      return DARK_CHART_COLORS[normalizedColor] ?? color
+    }
+
+    return color
+  }
+
   if (!colorConfig.length) {
     return null
   }
@@ -75,9 +98,7 @@ const ChartStyle = ({
 ${prefix} [data-chart=${id}] {
 ${colorConfig
 .map(([key, itemConfig]) => {
-const color =
-  itemConfig.theme?.[theme] ??
-  itemConfig.color
+const color = getThemeColor(itemConfig, theme)
 return color ? `  --color-${key}: ${color};` : null
 })
 .join("\n")}

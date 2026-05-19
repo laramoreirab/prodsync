@@ -212,10 +212,15 @@ class UsuarioModel {
 
     //verificar credenciais do login 
     static async verificarCredenciais(id, senha) {
+        const idUsuario = Number(id);
+        if (!Number.isInteger(idUsuario)) {
+            return null;
+        }
+
         try {
             const usuario = await prisma.usuarios.findUnique({
                 where: {
-                    id_usuario: Number(id)
+                    id_usuario: idUsuario
                 }
             });
             if (!usuario) {
