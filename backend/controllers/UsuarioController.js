@@ -280,100 +280,138 @@ class UsuarioController {
     }
 
     //PUT api/usuarios
-    static async atualizarUsuario(req, res) {
-        try {
-            const id_empresa = req.user.id_empresa;
-            const id_usuario = req.params.id
-            const { nome, cpf, email, id_setor, funcao, id_turno, id_maquina } = req.body;
+   // PUT /api/usuarios/:id
+static async atualizarUsuario(req, res) {
+    try {
+        const id_empresa = req.user.id_empresa;
+        const id_usuario = req.params.id;
 
-            // Validação do ID
-            if (!id_usuario || isNaN(id_usuario)) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'ID inválido',
-                    mensagem: 'O ID deve ser um número válido'
-                });
-            }
+        const {
+            nome,
+            cpf,
+            email,
+            id_setor,
+            funcao,
+            id_turno,
+            id_maquina
+        } = req.body;
 
-            //verificar se usuário existe
-            const usuarioExistente = await UsuarioModel.buscarPorId(id_usuario, id_empresa);
-            if (!usuarioExistente) {
-                return res.status(404).json({
-                    sucesso: false,
-                    erro: 'Usuário não encontrado',
-                    mensagem: `Usuário com ID ${id_usuario} não foi encontrado`
-                });
-            }
-
-            // Preparar dados para atualização
-            const dadosUpdateUsuario = {};
-            const dadosUpdateEscala = {};
-
-            if (nome !== undefined) { dadosUpdateUsuario.nome = nome }
-            if (email !== undefined) { dadosUpdateUsuario.email = email }
-            if (funcao !== undefined) { dadosUpdateUsuario.tipo = funcao }
-            if (cpf !== undefined) { dadosUpdateUsuario.cpf = cpf }
-
-            // Adicionar nova imagem se foi enviada
-            if (req.file) {
-                // Remover imagem antiga se existir
-                if (usuarioExistente.imagem_perfil) {
-                    await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
-                }
-                dadosUpdateUsuario.imagem_perfil = req.file.filename;
-            }
-
-            if (id_setor !== undefined) {
-                dadosUpdateEscala.id_setor = id_setor;
-            }
-            if (id_turno !== undefined) {
-                dadosUpdateEscala.id_turno = id_turno;
-            }
-            if (id_maquina !== undefined) {
-                dadosUpdateEscala.id_maquina = id_maquina;
-            }
-
-
-            if (
-                Object.keys(dadosUpdateUsuario).length === 0 &&
-                Object.keys(dadosUpdateEscala).length === 0
-            ) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'Nenhum dado para atualizar',
-                    mensagem: 'Forneça pelo menos um campo para atualizar'
-                });
-            }
-
-            // Cada atualização só executa se tiver dados
-            let updateUsuario = null;
-            let updateEscala = null;
-
-            if (Object.keys(dadosUpdateUsuario).length > 0) {
-                updateUsuario = await UsuarioModel.atualizar(id_usuario, id_empresa, dadosUpdateUsuario)
-            }
-            if (Object.keys(dadosUpdateEscala).length > 0) {
-                updateEscala = await EscalaTrabalhoModel.atualizar(id_usuario, id_empresa, dadosUpdateEscala)
-            }
-
-            return res.status(200).json({
-                sucesso: true,
-                mensagem: 'Usuario atualizado com sucesso',
-                dados: {
-                    ...updateUsuario,
-                    ...updateEscala
-                }
-            });
-
-        } catch (error) {
-            console.error('Erro ao atualizar usuário:', error);
-            return res.status(500).json({
+        // validação
+        if (!id_usuario || isNaN(id_usuario)) {
+            return res.status(400).json({
                 sucesso: false,
-                erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível atualizar o usuário!'
+                mensagem: 'ID inválido'
             });
         }
+
+        // verifica usuário
+        const usuarioExistente = await UsuarioModel.buscarPorId(
+            id_usuario,
+            id_empresa
+        );
+
+        if (!usuarioExistente) {
+            return res.status(404).json({
+                sucesso: false,
+                mensagem: 'Usuário não encontrado'
+            });
+        }
+
+        // -------------------------
+        // dados usuario
+        // -------------------------
+
+        const dadosUpdateUsuario = {};
+
+        if (nome !== undefined)
+            dadosUpdateUsuario.nome = nome;
+
+        if (cpf !== undefined)
+            dadosUpdateUsuario.cpf = cpf;
+
+        if (email !== undefined)
+            dadosUpdateUsuario.email = email;
+
+        if (funcao !== undefined)
+            dadosUpdateUsuario.tipo = funcao;
+
+        // imagem
+        if (req.file) {
+
+            if (usuarioExistente.imagem_perfil) {
+                await removerArquivoAntigo(
+                    usuarioExistente.imagem_perfil,
+                    'imagem'
+                );
+            }
+
+            dadosUpdateUsuario.imagem_perfil = req.file.filename;
+        }
+
+        // atualiza usuário
+        const usuarioAtualizado =
+            await UsuarioModel.atualizar(
+                id_usuario,
+                id_empresa,
+                dadosUpdateUsuario
+            );
+
+        // -------------------------
+        // operador
+        // -------------------------
+
+        if (funcao === "Operador") {
+
+            const dadosEscala = {};
+
+            if (id_setor !== undefined && id_setor !== '') {
+                dadosEscala.id_setor = id_setor;
+            }
+
+            if (id_turno !== undefined && id_turno !== '') {
+                dadosEscala.id_turno = id_turno;
+            }
+
+            if (id_maquina !== undefined && id_maquina !== '') {
+                dadosEscala.id_maquina = id_maquina;
+            }
+
+            await EscalaTrabalhoModel.atualizar(
+                id_usuario,
+                id_empresa,
+                dadosEscala
+            );
+        }
+
+        // -------------------------
+        // gestor
+        // -------------------------
+
+        if (funcao === "Gestor" && id_setor) {
+
+            await EscalaTrabalhoModel.atualizarSetorGestor(
+                id_usuario,
+                id_empresa,
+                id_setor
+            );
+        }
+
+        return res.status(200).json({
+            sucesso: true,
+            mensagem: 'Usuário atualizado com sucesso',
+            dados: usuarioAtualizado
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            sucesso: false,
+            mensagem: 'Erro ao atualizar usuário'
+        });
     }
+}
 
     //DELETE api/usuarios/:id/deletar - Excluir funcionario 
     static async deletarUsuario(req, res) {

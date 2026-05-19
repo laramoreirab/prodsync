@@ -261,26 +261,54 @@ class SetorModel {
     // Associa operadores a um setor atualizando suas escalas de trabalho
     static async associarOperadores(id_setor, ids_operadores, id_empresa) {
         try {
-            const setor = await prisma.setores.findFirst({
-                where: { id_setor, id_empresa }
-            });
+        const setor = await prisma.setores.findFirst({
+            where: { id_setor, id_empresa }
+        })
+        if (!setor) throw new Error('Setor não encontrado ou não pertence à empresa')
 
-            if (!setor) {
-                throw new Error('Setor não encontrado ou não pertence à empresa');
-            }
+        // busca o primeiro turno da empresa como fallback
+        const turnoFallback = await prisma.turno.findFirst({
+            where: { id_empresa },
+            select: { id_turno: true }
+        })
 
-            // Atualiza o id_setor em todas as escalas de trabalho dos operadores selecionados
-            const resultado = await prisma.escalaTrabalho.updateMany({
-                where: {
-                    id_operador: { in: ids_operadores },
-                    id_empresa: id_empresa
-                },
-                data: {
-                    id_setor: id_setor
+        if (!turnoFallback) throw new Error('Nenhum turno cadastrado na empresa')
+
+        // upsert um por um — cria se não existe, atualiza se existe
+        const resultados = await Promise.all(
+            ids_operadores.map(async (id_operador) => {
+
+                // tenta encontrar escala existente do operador
+                const escalaExistente = await prisma.escalaTrabalho.findFirst({
+                    where: { id_operador, id_empresa }
+                })
+
+                if (escalaExistente) {
+                    // atualiza o setor da escala existente
+                    return await prisma.escalaTrabalho.update({
+                        where: {
+                            id_operador_id_turno: {
+                                id_operador,
+                                id_turno: escalaExistente.id_turno
+                            }
+                        },
+                        data: { id_setor }
+                    })
+                } else {
+                    // cria nova escala com turno fallback
+                    return await prisma.escalaTrabalho.create({
+                        data: {
+                            id_operador,
+                            id_turno:   turnoFallback.id_turno,
+                            id_setor,
+                            id_empresa
+                        }
+                    })
                 }
-            });
+            })
+        )
 
-            return resultado;
+        return { count: resultados.length }
         } catch (error) {
             console.error('Erro ao associar operadores ao setor:', error);
             throw error;
@@ -315,22 +343,49 @@ class SetorModel {
                 include: {
                     operador: {
                         select: { id_usuario: true, nome: true, email: true, tipo: true }
+                    },
+                    turno: {
+                        select: {
+                            id_turno: true,
+                            nome_turno: true,
+                            dia_semana: true,
+                            hora_inicio: true,
+                            hora_fim: true
+                        }
+                    },
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true
+                        }
                     }
                 }
             });
 
             // Retornar apenas os operadores únicos
-            const operadoresUnicos = [];
-            const idsVistos = new Set();
+            const operadoresPorId = new Map();
 
             for (const escala of escalas) {
-                if (!idsVistos.has(escala.id_operador)) {
-                    operadoresUnicos.push(escala.operador);
-                    idsVistos.add(escala.id_operador);
+                if (!operadoresPorId.has(escala.id_operador)) {
+                    operadoresPorId.set(escala.id_operador, {
+                        ...escala.operador,
+                        turnos: [],
+                        maquinas: []
+                    });
+                }
+
+                const operador = operadoresPorId.get(escala.id_operador);
+
+                if (escala.turno && !operador.turnos.some(turno => turno.id_turno === escala.turno.id_turno)) {
+                    operador.turnos.push(escala.turno);
+                }
+
+                if (escala.maquina && !operador.maquinas.some(maquina => maquina.id_maquina === escala.maquina.id_maquina)) {
+                    operador.maquinas.push(escala.maquina);
                 }
             }
 
-            return operadoresUnicos;
+            return Array.from(operadoresPorId.values());
         } catch (error) {
             console.error('Erro ao listar operadores do setor:', error);
             throw error;

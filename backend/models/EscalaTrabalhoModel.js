@@ -263,31 +263,71 @@ class EscalaTrabalhoModel {
         }
     }
 
-    static async atualizar(id_operador, id_turno, diaSemanaOuDados, dadosAtualizados = null) {
+   static async atualizar(id_operador, id_empresa, dados) {
+
+    try {
+
+        const dadosValidos =
+            this.removerCamposInvalidos(dados);
+
+        if (dadosValidos.id_setor !== undefined) {
+            dadosValidos.id_setor =
+                Number(dadosValidos.id_setor);
+        }
+
+        if (dadosValidos.id_turno !== undefined) {
+            dadosValidos.id_turno =
+                Number(dadosValidos.id_turno);
+        }
+
+        if (dadosValidos.id_maquina !== undefined) {
+            dadosValidos.id_maquina =
+                Number(dadosValidos.id_maquina);
+        }
+
+        return await prisma.escalaTrabalho.updateMany({
+            where: {
+                id_operador: Number(id_operador),
+                id_empresa: Number(id_empresa)
+            },
+            data: dadosValidos
+        });
+
+    } catch (error) {
+
+        console.error(error);
+        throw error;
+    }
+}
+
+ static async atualizarSetorGestor(
+        id_gestor,
+        id_empresa,
+        id_setor
+    ) {
+
         try {
-            const dados = this.removerCamposInvalidos(dadosAtualizados ?? diaSemanaOuDados);
 
-            if (dadosAtualizados === null && typeof diaSemanaOuDados === 'object') {
-                return await prisma.escalaTrabalho.updateMany({
-                    where: {
-                        id_operador: Number(id_operador),
-                        id_empresa: Number(id_turno)
-                    },
-                    data: dados
-                });
-            }
-
-            return await prisma.escalaTrabalho.update({
+            // remove relação antiga
+            await prisma.setor_Gestor.deleteMany({
                 where: {
-                    id_operador_id_turno: {
-                        id_operador: Number(id_operador),
-                        id_turno: Number(id_turno)
-                    }
-                },
-                data: dados
+                    id_gestor: Number(id_gestor),
+                    id_empresa: Number(id_empresa)
+                }
             });
+
+            // cria nova relação
+            return await prisma.setor_Gestor.create({
+                data: {
+                    id_gestor: Number(id_gestor),
+                    id_empresa: Number(id_empresa),
+                    id_setor: Number(id_setor)
+                }
+            });
+
         } catch (error) {
-            console.error('Erro ao atualizar escala:', error);
+
+            console.error(error);
             throw error;
         }
     }

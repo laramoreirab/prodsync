@@ -261,9 +261,41 @@ class MaquinaModel {
                     id_empresa: id_empresa,
                     id_setor: id_setor,
                     ativo: true
+                },
+                include: {
+                    operador: {
+                        select: {
+                            id_usuario: true,
+                            nome: true
+                        }
+                    },
+                    historico_eventos: {
+                        where: {
+                            status_atual: {
+                                in: ['Parada', 'Manutencao', 'Setup']
+                            }
+                        },
+                        orderBy: {
+                            inicio: 'desc'
+                        },
+                        take: 1,
+                        select: {
+                            id_evento: true,
+                            status_atual: true,
+                            inicio: true,
+                            termino: true
+                        }
+                    }
                 }
             });
-            return maquinas;
+            return maquinas.map(maquina => {
+                const { historico_eventos, ...dadosMaquina } = maquina;
+                return {
+                    ...dadosMaquina,
+                    ultimo_evento: historico_eventos[0] ?? null,
+                    ultima_parada: historico_eventos[0]?.inicio ?? null
+                };
+            });
         } catch (error) {
             console.error('Erro ao listar máquinas por setor:', error);
             throw error;

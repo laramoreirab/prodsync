@@ -95,19 +95,75 @@ export default function SetorEspecificoPage({ params }) {
   
   const gestor = setor?.gestores?.[0]?.gestor;
 
+  const formatarHorario = (valor) => {
+    if (!valor) return "--:--";
+    return new Date(valor).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const diasSemanaOrdem = {
+    Domingo: 0,
+    Segunda: 1,
+    Segunda_feira: 1,
+    Terca: 2,
+    Terça: 2,
+    Terca_feira: 2,
+    Quarta: 3,
+    Quarta_feira: 3,
+    Quinta: 4,
+    Quinta_feira: 4,
+    Sexta: 5,
+    Sexta_feira: 5,
+    Sabado: 6,
+    Sábado: 6,
+  };
+
+  const formatarDiaSemana = (dia) => String(dia || "")
+    .replace(/_/g, "-")
+    .replace("Terca", "Terça")
+    .replace("Sabado", "Sábado");
+
+  const agruparTurnos = (listaTurnos) => {
+    const grupos = new Map();
+
+    for (const turno of listaTurnos) {
+      const chave = [
+        turno.nome_turno,
+        turno.hora_inicio,
+        turno.hora_fim,
+      ].join("|");
+
+      const grupo = grupos.get(chave) ?? {
+        ...turno,
+        dias: [],
+      };
+
+      grupo.dias.push(turno.dia_semana);
+      grupos.set(chave, grupo);
+    }
+
+    return Array.from(grupos.values()).map((turno) => ({
+      ...turno,
+      dias: [...new Set(turno.dias)]
+        .sort((a, b) => (diasSemanaOrdem[a] ?? 99) - (diasSemanaOrdem[b] ?? 99))
+        .map(formatarDiaSemana),
+    }));
+  };
+
   const normalizarMaquina = (maquina) => ({
     ...maquina,
     oee_atual: maquina.oee_atual ?? "-",
-    operador: maquina.operador?.nome ?? maquina.operador ?? "-",
+    operador: maquina.operador?.nome ?? maquina.operador ?? maquina.operador_atual ?? "-",
     status: maquina.status_atual || maquina.status || "-",
-    ultima_parada: maquina.ultima_parada ?? "-",
+    ultima_parada: maquina.ultima_parada ?? maquina.ultimo_evento?.inicio ?? "-",
   });
 
   const normalizarOperador = (usuario) => ({
     ...usuario,
     id_usuario: usuario.id_usuario ?? usuario.id_operador,
     funcao: usuario.funcao ?? usuario.tipo ?? "Operador",
-    turno: usuario.turno?.nome_turno ?? usuario.turno ?? "-",
+    turno: usuario.turnos?.length
+      ? [...new Set(usuario.turnos.map((turno) => turno.nome_turno).filter(Boolean))].join(", ")
+      : usuario.turno?.nome_turno ?? usuario.turno ?? "-",
     oee_medio: usuario.oee_medio ?? "-",
   });
 
@@ -254,6 +310,8 @@ export default function SetorEspecificoPage({ params }) {
     return usuario.nome?.toLowerCase().includes(termo) || String(usuario.id_usuario || "").includes(termo);
   });
 
+  const turnosAgrupados = agruparTurnos(turnos);
+
   const excluirSetorAtual = async () => {
     router.push("/adm/setores");
   };
@@ -305,7 +363,7 @@ export default function SetorEspecificoPage({ params }) {
 
           <div className="py-3 font-medium text-gray-900 text-xl">
             <div className="flex flex-col gap-1">
-              <p>Gestor Responsavel:
+              <p>Gestor:
                 {gestor ? (
                   <Link href={`/adm/usuarios/${gestor.id_usuario}`} className="hover:underline ml-2">
                     {gestor.nome}
@@ -317,10 +375,10 @@ export default function SetorEspecificoPage({ params }) {
               <div className="flex">
                 <p>Turnos:</p>
                 <ul className="list-disc list-inside ml-4">
-                  {turnos.length > 0 ? (
-                    turnos.map((t) => (
+                  {turnosAgrupados.length > 0 ? (
+                    turnosAgrupados.map((t) => (
                       <li key={t.id_turno}>
-                        {t.nome_turno} ({t.dia_semana}): {new Date(t.hora_inicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(t.hora_fim).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {t.nome_turno} ({t.dias.join(", ")}): {formatarHorario(t.hora_inicio)} - {formatarHorario(t.hora_fim)}
                       </li>
                     ))
                   ) : (
