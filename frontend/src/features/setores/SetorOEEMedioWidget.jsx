@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useSetorOEEPanel } from "./hooks/useSetorOEEPanel";
 
@@ -10,7 +11,18 @@ const oeeMetrics = [
 ];
 
 export function SetorOEEMedioWidget({ setorId }) {
-  const { data, loading, error } = useSetorOEEPanel(setorId);
+  const { data, loading, error } = useSetorOEEMedio(setorId);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const checkDark = () => setIsDark(document.documentElement.classList.contains("dark"));
+    checkDark();
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const fillColor = isDark ? "#7d95c6" : "#00357a";
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
   if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;

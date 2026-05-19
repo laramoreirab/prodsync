@@ -38,8 +38,17 @@ class AuthController {
                 })
             };
 
+            const idTrimmed = id.trim();
+            if (!/^[0-9]+$/.test(idTrimmed)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Identificador inválido',
+                    mensagem: 'O identificador deve ser um número válido.'
+                });
+            }
+
             //verificar se o usuário existe no banco de dados
-            const usuario = await UsuarioModel.verificarCredenciais(id.trim(), senha.trim());
+            const usuario = await UsuarioModel.verificarCredenciais(Number(idTrimmed), senha.trim());
             if (!usuario) {
                 return res.status(400).json({
                     sucesso: false,
