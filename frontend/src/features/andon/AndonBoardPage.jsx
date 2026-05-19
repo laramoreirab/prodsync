@@ -56,7 +56,9 @@ export function AndonBoardPage({ scope = "factory" }) {
       />
 
       <ContentGrid cols={2} className="mt-2">
+        <WidgetCard>
           <AndonStatusWidget scope={scope} title={content.statusTitle} />
+        </WidgetCard>
 
 
         <WidgetCard>
@@ -82,11 +84,11 @@ export function AndonBoardPage({ scope = "factory" }) {
         ? sections.map((section, index) => (
           <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
 
-          <AndonSectionMarquee
-            key={section.id}
-            reverse={scope === "factory" && index % 2 === 1}
-            section={section}
-          />
+            <AndonSectionMarquee
+              key={section.id}
+              reverse={scope === "factory" && index % 2 === 1}
+              section={section}
+            />
           </FadeUpItem>
         ))
         : null}

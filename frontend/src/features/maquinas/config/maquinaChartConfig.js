@@ -4,6 +4,7 @@ export const maquinaStatusConfig = {
   parada: { label: "Máquinas paradas:",    color: "#00357a" },
   setup:  { label: "Máquinas Setup:",       color:"#7d95c6" },
   manutencao:  { label: "Máquinas em manutenção:",       color: "#122f60" },
+  
 };
 
 // Quantidade de máquinas por setor (BarHorizontal)

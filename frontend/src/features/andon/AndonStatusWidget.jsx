@@ -1,25 +1,23 @@
 "use client";
 
+import { KPI } from "@/components/ui/charts/components";
 import { useAndonStatus } from "./hooks/useAndonStatus";
 
 const cards = [
   {
     key: "emProducao",
     label: "Em Produção",
-    background: "bg-green-50",
-    accent: "text-[#369948]",
+    accent: "#369948",
   },
   {
     key: "emSetup",
     label: "Em Setup",
-    background: "bg-yellow-50",
-    accent: "text-[#ffac1e]",
+    accent: "#ffac1e",
   },
   {
     key: "emParada",
     label: "Em Parada",
-    background: "bg-red-50",
-    accent: "text-[#b30000]"
+    accent: "#b30000",
   },
 ];
 
@@ -32,23 +30,24 @@ export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) 
   if (!data) return null;
 
   return (
-    <div className="space-y-4">
-      <p className="text-md font-semibold text-slate-950">{heading}</p>
-      <div className="grid gap-4 grid-cols-3 w-full max-w-2xl mx-auto">
-        {cards.map(({ key, label, background, accent}) => (
+    <div className="space-y-4 w-full h-full flex flex-col">
+      <p className="text-md font-semibold text-slate-950 flex-shrink-0">{heading}</p>
+      
+      <div className="grid gap-4 grid-cols-3 w-full flex-1">
+        {cards.map(({ key, label, accent }) => (
           <div
             key={key}
-            className={`flex aspect-square flex-col items-center rounded-xl ${background} p-4 text-center shadow-sm`}
+            className="flex w-full h-full flex-col rounded-xl bg-transparent border p-4 shadow-sm"
+            style={{ 
+              borderColor: accent, 
+              color: accent 
+            }}
           >
-            <span className={`text-lg font-semibold ${accent} leading-tight`}>
-              {label}
-            </span>
-
-            <div className="flex flex-1 items-center justify-center">
-              <span className={`text-4xl font-bold text-blacl`}>
-                {data[key]}
-              </span>
-            </div>
+            <KPI
+              title={label}
+              value={Number(data[key]) || 0}
+              type="number"
+            />
           </div>
         ))}
       </div>

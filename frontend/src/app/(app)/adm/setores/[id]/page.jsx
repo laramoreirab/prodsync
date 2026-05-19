@@ -400,7 +400,7 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Listagem de Máquinas ── */}
         <DetailListingSection
           id="listagem_maquinas"
-          title="Inventário de Máquinas do Setor"
+          title="Máquinas"
           action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
@@ -493,7 +493,7 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Listagem de Usuários ── */}
         <DetailListingSection
           id="listagem_usuarios"
-          title="Listagem de Usuários do Setor"
+          title="Usuários"
           action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">

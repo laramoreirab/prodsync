@@ -13,10 +13,22 @@ export const opCargaSetorConfig = {
 };
 
 export const opStatusConfig = {
-  emProducao:       { label: "Em Produção:",       color: "#00357a"  },
-  pausadasSetup:    { label: "Pausadas (Setup):",   color: "#212e4b"  },
-  atrasadas:        { label: "Atrasadas (Paradas):", color: "#7d95c6" },
-  aguardandoInicio: { label: "Aguardando Início:",  color: "#b0bfd8"  },
+  "Em Produção": { 
+    label: "Em Produção", 
+    color: "#00357a" 
+  },
+  "Pausadas (Setup)": { 
+    label: "Pausadas (Setup)", 
+    color: "#212e4b" 
+  },
+  "Atrasadas (Paradas)": { 
+    label: "Atrasadas (Paradas)", 
+    color: "#7d95c6" 
+  },
+  "Aguardando Início": { 
+    label: "Aguardando Início", 
+    color: "#b0bfd8" 
+  },
 };
 
 export const opConcluidasConfig = {

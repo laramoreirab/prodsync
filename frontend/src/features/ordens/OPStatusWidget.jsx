@@ -22,6 +22,7 @@ export function OPStatusWidget({ setorId = null }) {
       </header>
 
       <div className="mt-2">
+
         <CustomPieChart
           data={data}
           config={opStatusConfig}
