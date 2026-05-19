@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
 import { TempoParadoTempoProduzindoOperadorWidget } from "@/features/operador/TempoParadoTempoProduzindoOperadorWidget";
@@ -6,195 +6,350 @@ import { OEEOperadorWidget } from "@/features/operador/OEEOperadorWidget";
 import { PecasPorDiaWidget } from "@/features/operador/PecasPorDiaWidget";
 import { ProducaoPorHoraOperadorWidget } from "@/features/operador/ProducaoPorHoraOperadorWidget";
 import { EficienciaMaquinaWidget } from "@/features/operador/EficienciaMaquinaWidget";
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useCallback } from "react";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { EyeIcon, Pencil, Trash2, ChevronDown, Search } from "lucide-react";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { EyeIcon, Pencil, Trash2, ChevronDown, Search, Plus, BellRing, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
+import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
+import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
+import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 import { apiFetch } from "@/lib/api";
 
-const colunasUsuario = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-  { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
-  { id: 'data', key: 'data', label: 'Data (Início - Fim)', className: 'pl-10' },
+const colunasEventos = [
+  { id: "id", key: "id", label: "ID", className: "w-20 text-center justify-center" },
   {
-    id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
+    id: "tipo",
+    key: "tipoEvento",
+    label: "Tipo",
+    className: "text-center justify-center",
     icone: (valor) => {
+      const config = {
+        Setup: {
+          variant: "outline",
+          className:
+            "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100",
+        },
+        Parada: {
+          variant: "destructive",
+          className: "font-semibold text-sm border-none",
+        },
+      };
+      const estilo = config[valor] || { variant: "outline", className: "" };
       return (
-        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
           {valor}
         </Badge>
       );
-    }
+    },
   },
   {
-    id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
-    icone: (valor) => {
-      return (
-        <Badge variant="destructive" className="font-semibold text-sm border-none">
-          {valor}
-        </Badge>
-      );
-    }
+    id: "data",
+    key: "data",
+    label: "Data (Início - Fim)",
+    icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
   },
-  { id: 'observacao', key: 'observacao', label: 'Observação' },
+  {
+    id: "duracao",
+    key: "duracao",
+    label: "Duração",
+    icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
+  },
+  { id: "motivo", key: "motivo", label: "Motivo" },
+  { id: "observacao", key: "observacao", label: "Observação" },
 ];
 
+const colunasApontamento = [
+  { id: "id", key: "id", label: "ID", className: "w-20 text-center justify-center" },
+  { id: "op", key: "op", label: "OP Afetada", className: "w-30 text-center justify-center pl-5" },
+  {
+    id: "data",
+    key: "data",
+    label: "Data (Início - Fim)",
+    className: "pl-10",
+    icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
+  },
+  {
+    id: "produzido",
+    key: "produzido",
+    label: "Produzido",
+    className: "text-center justify-center",
+    icone: (valor) => (
+      <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+        {valor}
+      </Badge>
+    ),
+  },
+  {
+    id: "refugo",
+    key: "refugo",
+    label: "Refugo",
+    className: "text-center justify-center",
+    icone: (valor) => (
+      <Badge variant="destructive" className="font-semibold text-sm border-none">
+        {valor}
+      </Badge>
+    ),
+  },
+  { id: "observacao", key: "observacao", label: "Observação" },
+];
 
-export default function ProducaoOperadorPage({ params }) {
+const formatarPeriodo = (inicio, fim) => {
+  if (!inicio) return "-";
+  const ini = new Date(inicio);
+  const textoIni = `${ini.toLocaleDateString("pt-BR")} (${ini.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+  if (!fim) return `${textoIni})`;
+  const end = new Date(fim);
+  return `${textoIni} - ${end.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })})`;
+};
+
+const formatarDuracao = (minutos) => {
+  const total = Number(minutos) || 0;
+  const horas = Math.floor(total / 60);
+  const mins = Math.round(total % 60);
+  return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+};
+
+export default function UsuarioDetalhePage({ params }) {
   const { id } = use(params);
   const operadorId = Number(id);
+
   const [usuario, setUsuario] = useState(null);
+  const [carregando, setCarregando] = useState(true);
+
+  const [dadosEventos, setDadosEventos] = useState([]);
+  const [todosEventos, setTodosEventos] = useState([]);
+  const [buscaEvento, setBuscaEvento] = useState("");
+
   const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
+  const [todosApontamentos, setTodosApontamentos] = useState([]);
   const [buscaApontamento, setBuscaApontamento] = useState("");
 
-  const dadosOriginais = [
-    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta' },
-    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva' },
-    { id: 3, op: '5678', data: '13/09 (10:15 - 10:35)', duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-    { id: 4, op: '9012', data: '30/09 (11:00 - 12:00)', duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-    { id: 5, op: '1223', data: '28/03 (12:00 - 14:00)', duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
-    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
-    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
-    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
-  ];
+  const parseData = (dataStr) => {
+    if (!dataStr) return new Date(0);
+    if (dataStr instanceof Date) return dataStr;
+    const [dataParte] = String(dataStr).split(" ");
+    const [dia, mes] = dataParte.split("/");
+    return new Date(`2025-${mes}-${dia}`);
+  };
 
-  useEffect(() => {
-    setDadosApontamentoState(dadosOriginais);
-  }, []);
-
-  useEffect(() => {
-    async function carregarUsuario() {
-      const [usuarioDados, apontamentosResp] = await Promise.all([
+  const carregarDados = useCallback(async () => {
+    setCarregando(true);
+    try {
+      const [usuarioDados, historicoResp, apontamentosResp] = await Promise.all([
         usuariosCrudService.getById(operadorId),
+        apiFetch(`/api/usuarios/${operadorId}/historico-eventos`, { method: "GET" }),
         apiFetch(`/api/usuarios/${operadorId}/apontamentos`, { method: "GET" }),
       ]);
 
       setUsuario(usuarioDados);
-      setDadosApontamentoState(apontamentosResp.dados || []);
-    }
 
-    carregarUsuario().catch((error) => console.error("Erro ao carregar usuÃ¡rio:", error));
+      const eventos = (historicoResp.dados || []).map((item) => ({
+        ...item,
+        tipoEvento: item.tipo,
+        data: formatarPeriodo(item.inicio, item.fim),
+        duracao: formatarDuracao(item.duracao_minutos),
+        motivo: item.motivo || "-",
+        observacao: item.observacao || "-",
+      }));
+
+      const apontamentos = (apontamentosResp.dados || []).map((item) => ({
+        ...item,
+        data: item.inicio ? formatarPeriodo(item.inicio, item.fim) : item.data,
+      }));
+
+      setTodosEventos(eventos);
+      setDadosEventos(eventos);
+      setTodosApontamentos(apontamentos);
+      setDadosApontamentoState(apontamentos);
+    } catch (error) {
+      console.error("Erro ao carregar usuário:", error);
+    } finally {
+      setCarregando(false);
+    }
   }, [operadorId]);
 
-  const opcoesOrdenacaoApontamento = [
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'OP Afetada Crescente', value: 'opAfetada_asc' },
-    { label: 'OP Afetada Decrescente', value: 'opAfetada_desc' },
-    { label: 'Produzido Crescente', value: 'produzido_asc' },
-    { label: 'Produzido Decrescente', value: 'produzido_desc' },
-    { label: 'Refugo Crescente', value: 'refugo_asc' },
-    { label: 'Refugo Decrescente', value: 'refugo_desc' }
+  useEffect(() => {
+    if (operadorId) carregarDados();
+  }, [operadorId, carregarDados]);
+
+  const opcoesOrdenacaoEventos = [
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "Data Crescente", value: "data_asc" },
+    { label: "Data Decrescente", value: "data_desc" },
+    { label: "Duração Crescente", value: "duracao_asc" },
+    { label: "Duração Decrescente", value: "duracao_desc" },
   ];
 
-  //lógica de ordenação de Apontamentos
-  const handleSortApontamento = (criterio) => {
-    const dadosCopiados = [...dadosApontamentoState];
-
+  const handleSortEventos = (criterio) => {
+    const dadosCopiados = [...dadosEventos];
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
-
-      if (criterio === 'opAfetada_asc') return Number(a.op) - Number(b.op);
-      if (criterio === 'opAfetada_desc') return Number(b.op) - Number(a.op);
-
-      if (criterio === 'produzido_asc') return a.produzido - b.produzido;
-      if (criterio === 'produzido_desc') return b.produzido - a.produzido;
-
-      if (criterio === 'refugo_asc') return a.refugo - b.refugo;
-      if (criterio === 'refugo_desc') return b.refugo - a.refugo;
-
+      if (criterio === "id_asc") return a.id - b.id;
+      if (criterio === "id_desc") return b.id - a.id;
+      if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === "duracao_asc") {
+        const [hA, mA] = a.duracao.split(":").map(Number);
+        const [hB, mB] = b.duracao.split(":").map(Number);
+        return hA * 60 + mA - (hB * 60 + mB);
+      }
+      if (criterio === "duracao_desc") {
+        const [hA, mA] = a.duracao.split(":").map(Number);
+        const [hB, mB] = b.duracao.split(":").map(Number);
+        return hB * 60 + mB - (hA * 60 + mA);
+      }
       return 0;
     });
+    setDadosEventos(dadosCopiados);
+  };
 
+  const eventosFilter = [
+    { id: "tipoEvento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+    { id: "data", label: "Data", type: "date-range" },
+  ];
+
+  const aplicarFiltrosEventos = (filtrosSelecionados) => {
+    let dadosFiltrados = [...todosEventos];
+    if (filtrosSelecionados.tipoEvento?.length) {
+      dadosFiltrados = dadosFiltrados.filter((evento) =>
+        filtrosSelecionados.tipoEvento.includes(evento.tipoEvento)
+      );
+    }
+    if (filtrosSelecionados.data?.start) {
+      dadosFiltrados = dadosFiltrados.filter(
+        (evento) => new Date(evento.inicio) >= new Date(filtrosSelecionados.data.start)
+      );
+    }
+    if (filtrosSelecionados.data?.end) {
+      dadosFiltrados = dadosFiltrados.filter(
+        (evento) => new Date(evento.inicio) <= new Date(filtrosSelecionados.data.end)
+      );
+    }
+    setDadosEventos(dadosFiltrados);
+  };
+
+  const dadosEventosExibidos = dadosEventos.filter((evento) => {
+    const termo = buscaEvento.toLowerCase();
+    return (
+      (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
+      (evento.motivo?.toLowerCase() || "").includes(termo) ||
+      String(evento.id).includes(termo)
+    );
+  });
+
+  const opcoesOrdenacaoApontamento = [
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "OP Afetada Crescente", value: "opAfetada_asc" },
+    { label: "OP Afetada Decrescente", value: "opAfetada_desc" },
+    { label: "Produzido Crescente", value: "produzido_asc" },
+    { label: "Produzido Decrescente", value: "produzido_desc" },
+    { label: "Refugo Crescente", value: "refugo_asc" },
+    { label: "Refugo Decrescente", value: "refugo_desc" },
+  ];
+
+  const handleSortApontamento = (criterio) => {
+    const dadosCopiados = [...dadosApontamentoState];
+    dadosCopiados.sort((a, b) => {
+      if (criterio === "id_asc") return a.id - b.id;
+      if (criterio === "id_desc") return b.id - a.id;
+      if (criterio === "opAfetada_asc") return String(a.op).localeCompare(String(b.op));
+      if (criterio === "opAfetada_desc") return String(b.op).localeCompare(String(a.op));
+      if (criterio === "produzido_asc") return Number(a.produzido) - Number(b.produzido);
+      if (criterio === "produzido_desc") return Number(b.produzido) - Number(a.produzido);
+      if (criterio === "refugo_asc") return Number(a.refugo) - Number(b.refugo);
+      if (criterio === "refugo_desc") return Number(b.refugo) - Number(a.refugo);
+      return 0;
+    });
     setDadosApontamentoState(dadosCopiados);
   };
 
-
-  //filtros para apontamentos
   const apontamentoFilter = [
     { id: "data", label: "Data", type: "date-range" },
     { id: "produzido", label: "Produzido", type: "number-range" },
-    { id: "refugo", label: "Refugo", type: "number-range" }
+    { id: "refugo", label: "Refugo", type: "number-range" },
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosOriginais];
+    let dadosFiltrados = [...todosApontamentos];
 
-    if (filtrosSelecionados.produzido) {
-      if (filtrosSelecionados.produzido.min != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.produzido) >= filtrosSelecionados.produzido.min
-        );
-      }
-
-      if (filtrosSelecionados.produzido.max != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.produzido) <= filtrosSelecionados.produzido.max
-        );
-      }
+    if (filtrosSelecionados.produzido?.min != null) {
+      dadosFiltrados = dadosFiltrados.filter((a) => Number(a.produzido) >= filtrosSelecionados.produzido.min);
     }
-
-    if (filtrosSelecionados.refugo) {
-      if (filtrosSelecionados.refugo.min != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.refugo) >= filtrosSelecionados.refugo.min
-        );
-      }
-
-      if (filtrosSelecionados.refugo.max != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.refugo) <= filtrosSelecionados.refugo.max
-        );
-      }
+    if (filtrosSelecionados.produzido?.max != null) {
+      dadosFiltrados = dadosFiltrados.filter((a) => Number(a.produzido) <= filtrosSelecionados.produzido.max);
+    }
+    if (filtrosSelecionados.refugo?.min != null) {
+      dadosFiltrados = dadosFiltrados.filter((a) => Number(a.refugo) >= filtrosSelecionados.refugo.min);
+    }
+    if (filtrosSelecionados.refugo?.max != null) {
+      dadosFiltrados = dadosFiltrados.filter((a) => Number(a.refugo) <= filtrosSelecionados.refugo.max);
+    }
+    if (filtrosSelecionados.data?.start) {
+      dadosFiltrados = dadosFiltrados.filter(
+        (a) => new Date(a.inicio || parseData(a.data)) >= new Date(filtrosSelecionados.data.start)
+      );
+    }
+    if (filtrosSelecionados.data?.end) {
+      dadosFiltrados = dadosFiltrados.filter(
+        (a) => new Date(a.inicio || parseData(a.data)) <= new Date(filtrosSelecionados.data.end)
+      );
     }
 
     setDadosApontamentoState(dadosFiltrados);
   };
 
-  //filtra os dados atuais de APONTAMENTOS (filtrados e ordenados) pelo termo de busca
   const dadosApontamentosFiltrados = dadosApontamentoState.filter((a) => {
     const termo = buscaApontamento.toLowerCase();
-
-    return (
-      String(a.op).toLowerCase().includes(termo) ||
-      String(a.id).includes(termo)
-    );
+    return String(a.op).toLowerCase().includes(termo) || String(a.id).includes(termo);
   });
+
+  if (carregando) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col items-center justify-center p-20">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-900 mb-4" />
+        <p className="text-lg text-gray-600 font-medium">Carregando usuário...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-4">
-
         <Link className="flex items-center" href="/adm/usuarios">
           <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Usuários </p>
+          <p className="text-xl font-semibold text-gray-800">Voltar para Usuários</p>
         </Link>
 
         <section id="infos_user" className="flex flex-col">
           <div className="flex justify-between items-start">
             <div className="flex">
               <Image
-                src={usuario?.imagem_perfil ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}` : "/userdefault.svg"}
-                alt="Demo Maquina"
+                src={
+                  usuario?.imagem_perfil
+                    ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
+                    : "/userdefault.svg"
+                }
+                alt={usuario?.nome || "Usuário"}
                 className="rounded-xl"
                 width={250}
                 height={250}
               />
-
               <div className="flex flex-col ml-5">
                 <h1 className="text-3xl font-bold text-black">Nome: {usuario?.nome || "-"}</h1>
                 <div className="flex gap-10">
-
                   <div className="flex flex-col gap-5 mt-2">
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">ID:</p>
@@ -209,11 +364,12 @@ export default function ProducaoOperadorPage({ params }) {
                       <p className="text-xl font-medium text-black">{usuario?.cpf || "-"}</p>
                     </div>
                   </div>
-
                   <div className="flex flex-col gap-5 mt-2">
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">Setor:</p>
-                      <p className="text-xl font-medium text-black">{usuario?.setor?.nome_setor || "-"}</p>
+                      <p className="text-xl font-medium text-black">
+                        {usuario?.setor?.nome_setor || "-"}
+                      </p>
                     </div>
                     <div className="flex items-center">
                       <p className="text-xl font-semibold text-black mr-2">Função:</p>
@@ -234,13 +390,12 @@ export default function ProducaoOperadorPage({ params }) {
                   <Pencil size={36} className="mr-1" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormEdicaoUsuario usuarioId={operadorId} />
+                  <FormEdicaoUsuario usuarioId={operadorId} onEdicaoSucesso={carregarDados} />
                 </DialogContent>
               </Dialog>
-
               <Dialog>
                 <DialogTrigger className="text-[#b30000] cursor-pointer">
-                  <Trash2 className=" w-9 h-9" />
+                  <Trash2 className="w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>
                   <FormExclusaoUsuario usuarioId={operadorId} />
@@ -248,49 +403,41 @@ export default function ProducaoOperadorPage({ params }) {
               </Dialog>
             </div>
           </div>
-
         </section>
 
-        <section id="maquina_responsavel" className="mt-5">
-          <h1 className="font-bold text-3xl">Responsável por:</h1>
-          <Link href={usuario?.maquina?.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"} >
-            <div className="bg-white w-full shadow-md border rounded-lg flex justify-between items-start p-8 mt-6">
-              <div className="flex">
-                <Image src="/demo_maq.png" alt="Demo Maquina" className="rounded-lg" width={200} height={150} />
-                <div className="ml-8 flex flex-col gap-2">
-                  <h1 className="text-3xl font-bold text-[#212e4b] uppercase">{usuario?.maquina?.nome || "-"}</h1>
-                  <div className="flex items-center">
-                    <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                    <p className="text-xl font-medium text-black">{usuario?.maquina?.id_maquina || "-"}</p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-xl font-semibold text-black mr-2">Série:</p>
-                    <p className="text-xl font-medium text-black">{usuario?.maquina?.serie || "-"}</p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-xl font-semibold text-black mr-2">Data de Aquisição:</p>
-                    <p className="text-xl font-medium text-black">{usuario?.maquina?.data_aquisicao ? new Date(usuario.maquina.data_aquisicao).toLocaleDateString("pt-BR") : "-"}</p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
-                    <p className="text-xl font-medium text-black">40 peças/h</p>
+        {usuario?.maquina && (
+          <section id="maquina_responsavel" className="mt-5">
+            <h1 className="font-bold text-3xl">Responsável por:</h1>
+            <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
+              <div className="bg-white w-full shadow-md border rounded-lg flex justify-between items-start p-8 mt-6">
+                <div className="flex">
+                  <Image src="/demo_maq.png" alt="Máquina" className="rounded-lg" width={200} height={150} />
+                  <div className="ml-8 flex flex-col gap-2">
+                    <h1 className="text-3xl font-bold text-[#212e4b] uppercase">{usuario.maquina.nome || "-"}</h1>
+                    <div className="flex items-center">
+                      <p className="text-xl font-semibold text-black mr-2">ID:</p>
+                      <p className="text-xl font-medium text-black">{usuario.maquina.id_maquina || "-"}</p>
+                    </div>
+                    <div className="flex items-center">
+                      <p className="text-xl font-semibold text-black mr-2">Série:</p>
+                      <p className="text-xl font-medium text-black">{usuario.maquina.serie || "-"}</p>
+                    </div>
+                    <div className="flex items-center">
+                      <p className="text-xl font-semibold text-black mr-2">Status:</p>
+                      <p className="text-xl font-medium text-black">{usuario.maquina.status_atual || "-"}</p>
+                    </div>
                   </div>
                 </div>
               </div>
+            </Link>
+          </section>
+        )}
 
-              <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">{usuario?.maquina?.status_atual || "-"}</p>
-            </div>
-          </Link>
-        </section>
-
-
-        {/* Gráficos */}
         <h1 className="font-bold text-3xl mt-8">Produção</h1>
-        <div className="flex flex-col gap-4 ">
+        <div className="flex flex-col gap-4">
           <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
             <OEEOperadorWidget operadorId={operadorId} />
           </section>
-
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white border rounded-xl p-4 shadow-sm">
               <PecasPorDiaWidget operadorId={operadorId} />
@@ -302,7 +449,6 @@ export default function ProducaoOperadorPage({ params }) {
               <MetaProducaoWidget operadorId={operadorId} />
             </div>
           </section>
-
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white border rounded-xl p-4 shadow-sm">
               <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
@@ -313,59 +459,147 @@ export default function ProducaoOperadorPage({ params }) {
           </section>
         </div>
 
-        {/* Listagem */}
-        <div className="flex items-center gap-5">
-          <h1 className="text-4xl font-bold">Histórico de Apontamentos Feitos pelo Usuário</h1>
-          {/* Busca */}
+        {/* Histórico de Eventos */}
+        <section id="listagem_eventos">
+          <div className="flex items-center justify-between gap-5 mt-8 mb-4">
+            <h1 className="text-4xl font-semibold">Histórico de Eventos do Usuário</h1>
+            <Dialog>
+              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
+                <Plus size={28} className="text-white cursor-pointer" />
+                Cadastrar
+              </DialogTrigger>
+              <DialogContent>
+                <FormCadastroEvento onCadastroSucesso={carregarDados} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
           <div className="flex searchbar">
-            <div className="flex searchid   items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
               <input
                 type="search"
                 className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
+                placeholder="Busque por id, tipo ou motivo..."
+                value={buscaEvento}
+                onChange={(e) => setBuscaEvento(e.target.value)}
+              />
+              <button type="button" className="outline-none cursor-pointer mr-2">
+                <Search />
+              </button>
+            </div>
+          </div>
+
+          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
+            <p>{dadosEventosExibidos.length} eventos encontrados</p>
+            <div className="flex items-center gap-4 mb-3">
+              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+              <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+            </div>
+          </div>
+
+          {dadosEventosExibidos.length > 0 ? (
+            <TableListagens
+              data={dadosEventosExibidos}
+              columns={colunasEventos}
+              acoesDropdown={(evento) => (
+                <>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={evento.id} />
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <BellRing className="mr-2 h-4 w-4" />
+                        Solicitar Justificativa
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <ModalSucessNotificacao />
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar Evento
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+              <Search className="w-12 h-12 mb-4 text-gray-300" />
+              <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
+              <p>Não há eventos vinculados à máquina deste usuário ou nenhum resultado para a busca.</p>
+            </div>
+          )}
+        </section>
+
+        {/* Histórico de Apontamentos */}
+        <section id="listagem_apontamentos" className="mt-10">
+          <h1 className="text-4xl font-semibold mb-4">Histórico de Apontamentos do Usuário</h1>
+
+          <div className="flex searchbar">
+            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
+              <input
+                type="search"
+                className="p-2 w-full outline-none bg-transparent"
+                placeholder="Busque por OP ou id..."
                 value={buscaApontamento}
                 onChange={(e) => setBuscaApontamento(e.target.value)}
               />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
+              <button type="button" className="outline-none cursor-pointer mr-2">
+                <Search />
+              </button>
             </div>
           </div>
 
           <div className="row_ord_fil_cont flex items-center justify-between mt-3">
             <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-
             <div className="flex items-center gap-4 mb-3">
               <OrdenarDropdown
                 label="Ordenar por"
                 options={opcoesOrdenacaoApontamento}
                 onSortChange={handleSortApontamento}
               />
-
-              <FilterDropdown
-                filtersConfig={apontamentoFilter}
-                onApply={aplicarFiltrosApontamento}
-              />
+              <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
             </div>
           </div>
-          <section>
-            <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-              data={dadosApontamentosFiltrados}
-              columns={colunasUsuario}
-              acoesDropdown={(usuario) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/ordensDeProducao/${usuario.op}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver OP relacionada
-                    </Link>
 
-                  </DropdownMenuItem>
-                </>
+          {dadosApontamentosFiltrados.length > 0 ? (
+            <TableListagens
+              data={dadosApontamentosFiltrados}
+              columns={colunasApontamento}
+              acoesDropdown={(apontamento) => (
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver OP relacionada
+                  </Link>
+                </DropdownMenuItem>
               )}
             />
-          </section>
-        </div>
-
+          ) : (
+            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+              <Search className="w-12 h-12 mb-4 text-gray-300" />
+              <h2 className="text-xl font-semibold">Nenhum apontamento encontrado</h2>
+              <p>Não encontramos apontamentos para este usuário.</p>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );

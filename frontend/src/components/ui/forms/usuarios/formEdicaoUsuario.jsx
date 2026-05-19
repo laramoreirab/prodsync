@@ -76,10 +76,10 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                     nome: dados.nome || '',
                     cpf: dados.cpf || '',
                     email: dados.email || '',
-                    id_setor: dados.id_setor || '',
+                    id_setor: dados.id_setor != null ? String(dados.id_setor) : '',
                     funcao: dados.funcao || '',
-                    id_turno: dados.id_turno || '',
-                    id_maquina: dados.id_maquina || '',
+                    id_turno: dados.id_turno != null ? String(dados.id_turno) : '',
+                    id_maquina: dados.id_maquina != null ? String(dados.id_maquina) : '',
                 });
 
                 // Se o usuário já tiver uma imagem no banco, você pode configurar o preview aqui
@@ -152,6 +152,10 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
     useEffect(() => {
         async function carregarTurnos() {
+            if (!formData.id_setor) {
+                setListaTurnos([]);
+                return;
+            }
             try {
                 const options = { method: "GET" }
                 const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
@@ -168,13 +172,18 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
     useEffect(() => {
         async function carregarMaquinas() {
+            const idSetor = formData.id_setor;
+            if (!idSetor) {
+                setListaMaquinas([]);
+                return;
+            }
             try {
                 const options = { method: "GET" }
-                const dados = await apiFetch(`/api/maquinas/setor/${formData.id_setor}`, options)
+                const dados = await apiFetch(`/api/maquinas/setor/${idSetor}`, options)
                 setListaMaquinas(dados.dados);
             } catch (error) {
                 console.log(error)
-                toast.error("Erro ao carregar setores.");
+                toast.error("Erro ao carregar máquinas.");
             }
 
         }

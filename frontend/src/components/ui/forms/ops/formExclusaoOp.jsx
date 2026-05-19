@@ -23,11 +23,11 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
             }
 
             await Promise.all(ids.map((id) => opCrudService.delete(id, idMaquina)));
-            toast.success(ids.length === 1 ? "Ordem de Producao excluida com sucesso!" : "Ordens de Producao excluidas com sucesso!");
+            toast.success(ids.length === 1 ? "Ordem de produção excluída com sucesso!" : "Ordens de produção excluídas com sucesso!");
             if (onExclusaoSucesso) onExclusaoSucesso();
         } catch (error) {
             console.error("Erro ao excluir OP:", error);
-            toast.error("Erro ao excluir Ordem de Producao.");
+            toast.error("Erro ao excluir ordem de produção.");
         } finally {
             setCarregando(false);
         }

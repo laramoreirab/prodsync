@@ -265,7 +265,7 @@ export default function Usuarios() {
                   <>
                     {/* link*/}
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`usuarios/${user.id}`}>
+                      <Link href={user.funcao === "Gestor" ? `/adm/usuarios/gestor/${user.id}` : `/adm/usuarios/${user.id}`}>
                         <EyeIcon className="mr-2 h-10 w-10" />
                         Ver Detalhes
                       </Link>

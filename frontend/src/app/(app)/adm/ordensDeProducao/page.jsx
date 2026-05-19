@@ -271,7 +271,7 @@ export default function OrdensDeProducao() {
             acoesDropdown={(op) => (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`ordensDeProducao/${op.id}`}>
+                      <Link href={`/adm/ordensDeProducao/${op.id}`}>
                     <EyeIcon className="mr-2 h-4 w-4" />
                     Ver Detalhes
                   </Link>

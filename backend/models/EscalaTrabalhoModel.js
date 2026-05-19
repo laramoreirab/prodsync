@@ -285,10 +285,57 @@ class EscalaTrabalhoModel {
                 Number(dadosValidos.id_maquina);
         }
 
+        const idOperador = Number(id_operador);
+        const idEmpresa = Number(id_empresa);
+
+        const existente = await prisma.escalaTrabalho.findFirst({
+            where: { id_operador: idOperador, id_empresa: idEmpresa }
+        });
+
+        if (!existente) {
+            const idSetor = dadosValidos.id_setor;
+            const idTurno = dadosValidos.id_turno;
+            if (!idSetor || !idTurno) {
+                return { count: 0 };
+            }
+            return await prisma.escalaTrabalho.create({
+                data: {
+                    id_operador: idOperador,
+                    id_empresa: idEmpresa,
+                    id_setor: idSetor,
+                    id_turno: idTurno,
+                    id_maquina: dadosValidos.id_maquina ?? null
+                }
+            });
+        }
+
+        const novoTurno = dadosValidos.id_turno ?? existente.id_turno;
+        if (novoTurno !== existente.id_turno) {
+            await prisma.escalaTrabalho.delete({
+                where: {
+                    id_operador_id_turno: {
+                        id_operador: existente.id_operador,
+                        id_turno: existente.id_turno
+                    }
+                }
+            });
+            return await prisma.escalaTrabalho.create({
+                data: {
+                    id_operador: idOperador,
+                    id_empresa: idEmpresa,
+                    id_setor: dadosValidos.id_setor ?? existente.id_setor,
+                    id_turno: novoTurno,
+                    id_maquina: dadosValidos.id_maquina !== undefined
+                        ? dadosValidos.id_maquina
+                        : existente.id_maquina
+                }
+            });
+        }
+
         return await prisma.escalaTrabalho.updateMany({
             where: {
-                id_operador: Number(id_operador),
-                id_empresa: Number(id_empresa)
+                id_operador: idOperador,
+                id_empresa: idEmpresa
             },
             data: dadosValidos
         });

@@ -183,6 +183,7 @@ export default function MaquinaDetalhePage({ params }) {
           .map((item) => ({
             ...item,
             op: item.ordem_producao?.codigo_lote || item.ordem_producao?.id_ordem || "-",
+            id_ordem: item.ordem_producao?.id_ordem ?? null,
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
@@ -696,7 +697,7 @@ export default function MaquinaDetalhePage({ params }) {
                   acoesDropdown={(apontamento) => (
                     <>
                       <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link href={`/adm/ordemDeProducao/${apontamento.op}`}>
+                        <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
                           <EyeIcon className="mr-2 h-4 w-4" />
                           Ver OP relacionada
                         </Link>

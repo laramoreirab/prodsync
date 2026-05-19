@@ -24,6 +24,8 @@ router.get('/dashboard/concluidas-dia', aplicarEscopoGestor, OrdemProducaoContro
 
 router.get('/', aplicarEscopoGestor, paginacaoMiddleware, OrdemProducaoController.listarTodos);
 router.post('/', validarBodySetorGestor('id_setor'), OrdemProducaoController.criar);
+router.get('/:id_ordem/historico-eventos', autorizarOrdemParam('id_ordem'), OrdemProducaoController.listarHistoricoEventos);
+router.get('/:id_ordem/apontamentos', autorizarOrdemParam('id_ordem'), OrdemProducaoController.listarApontamentos);
 router.get('/:id_ordem', autorizarOrdemParam('id_ordem'), OrdemProducaoController.buscarPorId);
 router.put('/:id_ordem', autorizarOrdemParam('id_ordem'), validarBodySetorGestor('id_setor'), OrdemProducaoController.atualizar);
 router.delete('/:id_ordem', autorizarOrdemParam('id_ordem'), OrdemProducaoController.deletar);

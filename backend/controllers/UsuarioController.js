@@ -93,7 +93,7 @@ class UsuarioController {
                 })
             };
 
-            // Busca também os dados de escala (setor, turno, máquina)
+            // Busca também os dados de escala (setor, turno, máquina) ou setor do gestor
             const escala = await prisma.escalaTrabalho.findFirst({
                 where: { id_operador: id_usuario, id_empresa },
                 select: {
@@ -103,14 +103,30 @@ class UsuarioController {
                 }
             });
 
+            let id_setor = escala?.id_setor ?? null;
+            let id_turno = escala?.id_turno ?? null;
+            let id_maquina = escala?.id_maquina ?? null;
+
+            if (usuario.tipo === 'Gestor') {
+                const gestorSetor = await prisma.setor_Gestor.findFirst({
+                    where: { id_gestor: id_usuario, id_empresa },
+                    select: { id_setor: true }
+                });
+                if (gestorSetor) {
+                    id_setor = gestorSetor.id_setor;
+                    id_turno = null;
+                    id_maquina = null;
+                }
+            }
+
             return res.status(200).json({
                 sucesso: true,
                 dados: {
                     ...usuario,
                     funcao: usuario.tipo,
-                    id_setor: escala?.id_setor ?? null,
-                    id_turno: escala?.id_turno ?? null,
-                    id_maquina: escala?.id_maquina ?? null
+                    id_setor,
+                    id_turno,
+                    id_maquina
                 }
             });
 
@@ -520,13 +536,39 @@ static async atualizarUsuario(req, res) {
             const id_empresa = req.user.id_empresa;
 
             if (!id_usuario || isNaN(id_usuario)) {
-                return res.status(400).json({ sucesso: false, erro: 'ID de usuÃ¡rio invÃ¡lido' });
+                return res.status(400).json({ sucesso: false, erro: 'ID de usuário inválido' });
             }
 
             const dados = await UsuarioModel.listarApontamentosUsuario(id_empresa, id_usuario);
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
-            console.error('Erro ao listar apontamentos do usuÃ¡rio:', error);
+            console.error('Erro ao listar apontamentos do usuário:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
+        }
+    }
+
+    static async listarHistoricoEventosUsuario(req, res) {
+        try {
+            const id_usuario = Number(req.params.id);
+            const id_empresa = req.user.id_empresa;
+            const limite = parseInt(req.query.limite) || 50;
+
+            if (!id_usuario || isNaN(id_usuario)) {
+                return res.status(400).json({ sucesso: false, erro: 'ID de usuário inválido' });
+            }
+
+            if (limite <= 0 || limite > 200) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Limite inválido',
+                    mensagem: 'O limite deve ser um número entre 1 e 200'
+                });
+            }
+
+            const dados = await UsuarioModel.listarHistoricoEventosUsuario(id_empresa, id_usuario, limite);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar histórico de eventos do usuário:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
         }
     }
