@@ -8,7 +8,7 @@
     <!-- Container que corta o progresso pela metade -->
     <FrameLayout
         android:layout_width="100dp"
-        android:layout_height="55dp"
+        android:layout_height="50dp"
         android:clipChildren="true">
 
         <ProgressBar
@@ -17,8 +17,8 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:max="200"
+            android:padding="0dp"
             android:progress="85"
-            android:rotation="180"
             android:progressDrawable="@drawable/gauge_progress_base" />
 
         <TextView
@@ -30,7 +30,7 @@
             android:text="85%"
             android:textSize="20sp"
             android:fontFamily="@font/montserrat_bold"
-            android:textColor="#212e4b"/>
+            android:textColor="@color/machine_title"/>
 
     </FrameLayout>
 
@@ -43,6 +43,6 @@
         android:fontFamily="@font/montserrat_semibold"
         android:layout_marginTop="4dp"
         android:gravity="center"
-        android:textColor="#212e4b"/>
+        android:textColor="@color/machine_title"/>
 
 </LinearLayout>

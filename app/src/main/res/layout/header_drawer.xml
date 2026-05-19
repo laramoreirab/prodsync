@@ -11,7 +11,7 @@
         android:layout_width="104dp"
         android:layout_height="104dp"
         android:src="@drawable/s_logo"
-        android:tint="@color/white"
+        android:tint="#FFFFFF"
     />
 
 </LinearLayout>

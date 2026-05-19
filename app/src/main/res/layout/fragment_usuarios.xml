@@ -4,23 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="#FAFAFA">
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="24dp">
-
-        <!-- Imagem Decorativa (Plano de Fundo) -->
-        <ImageView
-            android:id="@+id/iv_bg_pattern"
-            android:layout_width="306dp"
-            android:layout_height="364dp"
-            android:src="@drawable/bg_s_logo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/tv_titulo"
@@ -90,7 +79,7 @@
             android:layout_marginTop="24dp"
             android:text="Setor Roscas"
             android:textSize="22sp"
-            android:fontFamily="@font/montserrat_bold"
+            android:textStyle="bold"
             android:textColor="@color/black"
             app:layout_constraintTop_toBottomOf="@id/search_container"
             app:layout_constraintStart_toStartOf="parent" />
@@ -111,14 +100,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:visibility="gone"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="80dp"
             app:layout_constraintTop_toBottomOf="@id/search_container"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/ic_search"
                 app:tint="@color/cinza_claro" />
 
@@ -126,8 +115,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nenhum usuário encontrado"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:textSize="20sp"
+                android:fontFamily="@font/montserrat_bold"
                 android:textColor="@color/cinza"
                 android:layout_marginTop="16dp" />
         </LinearLayout>

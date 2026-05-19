@@ -73,7 +73,7 @@
         android:background="@color/azul_marinho"
         app:headerLayout="@layout/header_drawer"
         app:menu="@menu/menu_drawer"
-        app:itemTextColor="@color/white"
-        app:itemIconTint="@color/white"/>
+        app:itemTextColor="#FFFFFF"
+        app:itemIconTint="#FFFFFF"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

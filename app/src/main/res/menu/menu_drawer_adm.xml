@@ -14,6 +14,6 @@
         android:icon="@drawable/ic_users" />
     <item
         android:id="@+id/nav_perfil"
-        android:title="Perfil"
+        android:title="Configurações"
         android:icon="@drawable/ic_account" />
 </menu>

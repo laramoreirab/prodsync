@@ -15,7 +15,7 @@
         android:padding="12dp">
 
         <ImageView
-            android:id="@+id/iv_maquina"
+            android:id="@+id/iv_op_maquina"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/ic_ferramenta"
@@ -25,53 +25,50 @@
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <TextView
-            android:id="@+id/tv_nome_maquina"
+            android:id="@+id/tv_id_op"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="THAK-009"
+            android:text="OP #444555"
             android:textColor="@color/machine_title"
             android:textSize="20sp"
             android:fontFamily="@font/montserrat_bold"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_maquina"
+            app:layout_constraintStart_toEndOf="@id/iv_op_maquina"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/tv_id_maquina"
+            android:id="@+id/tv_maquina_op"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Id: 1092"
+            android:text="Máquina: THAK-009"
             android:textColor="@color/machine_sub"
             android:textSize="16sp"
             android:fontFamily="@font/montserrat_medium"
-            app:layout_constraintTop_toBottomOf="@id/tv_nome_maquina"
-            app:layout_constraintStart_toStartOf="@id/tv_nome_maquina" />
+            app:layout_constraintTop_toBottomOf="@id/tv_id_op"
+            app:layout_constraintStart_toStartOf="@id/tv_id_op" />
 
         <TextView
-            android:id="@+id/tv_serie_maquina"
+            android:id="@+id/tv_prioridade_op"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Série: SX-900"
+            android:text="Prioridade: Crítica"
             android:textColor="@color/machine_sub"
-            android:fontFamily="@font/montserrat_medium"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/tv_id_maquina"
-            app:layout_constraintStart_toStartOf="@id/tv_id_maquina" />
+            android:fontFamily="@font/montserrat_medium"
+            app:layout_constraintTop_toBottomOf="@id/tv_maquina_op"
+            app:layout_constraintStart_toStartOf="@id/tv_maquina_op" />
 
         <TextView
-            android:id="@+id/tv_status_badge"
+            android:id="@+id/tv_data_final_op"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Parada"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:textSize="12sp"
-            android:fontFamily="@font/montserrat_semibold"
-            android:background="@drawable/bg_badge_parada"
-            android:textColor="@color/txt_parada"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:text="Data Final: 13/09/2026"
+            android:textColor="@color/machine_sub"
+            android:textSize="16sp"
+            android:fontFamily="@font/montserrat_medium"
+            app:layout_constraintTop_toBottomOf="@id/tv_prioridade_op"
+            app:layout_constraintStart_toStartOf="@id/tv_prioridade_op" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
