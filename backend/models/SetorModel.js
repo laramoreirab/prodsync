@@ -22,9 +22,44 @@ class SetorModel {
     // Associa máquinas a um setor
     static async associarMaquinas(id_setor, id_empresa, ids_maquinas) {
         try {
+            const ids = ids_maquinas.map(Number).filter((id) => Number.isInteger(id) && id > 0);
+            if (ids.length !== ids_maquinas.length) {
+                throw new Error('IDs de maquinas invalidos');
+            }
+
+            const maquinasVinculadas = await prisma.maquinas.findMany({
+                where: {
+                    id_maquina: { in: ids },
+                    id_empresa,
+                    ativo: true,
+                    id_setor: {
+                        not: null
+                    },
+                    NOT: {
+                        id_setor
+                    }
+                },
+                select: {
+                    id_maquina: true,
+                    nome: true,
+                    setor: {
+                        select: {
+                            nome_setor: true
+                        }
+                    }
+                }
+            });
+
+            if (maquinasVinculadas.length > 0) {
+                const nomes = maquinasVinculadas
+                    .map((maquina) => `${maquina.nome} (${maquina.setor?.nome_setor ?? 'setor existente'})`)
+                    .join(', ');
+                throw new Error(`Maquina ja vinculada a outro setor: ${nomes}`);
+            }
+
             const resultado = await prisma.maquinas.updateMany({
                 where: {
-                    id_maquina: { in: ids_maquinas },
+                    id_maquina: { in: ids },
                     id_empresa: id_empresa
                 },
                 data: {
@@ -33,7 +68,7 @@ class SetorModel {
             });
             const maquinas = await prisma.maquinas.findMany({
                 where: {
-                    id_maquina: { in: ids_maquinas },
+                    id_maquina: { in: ids },
                     id_empresa,
                     id_operador: { not: null }
                 },
@@ -195,13 +230,16 @@ class SetorModel {
             const gestor = await prisma.usuarios.findFirst({
                 where: {
                     id_usuario: id_gestor,
-                    id_empresa: id_empresa,
-                    tipo: 'Gestor'
+                    id_empresa: id_empresa
                 }
             });
 
             if (!gestor) {
-                throw new Error('Usuário não encontrado, não pertence à empresa ou não é gestor');
+                throw new Error('Usuario nao encontrado ou nao pertence a empresa');
+            }
+
+            if (gestor.tipo !== 'Gestor') {
+                throw new Error('Usuario selecionado nao e do tipo Gestor');
             }
 
             const associacao = await prisma.setor_Gestor.create({

@@ -46,6 +46,9 @@ class SetorController {
             res.status(200).json({ sucesso: true, mensagem: 'Máquinas associadas com sucesso' });
         } catch (error) {
             console.error('Erro ao associar máquinas:', error);
+            if (error.message?.includes('Maquina ja vinculada') || error.message?.includes('IDs de maquinas invalidos')) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
@@ -174,6 +177,12 @@ class SetorController {
             res.status(201).json({ sucesso: true, dados: associacao });
         } catch (error) {
             console.error('Erro ao associar gestor:', error);
+            if (error.message && (
+                error.message.includes('nao encontrado') ||
+                error.message.includes('nao e do tipo Gestor')
+            )) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
             if (error.message && (error.message.includes('não encontrado') || error.message.includes('não é gestor'))) {
                 return res.status(400).json({ sucesso: false, erro: error.message });
             }

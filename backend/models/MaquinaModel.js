@@ -128,6 +128,24 @@ class MaquinaModel {
     // Atualiza dados cadastrais
     static async atualizarDados(id_maquina, id_empresa, dados) {
         try {
+            if (dados.id_setor) {
+                const maquinaAtual = await prisma.maquinas.findFirst({
+                    where: {
+                        id_maquina,
+                        id_empresa,
+                        ativo: true
+                    },
+                    select: {
+                        id_setor: true
+                    }
+                });
+
+                const novoSetor = Number(dados.id_setor);
+                if (maquinaAtual?.id_setor && maquinaAtual.id_setor !== novoSetor) {
+                    throw new Error('Maquina ja vinculada a outro setor');
+                }
+            }
+
             const dataUpdate = {
                 nome: dados.nome,
                 serie: dados.serie,

@@ -105,6 +105,7 @@ export default function OrdensDeProducao() {
   const { ops, loading, refresh } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
 
   useEffect(() => {
     setDados(ops || []);
@@ -241,6 +242,15 @@ export default function OrdensDeProducao() {
             data={dadosExibidos}
             columns={colunasOrdemProd}
             enableSelection
+            onSelectedChange={setSelecionados}
+            excluirLote={
+              <DialogContent>
+                <FormExclusaoOp
+                  opIds={selecionados.map((op) => op.id ?? op.id_ordem)}
+                  onExclusaoSucesso={refresh}
+                />
+              </DialogContent>
+            }
             acoesDropdown={(op) => (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
