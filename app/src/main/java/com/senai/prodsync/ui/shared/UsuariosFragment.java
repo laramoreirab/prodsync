@@ -8,14 +8,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.senai.prodsync.AppDatabase;
 import com.senai.prodsync.R;
+import com.senai.prodsync.UserService;
+import com.senai.prodsync.Usuario;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UsuariosFragment extends Fragment {
 
@@ -48,7 +59,6 @@ public class UsuariosFragment extends Fragment {
         TextView tvSetor = view.findViewById(R.id.tv_setor);
         layoutNoResults = view.findViewById(R.id.layout_no_results);
 
-        // Padronização de Hint e Visibilidade conforme o cargo (idêntico a Maquinas)
         if ("adm".equals(userRole)) {
             etSearch.setHint("Busque por nome, id, função ou setor...");
             if (tvSetor != null) tvSetor.setVisibility(View.VISIBLE);
@@ -57,12 +67,7 @@ public class UsuariosFragment extends Fragment {
             if (tvSetor != null) tvSetor.setVisibility(View.GONE);
         }
 
-        List<Usuario> lista = new ArrayList<>();
-        lista.add(new Usuario("Estevão Ferrreira", "1092", "Gestor", "Roscas", "estevao@prodsync.com", "Manhã", "123.456.789-00", "THAK-001", 0));
-        lista.add(new Usuario("José Adamastor Luís da Silva", "1093", "Operador", "Engrenagens", "josezinho@gmail.com", "Noite", "443.651.730-65", "THAK-909816", 0));
-        lista.add(new Usuario("Estevão Ferrreira", "1094", "Gestor", "Roscas", "estevao2@prodsync.com", "Tarde", "987.654.321-11", "THAK-002", 0));
-
-        adapter = new UsuarioAdapter(lista, userRole, usuario -> {
+        adapter = new UsuarioAdapter(new ArrayList<>(), userRole, usuario -> {
             UsuarioDetalheFragment fragment = UsuarioDetalheFragment.newInstance(usuario.getId());
             if (getParentFragmentManager() != null) {
                 getParentFragmentManager().beginTransaction()
@@ -75,7 +80,10 @@ public class UsuariosFragment extends Fragment {
         rvUsuarios.setLayoutManager(new LinearLayoutManager(getContext()));
         rvUsuarios.setAdapter(adapter);
 
-        // Lógica de busca padronizada com feedback de "Nenhum resultado"
+        // Busca inicial do Banco Local e Sincronização com API
+        carregarUsuariosLocal();
+        sincronizarComApi();
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -83,7 +91,6 @@ public class UsuariosFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int countResultados = adapter.filtrar(s.toString());
-                
                 if (countResultados == 0) {
                     rvUsuarios.setVisibility(View.GONE);
                     if (layoutNoResults != null) layoutNoResults.setVisibility(View.VISIBLE);
@@ -92,9 +99,38 @@ public class UsuariosFragment extends Fragment {
                     if (layoutNoResults != null) layoutNoResults.setVisibility(View.GONE);
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void carregarUsuariosLocal() {
+        new Thread(() -> {
+            List<Usuario> usuarios = AppDatabase.getInstance(getContext()).userDao().getAll();
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> adapter.atualizarLista(usuarios));
+            }
+        }).start();
+    }
+
+    private void sincronizarComApi() {
+        UserService.getClient().getUsuarios().enqueue(new Callback<List<Usuario>>() {
+            @Override
+            public void onResponse(Call<List<Usuario>> call, Response<List<Usuario>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new Thread(() -> {
+                        AppDatabase.getInstance(getContext()).userDao().insertAll(response.body());
+                        carregarUsuariosLocal();
+                    }).start();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Usuario>> call, Throwable t) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Erro ao sincronizar usuários", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
     }
 }

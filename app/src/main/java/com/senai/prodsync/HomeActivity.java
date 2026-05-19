@@ -1,33 +1,45 @@
 package com.senai.prodsync;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.senai.prodsync.ui.shared.UsuariosFragment; // Corrigido para a pasta Shared
+import com.senai.prodsync.ui.shared.UsuariosFragment;
 import com.senai.prodsync.ui.shared.MaquinaDetalheFragment;
 import com.senai.prodsync.ui.shared.MaquinasFragment;
 import com.senai.prodsync.ui.shared.OpsFragment;
 import com.senai.prodsync.ui.shared.PerfilFragment;
+
+import java.util.concurrent.TimeUnit;
 
 public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private BottomNavigationView bottomNav;
     private String userRole;
+    private static final int NOTIFICATION_PERMISSION_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigation_view);
         bottomNav = findViewById(R.id.bottomNav);
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        FloatingActionButton fabTeste = findViewById(R.id.fab_teste_notificacao);
 
         // Configurar a Toolbar para abrir o Drawer
         toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
@@ -55,6 +68,39 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             replaceFragment(new MaquinasFragment());
         }
+
+        // 1. Pedir permissão de notificação (Android 13+)
+        checkNotificationPermission();
+
+        // 2. Iniciar monitoramento automático (A cada 15 min - mínimo permitido)
+        startPeriodicCheck();
+
+        // 3. Botão de teste momentâneo
+        fabTeste.setOnClickListener(v -> {
+            Toast.makeText(this, "Sincronizando com API Render...", Toast.LENGTH_SHORT).show();
+            OneTimeWorkRequest testRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class).build();
+            WorkManager.getInstance(this).enqueue(testRequest);
+        });
+    }
+
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_CODE);
+            }
+        }
+    }
+
+    private void startPeriodicCheck() {
+        PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(
+                NotificationWorker.class, 15, TimeUnit.MINUTES)
+                .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "MachineStatusCheck",
+                ExistingPeriodicWorkPolicy.KEEP,
+                periodicWorkRequest
+        );
     }
 
     private void setupMenus(String role) {
@@ -91,7 +137,7 @@ public class HomeActivity extends AppCompatActivity {
             replaceFragment(new OpsFragment());
             return true;
         } else if (itemId == R.id.nav_usuarios) {
-            replaceFragment(new UsuariosFragment()); // Agora chamará a versão com a lista!
+            replaceFragment(new UsuariosFragment());
             return true;
         } else if (itemId == R.id.nav_perfil) {
             replaceFragment(new PerfilFragment());

@@ -5,9 +5,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.senai.prodsync.R;
+import com.senai.prodsync.Usuario;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +31,12 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.UsuarioV
         this.listaFiltrada = new ArrayList<>(lista);
         this.userRole = userRole;
         this.listener = listener;
+    }
+
+    public void atualizarLista(List<Usuario> novaLista) {
+        this.listaOriginal = novaLista;
+        this.listaFiltrada = new ArrayList<>(novaLista);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -73,12 +83,10 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.UsuarioV
                                            u.getFuncao().toLowerCase().contains(busca);
 
                 if ("adm".equals(userRole)) {
-                    // ADM busca por nome, id, função OU setor
-                    if (matchNomeIdFuncao || u.getSetor().toLowerCase().contains(busca)) {
+                    if (matchNomeIdFuncao || (u.getSetor() != null && u.getSetor().toLowerCase().contains(busca))) {
                         listaFiltrada.add(u);
                     }
                 } else {
-                    // GESTOR busca APENAS por nome, id ou função (conforme solicitado)
                     if (matchNomeIdFuncao) {
                         listaFiltrada.add(u);
                     }

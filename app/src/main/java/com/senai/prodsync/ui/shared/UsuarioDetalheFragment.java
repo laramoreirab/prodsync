@@ -9,9 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.senai.prodsync.AppDatabase;
 import com.senai.prodsync.R;
-import java.util.ArrayList;
-import java.util.List;
+import com.senai.prodsync.Usuario;
 
 public class UsuarioDetalheFragment extends Fragment {
 
@@ -54,40 +54,29 @@ public class UsuarioDetalheFragment extends Fragment {
         TextView tvMaquinaNome = view.findViewById(R.id.tv_maquina_nome);
         ImageView ivMaquinaFoto = view.findViewById(R.id.iv_maquina_foto);
 
-        Usuario usuario = buscarUsuarioPorId(userId);
-
-        if (usuario != null) {
-            tvNome.setText("Nome: " + usuario.getNome());
-            tvIdVal.setText(usuario.getId());
-            tvEmailVal.setText(usuario.getEmail());
-            tvSetorVal.setText(usuario.getSetor());
-            tvTurnoVal.setText(usuario.getTurno());
-            tvFuncaoVal.setText(usuario.getFuncao());
-            tvCpfVal.setText(usuario.getCpf());
-            tvMaquinaNome.setText(usuario.getMaquinaResponsavel());
-            
-            if (usuario.getFotoRes() != 0) {
-                ivFoto.setImageResource(usuario.getFotoRes());
-            } else {
-                ivFoto.setImageResource(R.drawable.ic_account);
+        new Thread(() -> {
+            Usuario usuario = AppDatabase.getInstance(getContext()).userDao().getById(userId);
+            if (getActivity() != null && usuario != null) {
+                getActivity().runOnUiThread(() -> {
+                    tvNome.setText("Nome: " + usuario.getNome());
+                    tvIdVal.setText(usuario.getId());
+                    tvEmailVal.setText(usuario.getEmail());
+                    tvSetorVal.setText(usuario.getSetor());
+                    tvTurnoVal.setText(usuario.getTurno());
+                    tvFuncaoVal.setText(usuario.getFuncao());
+                    tvCpfVal.setText(usuario.getCpf());
+                    tvMaquinaNome.setText(usuario.getMaquinaResponsavel());
+                    
+                    if (usuario.getFotoRes() != 0) {
+                        ivFoto.setImageResource(usuario.getFotoRes());
+                    } else {
+                        ivFoto.setImageResource(R.drawable.ic_account);
+                    }
+                    
+                    // Simulação de foto da máquina
+                    ivMaquinaFoto.setImageResource(R.drawable.ic_ferramenta);
+                });
             }
-            
-            // Simulação de foto da máquina
-            ivMaquinaFoto.setImageResource(R.drawable.ic_ferramenta);
-        }
-    }
-
-    private Usuario buscarUsuarioPorId(String id) {
-        List<Usuario> lista = new ArrayList<>();
-        lista.add(new Usuario("Estevão Ferrreira", "1092", "Gestor", "Roscas", "estevao@prodsync.com", "Manhã", "123.456.789-00", "THAK-001", 0));
-        lista.add(new Usuario("José Adamastor Luís da Silva", "1093", "Operador", "Engrenagens", "josezinho@gmail.com", "Noite", "443.651.730-65", "THAK-909816", 0));
-        lista.add(new Usuario("Estevão Ferrreira", "1094", "Gestor", "Roscas", "estevao2@prodsync.com", "Tarde", "987.654.321-11", "THAK-002", 0));
-
-        for (Usuario u : lista) {
-            if (u.getId().equals(id)) {
-                return u;
-            }
-        }
-        return null;
+        }).start();
     }
 }
