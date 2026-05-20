@@ -14,6 +14,7 @@ import InputSenha from "./inputSenha";
 import { useState } from "react";
 import { CheckCircle2, EyeClosed, Info, Eye } from "lucide-react";
 import { apiFetch } from "@/lib/api"
+import { toast } from "sonner";
 
 export default function CriarSenha() {
 
@@ -92,12 +93,11 @@ export default function CriarSenha() {
                 return;
             }
 
-            alert("Senha criada com sucesso!");
+            toast("Senha criada com sucesso!");
 
             //redireciona pelo tipo que vem no token
-            if (localStorage.getItem("tipo") === "Adm") router.push("/adm/DashboardGeral")
-            if (localStorage.getItem("tipo") === "Gestor") router.push("/gestor/DashboardGeral")
-            if (localStorage.getItem("tipo") === "Operador") router.push("/operador/DashboardGeral")
+            if (localStorage.getItem("tipo") === "Gestor") router.push("/gestor/")
+            if (localStorage.getItem("tipo") === "Operador") router.push("/operador/")
 
         } catch (error) {
             setErro(error?.message || "Erro de conexão com o servidor")

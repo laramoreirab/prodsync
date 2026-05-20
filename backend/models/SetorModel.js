@@ -732,11 +732,14 @@ class SetorModel {
             // Calcula a média
             const media = totalOperadoresEscalados / totalSetores;
 
-            // Retorna apenas o número (formatado com 1 casa decimal, por exemplo)
+            if(media>0 && media <1){
+                media = 1
+            }
+
             return {
                 titulo: "Número de operadores por setor (média)",
                 subtitulo: "Atualizado em tempo real",
-                valor: Number(media.toFixed(1))
+                valor: Number(Math.round(media))
             }
         } catch (error) {
             console.error('Erro ao calcular média de operadores por setor:', error);
