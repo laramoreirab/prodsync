@@ -38,6 +38,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import { opCrudService } from "@/services/opCrudService";
+import { filtrarPorDuracaoMax, filtrarPorNumberRange, duracaoEmMinutos } from "@/lib/filterUtils";
 
 const colunasEventos = [
   { id: "id", key: "id", label: "ID", className: "w-20 text-center justify-center" },
@@ -266,6 +267,7 @@ export default function OPDetalhePage({ params }) {
   const eventosFilter = [
     { id: "evento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
 
   const aplicarFiltrosEventos = (filtrosSelecionados) => {
@@ -284,6 +286,10 @@ export default function OPDetalhePage({ params }) {
       dadosFiltrados = dadosFiltrados.filter(
         (e) => new Date(e.inicio) <= new Date(filtrosSelecionados.data.end)
       );
+    }
+
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
     }
 
     setDadosEventos(dadosFiltrados);
