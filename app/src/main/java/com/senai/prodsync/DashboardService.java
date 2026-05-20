@@ -1,6 +1,5 @@
 package com.senai.prodsync;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -9,14 +8,15 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Path;
 
-public interface UserService {
+public interface DashboardService {
     String BASE_URL = "https://prodsync-backend.onrender.com/api/";
 
-    @GET("usuarios/listarSemAdms")
-    Call<ApiResponse<List<Usuario>>> getUsuarios(@Header("Authorization") String token);
+    @GET("oee/{maquinaId}")
+    Call<ApiResponse<OeeResponse>> getOee(@Header("Authorization") String token, @Path("maquinaId") String maquinaId);
 
-    static UserService getClient() {
+    static DashboardService getClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -32,6 +32,6 @@ public interface UserService {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(UserService.class);
+                .create(DashboardService.class);
     }
 }

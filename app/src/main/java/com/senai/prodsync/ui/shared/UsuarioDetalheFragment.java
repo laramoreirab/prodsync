@@ -9,29 +9,26 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.senai.prodsync.AppDatabase;
+import com.bumptech.glide.Glide;
 import com.senai.prodsync.R;
 import com.senai.prodsync.Usuario;
 
 public class UsuarioDetalheFragment extends Fragment {
 
-    private static final String ARG_USER_ID = "user_id";
-    private String userId;
+    // Nota: Como removemos o banco local, passaremos os dados básicos via Bundle
+    // Ou você pode implementar um UserService.getById futuramente.
+    private static final String ARG_USER_NOME = "user_nome";
+    private static final String ARG_USER_FUNCAO = "user_funcao";
+    private static final String ARG_USER_FOTO = "user_foto";
 
-    public static UsuarioDetalheFragment newInstance(String userId) {
+    public static UsuarioDetalheFragment newInstance(String nome, String funcao, String fotoUrl) {
         UsuarioDetalheFragment fragment = new UsuarioDetalheFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_USER_ID, userId);
+        args.putString(ARG_USER_NOME, nome);
+        args.putString(ARG_USER_FUNCAO, funcao);
+        args.putString(ARG_USER_FOTO, fotoUrl);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            userId = getArguments().getString(ARG_USER_ID);
-        }
     }
 
     @Override
@@ -45,38 +42,19 @@ public class UsuarioDetalheFragment extends Fragment {
 
         TextView tvNome = view.findViewById(R.id.tv_nome_usuario_detalhe);
         ImageView ivFoto = view.findViewById(R.id.iv_usuario_foto);
-        TextView tvIdVal = view.findViewById(R.id.tv_id_val);
-        TextView tvEmailVal = view.findViewById(R.id.tv_email_val);
-        TextView tvSetorVal = view.findViewById(R.id.tv_setor_val);
-        TextView tvTurnoVal = view.findViewById(R.id.tv_turno_val);
         TextView tvFuncaoVal = view.findViewById(R.id.tv_funcao_val);
-        TextView tvCpfVal = view.findViewById(R.id.tv_cpf_val);
-        TextView tvMaquinaNome = view.findViewById(R.id.tv_maquina_nome);
-        ImageView ivMaquinaFoto = view.findViewById(R.id.iv_maquina_foto);
 
-        new Thread(() -> {
-            Usuario usuario = AppDatabase.getInstance(getContext()).userDao().getById(userId);
-            if (getActivity() != null && usuario != null) {
-                getActivity().runOnUiThread(() -> {
-                    tvNome.setText("Nome: " + usuario.getNome());
-                    tvIdVal.setText(usuario.getId());
-                    tvEmailVal.setText(usuario.getEmail());
-                    tvSetorVal.setText(usuario.getSetor());
-                    tvTurnoVal.setText(usuario.getTurno());
-                    tvFuncaoVal.setText(usuario.getFuncao());
-                    tvCpfVal.setText(usuario.getCpf());
-                    tvMaquinaNome.setText(usuario.getMaquinaResponsavel());
-                    
-                    if (usuario.getFotoRes() != 0) {
-                        ivFoto.setImageResource(usuario.getFotoRes());
-                    } else {
-                        ivFoto.setImageResource(R.drawable.ic_account);
-                    }
-                    
-                    // Simulação de foto da máquina
-                    ivMaquinaFoto.setImageResource(R.drawable.ic_ferramenta);
-                });
+        if (getArguments() != null) {
+            String nome = getArguments().getString(ARG_USER_NOME);
+            String funcao = getArguments().getString(ARG_USER_FUNCAO);
+            String fotoUrl = getArguments().getString(ARG_USER_FOTO);
+
+            tvNome.setText(nome);
+            tvFuncaoVal.setText(funcao);
+
+            if (fotoUrl != null && !fotoUrl.isEmpty()) {
+                Glide.with(this).load(fotoUrl).placeholder(R.drawable.ic_account).circleCrop().into(ivFoto);
             }
-        }).start();
+        }
     }
 }

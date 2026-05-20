@@ -10,13 +10,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 
-public interface UserService {
+public interface OPService {
     String BASE_URL = "https://prodsync-backend.onrender.com/api/";
 
-    @GET("usuarios/listarSemAdms")
-    Call<ApiResponse<List<Usuario>>> getUsuarios(@Header("Authorization") String token);
+    @GET("ordens")
+    Call<ApiResponse<PaginatedData<OrdemProducao>>> getOrdens(@Header("Authorization") String token);
 
-    static UserService getClient() {
+    static OPService getClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -32,6 +32,6 @@ public interface UserService {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(UserService.class);
+                .create(OPService.class);
     }
 }

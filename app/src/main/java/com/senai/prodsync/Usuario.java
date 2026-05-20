@@ -1,60 +1,58 @@
 package com.senai.prodsync;
 
 import androidx.annotation.NonNull;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
+import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "usuarios")
 public class Usuario {
-    @PrimaryKey
     @NonNull
+    @SerializedName("id_usuario")
     private String id;
+    
     private String nome;
+    
+    @SerializedName("tipo")
     private String funcao;
-    private String setor;
+    
+    @SerializedName("setor")
+    private SetorInfo setorInfo;
+    
     private String email;
     private String turno;
     private String cpf;
+    
+    @SerializedName("maquina_responsavel")
     private String maquinaResponsavel;
-    private int fotoRes;
+    
+    @SerializedName("foto")
+    private String fotoUrl;
 
-    public Usuario(@NonNull String id, String nome, String funcao, String setor, String email, String turno, String cpf, String maquinaResponsavel, int fotoRes) {
-        this.id = id;
-        this.nome = nome;
-        this.funcao = funcao;
-        this.setor = setor;
-        this.email = email;
-        this.turno = turno;
-        this.cpf = cpf;
-        this.maquinaResponsavel = maquinaResponsavel;
-        this.fotoRes = fotoRes;
-    }
-
-    @NonNull
     public String getId() { return id; }
-    public void setId(@NonNull String id) { this.id = id; }
-
+    public void setId(String id) { this.id = id; }
+    
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
-
+    
     public String getFuncao() { return funcao; }
     public void setFuncao(String funcao) { this.funcao = funcao; }
-
-    public String getSetor() { return setor; }
-    public void setSetor(String setor) { this.setor = setor; }
-
+    
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-
+    
     public String getTurno() { return turno; }
     public void setTurno(String turno) { this.turno = turno; }
-
+    
     public String getCpf() { return cpf; }
     public void setCpf(String cpf) { this.cpf = cpf; }
+    
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 
-    public String getMaquinaResponsavel() { return maquinaResponsavel; }
-    public void setMaquinaResponsavel(String maquinaResponsavel) { this.maquinaResponsavel = maquinaResponsavel; }
+    public String getSetor() { 
+        return (setorInfo != null) ? setorInfo.nomeSetor : "Geral"; 
+    }
 
-    public int getFotoRes() { return fotoRes; }
-    public void setFotoRes(int fotoRes) { this.fotoRes = fotoRes; }
+    public static class SetorInfo {
+        @SerializedName("nome_setor")
+        public String nomeSetor;
+    }
 }

@@ -1,5 +1,7 @@
 package com.senai.prodsync.ui.shared;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,14 +10,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.senai.prodsync.ApiResponse;
+import com.senai.prodsync.OPService;
+import com.senai.prodsync.OrdemProducao;
+import com.senai.prodsync.PaginatedData;
 import com.senai.prodsync.R;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class OpsFragment extends Fragment {
 
@@ -28,10 +42,10 @@ public class OpsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null && getActivity().getIntent() != null) {
-            userRole = getActivity().getIntent().getStringExtra("USER_ROLE");
+        if (getActivity() != null) {
+            SharedPreferences prefs = getActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
+            userRole = prefs.getString("tipo", "operador");
         }
-        if (userRole == null) userRole = "operador";
     }
 
     @Override
@@ -48,56 +62,74 @@ public class OpsFragment extends Fragment {
         layoutNoResults = view.findViewById(R.id.layout_no_results);
         TextView tvSetor = view.findViewById(R.id.tv_setor);
 
-        // Ajusta a SearchBar e Visibilidade do Setor conforme o cargo
-        if ("gestor".equals(userRole)) {
-            etSearch.setHint("Busque por id, máquina ou prioridade....");
-            if (tvSetor != null) tvSetor.setVisibility(View.GONE);
-        } else if ("operador".equals(userRole)) {
-            etSearch.setHint("Busque por id ou prioridade....");
-            if (tvSetor != null) tvSetor.setVisibility(View.GONE);
-        } else {
-            etSearch.setHint("Busque por nome, id, prioridade ou setor...");
-            if (tvSetor != null) tvSetor.setVisibility(View.VISIBLE);
+        if (tvSetor != null) {
+            SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
+            tvSetor.setText("Setor: " + prefs.getString("setor", "Geral"));
+            tvSetor.setVisibility("adm".equals(userRole) ? View.VISIBLE : View.GONE);
         }
 
-        // Dados mockados
-        List<Op> lista = new ArrayList<>();
-        lista.add(new Op("444555", "THAK-009", "Crítica", "13/09/2026", "Roscas"));
-        lista.add(new Op("444556", "THAK-010", "Alta", "14/09/2026", "Engrenagens"));
-        lista.add(new Op("444557", "THAK-009", "Média", "15/09/2026", "Roscas"));
-
-        adapter = new OpAdapter(lista, userRole, op -> {
-            // Navegação para detalhes da OP (a ser implementada)
+        adapter = new OpAdapter(new ArrayList<>(), userRole, op -> {
             OpDetalheFragment fragment = OpDetalheFragment.newInstance(op.getId());
-            if (getParentFragmentManager() != null) {
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainer, fragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         rvOps.setLayoutManager(new LinearLayoutManager(getContext()));
         rvOps.setAdapter(adapter);
 
+        carregarOps();
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int countResultados = adapter.filtrar(s.toString());
-                if (countResultados == 0) {
-                    rvOps.setVisibility(View.GONE);
-                    layoutNoResults.setVisibility(View.VISIBLE);
-                } else {
-                    rvOps.setVisibility(View.VISIBLE);
-                    layoutNoResults.setVisibility(View.GONE);
+                adapter.filtrar(s.toString());
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void carregarOps() {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
+        String token = "Bearer " + prefs.getString("token", "");
+
+        OPService.getClient().getOrdens(token).enqueue(new Callback<ApiResponse<PaginatedData<OrdemProducao>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<PaginatedData<OrdemProducao>>> call, Response<ApiResponse<PaginatedData<OrdemProducao>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
+                    List<OrdemProducao> ordens = response.body().getDados().getList();
+                    List<Op> listaUI = new ArrayList<>();
+                    if (ordens != null) {
+                        for (OrdemProducao item : ordens) {
+                            listaUI.add(new Op(
+                                    item.getId(),
+                                    item.getMaquinaId() != null ? item.getMaquinaId() : "N/A",
+                                    item.getPrioridade() != null ? item.getPrioridade() : "Normal",
+                                    item.getDataFinal() != null ? item.getDataFinal() : "S/D",
+                                    item.getSetor() != null ? item.getSetor() : "Geral"
+                            ));
+                        }
+                    }
+                    adapter = new OpAdapter(listaUI, userRole, op -> {
+                        OpDetalheFragment fragment = OpDetalheFragment.newInstance(op.getId());
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragmentContainer, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    });
+                    rvOps.setAdapter(adapter);
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void onFailure(Call<ApiResponse<PaginatedData<OrdemProducao>>> call, Throwable t) {
+                if (getContext() != null)
+                    Toast.makeText(getContext(), "Erro ao carregar OPs", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

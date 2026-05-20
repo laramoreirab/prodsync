@@ -1,22 +1,34 @@
 package com.senai.prodsync;
 
-import java.util.List;
+import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 
 public interface MachineService {
-    // ESTE É O ENDPOINT DA API RENDER. 
-    // Substitua 'sua-api-no-render' pelo seu subdomínio real.
-    String BASE_URL = "https://sua-api-no-render.onrender.com/";
+    String BASE_URL = "https://prodsync-backend.onrender.com/api/";
 
-    @GET("maquinas") // Altere para o caminho correto da sua API
-    Call<List<Machine>> getMaquinas();
+    @GET("maquinas")
+    Call<ApiResponse<PaginatedData<Machine>>> getMaquinas(@Header("Authorization") String token);
 
     static MachineService getClient() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .connectTimeout(90, TimeUnit.SECONDS)
+                .readTimeout(90, TimeUnit.SECONDS)
+                .writeTimeout(90, TimeUnit.SECONDS)
+                .build();
+
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(MachineService.class);

@@ -1,33 +1,35 @@
 package com.senai.prodsync;
 
-import androidx.annotation.NonNull;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "maquinas")
 public class Machine {
-    @PrimaryKey
-    @NonNull
+    @SerializedName(value = "id_maquina", alternate = {"id", "_id"})
     private String id;
-    private String nome;
-    private String status; // "Vermelho", "Verde", etc.
     
-    @SerializedName("tempo_parada_minutos")
-    private int tempoParadaMinutos;
+    @SerializedName(value = "nome_maquina", alternate = {"nome", "name", "maquina"})
+    private String nome;
+    
+    private String status;
+    private String serie;
+    
+    @SerializedName("setor")
+    private SetorInfo setorInfo;
 
-    public Machine() {}
+    public String getId() { return id != null ? id : "0"; }
+    public String getNome() { return nome != null ? nome : "Máquina"; }
+    public String getStatus() { return status != null ? status : "parada"; }
+    public String getSerie() { return (serie != null) ? serie : "S/N"; }
+    
+    public String getSetor() { 
+        if (setorInfo != null) {
+            return (setorInfo.nomeSetor != null) ? setorInfo.nomeSetor : setorInfo.nome;
+        }
+        return "Geral";
+    }
 
-    @NonNull
-    public String getId() { return id; }
-    public void setId(@NonNull String id) { this.id = id; }
-
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public int getTempoParadaMinutos() { return tempoParadaMinutos; }
-    public void setTempoParadaMinutos(int tempoParadaMinutos) { this.tempoParadaMinutos = tempoParadaMinutos; }
+    public static class SetorInfo {
+        @SerializedName(value = "nome_setor", alternate = {"nome", "setor"})
+        public String nomeSetor;
+        public String nome; // Fallback para nomes simples
+    }
 }

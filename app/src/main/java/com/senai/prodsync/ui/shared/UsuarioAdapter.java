@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.senai.prodsync.R;
 import com.senai.prodsync.Usuario;
 
@@ -53,7 +54,15 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.UsuarioV
         holder.tvId.setText("Id: " + usuario.getId());
         holder.tvFuncao.setText("Função: " + usuario.getFuncao());
         
-        if (usuario.getFotoRes() != 0) {
+        // Carregamento de imagem com Glide
+        if (usuario.getFotoUrl() != null && !usuario.getFotoUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(usuario.getFotoUrl())
+                    .placeholder(R.drawable.ic_account)
+                    .error(R.drawable.ic_account)
+                    .circleCrop()
+                    .into(holder.ivFoto);
+        } else if (usuario.getFotoRes() != 0) {
             holder.ivFoto.setImageResource(usuario.getFotoRes());
         } else {
             holder.ivFoto.setImageResource(R.drawable.ic_account);

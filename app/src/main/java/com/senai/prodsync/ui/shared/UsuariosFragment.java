@@ -1,5 +1,7 @@
 package com.senai.prodsync.ui.shared;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.senai.prodsync.AppDatabase;
+import com.senai.prodsync.ApiResponse;
 import com.senai.prodsync.R;
 import com.senai.prodsync.UserService;
 import com.senai.prodsync.Usuario;
@@ -39,10 +41,10 @@ public class UsuariosFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null && getActivity().getIntent() != null) {
-            userRole = getActivity().getIntent().getStringExtra("USER_ROLE");
+        if (getActivity() != null) {
+            SharedPreferences prefs = getActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
+            userRole = prefs.getString("tipo", "gestor");
         }
-        if (userRole == null) userRole = "gestor";
     }
 
     @Override
@@ -59,16 +61,16 @@ public class UsuariosFragment extends Fragment {
         TextView tvSetor = view.findViewById(R.id.tv_setor);
         layoutNoResults = view.findViewById(R.id.layout_no_results);
 
-        if ("adm".equals(userRole)) {
-            etSearch.setHint("Busque por nome, id, função ou setor...");
-            if (tvSetor != null) tvSetor.setVisibility(View.VISIBLE);
-        } else {
-            etSearch.setHint("Busque por nome, id ou função...");
-            if (tvSetor != null) tvSetor.setVisibility(View.GONE);
-        }
+        if (tvSetor != null) tvSetor.setVisibility("adm".equals(userRole) ? View.VISIBLE : View.GONE);
 
         adapter = new UsuarioAdapter(new ArrayList<>(), userRole, usuario -> {
-            UsuarioDetalheFragment fragment = UsuarioDetalheFragment.newInstance(usuario.getId());
+            // Chamada corrigida passando Nome, Função e Foto para o Detalhe
+            UsuarioDetalheFragment fragment = UsuarioDetalheFragment.newInstance(
+                    usuario.getNome(),
+                    usuario.getFuncao(),
+                    usuario.getFotoUrl()
+            );
+            
             if (getParentFragmentManager() != null) {
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainer, fragment)
@@ -80,56 +82,38 @@ public class UsuariosFragment extends Fragment {
         rvUsuarios.setLayoutManager(new LinearLayoutManager(getContext()));
         rvUsuarios.setAdapter(adapter);
 
-        // Busca inicial do Banco Local e Sincronização com API
-        carregarUsuariosLocal();
         sincronizarComApi();
 
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int countResultados = adapter.filtrar(s.toString());
-                if (countResultados == 0) {
-                    rvUsuarios.setVisibility(View.GONE);
-                    if (layoutNoResults != null) layoutNoResults.setVisibility(View.VISIBLE);
-                } else {
-                    rvUsuarios.setVisibility(View.VISIBLE);
-                    if (layoutNoResults != null) layoutNoResults.setVisibility(View.GONE);
-                }
+                adapter.filtrar(s.toString());
             }
             @Override
             public void afterTextChanged(Editable s) {}
         });
     }
 
-    private void carregarUsuariosLocal() {
-        new Thread(() -> {
-            List<Usuario> usuarios = AppDatabase.getInstance(getContext()).userDao().getAll();
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> adapter.atualizarLista(usuarios));
-            }
-        }).start();
-    }
-
     private void sincronizarComApi() {
-        UserService.getClient().getUsuarios().enqueue(new Callback<List<Usuario>>() {
+        if (getContext() == null) return;
+        
+        SharedPreferences prefs = getContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
+        String token = "Bearer " + prefs.getString("token", "");
+
+        UserService.getClient().getUsuarios(token).enqueue(new Callback<ApiResponse<List<Usuario>>>() {
             @Override
-            public void onResponse(Call<List<Usuario>> call, Response<List<Usuario>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    new Thread(() -> {
-                        AppDatabase.getInstance(getContext()).userDao().insertAll(response.body());
-                        carregarUsuariosLocal();
-                    }).start();
+            public void onResponse(Call<ApiResponse<List<Usuario>>> call, Response<ApiResponse<List<Usuario>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
+                    adapter.atualizarLista(response.body().getDados());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Usuario>> call, Throwable t) {
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Erro ao sincronizar usuários", Toast.LENGTH_SHORT).show();
-                }
+            public void onFailure(Call<ApiResponse<List<Usuario>>> call, Throwable t) {
+                if (getContext() != null)
+                    Toast.makeText(getContext(), "Erro ao carregar usuários", Toast.LENGTH_SHORT).show();
             }
         });
     }
