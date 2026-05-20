@@ -27,6 +27,13 @@ import {
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FormJustificativaEvento from "@/components/ui/forms/historicoEventos/formJustificativaEvento";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
+import { DataEvento } from "@/components/ui/dataEvento";
+import {
+  filtrarPorDataInicio,
+  filtrarPorDuracaoMax,
+  duracaoEmMinutos,
+} from "@/lib/filterUtils";
 
 import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";
 
@@ -57,8 +64,19 @@ const colunasEventos = [
     }
   },
 
-  { id: 'data', key: 'data', label: 'Data(Início - Fim)', className: 'pl-20 w-1/5' },
-  { id: 'duracao', key: 'duracao', label: 'Duração' },
+  {
+    id: 'data',
+    key: 'data',
+    label: 'Data (Início - Fim)',
+    className: 'pl-20 w-1/5',
+    icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
+  },
+  {
+    id: 'duracao',
+    key: 'duracao',
+    label: 'Duração',
+    icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
+  },
   { id: 'motivo', key: 'motivo', label: 'Motivo' },
   { id: 'observacao', key: 'observacao', label: 'Observação', className: 'pl-5' },
 ];
@@ -103,27 +121,20 @@ export default function HistoricoEventos() {
     dadosCopiados.sort((a, b) => {
       if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
       if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
-      if (criterio === 'duracao_asc') {
-        const [horasA, minutosA] = a.duracao.split(':').map(Number);
-        const [horasB, minutosB] = b.duracao.split(':').map(Number);
-        return (horasA * 60 + minutosA) - (horasB * 60 + minutosB);
-      }
-      if (criterio === 'duracao_desc') {
-        const [horasA, minutosA] = a.duracao.split(':').map(Number);
-        const [horasB, minutosB] = b.duracao.split(':').map(Number);
-        return (horasB * 60 + minutosB) - (horasA * 60 + minutosA);
-      }
-
+      if (criterio === 'duracao_asc') return duracaoEmMinutos(a) - duracaoEmMinutos(b);
+      if (criterio === 'duracao_desc') return duracaoEmMinutos(b) - duracaoEmMinutos(a);
       return 0;
     });
 
     setDados(dadosCopiados);
   };
 
-  const dadosExibidos = dados.filter((eventos) => {
+  const dadosExibidos = dados.filter((evento) => {
     const termo = busca.toLowerCase();
     return (
-      eventos.tipo.toLowerCase().includes(termo) // ← só filtra por tipo
+      evento.tipo?.toLowerCase().includes(termo) ||
+      evento.id?.toString().includes(termo) ||
+      evento.motivo?.toLowerCase().includes(termo)
     );
   });
 
@@ -137,36 +148,25 @@ export default function HistoricoEventos() {
   const aplicarFiltros = (filtrosSelecionados) => {
     let dadosFiltrados = [...eventos];
 
-    //filtro por tipo
-    if (filtrosSelecionados.tipo && filtrosSelecionados.tipo.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(item =>
+    if (filtrosSelecionados.tipo?.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter((item) =>
         filtrosSelecionados.tipo.includes(item.tipo)
       );
     }
 
-    //filtro por data
-    if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        const dataInicio = new Date(filtrosSelecionados.data.start);
-        dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.inicio ?? item.data) >= dataInicio
-        );
-      }
-      if (filtrosSelecionados.data.end) {
-        const dataFim = new Date(filtrosSelecionados.data.end);
-        dadosFiltrados = dadosFiltrados.filter(item =>
-          new Date(item.inicio ?? item.data) <= dataFim
-        );
-      }
+    dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
+
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
     }
 
     setDados(dadosFiltrados);
-  }
+  };
 
   const historicoEventosFilter = [
     { id: "tipo", label: "Tipo de Evento", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
-    // {id:"duracao", label:"Duração", type: "time-max"}  --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
 
 
