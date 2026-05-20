@@ -16,14 +16,20 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2, ChevronDown } from "lucide-react";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { useSetores } from "@/hooks/useSetores";
 import TableListagens from "@/components/table";
 import FormCadastroSetor from '@/components/ui/forms/setores/formCadastroSetor';
+import FormCadastroTurnoGeral from '@/components/ui/forms/setores/formCadastroTurnoGeral';
 import FormExclusaoSetor from '@/components/ui/forms/setores/formExclusaoSetor';
 import FormEdicaoSetor from '@/components/ui/forms/setores/formEdicaoSetor';
 import Link from "next/link";
@@ -47,6 +53,7 @@ export default function PageSetores() {
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
+  const [criarAberto, setCriarAberto] = useState(null);
   const filtersConfig = setoresFilter.map((filter) =>
     filter.id === "nome_setor"
       ? { ...filter, options: setores.map((setor) => setor.nome_setor).filter(Boolean) }
@@ -154,15 +161,37 @@ export default function PageSetores() {
               </h1>
             </div>
 
-            {/* Modal de Criar Setor */}
-            <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                 <Plus className="mr-2" />
                 Criar
-              </DialogTrigger>
+                <ChevronDown className="ml-2 w-5 h-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-48">
+                <DropdownMenuItem
+                  className="cursor-pointer text-base font-medium"
+                  onClick={() => setCriarAberto("setor")}
+                >
+                  Setor
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer text-base font-medium"
+                  onClick={() => setCriarAberto("turno")}
+                >
+                  Turno (todos os setores)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
+            <Dialog open={criarAberto === "setor"} onOpenChange={(open) => !open && setCriarAberto(null)}>
               <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <FormCadastroSetor onCadastroSucesso={refresh} />
+                <FormCadastroSetor onCadastroSucesso={() => { refresh(); setCriarAberto(null); }} />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={criarAberto === "turno"} onOpenChange={(open) => !open && setCriarAberto(null)}>
+              <DialogContent>
+                <FormCadastroTurnoGeral onSuccess={() => { refresh(); setCriarAberto(null); }} />
               </DialogContent>
             </Dialog>
           </div>
