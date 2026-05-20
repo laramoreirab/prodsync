@@ -33,6 +33,11 @@ import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modal
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
+import {
+  filtrarPorDuracaoMax,
+  filtrarPorNumberRange,
+  duracaoEmMinutos,
+} from "@/lib/filterUtils";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
 const colunasMaquina = [
@@ -280,7 +285,7 @@ export default function MaquinaDetalhePage({ params }) {
   const eventosFilter = [
     { id: "tipoEvento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
-    // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
 
   const aplicarFiltrosEventos = (filtrosSelecionados) => {
@@ -306,6 +311,13 @@ export default function MaquinaDetalhePage({ params }) {
           parseData(evento.data) <= new Date(filtrosSelecionados.data.end)
         );
       }
+    }
+
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(
+        dadosFiltrados.map((e) => ({ ...e, inicio: e.inicio ?? parseData(e.data), fim: e.fim })),
+        filtrosSelecionados.duracao.max
+      );
     }
 
     setDados(dadosFiltrados);
@@ -368,50 +380,19 @@ export default function MaquinaDetalhePage({ params }) {
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
     let dadosFiltrados = [...todosApontamentos];
 
-    //filtro por produzido
-    if (filtrosSelecionados.produzido) {
-      if (filtrosSelecionados.produzido.min != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.produzido) >= filtrosSelecionados.produzido.min
-        );
-      }
-
-      if (filtrosSelecionados.produzido.max != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.produzido) <= filtrosSelecionados.produzido.max
-        );
-      }
+    if (filtrosSelecionados.data?.start) {
+      dadosFiltrados = dadosFiltrados.filter((a) =>
+        parseData(a.data ?? a.inicio) >= new Date(filtrosSelecionados.data.start)
+      );
+    }
+    if (filtrosSelecionados.data?.end) {
+      dadosFiltrados = dadosFiltrados.filter((a) =>
+        parseData(a.data ?? a.inicio) <= new Date(filtrosSelecionados.data.end)
+      );
     }
 
-    //filtro por refugo
-    if (filtrosSelecionados.refugo) {
-      if (filtrosSelecionados.refugo.min != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.refugo) >= filtrosSelecionados.refugo.min
-        );
-      }
-
-      if (filtrosSelecionados.refugo.max != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.refugo) <= filtrosSelecionados.refugo.max
-        );
-      }
-    }
-
-    //filtro por data
-    if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          parseData(a.data) >= new Date(filtrosSelecionados.data.start)
-        );
-      }
-
-      if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          parseData(a.data) <= new Date(filtrosSelecionados.data.end)
-        );
-      }
-    }
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "produzido", filtrosSelecionados.produzido);
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "refugo", filtrosSelecionados.refugo);
 
     setDadosApontamentoState(dadosFiltrados);
   };

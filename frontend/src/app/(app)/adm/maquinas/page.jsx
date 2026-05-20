@@ -31,8 +31,8 @@ import { DataUltimaParada } from "@/components/ui/dataUltimaParada";
 
 
 
-const maquinasFilter = [
-  { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
+const maquinasFilterBase = [
+  { id: "setor", label: "Setor", type: "checkbox", options: [] },
   { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
   { id: "data", label: "Parada", type: "date-range" }
 ];
@@ -81,10 +81,18 @@ export default function Maquinas() {
   const [busca, setBusca] = useState("");
   const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
 
+  const maquinasFilter = maquinasFilterBase.map((filter) =>
+    filter.id === "setor"
+      ? {
+          ...filter,
+          options: [...new Set(maquinas.map((m) => m.setor).filter(Boolean))],
+        }
+      : filter
+  );
+
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(maquinas);
-    console.log(maquinas)
   }, [maquinas]);
 
   //lógica de ordenação
