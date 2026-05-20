@@ -53,6 +53,11 @@ import {
 
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+import {
+  filtrarPorDataInicio,
+  filtrarPorDuracaoMax,
+  duracaoEmMinutos,
+} from "@/lib/filterUtils";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
@@ -98,7 +103,7 @@ const colunasEventos = [
 const historicoEventosFilter = [
   { id: "tipo", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
   { id: "data", label: "Data", type: "date-range" },
-  // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+  { id: "duracao", label: "Duração máx.", type: "time-max" },
 ];
 
 
@@ -133,16 +138,8 @@ export default function HistoricoEventos() {
       if (criterio === 'maquina') return a.maquina.localeCompare(b.maquina);
       if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
       if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
-      if (criterio === 'duracao_asc') {
-        const [horasA, minutosA] = a.duracao.split(':').map(Number);
-        const [horasB, minutosB] = b.duracao.split(':').map(Number);
-        return (horasA * 60 + minutosA) - (horasB * 60 + minutosB);
-      }
-      if (criterio === 'duracao_desc') {
-        const [horasA, minutosA] = a.duracao.split(':').map(Number);
-        const [horasB, minutosB] = b.duracao.split(':').map(Number);
-        return (horasB * 60 + minutosB) - (horasA * 60 + minutosA);
-      }
+      if (criterio === 'duracao_asc') return duracaoEmMinutos(a) - duracaoEmMinutos(b);
+      if (criterio === 'duracao_desc') return duracaoEmMinutos(b) - duracaoEmMinutos(a);
       return 0;
     });
 
@@ -161,29 +158,10 @@ export default function HistoricoEventos() {
       );
     }
 
-    //filtro por data
-    if (filtrosSelecionados.data) {
-      if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(evento =>
-          new Date(evento.inicio) >= new Date(filtrosSelecionados.data.start)
-        );
-      }
-      if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(evento =>
-          new Date(evento.inicio) <= new Date(filtrosSelecionados.data.end)
-        );
-      }
+    dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
     }
-
-    // //filtro por duração --> não funcionou
-    //  if (filtrosSelecionados.duracao) {
-    //   const duracaoMax = filtrosSelecionados.duracao;
-    //   dadosFiltrados = dadosFiltrados.filter(evento => {    
-    //     const [horas, minutos] = evento.duracao.split(':').map(Number);
-    //     const duracaoEvento = horas * 60 + minutos;
-    //     return duracaoEvento <= duracaoMax;
-    //   });
-    // }
 
     setDados(dadosFiltrados);
   };
