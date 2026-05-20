@@ -49,28 +49,42 @@ export function ProducaoTotalWidget({ setorId }) {
   // const data = periodoAtual.mock;
  
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
-        <div>
-          <p className="text-sm font-semibold text-black">Produção total das máquinas</p>
-          <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
+    <div className="w-full overflow-hidden"> {/* Garante que nada vaze */}
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+        
+        {/* Bloco do Título */}
+        <div className="min-w-0"> 
+          <p className="text-sm font-semibold text-black truncate">
+            Produção total das máquinas
+          </p>
+          <p className="text-xs text-gray-400 font-semibold mt-1">
+            *Atualizado em tempo real
+          </p>
         </div>
-        <div className="flex gap-2 flex-shrink-0">
+  
+        {/* Bloco dos Botões */}
+        <div className="flex gap-2 pb-1 overflow-x-auto max-w-full sm:pb-0 sm:overflow-visible relative z-10 no-scrollbar">
           {PERIODOS.map(({ label, dias }) => (
             <button
               key={dias}
               onClick={() => setDiasSelecionados(dias)}
-              className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${diasSelecionados === dias
+              className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
+                diasSelecionados === dias
                   ? "bg-[var(--secondary-foreground)] text-white shadow-sm"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+              }`}
             >
               {label}
             </button>
           ))}
         </div>
+  
       </div>
-      <AreaChartBase data={dadosGrafico} xKey="data" yKey="total" config={producaoTotalConfig} />
+  
+      {/* Gráfico */}
+      <div className="w-full overflow-x-auto">
+        <AreaChartBase data={dadosGrafico} xKey="data" yKey="total" config={producaoTotalConfig} />
+      </div>
     </div>
   );
 }

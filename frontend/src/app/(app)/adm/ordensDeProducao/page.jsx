@@ -350,7 +350,7 @@ export default function OrdensDeProducao() {
 
 
        {/* Listagem */}
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="OPs" className="mt-8" />
  
       <SearchBar
         value={busca}

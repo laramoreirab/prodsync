@@ -384,7 +384,7 @@ export default function MaquinaDetalhePage({ params }) {
         {/* Listagem de Eventos */}
         <DetailListingSection
           id="listagem_eventos"
-          title="Eventos da Máquina"
+          title="Histórico de Eventos da Máquina"
           action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-lg gap-2">
@@ -460,7 +460,7 @@ export default function MaquinaDetalhePage({ params }) {
         {/* Listagem de Apontamentos */}
         <DetailListingSection
           id="listagem_apontamentos"
-          title="Apontamentos da Máquina"
+          title="Histórico de Apontamentos da Máquina"
           search={
             <SearchBar
               value={buscaApontamento}

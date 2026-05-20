@@ -395,18 +395,18 @@ export default function OPDetalhePage({ params }) {
         />
 
         {/* SEÇÃO 1: Info card + Progresso */}
-<section>
-  <motion.div
-    variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
-    initial="hidden"
-    animate="visible"
-    className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
-  >
-    <motion.div
-      variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-      className="md:col-span-2"
-    >
-      <div className="flex items-center">
+        <section>
+          <motion.div
+            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
+          >
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+              className="md:col-span-2"
+            >
+              <div className="flex items-center">
                 <div className="flex gap-2 bg-white border rounded-xl shadow-sm w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4">
                   <Image src="/demo_maq.png" className="rounded-lg" alt="Máquina" width={150} height={150} />
                   <p className="text-2xl">THAK-90334</p>
@@ -435,46 +435,46 @@ export default function OPDetalhePage({ params }) {
                   </div>
                 </div>
               </div>
-    </motion.div>
+            </motion.div>
 
-    <motion.div
-      variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-      className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm"
-    >
-       <OPProgressoWidget opId={opId} />
-    </motion.div>
-  </motion.div>
-</section>
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+              className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm"
+            >
+              <OPProgressoWidget opId={opId} />
+            </motion.div>
+          </motion.div>
+        </section>
 
         {/* SEÇÃO 2: OEE Gauges */}
- <SectionHighlight>
-        <OPOEEDetalheWidget opId={opId} />
-      </SectionHighlight>
+        <SectionHighlight>
+          <OPOEEDetalheWidget opId={opId} />
+        </SectionHighlight>
 
-      {/* Listagem de Eventos */}
-      <DetailListingSection
-        id="listagem_histEventos"
-        title="Histórico de Eventos da OP"
-        search={
-          <SearchBar
-            value={buscaEvento}
-            onChange={(e) => setBuscaEvento(e.target.value)}
-            placeholder="Busque por id ou tipo de evento..."
-          />
-        }
-        filterRow={
-          <FilterRow
-            count={dadosEventosExibidos.length}
-            label="eventos"
-            actions={
-              <>
-                <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-                <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-              </>
-            }
-          />
-        }
-      >
+        {/* Listagem de Eventos */}
+        <DetailListingSection
+          id="listagem_histEventos"
+          title="Histórico de Eventos da OP"
+          search={
+            <SearchBar
+              value={buscaEvento}
+              onChange={(e) => setBuscaEvento(e.target.value)}
+              placeholder="Busque por id ou tipo de evento..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosEventosExibidos.length}
+              label="eventos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                </>
+              }
+            />
+          }
+        >
 
           {loading ? (
             <p className="text-gray-500 text-center py-8">
@@ -507,12 +507,12 @@ export default function OPDetalhePage({ params }) {
               )}
             />
           ) : (
-<EmptyState
-            title="Nenhum evento encontrado"
-            message="Não encontramos nenhum evento com esse termo ou filtro."
-          />
+            <EmptyState
+              title="Nenhum evento encontrado"
+              message="Não encontramos nenhum evento com esse termo ou filtro."
+            />
           )}
-      </DetailListingSection>
+        </DetailListingSection>
 
         {/* Listagem de Apontamentos */}
         <DetailListingSection

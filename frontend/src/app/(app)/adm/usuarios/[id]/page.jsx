@@ -200,7 +200,7 @@ export default function ProducaoOperadorPage({ params }) {
         />
 
         {/* Máquina responsável */}
-        <DetailSectionTitle title="Responsável por:" />
+        <DetailSectionTitle title="Responsável por:" className="mt-4"/>
         <Link href="/adm/maquinas/1">
           <UserProfileCard
             imageSrc="/demo_maq.png"
@@ -221,7 +221,7 @@ export default function ProducaoOperadorPage({ params }) {
         </Link>
 
         {/* Seção de Produção */}
-        <DetailSectionTitle title="Produção" />
+        <DetailSectionTitle title="Produção" className="mt-4 pt-6"/>
 
         <SectionHighlight>
           <OEEOperadorWidget operadorId={operadorId} />
@@ -251,7 +251,7 @@ export default function ProducaoOperadorPage({ params }) {
         {/* Listagem de Apontamentos */}
         <DetailListingSection
           id="listagem_apontamentos"
-          title="Apontamentos"
+          title="Histórico de Apontamentos Feitos pelo Usuário"
           search={
             <SearchBar
               value={buscaApontamento}

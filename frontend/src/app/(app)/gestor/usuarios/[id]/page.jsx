@@ -516,7 +516,7 @@ export default function UsuarioDetalheGestor({ params }) {
         {/* Listagem de Apontamentos feito pelo Usuário */}
         <DetailListingSection
           id="listagem_apontamentos"
-          title="Histórico de Apontamentos"
+          title="Histórico de Apontamentos Feitos pelo Usuário"
           search={
             <SearchBar
               value={buscaApontamento}

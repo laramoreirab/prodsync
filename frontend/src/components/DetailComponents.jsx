@@ -30,6 +30,7 @@
 
 import { motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
+import { SPACING } from "@/lib/spacing"
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { FadeUpItem, StaggerWrapper } from "@/components/AnimatedComponents";
@@ -53,23 +54,6 @@ const DV = {
   },
 };
 
-// ─────────────────────────────────────────────
-// DETAIL LAYOUT
-// Wrapper de página de detalhe. Não inclui a
-// sidebar — esta já vem do layout pai (adm/layout).
-// ─────────────────────────────────────────────
-
-/**
- * @param {string}    className   — classes extras
- * @param {string}    paddingX    — padding horizontal (default: "px-4 sm:px-6 lg:px-8")
- */
-export function DetailLayout({ children, className, paddingX = "px-4 sm:px-6 lg:px-8" }) {
-  return (
-    <div className={cn("w-full pb-12 space-y-6", paddingX, className)}>
-      {children}
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────
 // DETAIL BACK LINK
@@ -226,7 +210,7 @@ export function DetailSectionTitle({ title, size = "3xl", className }) {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className={cn("font-bold", sizeClass, className)}
+      className={cn("font-bold", SPACING.sectionGap, sizeClass, className)}
     >
       {title}
     </motion.h2>
@@ -542,10 +526,23 @@ export function SectionHighlight({ children, className }) {
 /**
  * @param {string}  className   — classes extras
  */
+// Mantenha só o DetailPageContainer e delete DetailLayout
+// ou faça DetailLayout ser um alias:
+
 export function DetailPageContainer({ children, className }) {
   return (
-    <div className={cn("w-full mt-6 pb-12 px-4 sm:px-6 lg:px-8 space-y-6", className)}>
+    <div className={cn(
+      "w-full",
+      SPACING.pageTop,
+      SPACING.pageX,
+      SPACING.pageBottom,
+      SPACING.sectionGap,
+      className
+    )}>
       {children}
     </div>
-  );
+  )
 }
+
+// alias para retrocompatibilidade
+export { DetailPageContainer as DetailLayout }

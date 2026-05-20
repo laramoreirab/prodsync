@@ -151,7 +151,6 @@ export default function PageSetores() {
 
   return (
     <PageLayout>
-      <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">
           <PageHeader title="Setores" action={
             <Dialog>
@@ -166,7 +165,7 @@ export default function PageSetores() {
             </Dialog>
           } />
         </section>
-      </div>
+
       {/* Gráficos */}
 
       {/* SEÇÃO 1 */}
@@ -199,7 +198,7 @@ export default function PageSetores() {
 
       {/* Listagem */}
 
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="Listagem de Setores" className="mt-8" />
 
       {/* Busca */}
 
