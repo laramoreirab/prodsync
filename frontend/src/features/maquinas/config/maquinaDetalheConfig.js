@@ -13,7 +13,7 @@ export const oeeEvolucaoConfig = {
 };
  
 export const velocidadeConfig = {
-  valor: { label: "Peças/min:", color: "#004aad" },
+  valor: { label: "Peças/min:", color: "var(--azul-cobalto)" },
 };
  
 export const oeeMetricasMaquinaConfig = [

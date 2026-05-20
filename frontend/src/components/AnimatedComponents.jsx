@@ -368,7 +368,7 @@ export function SearchBar({ value, onChange, placeholder = "Buscar...", classNam
   return (
     <FadeUpItem
       className={cn(
-        "flex items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]",
+        "flex items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]",
         className
       )}
     >

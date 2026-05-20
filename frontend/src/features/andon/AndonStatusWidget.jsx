@@ -17,7 +17,7 @@ const cards = [
   {
     key: "emParada",
     label: "Em Parada",
-    accent: "#b30000",
+    accent: "var(--trash)",
   },
 ];
 

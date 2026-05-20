@@ -91,9 +91,17 @@
   --amarelo: #ffd51e;
   --azul-cobalto: #004aad;
   --cinza-escuro: #545454;
+  --amarelo-setup: #fffbea;
 
   --color-grafico-area: #00357a;
   --color-grafico-colunas: #7d95c6;
+
+  --status-neutral-bg:#ECECEC;
+  --status-neutral-text:#636F87;
+
+  --pencil:#122f60;
+  --trash:#b30000;
+  
 }
 
 .dark {

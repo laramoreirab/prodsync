@@ -149,7 +149,7 @@ function AppearanceSettings({ darkMode, onDarkModeChange }) {
           checked={darkMode}
           onCheckedChange={onDarkModeChange}
           aria-label="Ativar modo escuro"
-          className="data-checked:bg-[#636f87] data-unchecked:bg-[#c3c7c8] dark:data-checked:bg-[#7d95c6] dark:data-unchecked:bg-[#636f87]"
+          className="data-checked:bg-[var(--status-neutral-text)] data-unchecked:bg-[#c3c7c8] dark:data-checked:bg-[#7d95c6] dark:data-unchecked:bg-[#636f87]"
         />
       </div>
     </div>

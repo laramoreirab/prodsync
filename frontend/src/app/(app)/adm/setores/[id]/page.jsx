@@ -295,7 +295,7 @@ export default function SetorEspecificoPage({ params }) {
           action={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[#122f60] cursor-pointer">
+                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -304,7 +304,7 @@ export default function SetorEspecificoPage({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="text-[#b30000] cursor-pointer">
+                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>

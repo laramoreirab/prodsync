@@ -96,7 +96,7 @@ export default function OrdensDeProducao() {
           },
           "Setup": {
             variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-semibold text-sm "
+            className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm "
           },
           "Parada": {
             variant: "destructive",
@@ -108,7 +108,7 @@ export default function OrdensDeProducao() {
           },
           "Aguardando Início": {
             variant: "outline",
-            className: "bg-[#ECECEC] text-[#636F87] text-sm font-semibold border-none"
+            className: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)] text-sm font-semibold border-none"
           }
         };
 
@@ -222,7 +222,7 @@ return (
     <PageHeader title="Ordens de Produção" />
 
     <StaggerWrapper className="grid grid-cols-5 gap-6 w-full">
-      <FadeUpItem className="col-span-1 bg-[#efefef] p-5 flex flex-col gap-15 rounded-lg shadow-sm h-60">
+      <FadeUpItem className="col-span-1 bg-[var(--cinza-claro)] p-5 flex flex-col gap-15 rounded-lg shadow-sm h-60">
         <h1 className="text-[#545454] text-lg text-center font-semibold align-text-top">Aguardando Início</h1>
         <span className="text-black text-center text-4xl font-bold">2</span>
       </FadeUpItem>

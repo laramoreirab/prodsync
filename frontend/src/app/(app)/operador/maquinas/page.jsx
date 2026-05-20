@@ -40,7 +40,7 @@ export default function MaquinaDetalhePage({ params }) {
           {
             label: "Status",
             value: (
-              <span className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">
+              <span className="rounded-xl px-3 text-[var(--trash)] font-semibold bg-red-100">
                 Parada
               </span>
             ),

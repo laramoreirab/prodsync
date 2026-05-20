@@ -1,9 +1,9 @@
 // Status Operacional (DonutChart/PieChart)
 export const maquinaStatusConfig = {
-  produzindo:  { label: "Máquinas ativas:",     color: "#004aad" },
+  produzindo:  { label: "Máquinas ativas:",     color: "var(--azul-cobalto)" },
   parada: { label: "Máquinas paradas:",    color: "#00357a" },
   setup:  { label: "Máquinas Setup:",       color:"#7d95c6" },
-  manutencao:  { label: "Máquinas em manutenção:",       color: "#122f60" },
+  manutencao:  { label: "Máquinas em manutenção:",       color: "var(--pencil)" },
   
 };
 
@@ -31,9 +31,9 @@ export const producaoDefeitosConfig = {
 
 // Status por turno (BarStackedVertical)
 export const maquinasTurnoConfig = {
-  ativas:     { label: "Ativas:",        color: "#004aad" },
+  ativas:     { label: "Ativas:",        color: "var(--azul-cobalto)" },
   paradas:    { label: "Paradas:",       color: "#7d95c6" },
-  manutencao: { label: "Setup:", color: "#122f60" },
+  manutencao: { label: "Setup:", color: "var(--pencil)" },
 };
 
 // Produção total (AreaChart)

@@ -180,7 +180,7 @@ export default function ProducaoOperadorPage({ params }) {
           actions={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[#122f60] cursor-pointer">
+                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -188,7 +188,7 @@ export default function ProducaoOperadorPage({ params }) {
                 </DialogContent>
               </Dialog>
               <Dialog>
-                <DialogTrigger className="text-[#b30000] cursor-pointer">
+                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -215,7 +215,7 @@ export default function ProducaoOperadorPage({ params }) {
               { label: "Velocidade Média", value: "40 peças/h" },
             ]}
             actions={
-              <span className="rounded-xl px-3 py-1 text-[#b30000] font-semibold bg-red-100 text-sm">Parada</span>
+              <span className="rounded-xl px-3 py-1 text-[var(--trash)] font-semibold bg-red-100 text-sm">Parada</span>
             }
           />
         </Link>

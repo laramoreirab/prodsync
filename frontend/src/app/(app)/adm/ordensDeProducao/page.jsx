@@ -149,7 +149,7 @@ const colunasOrdemProd = [
         },
         "Aguardando Início": {
           variant: "outline",
-          className: "!bg-[#ECECEC] !text-[#636F87] !border-slate-500/30 text-sm font-semibold border-none dark:!border-slate-300/45 dark:!bg-slate-300/20 dark:!text-slate-100"
+          className: "!bg-[var(--status-neutral-bg)] !text-[var(--status-neutral-text)] !border-slate-500/30 text-sm font-semibold border-none dark:!border-slate-300/45 dark:!bg-slate-300/20 dark:!text-slate-100"
         }
       };
       const item = config[valor] || { icon: null };

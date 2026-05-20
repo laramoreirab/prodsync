@@ -20,7 +20,7 @@ const badgeVariants = cva(
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
         parada: "font-semibold text-sm bg-vermelho-vivido/10 text-vermelho-vivido",
-        setup: "font-semibold text-sm bg-[#fffbea] text-amarelo ",
+        setup: "font-semibold text-sm bg-[] text-amarelo ",
         produzindo: "bg-green-500/15 text-green-600 text-sm font-semibold border-none",
       },
     },
