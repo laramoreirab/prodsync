@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
+import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
@@ -124,7 +125,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                 try {
                     const options = { method : "GET"}
                     const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`,options)
-                    setListaTurnos(dados.dados);
+                    setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
                 } catch (error) {
                     console.log(error)
                     toast.error("Erro ao carregar turnos.");

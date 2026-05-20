@@ -22,6 +22,7 @@ import FormCadastroUsuario from "@/components/ui/forms/usuarios/formCadastroUsua
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import turnoCrudService from "@/services/turnoCrudService";
+import { filtrarPorNumberRange } from "@/lib/filterUtils";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
@@ -227,11 +228,14 @@ export default function SetorEspecificoPage({ params }) {
     { id: "oee", label: "OEE Médio", type: "number-range" },
   ];
 
+  const turnosAgrupados = agruparTurnos(turnos);
+  const opcoesTurnoFiltro = [...new Set(turnosAgrupados.map((t) => t.nome_turno).filter(Boolean))];
+
   const usuariosFilter = [
     { id: "funcao", label: "Função", type: "checkbox", options: ["Operador", "Gestor"] },
-    { id: "turno", label: "Turno", type: "checkbox", options: ["Manhã", "Tarde", "Noite"] },
+    { id: "turno", label: "Turno", type: "checkbox", options: opcoesTurnoFiltro },
     { id: "oee", label: "OEE Médio", type: "number-range" },
-  ]
+  ];
 
   // funções para ordenação e aplicação de filtros 
   // ainda precisam ser implementadas! no momento que elas foram feitas, não havia tabelas ainda
@@ -272,15 +276,23 @@ export default function SetorEspecificoPage({ params }) {
     if (filtrosSelecionados.status?.length) {
       filtrados = filtrados.filter((maquina) => filtrosSelecionados.status.includes(maquina.status));
     }
-    if (filtrosSelecionados.oee) {
-      const { min, max } = filtrosSelecionados.oee;
+    if (filtrosSelecionados.data?.start) {
+      const inicio = new Date(filtrosSelecionados.data.start);
       filtrados = filtrados.filter((maquina) => {
-        const oee = parseFloat(String(maquina.oee_atual).replace("%", "")) || 0;
-        return oee >= (min || 0) && oee <= (max || Infinity);
+        const dataParada = maquina.ultima_parada;
+        return dataParada && dataParada !== "-" && new Date(dataParada) >= inicio;
       });
     }
+    if (filtrosSelecionados.data?.end) {
+      const fim = new Date(filtrosSelecionados.data.end);
+      filtrados = filtrados.filter((maquina) => {
+        const dataParada = maquina.ultima_parada;
+        return dataParada && dataParada !== "-" && new Date(dataParada) <= fim;
+      });
+    }
+    filtrados = filtrarPorNumberRange(filtrados, "oee_atual", filtrosSelecionados.oee);
     setDadosMaquina(filtrados);
-  }
+  };
 
   const aplicarFiltrosUsers = (filtrosSelecionados) => {
     let filtrados = [...usuarios];
@@ -288,17 +300,14 @@ export default function SetorEspecificoPage({ params }) {
       filtrados = filtrados.filter((usuario) => filtrosSelecionados.funcao.includes(usuario.funcao));
     }
     if (filtrosSelecionados.turno?.length) {
-      filtrados = filtrados.filter((usuario) => filtrosSelecionados.turno.includes(usuario.turno));
-    }
-    if (filtrosSelecionados.oee) {
-      const { min, max } = filtrosSelecionados.oee;
       filtrados = filtrados.filter((usuario) => {
-        const oee = parseFloat(String(usuario.oee_medio).replace("%", "")) || 0;
-        return oee >= (min || 0) && oee <= (max || Infinity);
+        const turnosUsuario = String(usuario.turno || "").split(",").map((t) => t.trim());
+        return filtrosSelecionados.turno.some((t) => turnosUsuario.includes(t));
       });
     }
+    filtrados = filtrarPorNumberRange(filtrados, "oee_medio", filtrosSelecionados.oee);
     setDadosExibidos(filtrados);
-  }
+  };
 
   const maquinasExibidas = dadosMaquina.filter((maquina) => {
     const termo = buscaMaquinas.toLowerCase();
@@ -309,8 +318,6 @@ export default function SetorEspecificoPage({ params }) {
     const termo = buscaUsuarios.toLowerCase();
     return usuario.nome?.toLowerCase().includes(termo) || String(usuario.id_usuario || "").includes(termo);
   });
-
-  const turnosAgrupados = agruparTurnos(turnos);
 
   const excluirSetorAtual = async () => {
     router.push("/adm/setores");
@@ -377,7 +384,7 @@ export default function SetorEspecificoPage({ params }) {
                 <ul className="list-disc list-inside ml-4">
                   {turnosAgrupados.length > 0 ? (
                     turnosAgrupados.map((t) => (
-                      <li key={t.id_turno}>
+                      <li key={`${t.nome_turno}-${t.hora_inicio}-${t.hora_fim}`}>
                         {t.nome_turno} ({t.dias.join(", ")}): {formatarHorario(t.hora_inicio)} - {formatarHorario(t.hora_fim)}
                       </li>
                     ))
@@ -530,8 +537,7 @@ export default function SetorEspecificoPage({ params }) {
               /* se não tiver correspondência (length === 0), mostra apenas a div */
               <div className="flex flex-col items-center justify-center p-8 text-gray-500 w-full mt-4">
                 <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum setor encontrado</h2>
-                {/* <p>Não encontramos nenhum resultado para "{busca}".</p> */}
+                <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
               </div>
             )}
           </div>
@@ -636,8 +642,7 @@ export default function SetorEspecificoPage({ params }) {
               /* se não tiver correspondência (length === 0), mostra apenas a div */
               <div className="flex flex-col items-center justify-center p-8 text-gray-500 w-full mt-4">
                 <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum setor encontrado</h2>
-                {/* <p>Não encontramos nenhum resultado para "{busca}".</p> */}
+                <h2 className="text-xl font-semibold">Nenhum usuário encontrado</h2>
               </div>
             )}
           </div>
