@@ -23,6 +23,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import FormCadastroEventoGestor from "@/components/ui/forms/historicoEventos/formCadastroEventoGestor";
+import { filtrarPorDuracaoMax, filtrarPorNumberRange } from "@/lib/filterUtils";
 
 
 
@@ -225,7 +226,7 @@ export default function OPDetalheGestor({ params }) {
   const eventosFilter = [
     { id: "evento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
-    // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
 
 
@@ -260,6 +261,10 @@ export default function OPDetalheGestor({ params }) {
           return dataEvento <= dataFimFiltro;
         });
       }
+    }
+
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
     }
 
     setDadosEventos(dadosFiltrados);

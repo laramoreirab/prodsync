@@ -25,6 +25,7 @@ import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaqu
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
+import { filtrarPorDuracaoMax, filtrarPorNumberRange } from "@/lib/filterUtils";
 
 const colunasMaquina = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
@@ -260,7 +261,7 @@ export default function MaquinaDetalheGestor({ params }) {
   const eventosFilter = [
     { id: "tipoEvento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
     { id: "data", label: "Data", type: "date-range" },
-    // {id:"duracao", label:"Duração", type:"time-max"} --> não funcionou, tentei de várias formas mas o filtro por duração não funcionou, então deixei comentado por enquanto. quem quiser tentar implementar depois, fique à vontade!
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
 
   const aplicarFiltrosEventos = (filtrosSelecionados) => {
@@ -286,6 +287,13 @@ export default function MaquinaDetalheGestor({ params }) {
           parseData(evento.data) <= new Date(filtrosSelecionados.data.end)
         );
       }
+    }
+
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(
+        dadosFiltrados.map((e) => ({ ...e, inicio: e.inicio ?? parseData(e.data), fim: e.fim })),
+        filtrosSelecionados.duracao.max
+      );
     }
 
     setDados(dadosFiltrados);
