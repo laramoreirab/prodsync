@@ -1,85 +1,90 @@
 var wifi = require("Wifi");
-var http = require("http"); // 1. Voltamos para o HTTP normal!
+var mqtt = require("tinyMQTT"); 
 
-// Configuração de Pinos
-var PIN_VERDE = D32;    // PRODUZINDO
-var PIN_AMARELO = D33;  // SETUP
-var PIN_VERMELHO = D25; // PARADA
+var PIN_VERDE = D32;    
+var PIN_AMARELO = D33;  
+var PIN_VERMELHO = D25; 
 
-// Configuração da Máquina
-var MAQUINA_ID = 1;
+var MAQUINA_ID = 20;
 var statusAtual = null; 
+var clienteMQTT = null;
 
-// --- 1. Gestão de Conexão Wi-Fi ---
+// Este é o canal (Tópico) exclusivo da sua máquina
+var TOPICO = "phietro/fabrica/maquina1/status";
+
 function conectaWifi() {
-  console.log("Conectando ao Wi-Fi...");
-  wifi.connect("Phietro", { password: "jchr3942" }, function(err) {
-    if (err) {
-      console.log("Erro no Wi-Fi. Tentando novamente em 10s...");
-      setTimeout(conectaWifi, 10000);
-      return;
-    }
-    console.log("Conectado! IP: " + wifi.getIP().ip);
-  });
+  console.log("Limpando conexões antigas...");
+  wifi.disconnect(); // Garante que o rádio do ESP32 comece do zero
+
+  // Aguarda 1 segundo para o chip limpar a memória antes de tentar reconectar
+  setTimeout(function() {
+    console.log("Tentando conectar ao Wi-Fi: Phietro...");
+    wifi.connect("Phietro", { password: "123" }, function(err) {
+      if (err) {
+        console.log("Erro no Wi-Fi. Tentando em 10s...");
+        setTimeout(conectaWifi, 10000);
+        return;
+      }
+      console.log("✅ Wi-Fi Conectado! IP:", wifi.getIP().ip);
+      conectaBroker(); 
+    });
+  }, 1000);
 }
 
-// --- 2. Função de Envio HTTP POST ---
-function enviaStatus(novoStatus) {
-  if (statusAtual === novoStatus) return; 
+function conectaBroker() {
+  console.log("Conectando ao broker MQTT...");
   
-  statusAtual = novoStatus;
-  console.log("Mudança de Status: " + statusAtual);
+  // Conecta na porta padrão 1883 sem criptografia (zero travamentos de RAM)
+  clienteMQTT = mqtt.create("broker.hivemq.com");
+  
+  clienteMQTT.on("connected", function() {
+    console.log("Conectado ao Broker HiveMQ com sucesso!");
+  });
 
+  clienteMQTT.on("disconnected", function() {
+    console.log("Desconectado do Broker. Tentando reconectar...");
+    setTimeout(conectaBroker, 5000);
+  });
+
+  clienteMQTT.connect();
+}
+
+function enviaStatus(novoStatus) {
+  if (!clienteMQTT) {
+    console.log("Aguarde, MQTT ainda não conectou...");
+    return;
+  }
+  
+  if (statusAtual === novoStatus) return; 
+  statusAtual = novoStatus;
+  
   var dados = JSON.stringify({
     maquina_id: MAQUINA_ID,
     status: statusAtual
   });
 
-  var options = {
-    host: 'webhook.site', 
-    port: 80, // 2. AQUI ESTÁ O SEGREDO! Porta 80 é o padrão da internet para HTTP
-    path: '/5955e794-6d9a-47af-befb-ec1520a8f06f', 
-    method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": dados.length
-    }
-  };
-
-  // 3. Voltamos para http.request
-  var req = http.request(options, function(res) {
-    res.on('data', function(data) {
-      console.log("Resposta do Servidor: " + data);
-    });
-  });
-
-  req.on('error', function(err) {
-    console.log("Erro no Envio: ", err);
-    statusAtual = null; 
-  });
-
-  req.end(dados);
+  // Publica a mensagem no canal de forma instantânea
+  clienteMQTT.publish(TOPICO, dados);
+  console.log("Publicado no canal MQTT:", dados);
 }
 
-// --- 3. Configuração dos Botões ---
 function configuraBotoes() {
   pinMode(PIN_VERDE, "input_pullup");
   pinMode(PIN_AMARELO, "input_pullup");
   pinMode(PIN_VERMELHO, "input_pullup");
 
   setWatch(function() { 
-    enviaStatus("PRODUZINDO"); 
+    setTimeout(function() { enviaStatus("PRODUZINDO"); }, 10); 
   }, PIN_VERDE, { repeat: true, edge: "falling", debounce: 50 });
 
   setWatch(function() { 
-    enviaStatus("SETUP"); 
+    setTimeout(function() { enviaStatus("SETUP"); }, 10); 
   }, PIN_AMARELO, { repeat: true, edge: "falling", debounce: 50 });
 
   setWatch(function() { 
-    enviaStatus("PARADA"); 
+    setTimeout(function() { enviaStatus("PARADA"); }, 10); 
   }, PIN_VERMELHO, { repeat: true, edge: "falling", debounce: 50 });
 }
 
-// --- Inicialização ---
 configuraBotoes();
 conectaWifi();
