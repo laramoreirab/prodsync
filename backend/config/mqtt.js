@@ -1,5 +1,4 @@
 import mqtt from 'mqtt';
-import { apiFetch } from '../../frontend/src/lib/api.js';
 
 // Conexão via WebSockets seguros para não travar na escola e rodar direto no Render
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
@@ -20,8 +19,12 @@ clienteMQTT.on('message', async (topic, message) => {
     const dados = JSON.parse(message.toString());
     console.log(dados)
     console.log(`[NOVO STATUS] Máquina: ${dados.maquina_id} | Status: ${dados.status}`);
-    const enviandoRequisicao = await apiFetch('/api/eventos/maquina', {
+    const enviandoRequisicao = await fetch('https://prodsync-backend.onrender.com/api/eventos/maquina', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
       body: JSON.stringify(dados)
     });
 
