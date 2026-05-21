@@ -34,8 +34,8 @@ import {
   TabsContent,
 } from "@/components/ui/tabs";
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import {
   filtrarPorDataInicio,
   filtrarPorDuracaoMax,

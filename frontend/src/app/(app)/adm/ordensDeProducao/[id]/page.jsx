@@ -16,7 +16,6 @@ import {
   Trash2,
   Flame,
   Plus,
-  Search,
   EyeIcon,
   Loader2,
   MoveHorizontal,
@@ -38,33 +37,18 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import { opCrudService } from "@/services/opCrudService";
-import { FadeUpItem } from "@/components/AnimatedComponents";
 
-// AnimatedComponents
+// AnimatedComponents (FadeUpItem duplicado foi removido daqui e deixado só na desestruturação)
 import {
-  PageLayout,
   SearchBar,
   FilterRow,
   EmptyState,
-  WidgetCard,
   FadeUpItem
 } from "@/components/AnimatedComponents";
 
 // DetailComponents
-import {
-  DetailPageContainer,
-  DetailBackLink,
-  DetailHeader,
-  DetailActions,
-  DetailInfoCard,
-  DetailInfoColumn,
-  DetailInfoField,
-  DetailWidgetGrid,
-  DetailWidgetCard,
-  DetailListingSection,
-  StatusBadge,
-} from "@/components/DetailComponents";
-import { filtrarPorDuracaoMax, filtrarPorNumberRange, duracaoEmMinutos } from "@/lib/filterUtils";
+import { DetailListingSection } from "@/components/DetailComponents";
+import { filtrarPorDuracaoMax } from "@/lib/filterUtils";
 
 const colunasEventos = [
   { id: "id", key: "id", label: "ID", className: "w-20 text-center justify-center" },
@@ -143,7 +127,7 @@ const colunasApontamento = [
 const formatarPeriodo = (inicio, fim) => {
   if (!inicio) return "-";
   const ini = new Date(inicio);
-  const textoIni = `${ini.toLocaleDateString("pt-BR")} (${ini.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+  const textoIni = `${ini.toLocaleDateString("pt-BR")} (${ini.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })})`;
   if (!fim) return `${textoIni})`;
   const end = new Date(fim);
   return `${textoIni} - ${end.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })})`;
@@ -259,6 +243,12 @@ export default function OPDetalhePage({ params }) {
     carregarDados();
   }, [carregarDados]);
 
+  // Função handleEditBatch adicionada para corrigir o erro da prop onEditSelected
+  const handleEditBatch = (rows) => {
+    console.log("Linhas selecionadas para edição em lote:", rows);
+    // Adicione a lógica de edição em lote aqui
+  };
+
   const opcoesOrdenacaoEventos = [
     { label: "ID Crescente", value: "id_asc" },
     { label: "ID Decrescente", value: "id_desc" },
@@ -305,7 +295,7 @@ export default function OPDetalhePage({ params }) {
     let dadosFiltrados = [...todosEventos];
 
     if (filtrosSelecionados.evento?.length) {
-      dadosFiltrados = dadosFiltrados.filter((e) => filtrosSelecionados.evento.includes(e.evento),);
+      dadosFiltrados = dadosFiltrados.filter((e) => filtrosSelecionados.evento.includes(e.evento));
     }
 
     if (filtrosSelecionados.data?.start) {
@@ -335,13 +325,8 @@ export default function OPDetalhePage({ params }) {
     );
   });
 
+  // Duplicações removidas deste array
   const opcoesOrdenacaoApontamento = [
-    { label: "ID Crescente", value: "id_asc" },
-    { label: "ID Decrescente", value: "id_desc" },
-    { label: "Produzido Crescente", value: "produzido_asc" },
-    { label: "Produzido Decrescente", value: "produzido_desc" },
-    { label: "Refugo Crescente", value: "refugo_asc" },
-    { label: "Refugo Decrescente", value: "refugo_desc" },
     { label: "ID Crescente", value: "id_asc" },
     { label: "ID Decrescente", value: "id_desc" },
     { label: "Produzido Crescente", value: "produzido_asc" },
@@ -364,10 +349,10 @@ export default function OPDetalhePage({ params }) {
     setDadosApontamentoState(dadosCopiados);
   };
 
+  // Duplicações removidas deste array
   const apontamentoFilter = [
     { id: "data", label: "Data", type: "date-range" },
     { id: "produzido", label: "Produzido", type: "number-range" },
-    { id: "refugo", label: "Refugo", type: "number-range" },
     { id: "refugo", label: "Refugo", type: "number-range" },
   ];
 
@@ -611,7 +596,6 @@ export default function OPDetalhePage({ params }) {
                 onEditSelected={(rows) => handleEditBatch(rows)}
                 acoesDropdown={(evento) => (
                   <>
-                    {/* O comentário dentro do fragmento agora é válido */}
                     <Dialog>
                       <DialogTrigger asChild>
                         <DropdownMenuItem

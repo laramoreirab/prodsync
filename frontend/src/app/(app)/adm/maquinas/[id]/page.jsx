@@ -357,11 +357,6 @@ export default function MaquinaDetalhePage({ params }) {
     setDadosApontamentoState(dadosFiltrados);
   };
 
-  const dadosExibidos = dados.filter((evento) => {
-    const t = buscaEvento.toLowerCase();
-    return (evento.tipoEvento?.toLowerCase() || "").includes(t) || (evento.motivo?.toLowerCase() || "").includes(t) || evento.id?.toString().includes(t);
-  });
-
   const dadosApontamentosFiltrados = dadosApontamentoState.filter((a) => {
     const t = buscaApontamento.toLowerCase();
     return String(a.op || "").toLowerCase().includes(t) || a.id?.toString().includes(t);
@@ -526,73 +521,58 @@ export default function MaquinaDetalhePage({ params }) {
           )}
         </DetailListingSection>
 
-          {/* Listagem de Apontamentos */}
-          <section>
-            <div>
-              <h1 className="text-4xl font-semibold mb-3">Histórico de Apontamentos da Máquina</h1>
-              {/* Busca */}
-              <div className="flex searchbar">
-                <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-                  <input
-                    type="search"
-                    className="p-2 w-full outline-none bg-transparent"
-                    placeholder="Busque por nome ou id..."
-                    value={buscaApontamento}
-                    onChange={(e) => setBuscaApontamento(e.target.value)}
-                  />
-                  <button className="outline-none cursor-pointer mr-2"><Search /></button>
-                </div>
-              </div>
-
-              <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-                <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-
-                <div className="flex items-center gap-4 mb-3">
+        <DetailListingSection
+          id="listagem_histApontamentos"
+          title="Histórico de Apontamentos da Máquina"
+          search={
+            <SearchBar
+              value={buscaApontamento}
+              onChange={(e) => setBuscaApontamento(e.target.value)}
+              placeholder="Busque por id..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosApontamentosFiltrados.length}
+              label="apontamentos"
+              actions={
+                <>
                   <OrdenarDropdown
                     label="Ordenar por"
                     options={opcoesOrdenacaoApontamento}
                     onSortChange={handleSortApontamento}
                   />
-
                   <FilterDropdown
                     filtersConfig={apontamentoFilter}
                     onApply={aplicarFiltrosApontamento}
                   />
-                </div>
-              </div>
-
-              {dadosApontamentosFiltrados.length > 0 ? (
-                <TableListagens
-                  data={dadosApontamentosFiltrados} 
-                  columns={colunasApontamento}
-                  acoesDropdown={(apontamento) => (
-                    <>
-                      <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
-                          <EyeIcon className="mr-2 h-4 w-4" />
-                          Ver OP relacionada
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                  <Search className="w-12 h-12 mb-4 text-gray-300" />
-                  <h2 className="text-xl font-semibold">Nenhuma máquina encontrada</h2>
-                  <p>Não encontramos nenhum apontamento correspondente ao filtro ou busca.</p>
-                </div>
+                </>
+              }
+            />
+          }
+        >
+          {dadosApontamentosFiltrados.length > 0 ? (
+            <TableListagens
+              data={dadosApontamentosFiltrados}
+              columns={colunasApontamento}
+              acoesDropdown={(apontamento) => (
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver OP relacionada
+                  </Link>
+                </DropdownMenuItem>
               )}
+            />
+          ) : (
+            <EmptyState
+              title="Nenhum apontamento encontrado"
+              message="Não encontramos apontamentos correspondentes ao filtro ou busca."
+            />
+          )}
+        </DetailListingSection>
 
-
-            </div>
-          </section>
-
-
-        </section >
-
-      </div >
-
-    </main >
+      </DetailPageContainer>
+    </PageLayout>
   );
 }
