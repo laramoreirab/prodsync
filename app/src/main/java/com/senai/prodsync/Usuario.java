@@ -1,65 +1,77 @@
 package com.senai.prodsync;
 
-import androidx.annotation.NonNull;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 public class Usuario {
-    @NonNull
-    @SerializedName("id_usuario")
+    @SerializedName(value = "id_usuario", alternate = {"id"})
     private String id;
     
     private String nome;
     
-    @SerializedName(value = "tipo", alternate = {"cargo", "funcao", "role", "tipo_usuario", "nivel", "cargo_usuario", "tipo_acesso"})
+    @SerializedName(value = "funcao", alternate = {"tipo", "cargo"})
     private String funcao;
     
     @SerializedName("setor")
-    private SetorInfo setorInfo;
+    private JsonElement setor; 
     
-    @SerializedName(value = "email", alternate = {"email_usuario", "contato"})
+    @SerializedName("turno")
+    private JsonElement turno;
+
+    @SerializedName(value = "maquina", alternate = {"maquina_responsavel", "serie_maquina", "id_maquina"})
+    private JsonElement maquina;
+    
+    @SerializedName(value = "email", alternate = {"email_usuario"})
     private String email;
 
-    private String turno;
-
-    @SerializedName(value = "cpf", alternate = {"cpf_usuario", "documento"})
+    @SerializedName(value = "cpf", alternate = {"cpf_usuario"})
     private String cpf;
     
-    @SerializedName("maquina_responsavel")
-    private String maquinaResponsavel;
-    
-    @SerializedName("foto")
+    @SerializedName(value = "imagem_perfil", alternate = {"foto", "foto_url"})
     private String fotoUrl;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() { return id != null ? id : "0"; }
     
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() { return nome != null ? nome : "Sem nome"; }
     
-    public String getFuncao() { return funcao; }
-    public void setFuncao(String funcao) { this.funcao = funcao; }
+    public String getFuncao() { return funcao != null ? funcao : "Não informado"; }
     
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmail() { return (email != null && !email.isEmpty()) ? email : "Não informado"; }
     
-    public String getTurno() { return turno; }
-    public void setTurno(String turno) { this.turno = turno; }
+    public String getCpf() { return (cpf != null && !cpf.isEmpty()) ? cpf : "Não informado"; }
     
-    public String getCpf() { return cpf; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
-    
-    public String getFotoUrl() { return fotoUrl; }
-    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
-
-    public String getMaquinaResponsavel() { return maquinaResponsavel; }
-    public void setMaquinaResponsavel(String maquinaResponsavel) { this.maquinaResponsavel = maquinaResponsavel; }
-
-    public String getSetor() { 
-        return (setorInfo != null) ? setorInfo.nomeSetor : "Geral"; 
+    public String getFotoUrl() { 
+        if (fotoUrl != null && !fotoUrl.startsWith("http") && !fotoUrl.isEmpty()) {
+            return "https://prodsync-backend.onrender.com/uploads/imagens/" + fotoUrl;
+        }
+        return fotoUrl; 
     }
 
-    public static class SetorInfo {
-        @SerializedName("nome_setor")
-        public String nomeSetor;
+    public String getSetor() { 
+        return extractString(setor, "nome_setor", "Geral");
+    }
+
+    public String getTurno() { 
+        return extractString(turno, "nome_turno", "Não informado");
+    }
+
+    public String getMaquinaResponsavel() { 
+        String res = extractString(maquina, "nome", null);
+        if (res == null || res.equals("Nenhuma")) {
+            res = extractString(maquina, "serie", "Nenhuma");
+        }
+        return res;
+    }
+
+    private String extractString(JsonElement element, String fieldName, String defaultValue) {
+        if (element == null || element.isJsonNull()) return defaultValue;
+        if (element.isJsonPrimitive()) return element.getAsString();
+        if (element.isJsonObject()) {
+            JsonElement field = element.getAsJsonObject().get(fieldName);
+            if (field != null && !field.isJsonNull()) {
+                return field.getAsString();
+            }
+        }
+        return defaultValue;
     }
 }

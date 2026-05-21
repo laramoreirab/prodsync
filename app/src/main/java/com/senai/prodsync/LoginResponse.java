@@ -1,5 +1,6 @@
 package com.senai.prodsync;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 public class LoginResponse {
@@ -17,7 +18,7 @@ public class LoginResponse {
         private String tipo;
         
         @SerializedName("setor")
-        private SetorInfo setorInfo;
+        private JsonElement setor;
         
         @SerializedName("id_usuario")
         private int idUsuario;
@@ -29,10 +30,13 @@ public class LoginResponse {
         private int idEmpresa;
 
         private String email;
-        private String turno;
+        
+        @SerializedName("turno")
+        private JsonElement turno;
+        
         private String cpf;
         
-        @SerializedName("foto")
+        @SerializedName(value = "foto", alternate = {"imagem_perfil"})
         private String fotoUrl;
 
         public String getToken() { return token; }
@@ -40,7 +44,7 @@ public class LoginResponse {
         public String getTipo() { return tipo; }
         
         public String getSetor() { 
-            return (setorInfo != null) ? setorInfo.nomeSetor : "Geral"; 
+            return extractString(setor, "nome_setor", "Geral");
         }
         
         public int getIdUsuario() { return idUsuario; }
@@ -48,14 +52,27 @@ public class LoginResponse {
         public int getIdEmpresa() { return idEmpresa; }
 
         public String getEmail() { return email; }
-        public String getTurno() { return turno; }
+        public String getTurno() { 
+            return extractString(turno, "nome_turno", "Não informado");
+        }
         public String getCpf() { return cpf; }
-        public String getFotoUrl() { return fotoUrl; }
+        public String getFotoUrl() { 
+            if (fotoUrl != null && !fotoUrl.startsWith("http") && !fotoUrl.isEmpty()) {
+                return "https://prodsync-backend.onrender.com/uploads/imagens/" + fotoUrl;
+            }
+            return fotoUrl; 
+        }
 
-        // Classe interna para mapear o objeto setor do backend
-        public static class SetorInfo {
-            @SerializedName("nome_setor")
-            public String nomeSetor;
+        private String extractString(JsonElement element, String fieldName, String defaultValue) {
+            if (element == null || element.isJsonNull()) return defaultValue;
+            if (element.isJsonPrimitive()) return element.getAsString();
+            if (element.isJsonObject()) {
+                JsonElement field = element.getAsJsonObject().get(fieldName);
+                if (field != null && !field.isJsonNull()) {
+                    return field.getAsString();
+                }
+            }
+            return defaultValue;
         }
     }
 }

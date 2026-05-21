@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             btnLogin.setEnabled(false);
-            btnLogin.setText("Conectando...");
+            btnLogin.setText("Entrando...");
 
             LoginRequest loginRequest = new LoginRequest(id, senha);
 
