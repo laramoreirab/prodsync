@@ -1,5 +1,5 @@
 import mqtt from 'mqtt';
-import { apiFetch } from '../frontend/src/lib/api.js';
+import { apiFetch } from '../../frontend/src/lib/api.js';
 
 // Conexão via WebSockets seguros para não travar na escola e rodar direto no Render
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
