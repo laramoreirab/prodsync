@@ -1,15 +1,15 @@
-const mqtt = require('mqtt');
+import mqtt from 'mqtt';
 
 // Conexão via WebSockets seguros para não travar na escola e rodar direto no Render
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 const TOPICO = 'phietro/fabrica/maquina1/status';
 
 clienteMQTT.on('connect', () => {
-  console.log('✅ SUCESSO: O Backend conectou ao Broker HiveMQ!');
+  console.log('SUCESSO: O Backend conectou ao Broker HiveMQ!');
   
   clienteMQTT.subscribe(TOPICO, (err) => {
     if (!err) {
-      console.log(`🎧 Escutando a placa no canal: ${TOPICO}`);
+      console.log(`Escutando a placa no canal: ${TOPICO}`);
     }
   });
 });
