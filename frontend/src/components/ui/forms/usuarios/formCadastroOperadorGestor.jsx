@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
+import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
+import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
@@ -57,7 +59,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                     apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, { method: "GET" }),
                     apiFetch(`/api/maquinas/setor/${formData.id_setor}`, { method: "GET" }),
                 ]);
-                setListaTurnos(turnos.dados || []);
+                setListaTurnos(deduplicarTurnosParaSelect(turnos.dados || []));
                 setListaMaquinas(maquinas.dados || []);
             } catch (error) {
                 console.error(error);
@@ -88,9 +90,10 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
         e.preventDefault();
 
         const payload = new FormData();
+        const cpfLimpo = formData.cpf.replace(/\D/g, '');
         //formData.append('campo', value)
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpf);
+        payload.append('cpf', formData.cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', 'Operador');
@@ -179,6 +182,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
+                            mascara={mascaraCPF}
                             required />
                     </div>
                     <div>

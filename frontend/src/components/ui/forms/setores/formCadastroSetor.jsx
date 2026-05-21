@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, X as XIcon, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Plus, X as XIcon, ChevronDown, Loader2 } from "lucide-react";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -18,6 +18,13 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
     const [funcaoSelecionada, setFuncaoSelecionada] = useState("");
     const [listaEquipe, setListaEquipe] = useState([]);
     const [equipeSelecionada, setEquipeSelecionada] = useState([]);
+    const [carregando, setCarregando] = useState(false);
+    const submitEmAndamentoRef = useRef(false);
+
+    const tipoUsuario = (usuario) => usuario?.tipo ?? usuario?.funcao;
+    const usuariosFiltrados = funcaoSelecionada
+        ? listaEquipe.filter((usuario) => tipoUsuario(usuario) === funcaoSelecionada)
+        : listaEquipe;
 
     useEffect(() => {
         async function carregarMaquinas() {
@@ -51,6 +58,11 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
         if (!idMaquina || maquinasSelecionadas.some(m => m.id_maquina === idMaquina)) return;
 
         const maquina = listaMaquinas.find(m => m.id_maquina === idMaquina);
+        if (maquina?.id_setor) {
+            toast.error("Esta maquina ja esta vinculada a outro setor.");
+            setMaquinaSelecionada("");
+            return;
+        }
         if (maquina) setMaquinasSelecionadas([...maquinasSelecionadas, maquina]);
         setMaquinaSelecionada("");
     };
@@ -65,6 +77,16 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
         if (!idUsuario || !funcaoSelecionada || equipeSelecionada.some(u => u.id_usuario === idUsuario)) return;
 
         const usuario = listaEquipe.find(u => u.id_usuario === idUsuario);
+        if (funcaoSelecionada === "Gestor" && tipoUsuario(usuario) !== "Gestor") {
+            toast.error("Apenas usuarios do tipo Gestor podem ser definidos como gestor do setor.");
+            return;
+        }
+
+        if (funcaoSelecionada === "Operador" && tipoUsuario(usuario) !== "Operador") {
+            toast.error("Apenas usuarios do tipo Operador podem ser definidos como operador do setor.");
+            return;
+        }
+
         if (usuario) setEquipeSelecionada([...equipeSelecionada, { ...usuario, funcao: funcaoSelecionada }]);
         setUsuarioSelecionado("");
         setFuncaoSelecionada("");
@@ -76,6 +98,9 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitEmAndamentoRef.current) return;
+        submitEmAndamentoRef.current = true;
+        setCarregando(true);
 
         try {
             const novoSetor = await setorCrudService.create({
@@ -114,7 +139,10 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
             if (onCadastroSucesso) onCadastroSucesso();
         } catch (error) {
             console.error("Erro ao criar setor:", error);
-            toast.error("Erro ao criar setor.");
+            toast.error(error.message || "Erro ao criar setor.");
+        } finally {
+            submitEmAndamentoRef.current = false;
+            setCarregando(false);
         }
     };
 
@@ -168,7 +196,9 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                                 className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
                             >
                                 <option value="">Selecione...</option>
-                                {listaMaquinas.map((maquina) => (
+                                {listaMaquinas
+                                    .filter((maquina) => !maquina.id_setor)
+                                    .map((maquina) => (
                                     <option key={maquina.id_maquina} value={maquina.id_maquina}>
                                         {maquina.nome}
                                     </option>
@@ -180,7 +210,9 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                         </div>
 
                         <button
+                            type="button"
                             onClick={adicionarMaquina}
+                            disabled={carregando}
                             className="bg-[#002C6A] hover:bg-[#001f4d] text-white rounded-full w-9 h-9 flex items-center justify-center focus:outline-none transition-colors shrink-0"
                         >
                             <Plus className="h-5 w-5" />
@@ -218,9 +250,9 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                                     className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 bg-white focus:outline-none shadow-sm text-gray-400 text-lg"
                                 >
                                     <option value="">Selecione...</option>
-                                    {listaEquipe.map((usuario) => (
+                                    {usuariosFiltrados.map((usuario) => (
                                         <option key={usuario.id_usuario} value={usuario.id_usuario}>
-                                            {usuario.nome}
+                                            {usuario.nome} ({tipoUsuario(usuario)})
                                         </option>
                                     ))}
                                 </select>
@@ -249,7 +281,9 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                         </div>
 
                         <button
+                            type="button"
                             onClick={adicionarColaborador}
+                            disabled={carregando}
                             className="bg-[#002C6A] hover:bg-[#001f4d] text-white rounded-full w-9 h-9 flex items-center justify-center focus:outline-none transition-colors shrink-0 mb-0.5"
                         >
                             <Plus className="h-5 w-5" />
@@ -277,8 +311,13 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg">
-                        Criar
+                    <button
+                        type="submit"
+                        disabled={carregando}
+                        className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                        {carregando && <Loader2 className="h-5 w-5 animate-spin" />}
+                        {carregando ? "Criando..." : "Criar"}
                     </button>
                 </div>
             </form>

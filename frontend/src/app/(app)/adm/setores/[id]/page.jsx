@@ -22,6 +22,7 @@ import FormCadastroUsuario from "@/components/ui/forms/usuarios/formCadastroUsua
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import turnoCrudService from "@/services/turnoCrudService";
+import { filtrarPorNumberRange } from "@/lib/filterUtils";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
@@ -119,19 +120,75 @@ export default function SetorEspecificoPage({ params }) {
 
   const gestor = setor?.gestores?.[0]?.gestor;
 
+  const formatarHorario = (valor) => {
+    if (!valor) return "--:--";
+    return new Date(valor).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const diasSemanaOrdem = {
+    Domingo: 0,
+    Segunda: 1,
+    Segunda_feira: 1,
+    Terca: 2,
+    Terça: 2,
+    Terca_feira: 2,
+    Quarta: 3,
+    Quarta_feira: 3,
+    Quinta: 4,
+    Quinta_feira: 4,
+    Sexta: 5,
+    Sexta_feira: 5,
+    Sabado: 6,
+    Sábado: 6,
+  };
+
+  const formatarDiaSemana = (dia) => String(dia || "")
+    .replace(/_/g, "-")
+    .replace("Terca", "Terça")
+    .replace("Sabado", "Sábado");
+
+  const agruparTurnos = (listaTurnos) => {
+    const grupos = new Map();
+
+    for (const turno of listaTurnos) {
+      const chave = [
+        turno.nome_turno,
+        turno.hora_inicio,
+        turno.hora_fim,
+      ].join("|");
+
+      const grupo = grupos.get(chave) ?? {
+        ...turno,
+        dias: [],
+      };
+
+      grupo.dias.push(turno.dia_semana);
+      grupos.set(chave, grupo);
+    }
+
+    return Array.from(grupos.values()).map((turno) => ({
+      ...turno,
+      dias: [...new Set(turno.dias)]
+        .sort((a, b) => (diasSemanaOrdem[a] ?? 99) - (diasSemanaOrdem[b] ?? 99))
+        .map(formatarDiaSemana),
+    }));
+  };
+
   const normalizarMaquina = (maquina) => ({
     ...maquina,
     oee_atual: maquina.oee_atual ?? "-",
-    operador: maquina.operador?.nome ?? maquina.operador ?? "-",
+    operador: maquina.operador?.nome ?? maquina.operador ?? maquina.operador_atual ?? "-",
     status: maquina.status_atual || maquina.status || "-",
-    ultima_parada: maquina.ultima_parada ?? "-",
+    ultima_parada: maquina.ultima_parada ?? maquina.ultimo_evento?.inicio ?? "-",
   });
 
   const normalizarOperador = (usuario) => ({
     ...usuario,
     id_usuario: usuario.id_usuario ?? usuario.id_operador,
     funcao: usuario.funcao ?? usuario.tipo ?? "Operador",
-    turno: usuario.turno?.nome_turno ?? usuario.turno ?? "-",
+    turno: usuario.turnos?.length
+      ? [...new Set(usuario.turnos.map((turno) => turno.nome_turno).filter(Boolean))].join(", ")
+      : usuario.turno?.nome_turno ?? usuario.turno ?? "-",
     oee_medio: usuario.oee_medio ?? "-",
   });
 
@@ -196,9 +253,12 @@ export default function SetorEspecificoPage({ params }) {
     { id: "oee", label: "OEE Médio", type: "number-range" },
   ];
 
+  const turnosAgrupados = agruparTurnos(turnos);
+  const opcoesTurnoFiltro = [...new Set(turnosAgrupados.map((t) => t.nome_turno).filter(Boolean))];
+
   const usuariosFilter = [
     { id: "funcao", label: "Função", type: "checkbox", options: ["Operador", "Gestor"] },
-    { id: "turno", label: "Turno", type: "checkbox", options: ["Manhã", "Tarde", "Noite"] },
+    { id: "turno", label: "Turno", type: "checkbox", options: opcoesTurnoFiltro },
     { id: "oee", label: "OEE Médio", type: "number-range" },
   ];
 
@@ -240,13 +300,21 @@ export default function SetorEspecificoPage({ params }) {
     if (filtrosSelecionados.status?.length) {
       filtrados = filtrados.filter((maquina) => filtrosSelecionados.status.includes(maquina.status));
     }
-    if (filtrosSelecionados.oee) {
-      const { min, max } = filtrosSelecionados.oee;
+    if (filtrosSelecionados.data?.start) {
+      const inicio = new Date(filtrosSelecionados.data.start);
       filtrados = filtrados.filter((maquina) => {
-        const oee = parseFloat(String(maquina.oee_atual).replace("%", "")) || 0;
-        return oee >= (min || 0) && oee <= (max || Infinity);
+        const dataParada = maquina.ultima_parada;
+        return dataParada && dataParada !== "-" && new Date(dataParada) >= inicio;
       });
     }
+    if (filtrosSelecionados.data?.end) {
+      const fim = new Date(filtrosSelecionados.data.end);
+      filtrados = filtrados.filter((maquina) => {
+        const dataParada = maquina.ultima_parada;
+        return dataParada && dataParada !== "-" && new Date(dataParada) <= fim;
+      });
+    }
+    filtrados = filtrarPorNumberRange(filtrados, "oee_atual", filtrosSelecionados.oee);
     setDadosMaquina(filtrados);
   };
 
@@ -256,15 +324,12 @@ export default function SetorEspecificoPage({ params }) {
       filtrados = filtrados.filter((usuario) => filtrosSelecionados.funcao.includes(usuario.funcao));
     }
     if (filtrosSelecionados.turno?.length) {
-      filtrados = filtrados.filter((usuario) => filtrosSelecionados.turno.includes(usuario.turno));
-    }
-    if (filtrosSelecionados.oee) {
-      const { min, max } = filtrosSelecionados.oee;
       filtrados = filtrados.filter((usuario) => {
-        const oee = parseFloat(String(usuario.oee_medio).replace("%", "")) || 0;
-        return oee >= (min || 0) && oee <= (max || Infinity);
+        const turnosUsuario = String(usuario.turno || "").split(",").map((t) => t.trim());
+        return filtrosSelecionados.turno.some((t) => turnosUsuario.includes(t));
       });
     }
+    filtrados = filtrarPorNumberRange(filtrados, "oee_medio", filtrosSelecionados.oee);
     setDadosExibidos(filtrados);
   };
 
@@ -315,7 +380,6 @@ export default function SetorEspecificoPage({ params }) {
           }
         />
 
-        {/* Informações do setor */}
         <FadeUpItem className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm text-xl font-medium text-gray-900">
           <div className="flex flex-col gap-2">
             <p>
@@ -332,13 +396,10 @@ export default function SetorEspecificoPage({ params }) {
             <div className="flex">
               <p>Turnos:</p>
               <ul className="list-disc list-inside ml-4">
-                {turnos.length > 0 ? (
-                  turnos.map((t) => (
-                    <li key={t.id_turno}>
-                      {t.nome_turno} ({t.dia_semana}):{" "}
-                      {new Date(t.hora_inicio).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      {" - "}
-                      {new Date(t.hora_fim).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {turnosAgrupados.length > 0 ? (
+                  turnosAgrupados.map((t) => (
+                    <li key={`${t.nome_turno}-${t.hora_inicio}-${t.hora_fim}`}>
+                      {t.nome_turno} ({t.dias.join(", ")}): {formatarHorario(t.hora_inicio)} - {formatarHorario(t.hora_fim)}
                     </li>
                   ))
                 ) : (
@@ -407,7 +468,9 @@ export default function SetorEspecificoPage({ params }) {
                 <Plus size={22} />
                 Cadastrar
               </DialogTrigger>
-              <FormCadastroMaquina onCadastroSucesso={refresh} />
+              <DialogContent>
+                <FormCadastroMaquina onCadastroSucesso={refresh} />
+              </DialogContent>
             </Dialog>
           }
           search={

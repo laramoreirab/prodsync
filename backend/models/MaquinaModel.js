@@ -128,6 +128,24 @@ class MaquinaModel {
     // Atualiza dados cadastrais
     static async atualizarDados(id_maquina, id_empresa, dados) {
         try {
+            if (dados.id_setor) {
+                const maquinaAtual = await prisma.maquinas.findFirst({
+                    where: {
+                        id_maquina,
+                        id_empresa,
+                        ativo: true
+                    },
+                    select: {
+                        id_setor: true
+                    }
+                });
+
+                const novoSetor = Number(dados.id_setor);
+                if (maquinaAtual?.id_setor && maquinaAtual.id_setor !== novoSetor) {
+                    throw new Error('Maquina ja vinculada a outro setor');
+                }
+            }
+
             const dataUpdate = {
                 nome: dados.nome,
                 serie: dados.serie,
@@ -261,9 +279,41 @@ class MaquinaModel {
                     id_empresa: id_empresa,
                     id_setor: id_setor,
                     ativo: true
+                },
+                include: {
+                    operador: {
+                        select: {
+                            id_usuario: true,
+                            nome: true
+                        }
+                    },
+                    historico_eventos: {
+                        where: {
+                            status_atual: {
+                                in: ['Parada', 'Manutencao', 'Setup']
+                            }
+                        },
+                        orderBy: {
+                            inicio: 'desc'
+                        },
+                        take: 1,
+                        select: {
+                            id_evento: true,
+                            status_atual: true,
+                            inicio: true,
+                            termino: true
+                        }
+                    }
                 }
             });
-            return maquinas;
+            return maquinas.map(maquina => {
+                const { historico_eventos, ...dadosMaquina } = maquina;
+                return {
+                    ...dadosMaquina,
+                    ultimo_evento: historico_eventos[0] ?? null,
+                    ultima_parada: historico_eventos[0]?.inicio ?? null
+                };
+            });
         } catch (error) {
             console.error('Erro ao listar máquinas por setor:', error);
             throw error;

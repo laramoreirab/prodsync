@@ -106,9 +106,10 @@ const filtrosOps = [
 
 export default function OrdensDeProducaoGestor() {
   const { setorId } = usePerfil();
-  const { ops, loading, refresh, excluirOp } = useOps();
+  const { ops, loading, refresh } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
 
   const opsDoSetor = useMemo(() => {
     return (ops || []).filter((op) => !setorId || String(op.id_setor) === String(setorId));
@@ -180,75 +181,78 @@ export default function OrdensDeProducaoGestor() {
           </WidgetCard>
 
           <WidgetCard>
-            <OPAtrasadasKPIWidget setorId={setorId}/>
+            <OPAtrasadasKPIWidget setorId={setorId} />
           </WidgetCard>
 
           <WidgetCard>
-            <OPPecasBoasKPIWidget setorId={setorId}/>
+            <OPPecasBoasKPIWidget setorId={setorId} />
           </WidgetCard>
 
           <WidgetCard>
-            <OPRefugoKPIWidget setorId={setorId}/>
+            <OPRefugoKPIWidget setorId={setorId} />
           </WidgetCard>
-
 
         </KPIGrid>
 
         <KPIGrid cols={3} className="mt-4">
 
           <WidgetCard>
-            <OPEficienciaWidget setorId={setorId}/>
+            <OPEficienciaWidget setorId={setorId} />
           </WidgetCard>
 
           <WidgetCard>
-            <OPTopRefugoWidget setorId={setorId}/>
+            <OPTopRefugoWidget setorId={setorId} />
           </WidgetCard>
 
           <WidgetCard>
-            <OPCargaSetorWidget setorId={setorId}/>
+            <OPCargaSetorWidget setorId={setorId} />
           </WidgetCard>
-
 
         </KPIGrid>
 
         <ContentGrid cols={2} className="mt-6">
           <WidgetCard>
-            <OPStatusWidget setorId={setorId}/>
+            <OPStatusWidget setorId={setorId} />
           </WidgetCard>
           <WidgetCard>
-            <OPConcluidasDiaWidget setorId={setorId}/>
+            <OPConcluidasDiaWidget setorId={setorId} />
           </WidgetCard>
         </ContentGrid>
 
+        <SectionDivider title="OPs" className="mt-8" />
 
-        {/* Listagem de OPs */}
-<SectionDivider title="OPs" className="mt-8" />
+        <SearchBar
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Busque por id ou nome..."
+        />
 
-          {/* Busca */}
-<SearchBar
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-        placeholder="Busque por id ou nome..."
-      />
+        <FilterRow
+          count={dadosExibidos.length}
+          label="OPs"
+          actions={
+            <>
+              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+              <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
+            </>
+          }
+        />
 
-      <FilterRow
-        count={dadosExibidos.length}
-        label="OPs"
-        actions={
-          <>
-            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
-            <FilterDropdown filtersConfig={opsFilter} onApply={aplicarFiltros} />
-          </>
-        }
-      />
-
-          {/* Tabela */}
-          <FadeUpItem className="mt-4">
+        <FadeUpItem className="mt-4">
           {dadosExibidos.length > 0 ? (
             <TableListagens
               data={dadosExibidos}
               columns={colunasOrdemProd}
-              enableSelection={true}
+              enableSelection
+              onSelectedChange={setSelecionados}
+              excluirLote={
+                <DialogContent>
+                  <FormExclusaoOp
+                    opIds={selecionados.map((op) => op.id ?? op.id_ordem)}
+                    onExclusaoSucesso={refresh}
+                  />
+                </DialogContent>
+              }
               acoesDropdown={(op) => (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -269,7 +273,7 @@ export default function OrdensDeProducaoGestor() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh}/>
+                      <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
                     </DialogContent>
                   </Dialog>
 
@@ -284,9 +288,11 @@ export default function OrdensDeProducaoGestor() {
                       </DropdownMenuItem>
                     </DialogTrigger>
                     <DialogContent>
-                      <FormExclusaoOp opId={op.id}
-                      idMaquina={op.id_maquina}
-                      onExclusaoSucesso={refresh}/>
+                      <FormExclusaoOp
+                        opId={op.id}
+                        idMaquina={op.id_maquina}
+                        onExclusaoSucesso={refresh}
+                      />
                     </DialogContent>
                   </Dialog>
                 </>
@@ -294,11 +300,11 @@ export default function OrdensDeProducaoGestor() {
             />
           ) : (
             <EmptyState
-                      title="Nenhum resultado encontrado"
-                      message="Ajuste seus filtros ou termo de busca."
-                    />
+              title="Nenhum resultado encontrado"
+              message="Ajuste seus filtros ou termo de busca."
+            />
           )}
-          </FadeUpItem>
+        </FadeUpItem>
     </PageLayout>
   );
 }

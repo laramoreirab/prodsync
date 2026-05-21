@@ -94,4 +94,14 @@ export const opCrudService = {
     await apiFetch(`${API_URL}/${id}`, { method: "DELETE" });
     return true;
   },
+
+  getHistoricoEventos: async (id) => {
+    const response = await apiFetch(`${API_URL}/${id}/historico-eventos`);
+    return response?.dados ?? [];
+  },
+
+  getApontamentos: async (id) => {
+    const response = await apiFetch(`${API_URL}/${id}/apontamentos`);
+    return response?.dados ?? [];
+  },
 };

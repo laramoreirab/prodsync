@@ -1,91 +1,106 @@
 "use client"
 
-import { MotivoRefugoMaquinaWidget } from "@/features/maquinas/MotivoRefugoMaquinaWidget";
-import { MotivoSetupMaquinaWidget } from "@/features/maquinas/MotivoSetupMaquinaWidget";
-import { OEEMaquinaWidget } from "@/features/maquinas/OEEMaquinaWidget";
-import { OEEEvolucaoMaquinaWidget } from "@/features/maquinas/OEEEvolucaoMaquinaWidget";
-import { VelocidadeMaquinaWidget } from "@/features/maquinas/VelocidadeMaquinaWidget";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-} from "@/components/ui/dialog";
-import FormCriarApontamento from "@/components/ui/forms/maquinas/criarApontamento";
-
-import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
-
-import { PageLayout } from "@/components/AnimatedComponents";
-import { DetailPageContainer, MachineProfileCard } from "@/components/DetailComponents";
-
-import { use } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import { Loader2, Search, ChevronDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { apiFetch } from "@/lib/api";
+import { obterPerfil } from "@/services/authService";
+import { maquinaCrudService } from "@/services/maquinaCrudService";
 
-export default function MaquinaDetalhePage({ params }) {
-  const { id } = use(params);
-  const maquinaId = Number(id);
+const statusConfig = {
+  Produzindo: "bg-green-500/15 text-green-600",
+  Setup: "bg-amber-100 text-amber-900",
+  Parada: "bg-red-100 text-red-700",
+};
+
+export default function MaquinasOperadorPage() {
+  const [maquina, setMaquina] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
+
+  useEffect(() => {
+    async function carregar() {
+      try {
+        const perfil = await obterPerfil();
+        const idOperador = perfil?.id_usuario ?? perfil?.id;
+        if (!idOperador) {
+          setErro("Perfil do operador não encontrado");
+          return;
+        }
+
+        const respMaquina = await apiFetch(`/api/maquinas/obter-maquina-operador/${idOperador}`);
+        const idMaquina = respMaquina?.id_maquina ?? respMaquina?.dados?.id_maquina;
+
+        if (!idMaquina) {
+          setErro("Nenhuma máquina vinculada ao seu perfil");
+          return;
+        }
+
+        const detalhe = await maquinaCrudService.getById(idMaquina);
+        setMaquina(detalhe?.dados || detalhe);
+      } catch (e) {
+        console.error(e);
+        setErro("Erro ao carregar máquina");
+      } finally {
+        setLoading(false);
+      }
+    }
+    carregar();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-900" />
+      </main>
+    );
+  }
+
+  if (erro || !maquina) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed flex flex-col items-center justify-center p-8">
+        <Search className="w-12 h-12 mb-4 text-gray-300" />
+        <h2 className="text-xl font-semibold text-gray-600">{erro || "Máquina não encontrada"}</h2>
+      </main>
+    );
+  }
+
+  const status = maquina.status_atual || maquina.status || "-";
+  const statusClass = statusConfig[status] || "bg-gray-100 text-gray-700";
 
   return (
-  <PageLayout padded={false}>
-    <DetailPageContainer>
+    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+      <div className="w-full mt-8 pb-10 px-8 space-y-6">
+        <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+          Minha Máquina
+        </h1>
 
-      <MachineProfileCard
-        machineName="THAK-1234"
-        imageSrc="/demo_maq.png"
-        fieldsLeft={[
-          { label: "ID", value: "00000" },
-          { label: "Série", value: "SX-900" },
-          { label: "Velocidade Média", value: "40 peças/h" },
-        ]}
-        fieldsRight={[
-          {
-            label: "Status",
-            value: (
-              <span className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">
-                Parada
-              </span>
-            ),
-          },
-        ]}
-        actions={
-          <Dialog>
-            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-              <Plus className="mr-2" />
-              Criar Apontamento
-            </DialogTrigger>
-            <DialogContent>
-              <FormCriarApontamento id_maquina={maquinaId} />
-            </DialogContent>
-          </Dialog>
-        }
-      />
-
-        {/* Gráficos
-        SEÇÃO 1: Refugo + Setup */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
+        <Link
+          href={`/operador/maquinas/${maquina.id_maquina}`}
+          className="block bg-white border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center gap-6">
+            <Image
+              src={maquina.imagem || "/demo_maq.png"}
+              alt={maquina.nome}
+              width={120}
+              height={120}
+              className="rounded-xl object-cover"
+            />
+            <div className="flex flex-col gap-3 flex-1">
+              <h2 className="text-2xl font-bold text-[#212e4b]">{maquina.nome}</h2>
+              <p className="text-lg text-gray-600">ID: {String(maquina.id_maquina).padStart(5, "0")}</p>
+              <p className="text-lg text-gray-600">Série: {maquina.serie || "-"}</p>
+              <Badge variant="outline" className={`w-fit rounded-xl px-3 font-semibold border-none ${statusClass}`}>
+                {status}
+              </Badge>
+            </div>
+            <ChevronDown className="w-8 h-8 text-gray-400 transform -rotate-90" />
           </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <MotivoSetupMaquinaWidget maquinaId={maquinaId} />
-          </div>
-        </section>
-
-        {/* SEÇÃO 2: OEE Gauges */}
-        <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
-        <OEEMaquinaWidget maquinaId={maquinaId} /> 
-        </section>
-
-        {/* SEÇÃO 3: Evolução OEE + Velocidade */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <VelocidadeMaquinaWidget maquinaId={maquinaId} />
-          </div>
-        </section>
-
-</DetailPageContainer>
-  </PageLayout>
+        </Link>
+      </div>
+    </main>
   );
 }

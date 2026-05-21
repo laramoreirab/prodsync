@@ -174,6 +174,7 @@ export default function OrdensDeProducao() {
   const { ops, loading, error, refresh } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
 
 
   //sincronizar dados da API com estado local
@@ -374,10 +375,19 @@ export default function OrdensDeProducao() {
           data={dadosExibidos}
           columns={colunasOrdemProd}
           enableSelection={true}
+            onSelectedChange={setSelecionados}
+            excluirLote={
+              <DialogContent>
+                <FormExclusaoOp
+                  opIds={selecionados.map((op) => op.id ?? op.id_ordem)}
+                  onExclusaoSucesso={refresh}
+                />
+              </DialogContent>
+            }
           acoesDropdown={(op) => (
             <>
               <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href={`ordensDeProducao/${op.id}`}>
+                    <Link href={`/adm/ordensDeProducao/${op.id}`}>
                   <EyeIcon className="mr-2 h-4 w-4" />
                   Ver Detalhes
                 </Link>

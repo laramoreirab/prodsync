@@ -91,7 +91,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
   useEffect(() => {
     onSelectedChange?.(selectedRows.map(row => row.original));
-  }, [selectedRows.length]);
+  }, [rowSelection]);
 
   const barraSelecionados = enableSelection && hasSelection && (excluirLote || editarLote || solicitarJustificativa);
 

@@ -14,20 +14,9 @@ import TableListagens from "@/components/table";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import { filtrarPorNumberRange } from "@/lib/filterUtils";
 import Link from "next/link";
 import{PageLayout, PageHeader, PageSection, SectionDivider, SearchBar, FilterRow, EmptyState, StaggerWrapper, FadeUpItem} from "@/components/AnimatedComponents";
-
-const dadosOriginais = [
-  { id: 1, nome: 'Ana Silva', prioridade: 'Baixa', setor: 'Escavadeiras', status: 'Produzindo', progresso: '25%' },
-  { id: 2, nome: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status: 'Setup', progresso: '35%' },
-  { id: 3, nome: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status: 'Parada', progresso: '55%' },
-  { id: 4, nome: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status: 'Setup', progresso: '85%' },
-  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
-  { id: 6, nome: 'Carol Silva', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
-  { id: 7, nome: 'Guilherme Santos', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
-  { id: 8, nome: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status: 'Concluída', progresso: '15%' },
-  { id: 9, nome: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status: 'Aguardando Início', progresso: '15%' },
-];
 
 const opsFilter = [
   { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
@@ -173,13 +162,7 @@ export default function OrdensDeProducao() {
       );
     }
 
-    //filtro por progresso (intervalo)
-    if (filtrosSelecionados.progresso) {
-      const { min, max } = filtrosSelecionados.progresso;
-      if (min !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso >= min);
-      if (max !== undefined) dadosFiltrados = dadosFiltrados.filter(op => op.progresso <= max);
-    }
-
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "progresso", filtrosSelecionados.progresso);
 
     setDados(dadosFiltrados);
   };

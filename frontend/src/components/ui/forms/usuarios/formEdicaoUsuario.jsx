@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from 'react';
 import {
     DialogTitle,
@@ -6,10 +8,16 @@ import { Pencil, File, Upload, ChevronDown, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService'; // Importar o serviço
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/api';
+import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 
 export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const fileInputFotoRef = useRef(null);
+    const [setores, setSetores] = useState([]);
+    const [listaTurnos, setListaTurnos] = useState([])
+    const [listaMaquinas, setListaMaquinas] = useState([])
 
     // Estados para gerenciar os dados do formulário
     const [carregando, setCarregando] = useState(true);
@@ -38,7 +46,23 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
-        setFormData(prev => ({ ...prev, [id]: value }));
+
+        setFormData(prev => {
+            const novoEstado = { ...prev, [id]: value };
+
+            // Se mudou o setor, zera o turno e a máquina anteriores para evitar conflito de IDs
+            if (id === "id_setor") {
+                novoEstado.id_turno = "";
+                novoEstado.id_maquina = "";
+            }
+
+            // Se a função virar Gestor, remove máquina para não enviar valor antigo
+            if (id === "funcao" && value !== "Operador") {
+                novoEstado.id_maquina = "";
+            }
+
+            return novoEstado;
+        });
     };
 
     // Buscando os dados no banco assim que o modal abre
@@ -53,10 +77,10 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                     nome: dados.nome || '',
                     cpf: dados.cpf || '',
                     email: dados.email || '',
-                    id_setor: dados.id_setor || '',
+                    id_setor: dados.id_setor != null ? String(dados.id_setor) : '',
                     funcao: dados.funcao || '',
-                    id_turno: dados.id_turno || '',
-                    id_maquina: dados.id_maquina || '',
+                    id_turno: dados.id_turno != null ? String(dados.id_turno) : '',
+                    id_maquina: dados.id_maquina != null ? String(dados.id_maquina) : '',
                 });
 
                 // Se o usuário já tiver uma imagem no banco, você pode configurar o preview aqui
@@ -79,19 +103,39 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         if (usuarioId) buscarDadosDoUsuario();
     }, [usuarioId]);
 
+    useEffect(() => {
+        async function carregarSetores() {
+            try {
+                const dados = await setorCrudService.getAll();
+                setSetores(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar setores.");
+            }
+
+        }
+
+        carregarSetores();
+    }, []);
+
     // Função que lida com o envio do form usando FormData
     const handleSubmitIndividual = async (e) => {
         e.preventDefault();
 
         const payload = new FormData();
-        //formData.append('campo', value)
         payload.append('nome', formData.nome);
         payload.append('cpf', formData.cpf);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
-        payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
-        payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
+
+        if (formData.id_turno) {
+            payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
+        }
+        if (formData.id_maquina) {
+            payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
+        }
+
         payload.append('id_usuario', usuarioId);           // backend espera id_usuario no body
 
         // Só anexa a foto se o usuário tiver selecionado uma nova
@@ -106,6 +150,46 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
             toast.error("Erro ao atualizar os dados.");
         }
     };
+
+    useEffect(() => {
+        async function carregarTurnos() {
+            if (!formData.id_setor) {
+                setListaTurnos([]);
+                return;
+            }
+            try {
+                const options = { method: "GET" }
+                const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
+                setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar turnos.");
+            }
+
+        }
+
+        carregarTurnos();
+    }, [formData.id_setor]);
+
+    useEffect(() => {
+        async function carregarMaquinas() {
+            const idSetor = formData.id_setor;
+            if (!idSetor) {
+                setListaMaquinas([]);
+                return;
+            }
+            try {
+                const options = { method: "GET" }
+                const dados = await apiFetch(`/api/maquinas/setor/${idSetor}`, options)
+                setListaMaquinas(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar máquinas.");
+            }
+
+        }
+        carregarMaquinas();
+    }, [formData.id_setor]);
 
     const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
     const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
@@ -207,8 +291,16 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required>
                             <option value="">Selecione...</option>
-                            <option value="1">Roscas</option>
-                            <option value="2">Brocas</option>
+                            {setores.map((setor) => (
+
+                                <option
+                                    key={setor.id_setor}
+                                    value={setor.id_setor}
+                                >
+                                    {setor.nome_setor}
+                                </option>
+
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -237,11 +329,19 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             value={formData.id_turno}
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disabled={!formData.id_setor}
                             required>
                             <option value="">Selecione...</option>
-                            <option value="1">Manhã</option>
-                            <option value="2">Tarde</option>
-                            <option value="3">Noite</option>
+                            {listaTurnos.map((turno) => (
+
+                                <option
+                                    key={turno.id_turno}
+                                    value={turno.id_turno}
+                                >
+                                    {turno.nome_turno}
+                                </option>
+
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -256,11 +356,20 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             value={formData.id_maquina}
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disabled={!formData.id_setor}
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Máquina 1</option>
-                            <option value="2">Máquina 2</option>
+                            {listaMaquinas.map((maquina) => (
+
+                                <option
+                                    key={maquina.id_maquina}
+                                    value={maquina.id_maquina}
+                                >
+                                    {maquina.nome}
+                                </option>
+
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
