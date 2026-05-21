@@ -28,4 +28,4 @@ clienteMQTT.on('message', async (topic, message) => {
   }
 });
 
-module.exports = clienteMQTT;
+export default clienteMQTT;
