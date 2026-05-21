@@ -27,6 +27,23 @@ import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
 import { filtrarPorDuracaoMax, filtrarPorNumberRange } from "@/lib/filterUtils";
 
+// Layout geral
+import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+
+// Componentes de detalhe
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  DetailSectionTitle,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  SectionHighlight,
+  DetailListingSection,
+  DetailActions,
+  MachineProfileCard,
+  StatusBadge,
+} from "@/components/DetailComponents";
+
 const colunasMaquina = [
   { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   {
@@ -426,25 +443,33 @@ export default function MaquinaDetalheGestor({ params }) {
   // }
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full p-8 space-y-4">
+    <PageLayout>
+      <DetailPageContainer>
 
         {/* Informações da Máquina */}
 
-        <Link className="flex items-center" href="/gestor/maquinas">
-          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Máquinas </p>
-        </Link>
+        {/* Voltar */}
+        <DetailBackLink href="/gestor/maquinas" label="Voltar para Máquinas" />
 
-        <section id="infos_op" className="flex flex-col">
-          <div className="flex justify-between items-center">
-            <div className="bg-white px-5 pb-3 rounded-tl-4xl rounded-tr-4xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a]">
-              <h1 className="text-3xl font-bold uppercase text-[#212e4b] pb-0 inline-block px-6 py-4">
-                {maquina?.nome || `   ${maquinaId}`}
-              </h1>
-            </div>
-
-            <div className="flex space-x-2">
+        <MachineProfileCard
+          machineName={maquina?.nome || `Máquina ${maquinaId}`}
+          imageSrc={imagemMaquina}
+          fieldsLeft={[
+            { label: "ID", value: maquina?.id_maquina || maquinaId },
+            { label: "Série", value: maquina?.serie || "-" },
+            { label: "Setor", value: maquina?.id_setor || "-" },
+            {
+              label: "Status",
+              value: <StatusBadge status={maquina?.status_atual || maquina?.status || "Parada"} />,
+            },
+          ]}
+          fieldsRight={[
+            { label: "Operador", value: maquina?.id_operador || "-" },
+            { label: "Data de Aquisição", value: formatarData(maquina?.data_aquisicao) },
+            { label: "Velocidade Média", value: maquina?.capacidade || "-" },
+          ]}
+          actions={
+            <DetailActions>
               <Dialog>
                 <DialogTrigger className="text-[#122f60] cursor-pointer">
                   <Pencil size={36} className="mr-1" />
@@ -462,246 +487,166 @@ export default function MaquinaDetalheGestor({ params }) {
                   <FormExclusaoMaquina maquinaId={maquinaId} onExcluir={maquinaCrudService.delete} />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-          <div className="flex gap-8 mt-5">
-            <div className="bg-white rounded-xl p-13  ">
-              <img
-                src={imagemMaquina}
-                alt={maquina?.nome || "Máquina"}
-                className="rounded-xl w-37.5 h-37.5 object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "/demo_maq.png";
-                }}
-              />
-            </div>
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                <p className="text-xl font-medium text-black">{maquina?.id_maquina || maquinaId}</p>
-              </div>
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">Série:</p>
-                <p className="text-xl font-medium text-black">{maquina?.serie || "-"}</p>
-              </div>
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">Setor:</p>
-                <p className="text-xl font-medium text-black">{maquina?.id_setor || "-"}</p>
-              </div>
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">Status:</p>
-                <p className="rounded-xl px-3 text-[#b30000] font-semibold bg-red-100">{maquina?.status_atual || maquina?.status || "-"}</p>
-              </div>
-            </div>
+            </DetailActions>
+          }
+        />
 
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">Operador:</p>
-                <p className="text-xl font-medium text-black">{maquina?.id_operador || "-"}</p>
-              </div>
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">Data de Aquisição:</p>
-                <p className="text-xl font-medium text-black">{formatarData(maquina?.data_aquisicao)}</p>
-              </div>
-              <div className="flex items-center">
-                <p className="text-xl font-semibold text-black mr-2">Velocidade Média:</p>
-                <p className="text-xl font-medium text-black">{maquina?.capacidade || "-"}</p>
-              </div>
-
-            </div>
-          </div>
-        </section>
         {/* Gráficos */}
-        <h1 className="font-semibold text-4xl mt-5">Produção</h1>
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
+        <DetailSectionTitle title="Produção" />
+
+        <DetailWidgetGrid cols={2}>
+          <DetailWidgetCard>
             <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
+          </DetailWidgetCard>
+          <DetailWidgetCard>
             <MotivoSetupMaquinaWidget maquinaId={maquinaId} />
-          </div>
-        </section>
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
 
-        {/* <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
+        <SectionHighlight>
           <OEEMaquinaWidget maquinaId={maquinaId} />
-        </section> */}
+        </SectionHighlight>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
+        <DetailWidgetGrid cols={2}>
+          <DetailWidgetCard>
             <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
-          </div>
-          <div className="bg-white border rounded-xl p-4 shadow-sm">
+          </DetailWidgetCard>
+          <DetailWidgetCard>
             <VelocidadeMaquinaWidget maquinaId={maquinaId} />
-          </div>
-        </section>
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
 
         {/* Listagem histórico de eventos da máquina */}
 
-        <section id="listagem_eventos">
-          <div>
-            <div className="flex items-center justify-between gap-5 mt-8 mb-6">
-              <h1 className="text-4xl font-semibold mt-5">Histórico de Eventos da Máquina</h1>
-              <Dialog>
-                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-2 rounded-md text-white font-semibold text-2xl gap-2">
-                  <Plus size={28} className="text-white cursor-pointer" />
-                  Registrar
-                </DialogTrigger>
-                <DialogContent>
-                  <FormCadastroEvento />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-
-          {/* Busca */}
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
-                value={buscaEvento}
-                onChange={(e) => setBuscaEvento(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosExibidos.length} eventos encontrados</p>
-
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoEventos}
-                onSortChange={handleSortEventos}
-              />
-
-              <FilterDropdown
-                filtersConfig={eventosFilter}
-                onApply={aplicarFiltrosEventos}
-              />
-            </div>
-          </div>
-
+        <DetailListingSection
+          id="listagem_eventos"
+          title="Histórico de Eventos da Máquina"
+          action={
+            <Dialog>
+              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-lg gap-2">
+                <Plus size={28} />
+                Registrar
+              </DialogTrigger>
+              <DialogContent>
+                <FormCadastroEvento />
+              </DialogContent>
+            </Dialog>
+          }
+          search={
+            <SearchBar
+              value={buscaEvento}
+              onChange={(e) => setBuscaEvento(e.target.value)}
+              placeholder="Busque por nome ou id..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosExibidos.length}
+              label="eventos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                </>
+              }
+            />
+          }
+        >
           {/* Tabela */}
-          <div>
-            {dadosExibidos.length > 0 ? (
-              <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                data={dadosExibidos} columns={colunasMaquina}
-                acoesDropdown={(maquina) => (
-                  <>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                          Ver Detalhes
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DetalhesEvento eventoId={maquina.id} />
-                      </DialogContent>
-                    </Dialog>
+          {dadosExibidos.length > 0 ? (
+            <TableListagens
+              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+              data={dadosExibidos} columns={colunasMaquina}
+              acoesDropdown={(maquina) => (
+                <>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={maquina.id} />
+                    </DialogContent>
+                  </Dialog>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <BellRing className="mr-2 h-4 w-4" />
-                          Solicitar Justificativa
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <ModalSucessNotificacao />
-                      </DialogContent>
-                    </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <BellRing className="mr-2 h-4 w-4" />
+                        Solicitar Justificativa
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <ModalSucessNotificacao />
+                    </DialogContent>
+                  </Dialog>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <Pencil className="mr-2 h-4 w-4 text-primary" />
-                          Editar Evento
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <FormEdicaoEvento />
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                )}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar Evento
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoEvento />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
 
-              />
-            ) : (
-              //caso não encontre nada correspondente
-              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
-                <p>Não encontramos nenhum evento com o termo ou filtro.</p>
-              </div>
-            )}
-          </div>
-        </section>
+            />
+          ) : (
+            //caso não encontre nada correspondente
+            <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
+          )}
+        </DetailListingSection>
 
         {/* Listagem de Apontamentos */}
-        <section>
-          <div>
-            <h1 className="text-4xl font-semibold mb-3">Histórico de Apontamentos da Máquina</h1>
-            {/* Busca */}
-            <div className="flex searchbar">
-              <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-                <input
-                  type="search"
-                  className="p-2 w-full outline-none bg-transparent"
-                  placeholder="Busque por nome ou id..."
-                  value={buscaApontamento}
-                  onChange={(e) => setBuscaApontamento(e.target.value)}
-                />
-                <button className="outline-none cursor-pointer mr-2"><Search /></button>
-              </div>
-            </div>
+        <DetailListingSection
+          id="listagem_apontamentos"
+          title="Histórico de Apontamentos da Máquina"
+          search={
+            <SearchBar
+              value={buscaApontamento}
+              onChange={(e) => setBuscaApontamento(e.target.value)}
+              placeholder="Busque por nome ou id..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosApontamentosFiltrados.length}
+              label="apontamentos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
+                  <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
+                </>
+              }
+            />
+          }
+        >
+          {dadosApontamentosFiltrados.length > 0 ? (
+            <TableListagens
+              data={dadosApontamentosFiltrados}
+              columns={colunasApontamento}
+              acoesDropdown={(apontamento) => (
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`/adm/ordensDeProducao/${apontamento.op}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver OP relacionada
+                  </Link>
+                </DropdownMenuItem>
+              )}
+            />
+          ) : (
+            <EmptyState title="Nenhum apontamento encontrado" message={`Sem apontamentos para "${buscaApontamento}".`} />
+          )}
+        </DetailListingSection>
 
-            <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-              <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-
-              <div className="flex items-center gap-4">
-                <OrdenarDropdown
-                  label="Ordenar por"
-                  options={opcoesOrdenacaoApontamento}
-                  onSortChange={handleSortApontamento}
-                />
-
-                <FilterDropdown
-                  filtersConfig={apontamentoFilter}
-                  onApply={aplicarFiltrosApontamento}
-                />
-              </div>
-            </div>
-
-            {dadosApontamentosFiltrados.length > 0 ? (
-              <TableListagens
-                data={dadosApontamentosFiltrados} columns={colunasApontamento}
-                acoesDropdown={(apontamento) => (
-                  <>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`/adm/ordemDeProducao/${apontamento.op}`}>
-                        <EyeIcon className="mr-2 h-4 w-4" />
-                        Ver OP relacionada
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum apontamento encontrado</h2>
-                <p>Não encontramos nenhum apontamento com o termo ou filtro.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-      </div>
-    </main>
+    </DetailPageContainer>
+    </PageLayout >
   );
 }

@@ -15,7 +15,7 @@ import {
 // layout="vertical" inverte os eixos => barra fica horizontal.
 
 // Componente genérico 
-export function BarHorizontal({ data, config, title }) {
+export function BarHorizontal({ data, config, title, yKey = "setor", chartSize = "default", heightClassName }) {
   if (!data?.length) return null;
 
   const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
@@ -26,7 +26,7 @@ export function BarHorizontal({ data, config, title }) {
       <ChartContainer config={config} className="h-[200px] w-full">
         <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
           <YAxis
-            dataKey="setor"
+            dataKey={yKey}
             type="category"
             tickLine={false}
             axisLine={false}

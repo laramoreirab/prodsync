@@ -40,6 +40,28 @@ function formatarDataHora(valor) {
   });
 }
 
+import { motion } from "framer-motion";
+
+
+import {
+  PageLayout,
+  PageSection,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  LoadingState,
+} from "@/components/AnimatedComponents";
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  DetailHeader,
+  DetailActions,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  DetailListingSection,
+  SectionHighlight,
+} from "@/components/DetailComponents";
+
 export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const opId = id;
@@ -85,58 +107,75 @@ export default function OPDetalhePage({ params }) {
   const [eventosFiltrados, setEventosFiltrados] = useState(null);
 
   const dadosEventosBase = eventosFiltrados ?? eventos;
-  const dadosEventosExibidos = (eventosOrdenados ?? dadosEventosBase)
-    .filter((evento) => {
+  const dadosEventosExibidos = (eventosOrdenados ?? dadosEventosBase).filter(
+    (evento) => {
       const termo = buscaEvento.toLowerCase();
       return (
         evento.tipo?.toLowerCase().includes(termo) ||
         evento.id?.toString().includes(termo)
       );
-    });
+    },
+  );
 
   const colunasOP = [
-    { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
     {
-      id: 'tipo',
-      key: 'tipo',
-      label: 'Status',
-      className: 'text-center justify-center',
+      id: "id",
+      key: "id",
+      label: "ID",
+      className: "w-20 text-center justify-center",
+    },
+    {
+      id: "tipo",
+      key: "tipo",
+      label: "Status",
+      className: "text-center justify-center",
       icone: (valor) => {
         const config = {
-          "Setup": { variant: "secondary", className: "bg-[#fffbea] text-amarelo font-semibold text-sm" },
-          "Parada": { variant: "destructive", className: "font-semibold text-sm border-none" }
+          Setup: {
+            variant: "secondary",
+            className: "bg-[#fffbea] text-amarelo font-semibold text-sm",
+          },
+          Parada: {
+            variant: "destructive",
+            className: "font-semibold text-sm border-none",
+          },
         };
         const estilo = config[valor] || { variant: "outline", className: "" };
         return (
-          <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+          <Badge
+            variant={estilo.variant}
+            className={`whitespace-nowrap ${estilo.className}`}
+          >
             {valor}
           </Badge>
         );
-      }
+      },
     },
     {
-      id: 'data',
-      key: 'data',
-      label: 'Data (Início - Fim)',
-      icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />
+      id: "data",
+      key: "data",
+      label: "Data (Início - Fim)",
+      icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
     },
     {
-      id: 'duracao',
-      key: 'duracao',
-      label: 'Duração',
-      icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+      id: "duracao",
+      key: "duracao",
+      label: "Duração",
+      icone: (valor, row) => (
+        <DuracaoEvento inicio={row.inicio} fim={row.fim} />
+      ),
     },
-    { id: 'motivo', key: 'motivo', label: 'Motivo' },
-    { id: 'observacao', key: 'observacao', label: 'Observação' }
+    { id: "motivo", key: "motivo", label: "Motivo" },
+    { id: "observacao", key: "observacao", label: "Observação" },
   ];
 
   const opcoesOrdenacaoEventos = [
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'Data Crescente', value: 'data_asc' },
-    { label: 'Data Decrescente', value: 'data_desc' },
-    { label: 'Duração Crescente', value: 'duracao_asc' },
-    { label: 'Duração Decrescente', value: 'duracao_desc' },
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "Data Crescente", value: "data_asc" },
+    { label: "Data Decrescente", value: "data_desc" },
+    { label: "Duração Crescente", value: "duracao_asc" },
+    { label: "Duração Decrescente", value: "duracao_desc" },
   ];
 
   const handleSortEventos = (criterio) => {
@@ -154,7 +193,12 @@ export default function OPDetalhePage({ params }) {
   };
 
   const eventosFilter = [
-    { id: "tipo", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+    {
+      id: "tipo",
+      label: "Tipo",
+      type: "checkbox",
+      options: ["Parada", "Setup"],
+    },
     { id: "data", label: "Data", type: "date-range" },
     { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
@@ -164,7 +208,7 @@ export default function OPDetalhePage({ params }) {
 
     if (filtrosSelecionados.tipo?.length) {
       dadosFiltrados = dadosFiltrados.filter((e) =>
-        filtrosSelecionados.tipo.includes(e.tipo)
+        filtrosSelecionados.tipo.includes(e.tipo),
       );
     }
 
@@ -185,45 +229,65 @@ export default function OPDetalhePage({ params }) {
   }, [apontamentos]);
 
   const colunasApontamento = [
-    { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-    { id: 'data', key: 'data', label: 'Data (Início - Fim)' },
     {
-      id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
+      id: "id",
+      key: "id",
+      label: "ID",
+      className: "w-20 text-center justify-center",
+    },
+    { id: "data", key: "data", label: "Data (Início - Fim)" },
+    {
+      id: "produzido",
+      key: "produzido",
+      label: "Produzido",
+      className: "text-center justify-center",
       icone: (valor) => (
-        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+        <Badge
+          variant="outline"
+          className="bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+        >
           {valor}
         </Badge>
-      )
+      ),
     },
     {
-      id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
+      id: "refugo",
+      key: "refugo",
+      label: "Refugo",
+      className: "text-center justify-center",
       icone: (valor) => (
-        <Badge variant="destructive" className="font-semibold text-sm border-none">
+        <Badge
+          variant="destructive"
+          className="font-semibold text-sm border-none"
+        >
           {valor}
         </Badge>
-      )
+      ),
     },
-    { id: 'observacao', key: 'observacao', label: 'Observação' },
+    { id: "observacao", key: "observacao", label: "Observação" },
   ];
 
   const opcoesOrdenacaoApontamento = [
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'Produzido Crescente', value: 'produzido_asc' },
-    { label: 'Produzido Decrescente', value: 'produzido_desc' },
-    { label: 'Refugo Crescente', value: 'refugo_asc' },
-    { label: 'Refugo Decrescente', value: 'refugo_desc' }
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "Produzido Crescente", value: "produzido_asc" },
+    { label: "Produzido Decrescente", value: "produzido_desc" },
+    { label: "Refugo Crescente", value: "refugo_asc" },
+    { label: "Refugo Decrescente", value: "refugo_desc" },
   ];
 
   const handleSortApontamento = (criterio) => {
     const copia = [...dadosApontamentoState];
     copia.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
-      if (criterio === 'produzido_asc') return Number(a.produzido) - Number(b.produzido);
-      if (criterio === 'produzido_desc') return Number(b.produzido) - Number(a.produzido);
-      if (criterio === 'refugo_asc') return Number(a.refugo) - Number(b.refugo);
-      if (criterio === 'refugo_desc') return Number(b.refugo) - Number(a.refugo);
+      if (criterio === "id_asc") return a.id - b.id;
+      if (criterio === "id_desc") return b.id - a.id;
+      if (criterio === "produzido_asc")
+        return Number(a.produzido) - Number(b.produzido);
+      if (criterio === "produzido_desc")
+        return Number(b.produzido) - Number(a.produzido);
+      if (criterio === "refugo_asc") return Number(a.refugo) - Number(b.refugo);
+      if (criterio === "refugo_desc")
+        return Number(b.refugo) - Number(a.refugo);
       return 0;
     });
     setDadosApontamentoState(copia);
@@ -231,7 +295,7 @@ export default function OPDetalhePage({ params }) {
 
   const apontamentoFilter = [
     { id: "produzido", label: "Produzido", type: "number-range" },
-    { id: "refugo", label: "Refugo", type: "number-range" }
+    { id: "refugo", label: "Refugo", type: "number-range" },
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
@@ -280,45 +344,54 @@ export default function OPDetalhePage({ params }) {
   };
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
+    <PageLayout padded={false}>
+      <DetailPageContainer>
+        <DetailBackLink
+          href="/operador/ordensDeProducao"
+          label="Voltar para Ordens de Produção"
+        />
 
-        <Link className="flex items-center" href="/operador/ordensDeProducao">
-          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Ordens de Produção</p>
-        </Link>
+        <DetailHeader
+          title={`Ordem de Produção ${titulo}`}
+          actions={
+            <DetailActions>
+              <Dialog>
+                <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                  <Plus className="mr-2" />
+                  Criar Apontamento
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCriarApontamento
+                    id_ordemProducao={opId}
+                    id_maquina={op.id_maquina ?? op.maquina?.id_maquina}
+                  />
+                </DialogContent>
+              </Dialog>
 
-        <div className="flex justify-between">
-          <h1 className="text-4xl font-bold">Ordem de Produção {titulo}</h1>
-          <div className="flex flex-col items-center gap-3">
-            <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                <Plus className="mr-2" />
-                Criar Apontamento
-              </DialogTrigger>
-              <DialogContent>
-                <FormCriarApontamento
-                  id_ordemProducao={opId}
-                  id_maquina={op.id_maquina ?? op.maquina?.id_maquina}
-                />
-              </DialogContent>
-            </Dialog>
-
-            <Dialog>
-              <DialogTrigger className="bg-[#7d95c6] px-7 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                <Pencil className="mr-2" />
-                Justificar Evento
-              </DialogTrigger>
-              <DialogContent>
-                <FormJustificativaEvento />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
+              <Dialog>
+                <DialogTrigger className="bg-[#7d95c6] px-7 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                  <Pencil className="mr-2" />
+                  Justificar Evento
+                </DialogTrigger>
+                <DialogContent>
+                  <FormJustificativaEvento />
+                </DialogContent>
+              </Dialog>
+            </DetailActions>
+          }
+        />
 
         <section>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div className="md:col-span-2">
+          <motion.div
+            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
+          >
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+              className="md:col-span-2"
+            >
               <div className="flex items-center">
                 <div className="flex gap-2 bg-white border rounded-xl shadow-sm w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4">
                   <Image src={maquinaImagem} className="rounded-lg object-cover" alt="Máquina" width={150} height={150} />
@@ -351,48 +424,44 @@ export default function OPDetalhePage({ params }) {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
-              <OPProgressoWidget opId={opId} />
-            </div>
-          </div>
-        </section>
+    </motion.div>
 
-        <section className="bg-white border rounded-xl p-6 shadow-sm mb-13">
+    <motion.div
+      variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+      className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm"
+    >
+       <OPProgressoWidget opId={opId} />
+    </motion.div>
+  </motion.div>
+</section>
+
+        <SectionHighlight>
           <OPOEEDetalheWidget opId={opId} />
-        </section>
+        </SectionHighlight>
 
-        <section id="listagem_histEventos" className="mb-20">
-          <h1 className="text-3xl font-semibold mb-5">Histórico de Eventos da OP</h1>
-
-          <div className="flex searchbar">
-            <div className="flex items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none font-medium bg-transparent"
-                placeholder="Busque por id ou tipo de evento..."
-                value={buscaEvento}
-                onChange={(e) => setBuscaEvento(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-3">
-            <p>{dadosEventosExibidos.length} eventos encontrados</p>
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoEventos}
-                onSortChange={handleSortEventos}
-              />
-              <FilterDropdown
-                filtersConfig={eventosFilter}
-                onApply={aplicarFiltrosEventos}
-              />
-            </div>
-          </div>
-
+        <DetailListingSection
+          id="listagem_histEventos"
+          title="Histórico de Eventos da OP"
+          search={
+            <SearchBar
+              value={buscaEvento}
+              onChange={(e) => setBuscaEvento(e.target.value)}
+              placeholder="Busque por id ou tipo de evento..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosEventosExibidos.length}
+              label="eventos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                </>
+              }
+            />
+          }
+        >
           {dadosEventosExibidos.length > 0 ? (
             <TableListagens
               data={dadosEventosExibidos}
@@ -400,8 +469,14 @@ export default function OPDetalhePage({ params }) {
               acoesDropdown={(evento) => (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
+                      <EyeIcon
+                        strokeWidth={2}
+                        className="mr-1 h-4 w-4 text-primary"
+                      />
                       Ver Detalhes
                     </DropdownMenuItem>
                   </DialogTrigger>
@@ -412,58 +487,56 @@ export default function OPDetalhePage({ params }) {
               )}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold text-gray-500">Nenhum evento encontrado</h2>
-            </div>
+            <EmptyState
+              title="Nenhum evento encontrado"
+              message="Não encontramos nenhum evento com esse termo ou filtro."
+            />
           )}
-        </section>
+        </DetailListingSection>
 
-        <section id="listagem_histApontamentos">
-          <h1 className="text-3xl font-semibold mb-5">Histórico de Apontamentos da OP</h1>
-
-          <div className="flex searchbar">
-            <div className="flex items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none font-medium bg-transparent"
-                placeholder="Busque por id..."
-                value={buscaApontamento}
-                onChange={(e) => setBuscaApontamento(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-3">
-            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoApontamento}
-                onSortChange={handleSortApontamento}
-              />
-              <FilterDropdown
-                filtersConfig={apontamentoFilter}
-                onApply={aplicarFiltrosApontamento}
-              />
-            </div>
-          </div>
-
+        <DetailListingSection
+          id="listagem_histApontamentos"
+          title="Histórico de Apontamentos da OP"
+          search={
+            <SearchBar
+              value={buscaApontamento}
+              onChange={(e) => setBuscaApontamento(e.target.value)}
+              placeholder="Busque por id..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosApontamentosFiltrados.length}
+              label="apontamentos"
+              actions={
+                <>
+                  <OrdenarDropdown
+                    label="Ordenar por"
+                    options={opcoesOrdenacaoApontamento}
+                    onSortChange={handleSortApontamento}
+                  />
+                  <FilterDropdown
+                    filtersConfig={apontamentoFilter}
+                    onApply={aplicarFiltrosApontamento}
+                  />
+                </>
+              }
+            />
+          }
+        >
           {dadosApontamentosFiltrados.length > 0 ? (
             <TableListagens
               data={dadosApontamentosFiltrados}
               columns={colunasApontamento}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold text-gray-500">Nenhum apontamento encontrado</h2>
-            </div>
+            <EmptyState
+              title="Nenhum apontamento encontrado"
+              message="Não encontramos nenhum apontamento com esse termo ou filtro."
+            />
           )}
-        </section>
-
-      </div>
-    </main>
+        </DetailListingSection>
+      </DetailPageContainer>
+    </PageLayout>
   );
 }

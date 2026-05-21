@@ -15,15 +15,43 @@ import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsua
 import { useUsuarios } from "@/hooks/useUsuarios";
 import { usePerfil } from "@/hooks/usePerfil";
 
+import { useEffect, useState } from "react";
 import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
-import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSetorWidget";
+import { TurnosOperadoresWidget } from "@/features/usuarios/TurnosOperadoresWidget";
 import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
 import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
-import { CumprimentoMetaSetorWidget } from "@/features/usuarios/CumprimentoMetaSetorWidget";
-import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetorWidget";
+import { ProducaoMediaUsuarioSetorWidget } from "@/features/usuarios/ProducaoMediaUsuarioSetorWidget";
+import { UsuarioTaxaRefugoWidget } from "@/features/usuarios/UsuarioTaxaRefugoWidget";
 
-const turnoLabel = { "1": "Manha", "2": "Tarde", "3": "Noite" };
+import TableListagens from "@/components/table";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
+import FormCadastroOperadorGestor from "@/components/ui/forms/usuarios/formCadastroOperadorGestor";
+import FormEdicaoOperadorGestor from "@/components/ui/forms/usuarios/formEdicaoOperadorGestor";
+
+
+// Layout geral
+import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid } from "@/components/AnimatedComponents";
+
+// Componentes de detalhe
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  UserProfileCard,
+  DetailSectionTitle,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  SectionHighlight,
+  DetailListingSection,
+  DetailActions,
+} from "@/components/DetailComponents";
+
+const turnoLabel = { 1: "Manhã", 2: "Tarde", 3: "Noite" };
 
 const colunasUsuarios = [
   { id: "nome", key: "nome", label: "Nome", className: "w-1/5" },
@@ -79,14 +107,28 @@ export default function UsuariosGestor() {
     let filtrados = [...operadoresDoSetor];
 
     if (filtrosSelecionados.id_turno?.length > 0) {
-      filtrados = filtrados.filter((user) =>
-        filtrosSelecionados.id_turno.includes(turnoLabel[String(user.id_turno)])
+      dadosFiltrados = dadosFiltrados.filter((user) =>
+        filtrosSelecionados.id_turno.includes(turnoLabel[user.id_turno]),
       );
     }
 
-    setDados(filtrados);
+    // filtro por oee
+    if (filtrosSelecionados.oee_medio) {
+      const { min, max } = filtrosSelecionados.oee_medio;
+      const limiteMin = min !== "" && min !== undefined ? parseFloat(min) : 0;
+      const limiteMax =
+        max !== "" && max !== undefined ? parseFloat(max) : Infinity;
+
+      dadosFiltrados = dadosFiltrados.filter((item) => {
+        const valorNumerico = parseOEE(item.oee_medio);
+        return valorNumerico >= limiteMin && valorNumerico <= limiteMax;
+      });
+    }
+
+    setDados(dadosFiltrados);
   };
 
+  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
   const dadosExibidos = dados.filter((user) => {
     const termo = busca.toLowerCase();
     return user.nome?.toLowerCase().includes(termo) || String(user.id).includes(termo);
@@ -101,150 +143,146 @@ export default function UsuariosGestor() {
   }
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="px-8">
-        <div className="py-4 flex justify-between items-center">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-            Usuarios
-          </h1>
+    <PageLayout>
+      <PageHeader
+        title="Usuários"
+        action={
           <Dialog>
             <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
               <Plus className="mr-2" />
               Cadastrar
             </DialogTrigger>
-            <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
-              <FormCadastroOperadorGestor onCadastroSucesso={refresh} />
+
+            <DialogContent>
+              <FormCadastroOperadorGestor /*onCadastroSucesso={refresh} */ />
             </DialogContent>
           </Dialog>
-        </div>
+        }
+      />
 
-        <div className="flex flex-col gap-4">
-          <section className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="border rounded-xl p-4">
-                <QtdUsuariosWidget />
-              </div>
-              <div className="border rounded-xl p-4">
-                <QtdUsuariosPorSetorWidget />
-              </div>
-              <div className="border rounded-xl p-4">
-                <TopOperadoresWidget />
-              </div>
-            </div>
-          </section>
+      {/* Gráficos */}
+      <KPIGrid cols={3} className="mt-4">
+        <WidgetCard>
+          <QtdUsuariosWidget />
+        </WidgetCard>
 
-          <section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border rounded-xl p-6">
-                <TempoSessaoWidget />
-              </div>
-              <div className="border rounded-xl p-4">
-                <RotatividadeWidget />
-              </div>
-            </div>
-          </section>
+        <WidgetCard>
+          <TurnosOperadoresWidget setorId={setorId} />
+        </WidgetCard>
 
-          <section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border rounded-xl p-4">
-                <CumprimentoMetaSetorWidget />
-              </div>
-              <div className="border rounded-xl p-4">
-                <ProducaoMediaSetorWidget />
-              </div>
-            </div>
-          </section>
-        </div>
+        <WidgetCard>
+          <TopOperadoresWidget  setorId={setorId}/>
+        </WidgetCard>
+      </KPIGrid>
 
-        <section>
-          <div className="flex items-center py-6 gap-5">
-            <h2 className="text-4xl font-semibold">Listagem de Operadores</h2>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <TempoSessaoWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
+           <RotatividadeWidget setorId={setorId} />
+        </WidgetCard>
+      </ContentGrid>
 
-          <div className="flex searchbar mt-4">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full font-medium outline-none bg-transparent"
-                placeholder="Busque por nome ou id..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <ProducaoMediaUsuarioSetorWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
+          <UsuarioTaxaRefugoWidget setorId={setorId} />
+        </WidgetCard>
+      </ContentGrid>
 
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosExibidos.length} operadores encontrados</p>
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={[
-                  { label: "Ordem Alfabetica", value: "nome" },
-                  { label: "ID Crescente", value: "id_asc" },
-                  { label: "ID Decrescente", value: "id_desc" },
-                  { label: "Turno", value: "turno" },
-                ]}
-                onSortChange={handleSort}
-              />
-              <FilterDropdown
-                filtersConfig={[
-                  { id: "id_turno", label: "Turno", type: "checkbox", options: ["Manha", "Tarde", "Noite"] },
-                ]}
-                onApply={aplicarFiltros}
-              />
-            </div>
-          </div>
+      {/* Listagem */}
+      <SectionDivider title="Listagem de operadores" className="mt-8" />
 
-          <div className="flex flex-col flex-1 items-center w-full mt-4">
-            {dadosExibidos.length > 0 ? (
-              <TableListagens
-                data={dadosExibidos}
-                columns={colunasUsuarios}
-                acoesDropdown={(user) => (
-                  <>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href={`usuarios/${user.id}`}>
-                        <EyeIcon className="mr-2 h-10 w-10" />
-                        Ver Detalhes
-                      </Link>
+      {/* Busca */}
+      <SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por nome ou id..."
+      />
+
+      {/* Ordenar e Filtrar */}
+
+      <FilterRow
+        count={dadosExibidos.length}
+        label="usuários"
+        actions={
+          <>
+            <OrdenarDropdown
+              label="Ordenar por"
+              options={opcoesOrdenacao}
+              onSortChange={handleSort}
+            />
+            <FilterDropdown
+              filtersConfig={usuariosFilter}
+              onApply={aplicarFiltros}
+            />
+          </>
+        }
+      />
+
+      {/* Tabela */}
+      <FadeUpItem className="mt-4">
+        {dadosExibidos.length > 0 ? (
+          <TableListagens
+            data={dadosExibidos}
+            columns={colunasUsuarios}
+            acoesDropdown={(user) => (
+              <>
+                {/* link*/}
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`usuarios/${user.id}`}>
+                    <EyeIcon className="mr-2 h-10 w-10" />
+                    Ver Detalhes
+                  </Link>
+                </DropdownMenuItem>
+
+                {/* editar */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar
                     </DropdownMenuItem>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <Pencil className="mr-2 h-4 w-4 text-primary" />
-                          Editar
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
-                        <FormEdicaoOperadorGestor operadorId={user.id} onEdicaoSucesso={refresh} />
-                      </DialogContent>
-                    </Dialog>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                          Excluir
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                )}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-                <Search className="w-12 h-12 mb-4 text-gray-300" />
-                <h2 className="text-xl font-semibold">Nenhum operador encontrado</h2>
-                <p>Nao encontramos nenhum operador com a busca ou filtro.</p>
-              </div>
+                  </DialogTrigger>
+                  <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
+                    <FormEdicaoOperadorGestor
+                      operadorId={user.id} /* onEdicaoSucesso={refresh}*/
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                {/* excluir */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormExclusaoUsuario />
+                  </DialogContent>
+                </Dialog>
+              </>
             )}
-          </div>
-        </section>
-      </div>
-    </main>
+          />
+        ) : (
+          //caso não encontre nada correspondente
+          <EmptyState
+            title="Nenhum operador encontrado"
+            message={`Não encontramos nenhum resultado para "${busca}".`}
+          />
+        )}
+      </FadeUpItem>
+    </PageLayout>
   );
 }

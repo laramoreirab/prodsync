@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, EyeClosed, X, Eye } from "lucide-react";
+import { CheckCircle2, EyeClosed, X, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,7 +66,7 @@ const InputSenha = ({ value, onChange }) => {
             {showPassword ? (
               <Eye className="h-4 w-4 text-muted-foreground" />
             ) : (
-              <EyeClosed className="h-4 w-4 text-muted-foreground" />
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
             )}
           </Button>
         </div>

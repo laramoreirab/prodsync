@@ -13,7 +13,7 @@ export function TempoMedioParadaWidget() {
   return (
     <div>
       <p className="text-sm font-semibold text-black">
-        Tempo médio de parada das máquinas por setor
+        Tempo médio de parada das máquinas 
       </p>
       <p className="text-xs text-gray-400 font-semibold mt-1">
         *Atualizado em tempo real
@@ -23,7 +23,7 @@ export function TempoMedioParadaWidget() {
         <BarVerticalBase
           data={data}
           config={tempoMedioParadaConfig}
-          xKey="setor"
+          xKey="maquina"
           yKey="minutos"
         />
       </div>

@@ -38,6 +38,32 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import { opCrudService } from "@/services/opCrudService";
+import { FadeUpItem } from "@/components/AnimatedComponents";
+
+// AnimatedComponents
+import {
+  PageLayout,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  WidgetCard,
+  FadeUpItem
+} from "@/components/AnimatedComponents";
+
+// DetailComponents
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  DetailHeader,
+  DetailActions,
+  DetailInfoCard,
+  DetailInfoColumn,
+  DetailInfoField,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  DetailListingSection,
+  StatusBadge,
+} from "@/components/DetailComponents";
 import { filtrarPorDuracaoMax, filtrarPorNumberRange, duracaoEmMinutos } from "@/lib/filterUtils";
 
 const colunasEventos = [
@@ -265,7 +291,12 @@ export default function OPDetalhePage({ params }) {
   };
 
   const eventosFilter = [
-    { id: "evento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+    {
+      id: "evento",
+      label: "Tipo",
+      type: "checkbox",
+      options: ["Parada", "Setup"],
+    },
     { id: "data", label: "Data", type: "date-range" },
     { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
@@ -274,7 +305,7 @@ export default function OPDetalhePage({ params }) {
     let dadosFiltrados = [...todosEventos];
 
     if (filtrosSelecionados.evento?.length) {
-      dadosFiltrados = dadosFiltrados.filter((e) => filtrosSelecionados.evento.includes(e.evento));
+      dadosFiltrados = dadosFiltrados.filter((e) => filtrosSelecionados.evento.includes(e.evento),);
     }
 
     if (filtrosSelecionados.data?.start) {
@@ -311,6 +342,12 @@ export default function OPDetalhePage({ params }) {
     { label: "Produzido Decrescente", value: "produzido_desc" },
     { label: "Refugo Crescente", value: "refugo_asc" },
     { label: "Refugo Decrescente", value: "refugo_desc" },
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "Produzido Crescente", value: "produzido_asc" },
+    { label: "Produzido Decrescente", value: "produzido_desc" },
+    { label: "Refugo Crescente", value: "refugo_asc" },
+    { label: "Refugo Decrescente", value: "refugo_desc" },
   ];
 
   const handleSortApontamento = (criterio) => {
@@ -330,6 +367,7 @@ export default function OPDetalhePage({ params }) {
   const apontamentoFilter = [
     { id: "data", label: "Data", type: "date-range" },
     { id: "produzido", label: "Produzido", type: "number-range" },
+    { id: "refugo", label: "Refugo", type: "number-range" },
     { id: "refugo", label: "Refugo", type: "number-range" },
   ];
 
@@ -520,140 +558,165 @@ export default function OPDetalhePage({ params }) {
           <OPOEEDetalheWidget opId={opId} />
         </section>
 
-        {/* Histórico de Eventos */}
-        <section id="listagem_histEventos">
-          <div className="flex items-center justify-between gap-5 mt-6 mb-4">
-            <h1 className="text-4xl font-semibold">Histórico de Eventos da OP</h1>
+        {/* Listagens */}
+        <DetailListingSection
+          id="listagem_histEventos"
+          title="Histórico de Eventos da OP"
+          action={
             <Dialog>
-              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
+              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-2xl gap-2">
                 <Plus size={28} className="text-white cursor-pointer" />
                 Cadastrar
               </DialogTrigger>
+
               <DialogContent>
                 <FormCadastroEvento onCadastroSucesso={carregarDados} />
               </DialogContent>
             </Dialog>
-          </div>
-
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id, tipo ou motivo..."
-                value={buscaEvento}
-                onChange={(e) => setBuscaEvento(e.target.value)}
-              />
-              <button type="button" className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosExibidos.length} eventos encontrados</p>
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoEventos}
-                onSortChange={handleSortEventos}
-              />
-              <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-            </div>
-          </div>
-
-          {dadosExibidos.length > 0 ? (
-            <TableListagens
-              data={dadosExibidos}
-              columns={colunasEventos}
-              acoesDropdown={(evento) => (
-                <>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                        Ver detalhes
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DetalhesEvento eventoId={evento.id} />
-                    </DialogContent>
-                  </Dialog>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar justificativa
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <ModalSucessNotificacao />
-                    </DialogContent>
-                  </Dialog>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar evento
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
+          }
+          search={
+            <SearchBar
+              value={buscaEvento}
+              onChange={(e) => setBuscaEvento(e.target.value)}
+              placeholder="Busque por id, tipo ou motivo..."
             />
-          ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
-              <p>Não há eventos registrados para esta ordem de produção.</p>
-            </div>
-          )}
-        </section>
+          }
+          filterRow={
+            <FilterRow
+              count={dadosExibidos.length}
+              label="eventos"
+              actions={
+                <>
+                  <OrdenarDropdown
+                    label="Ordenar por"
+                    options={opcoesOrdenacaoEventos}
+                    onSortChange={handleSortEventos}
+                  />
+                  <FilterDropdown
+                    filtersConfig={eventosFilter}
+                    onApply={aplicarFiltrosEventos}
+                  />
+                </>
+              }
+            />
+          }
+        >
+          {/* Tabela */}
+          <FadeUpItem>
+            {dadosExibidos.length > 0 ? (
+              <TableListagens
+                data={dadosExibidos}
+                columns={colunasEventos}
+                enableSelection={true}
+                onEditSelected={(rows) => handleEditBatch(rows)}
+                acoesDropdown={(evento) => (
+                  <>
+                    {/* O comentário dentro do fragmento agora é válido */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem
+                          onSelect={(e) => e.preventDefault()}
+                          className="cursor-pointer"
+                        >
+                          <EyeIcon
+                            strokeWidth={2}
+                            className="mr-1 h-4 w-4 text-primary"
+                          />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DetalhesEvento eventoId={evento.id} />
+                      </DialogContent>
+                    </Dialog>
 
-        {/* Histórico de Apontamentos */}
-        <section id="listagem_histApontamentos" className="mt-10">
-          <h1 className="text-4xl font-semibold mb-4">Histórico de Apontamentos da OP</h1>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem
+                          onSelect={(e) => e.preventDefault()}
+                          className="cursor-pointer"
+                        >
+                          <BellRing className="mr-2 h-4 w-4" />
+                          Solicitar Justificativa
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <ModalSucessNotificacao />
+                      </DialogContent>
+                    </Dialog>
 
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id ou observação..."
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem
+                          onSelect={(e) => e.preventDefault()}
+                          className="cursor-pointer"
+                        >
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar Evento
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum evento encontrado"
+                message="Ajuste os filtros ou o termo de busca."
+              />
+            )}
+          </FadeUpItem>
+        </DetailListingSection>
+
+        {/* Listagem de Hist. Apontamentos da OP  */}
+        <FadeUpItem>
+          <DetailListingSection
+            id="listagem_histApontamentos"
+            title="Histórico de Apontamentos da OP"
+            search={
+              <SearchBar
                 value={buscaApontamento}
                 onChange={(e) => setBuscaApontamento(e.target.value)}
+                placeholder="Busque por id ou observação..."
               />
-              <button type="button" className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoApontamento}
-                onSortChange={handleSortApontamento}
+            }
+            filterRow={
+              <FilterRow
+                count={dadosApontamentosFiltrados.length}
+                label="apontamentos"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoApontamento}
+                      onSortChange={handleSortApontamento}
+                    />
+                    <FilterDropdown
+                      filtersConfig={apontamentoFilter}
+                      onApply={aplicarFiltrosApontamento}
+                    />
+                  </>
+                }
               />
-              <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
-            </div>
-          </div>
-
-          {dadosApontamentosFiltrados.length > 0 ? (
-            <TableListagens data={dadosApontamentosFiltrados} columns={colunasApontamento} />
-          ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhum apontamento encontrado</h2>
-              <p>Não há apontamentos registrados para esta ordem de produção.</p>
-            </div>
-          )}
-        </section>
+            }
+          >
+            {/* Tabela */}
+            {dadosApontamentosFiltrados.length > 0 ? (
+              <TableListagens
+                data={dadosApontamentosFiltrados}
+                columns={colunasApontamento}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum apontamento encontrado"
+                message="Ajuste os filtros ou o termo de busca."
+              />
+            )}
+          </DetailListingSection>
+        </FadeUpItem>
       </div>
     </main>
   );

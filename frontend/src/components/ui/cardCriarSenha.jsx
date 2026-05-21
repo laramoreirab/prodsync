@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import InputSenha from "./inputSenha";
 import { useState } from "react";
-import { CheckCircle2, EyeClosed, Info, Eye } from "lucide-react";
+import { CheckCircle2, Info, Eye, EyeOff } from "lucide-react";
 import { apiFetch } from "@/lib/api"
 import { toast } from "sonner";
 
@@ -108,7 +108,7 @@ export default function CriarSenha() {
     return (
         <section
             className="lg:h-[calc(100vh-80px)] flex items-center justify-center relative">
-            {step === 1 && (
+            {step === 2 && (
 
                 <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
 
@@ -177,7 +177,7 @@ export default function CriarSenha() {
 
 
 
-            {step === 2 && (
+            {step === 1 && (
 
                 <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
                     <Card className="px-6 py-8 sm:p-12 relative gap-6">
@@ -215,14 +215,14 @@ export default function CriarSenha() {
                                                     value={password} />
                                                 <Button
                                                     className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
-                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    onClick={(e) => { e.preventDefault(); setShowPassword(!showPassword); }}
                                                     size="icon"
                                                     type="button"
                                                     variant="ghost">
                                                     {showPassword ? (
                                                         <Eye className="h-4 w-4 text-muted-foreground" />
                                                     ) : (
-                                                        <EyeClosed className="h-4 w-4 text-muted-foreground" />
+                                                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                                                     )}
                                                 </Button>
 
