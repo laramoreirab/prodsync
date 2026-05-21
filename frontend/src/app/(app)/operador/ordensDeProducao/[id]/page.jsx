@@ -133,7 +133,7 @@ export default function OPDetalhePage({ params }) {
         const config = {
           Setup: {
             variant: "secondary",
-            className: "bg-[#fffbea] text-amarelo font-semibold text-sm",
+            className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm",
           },
           Parada: {
             variant: "destructive",
@@ -369,7 +369,7 @@ export default function OPDetalhePage({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="bg-[#7d95c6] px-7 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                <DialogTrigger className="bg-[var(--chart2)] px-7 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                   <Pencil className="mr-2" />
                   Justificar Evento
                 </DialogTrigger>
@@ -424,16 +424,16 @@ export default function OPDetalhePage({ params }) {
                   </div>
                 </div>
               </div>
-    </motion.div>
+            </motion.div>
 
-    <motion.div
-      variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-      className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm"
-    >
-       <OPProgressoWidget opId={opId} />
-    </motion.div>
-  </motion.div>
-</section>
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+              className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm"
+            >
+              <OPProgressoWidget opId={opId} />
+            </motion.div>
+          </motion.div>
+        </section>
 
         <SectionHighlight>
           <OPOEEDetalheWidget opId={opId} />

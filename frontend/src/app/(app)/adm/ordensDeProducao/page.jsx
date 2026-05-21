@@ -141,15 +141,15 @@ const colunasOrdemProd = [
         },
         "Parada": {
           variant: "destructive",
-          className: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm font-semibold border-none dark:!border-red-300/35 dark:!bg-red-500/20 dark:!text-red-100"
+          className: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm font-semibold border-none dark:!border-red-300/35 dark:!bg-red-500/20 :!text-red-100"
         },
         "Concluída": {
           variant: "outline",
-          className: "!border-blue-300 !bg-blue-100 !text-blue-600 text-sm font-semibold border-none dark:!border-blue-300/45 dark:!bg-blue-300/20 dark:!text-blue-100"
+          className: "!border-blue-300 !bg-blue-100 !text-blue-600 text-sm font-semibold border-none dark:!border-blue-300/45 dark:!bg-blue-300/20 :!text-blue-100"
         },
         "Aguardando Início": {
           variant: "outline",
-          className: "!bg-[#ECECEC] !text-[#636F87] !border-slate-500/30 text-sm font-semibold border-none dark:!border-slate-300/45 dark:!bg-slate-300/20 dark:!text-slate-100"
+          className: "!bg-[var(--status-neutral-bg)] !text-[var(--status-neutral-text)] !border-slate-500/30 text-sm font-semibold border-none dark:!border-slate-300/45 dark:!bg-slate-300/20 dark:!text-slate-100"
         }
       };
       const item = config[valor] || { icon: null };
@@ -351,7 +351,7 @@ export default function OrdensDeProducao() {
 
 
        {/* Listagem */}
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="OPs" className="mt-8" />
  
       <SearchBar
         value={busca}

@@ -78,12 +78,12 @@ const colunasOrdemProd = [
     icone: (valor) => {
       const config = {
         Produzindo: "bg-green-500/15 text-green-600",
-        Setup: "bg-[#fffbea] text-amarelo",
+        Setup: "bg-[var(--amarelo-setup)] text-amarelo",
         Parada: "bg-vermelho-vivido/10 text-vermelho-vivido",
         "ConcluÃ­da": "bg-blue-500/10 text-blue-600",
       };
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${config[valor] || "bg-[#ECECEC] text-[#636F87]"} text-sm font-semibold border-none p-2.5`}>
+        <Badge variant="outline" className={`whitespace-nowrap ${config[valor] || "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]"} text-sm font-semibold border-none p-2.5`}>
           {valor || "-"}
         </Badge>
       );

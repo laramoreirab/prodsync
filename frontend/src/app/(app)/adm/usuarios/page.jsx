@@ -220,7 +220,7 @@ export default function Usuarios() {
 
       {/* Listagem */}
 
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="Listagem de Usuários" className="mt-8" />
 
       <SearchBar
         value={busca}

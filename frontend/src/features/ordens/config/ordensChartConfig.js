@@ -1,27 +1,39 @@
 export const opTopRefugoConfig = {
   refugo: {
     label: "Refugo:",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
 
 export const opCargaSetorConfig = {
   carga: {
     label: "OPs:",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
 
 export const opStatusConfig = {
-  emProducao:       { label: "Em Produção:",       color: "#00357a"  },
-  pausadasSetup:    { label: "Pausadas (Setup):",   color: "#212e4b"  },
-  atrasadas:        { label: "Atrasadas (Paradas):", color: "#7d95c6" },
-  aguardandoInicio: { label: "Aguardando Início:",  color: "#b0bfd8"  },
+  "Em Produção": { 
+    label: "Em Produção", 
+    color: "var(--chart1)" 
+  },
+  "Pausadas (Setup)": { 
+    label: "Pausadas (Setup)", 
+    color: "var(--chart4)" 
+  },
+  "Atrasadas (Paradas)": { 
+    label: "Atrasadas (Paradas)", 
+    color: "var(--chart2)" 
+  },
+  "Aguardando Início": { 
+    label: "Aguardando Início", 
+    color: "var(--chart3)" 
+  },
 };
 
 export const opConcluidasConfig = {
   total: {
     label: "OPs Concluídas:",
-    color: "var(--color-grafico-area)",
+    color: "var(--chart1)",
   },
 };

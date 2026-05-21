@@ -84,16 +84,29 @@
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0F.708 0 0);
   --bg_app: url('/bg_app.svg');
   --vermelho-vivido: #b30000;
   --cinza-claro: #efefef;
   --amarelo: #ffd51e;
   --azul-cobalto: #004aad;
   --cinza-escuro: #545454;
+  --amarelo-setup: #fffbea;
 
   --color-grafico-area: #00357a;
   --color-grafico-colunas: #7d95c6;
+
+  --status-neutral-bg:#ECECEC;
+  --status-neutral-text:#636F87;
+
+  --pencil:#122f60;
+  --trash:#b30000;
+
+  --chart1:#00357a;
+  --chart2:#7d95c6;
+  --chart3:#b4d7ff;
+  --chart4:#122f60;
+  
 }
 
 .dark {

@@ -255,7 +255,7 @@ export default function HistoricoEventos() {
       </ContentGrid>
 
       {/* Listagem */}
-      <SectionDivider title="Listagem" className="mt-4" />
+      <SectionDivider title="Listagem de Eventos" className="mt-4" />
 
       <Tabs defaultValue="todos" className="w-full">
 
