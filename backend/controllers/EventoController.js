@@ -82,7 +82,7 @@ class EventoController {
         try {
             const id_empresa = req.user.id_empresa;
             const id_maquina = Number(req.body.id_maquina);
-            const { status_maquina } = req.body;
+            const status_maquina = req.body.status
 
             if (!status_maquina || String(status_maquina).trim() === '') {
                 return res.status(400).json({

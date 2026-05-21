@@ -1,4 +1,5 @@
 import mqtt from 'mqtt';
+import { apiFetch } from '.../frontend/src/lib/api.js';
 
 // Conexão via WebSockets seguros para não travar na escola e rodar direto no Render
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
@@ -17,11 +18,12 @@ clienteMQTT.on('connect', () => {
 clienteMQTT.on('message', async (topic, message) => {
   try {
     const dados = JSON.parse(message.toString());
+    console.log(dados)
     console.log(`[NOVO STATUS] Máquina: ${dados.maquina_id} | Status: ${dados.status}`);
-    
-    // COMO INTEGRAR COM O SEU PRISMA:
-    // Você pode importar seu cliente do Prisma aqui para salvar diretamente:
-    // await prisma.logProducao.create({ data: { maquinaId: dados.maquina_id, status: dados.status } });
+    const enviandoRequisicao = await apiFetch('/api/eventos/maquina', {
+      method: 'POST',
+      body: JSON.stringify(dados)
+    });
 
   } catch (erro) {
     console.error('Erro ao processar mensagem MQTT:', erro);
