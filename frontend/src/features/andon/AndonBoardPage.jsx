@@ -60,10 +60,9 @@ export function AndonBoardPage({ scope = "factory" }) {
           <AndonStatusWidget scope={scope} title={content.statusTitle} />
         </WidgetCard>
 
-
-        <WidgetCard>
-          <AndonRankingWidget scope={scope} />
-        </WidgetCard>
+          <WidgetCard>
+            <AndonRankingWidget scope={scope} />
+          </WidgetCard>
       </ContentGrid>
 
       {loading ? (
@@ -73,7 +72,7 @@ export function AndonBoardPage({ scope = "factory" }) {
       ) : null}
 
       {error ? (
-        <FadeUpItem className="mt-6 rounded-lg border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-destructive">
           Erro ao carregar os setores do Andon.
         </FadeUpItem>
       ) : null}

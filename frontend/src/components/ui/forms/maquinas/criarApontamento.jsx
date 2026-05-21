@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { Loader2, ChevronDown, Plus, Calendar } from "lucide-react";
 import {
     DialogTitle,
-    DialogClose
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
+import { deduplicarTurnosParaSelect } from "@/lib/filterUtils";
 
-export default function FormCriarApontamento({ id_maquina }) {
+export default function FormCriarApontamento({ id_maquina, id_ordemProducao }) {
     const [loading, setLoading] = useState(false);
 
     const [ordens, setOrdens] = useState([]);
@@ -16,7 +17,7 @@ export default function FormCriarApontamento({ id_maquina }) {
     const [loadingTurnos, setLoadingTurnos] = useState(false);
 
     const [form, setForm] = useState({
-        id_ordemProducao: '',
+        id_ordemProducao: id_ordemProducao || '',
         id_maquina: id_maquina || '',
         id_turno: '',
         qtd_boa: '',
@@ -26,14 +27,24 @@ export default function FormCriarApontamento({ id_maquina }) {
         observacao: '',
     });
 
-    // busca ordens de produção e turnos ao montar o componente
+    useEffect(() => {
+        if (id_ordemProducao) {
+            setForm((prev) => ({ ...prev, id_ordemProducao: String(id_ordemProducao) }));
+        }
+    }, [id_ordemProducao]);
+
+    useEffect(() => {
+        if (id_maquina) {
+            setForm((prev) => ({ ...prev, id_maquina: String(id_maquina) }));
+        }
+    }, [id_maquina]);
+
     useEffect(() => {
         async function fetchOrdens() {
             setLoadingOrdens(true);
             try {
-                const res = await fetch('/api/ordens-producao', { credentials: 'include' }); //a verificar esse caminho, nao achei no routes
-                const data = await res.json();
-                if (data.sucesso) setOrdens(data.dados);
+                const data = await apiFetch('/api/ordens?pagina=1&limite=100');
+                if (data.sucesso !== false) setOrdens(data.dados || []);
             } catch {
                 toast.error('Erro ao carregar ordens de produção');
             } finally {
@@ -44,9 +55,10 @@ export default function FormCriarApontamento({ id_maquina }) {
         async function fetchTurnos() {
             setLoadingTurnos(true);
             try {
-                const res = await fetch('/api/turnos', { credentials: 'include' });  //a verificar esse caminho, nao achei no routes
-                const data = await res.json();
-                if (data.sucesso) setTurnos(data.dados);
+                const data = await apiFetch('/api/turnos/listarTurnos');
+                if (data.sucesso !== false) {
+                    setTurnos(deduplicarTurnosParaSelect(data.dados || []));
+                }
             } catch {
                 toast.error('Erro ao carregar turnos');
             } finally {
@@ -68,40 +80,32 @@ export default function FormCriarApontamento({ id_maquina }) {
         setLoading(true);
 
         try {
-            //normalizando tipos antes de enviar proq o controller espera 
             const payload = {
                 ...form,
                 id_maquina: Number(form.id_maquina),
                 id_ordemProducao: Number(form.id_ordemProducao),
                 id_turno: Number(form.id_turno),
-                // garante number
                 qtd_boa: form.qtd_boa === '' ? '' : Number(form.qtd_boa),
                 qtd_refugo: form.qtd_refugo === '' ? '' : Number(form.qtd_refugo),
-                // datetime-local retorna "YYYY-MM-DDTHH:mm", converte para ISO completo com timezone
                 inicio: form.inicio ? new Date(form.inicio).toISOString() : '',
                 fim: form.fim ? new Date(form.fim).toISOString() : '',
             };
 
-            const res = await fetch('/api/apontamentos', { //caminho a verificar
+            const data = await apiFetch('/api/apontamentos', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
                 body: JSON.stringify(payload),
             });
 
-            const data = await res.json();
-
-            if (!res.ok || !data.sucesso) {
-                toast.error(data.mensagem || 'Erro ao criar apontamento');
+            if (!data.sucesso) {
+                toast.error(data.mensagem || data.erro || 'Erro ao criar apontamento');
                 return;
             }
 
             toast.success(data.mensagem || 'Apontamento criado com sucesso!');
 
-            //limpar formulário
             setForm({
-                id_ordemProducao: '',
-                id_maquina: id_maquina || '',
+                id_ordemProducao: id_ordemProducao ? String(id_ordemProducao) : '',
+                id_maquina: id_maquina ? String(id_maquina) : '',
                 id_turno: '',
                 qtd_boa: '',
                 qtd_refugo: '',
@@ -131,7 +135,6 @@ export default function FormCriarApontamento({ id_maquina }) {
 
             <form onSubmit={handleSubmit} className="space-y-6 p-4">
 
-                {/* ordem de produção */}
                 <div className="w-full">
                     <label className="block text-lg font-semibold mb-1">
                         Ordem de Produção
@@ -141,15 +144,15 @@ export default function FormCriarApontamento({ id_maquina }) {
                             name="id_ordemProducao"
                             value={form.id_ordemProducao}
                             onChange={handleChange}
-                            disabled={loadingOrdens}
-                            className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none pr-10  text-gray-300 font-medium disabled:opacity-50"
+                            disabled={loadingOrdens || !!id_ordemProducao}
+                            className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none pr-10 text-gray-700 font-medium disabled:opacity-50"
                         >
                             <option value="" disabled>
                                 {loadingOrdens ? 'Carregando...' : 'Selecione a Ordem'}
                             </option>
                             {ordens.map(op => (
-                                <option key={op.id_ordemProducao} value={op.id_ordemProducao}>
-                                    {op.codigo || `Ordem #${op.id_ordemProducao}`}
+                                <option key={op.id ?? op.id_ordem} value={op.id ?? op.id_ordem}>
+                                    {op.codigo_lote || op.nome || `Ordem #${op.id ?? op.id_ordem}`}
                                 </option>
                             ))}
                         </select>
@@ -157,7 +160,6 @@ export default function FormCriarApontamento({ id_maquina }) {
                     </div>
                 </div>
 
-                {/* turno */}
                 <div className="w-full">
                     <label className="block text-lg font-semibold mb-1">
                         Turno
@@ -168,15 +170,14 @@ export default function FormCriarApontamento({ id_maquina }) {
                             value={form.id_turno}
                             onChange={handleChange}
                             disabled={loadingTurnos}
-                            className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none text-gray-300
-                             pr-10 font-medium disabled:opacity-50"
+                            className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none text-gray-700 pr-10 font-medium disabled:opacity-50"
                         >
                             <option value="" disabled>
                                 {loadingTurnos ? 'Carregando...' : 'Selecione o Turno'}
                             </option>
                             {turnos.map(t => (
                                 <option key={t.id_turno} value={t.id_turno}>
-                                    {t.nome || `Turno #${t.id_turno}`}
+                                    {t.nome_turno || `Turno #${t.id_turno}`}
                                 </option>
                             ))}
                         </select>
@@ -184,7 +185,6 @@ export default function FormCriarApontamento({ id_maquina }) {
                     </div>
                 </div>
 
-                {/* início e fim  */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="w-full">
                         <label className="block text-lg font-semibold mb-1">
@@ -196,7 +196,7 @@ export default function FormCriarApontamento({ id_maquina }) {
                                 name="inicio"
                                 value={form.inicio}
                                 onChange={handleChange}
-                                className="w-full h-11 shadow-sm outline-none border border-neutral-200 rounded-lg bg-white p-2.5 text-lg text-gray-300 pr-10 appearance-none [&::-webkit-calendar-picker-indicator]:hidden font-medium"
+                                className="w-full h-11 shadow-sm outline-none border border-neutral-200 rounded-lg bg-white p-2.5 text-lg text-gray-700 pr-10 appearance-none [&::-webkit-calendar-picker-indicator]:hidden font-medium"
                             />
                             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                         </div>
@@ -211,14 +211,13 @@ export default function FormCriarApontamento({ id_maquina }) {
                                 name="fim"
                                 value={form.fim}
                                 onChange={handleChange}
-                                className="w-full h-11 shadow-sm outline-none border border-neutral-200 rounded-lg bg-white p-2.5 text-lg text-gray-300 pr-10 appearance-none [&::-webkit-calendar-picker-indicator]:hidden font-medium"
+                                className="w-full h-11 shadow-sm outline-none border border-neutral-200 rounded-lg bg-white p-2.5 text-lg text-gray-700 pr-10 appearance-none [&::-webkit-calendar-picker-indicator]:hidden font-medium"
                             />
                             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                         </div>
                     </div>
                 </div>
 
-                {/* quantidades de refugo e boa */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="w-full">
                         <label className="block text-lg font-semibold mb-1">
@@ -231,7 +230,7 @@ export default function FormCriarApontamento({ id_maquina }) {
                             onChange={handleChange}
                             min={0}
                             placeholder="Digite o total de peças"
-                            className="w-full h-11 shadow-sm outline-none border placeholder:font-medium placeholder-gray-300 border-neutral-200 rounded-lg bg-white p-2.5 text-lg"
+                            className="input-no-spinner w-full h-11 shadow-sm outline-none border placeholder:font-medium placeholder-gray-300 border-neutral-200 rounded-lg bg-white p-2.5 text-lg"
                         />
                     </div>
                     <div className="w-full">
@@ -245,12 +244,11 @@ export default function FormCriarApontamento({ id_maquina }) {
                             onChange={handleChange}
                             min={0}
                             placeholder="Digite a quantidade de refugo"
-                            className="w-full h-11 border shadow-sm placeholder:font-medium placeholder-gray-300 outline-none border-neutral-200 rounded-lg bg-white p-2.5 text-lg"
+                            className="input-no-spinner w-full h-11 border shadow-sm placeholder:font-medium placeholder-gray-300 outline-none border-neutral-200 rounded-lg bg-white p-2.5 text-lg"
                         />
                     </div>
                 </div>
 
-                {/* observação */}
                 <div className="w-full mb-4">
                     <label className="block text-lg font-semibold mb-1">
                         Observação

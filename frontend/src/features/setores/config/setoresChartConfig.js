@@ -47,4 +47,17 @@ export const setorProducaoMaquinaConfig = {
     color: "var(--chart1)",
   },
 };
+
+export const setorProducaoDiariaConfig = {
+  pcs: {
+    label: "Peças:",
+    color: "#00357a",
+  },
+};
+
+export const setorStatusDonutConfig = {
+  Produzindo: { label: "Produzindo", color: "#22c55e" },
+  Setup: { label: "Setup", color: "#f59e0b" },
+  Paradas: { label: "Paradas", color: "#ef4444" },
+};
  

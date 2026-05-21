@@ -15,16 +15,25 @@ const adminTabs = [
 ]
 
 const userTabs = [
+  { id: "conta", label: "Conta", icon: UserRound },
   { id: "aparencia", label: "Aparência", icon: Palette },
   { id: "seguranca", label: "Segurança", icon: KeyRound },
 ]
 
-const accountFields = [
+const adminAccountFields = [
   { id: "id", label: "ID" },
   { id: "emailEmpresa", label: "Email da Empresa", type: "email" },
   { id: "telefoneEmpresa", label: "Telefone da Empresa" },
   { id: "enderecoEmpresa", label: "Endereço da Empresa" },
   { id: "cpfRepresentante", label: "CPF do Representante" },
+]
+
+const userAccountFields = [
+  { id: "id", label: "ID" },
+  { id: "nome", label: "Nome" },
+  { id: "cpf", label: "CPF" },
+  { id: "cargo", label: "Cargo" },
+  { id: "email", label: "E-mail", type: "email" },
 ]
 
 const passwordRules = [
@@ -103,28 +112,44 @@ function SettingsInput(props) {
   )
 }
 
-function AccountSettings() {
+function AccountSettings({ role }) {
+  const isAdmin = role === "admin"
+  const fields = isAdmin ? adminAccountFields : userAccountFields
   return (
     <div className="max-w-sm space-y-4">
       <SectionTitle
         title="Informações da Conta"
-        description="Atualize suas informações pessoais."
+        description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
       />
 
       <form className="space-y-3">
-        {accountFields.map(({ id, label, type = "text" }) => (
-          <div key={id} className="space-y-1">
-            <label htmlFor={id} className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
-              {label}
-            </label>
-            <SettingsInput id={id} type={type} />
-          </div>
-        ))}
+        {fields.map(({ id, label, type = "text" }) => {
+          const isDisabled = !isAdmin || id === "id"
 
-        <Button type="button" className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
-          <Save className="size-4" />
-          Salvar Alterações
-        </Button>
+          return (
+            <div key={id} className="space-y-1">
+              <label htmlFor={id} className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                {label}
+              </label>
+              <SettingsInput
+                id={id}
+                type={type}
+                disabled={isDisabled}
+                readOnly={isDisabled}
+                className={cn(
+                  isDisabled && "bg-zinc-100 text-zinc-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500"
+                )}
+              />
+            </div>
+          )
+        })}
+
+        {isAdmin && (
+          <Button type="button" className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+            <Save className="size-4" />
+            Salvar Alterações
+          </Button>
+        )}
       </form>
     </div>
   )
@@ -283,7 +308,7 @@ export default function SettingsPage({ role = "operator" }) {
         <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
 
         <div className="flex-1 p-4 sm:p-6">
-          {activeTab === "conta" ? <AccountSettings /> : null}
+          {activeTab === "conta" ? <AccountSettings role={role} /> : null}
           {activeTab === "aparencia" ? (
             <AppearanceSettings darkMode={darkMode} onDarkModeChange={setDarkMode} />
           ) : null}

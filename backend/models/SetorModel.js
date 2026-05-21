@@ -22,9 +22,44 @@ class SetorModel {
     // Associa máquinas a um setor
     static async associarMaquinas(id_setor, id_empresa, ids_maquinas) {
         try {
+            const ids = ids_maquinas.map(Number).filter((id) => Number.isInteger(id) && id > 0);
+            if (ids.length !== ids_maquinas.length) {
+                throw new Error('IDs de maquinas invalidos');
+            }
+
+            const maquinasVinculadas = await prisma.maquinas.findMany({
+                where: {
+                    id_maquina: { in: ids },
+                    id_empresa,
+                    ativo: true,
+                    id_setor: {
+                        not: null
+                    },
+                    NOT: {
+                        id_setor
+                    }
+                },
+                select: {
+                    id_maquina: true,
+                    nome: true,
+                    setor: {
+                        select: {
+                            nome_setor: true
+                        }
+                    }
+                }
+            });
+
+            if (maquinasVinculadas.length > 0) {
+                const nomes = maquinasVinculadas
+                    .map((maquina) => `${maquina.nome} (${maquina.setor?.nome_setor ?? 'setor existente'})`)
+                    .join(', ');
+                throw new Error(`Maquina ja vinculada a outro setor: ${nomes}`);
+            }
+
             const resultado = await prisma.maquinas.updateMany({
                 where: {
-                    id_maquina: { in: ids_maquinas },
+                    id_maquina: { in: ids },
                     id_empresa: id_empresa
                 },
                 data: {
@@ -33,7 +68,7 @@ class SetorModel {
             });
             const maquinas = await prisma.maquinas.findMany({
                 where: {
-                    id_maquina: { in: ids_maquinas },
+                    id_maquina: { in: ids },
                     id_empresa,
                     id_operador: { not: null }
                 },
@@ -195,13 +230,16 @@ class SetorModel {
             const gestor = await prisma.usuarios.findFirst({
                 where: {
                     id_usuario: id_gestor,
-                    id_empresa: id_empresa,
-                    tipo: 'Gestor'
+                    id_empresa: id_empresa
                 }
             });
 
             if (!gestor) {
-                throw new Error('Usuário não encontrado, não pertence à empresa ou não é gestor');
+                throw new Error('Usuario nao encontrado ou nao pertence a empresa');
+            }
+
+            if (gestor.tipo !== 'Gestor') {
+                throw new Error('Usuario selecionado nao e do tipo Gestor');
             }
 
             const associacao = await prisma.setor_Gestor.create({
@@ -261,26 +299,54 @@ class SetorModel {
     // Associa operadores a um setor atualizando suas escalas de trabalho
     static async associarOperadores(id_setor, ids_operadores, id_empresa) {
         try {
-            const setor = await prisma.setores.findFirst({
-                where: { id_setor, id_empresa }
-            });
+        const setor = await prisma.setores.findFirst({
+            where: { id_setor, id_empresa }
+        })
+        if (!setor) throw new Error('Setor não encontrado ou não pertence à empresa')
 
-            if (!setor) {
-                throw new Error('Setor não encontrado ou não pertence à empresa');
-            }
+        // busca o primeiro turno da empresa como fallback
+        const turnoFallback = await prisma.turno.findFirst({
+            where: { id_empresa },
+            select: { id_turno: true }
+        })
 
-            // Atualiza o id_setor em todas as escalas de trabalho dos operadores selecionados
-            const resultado = await prisma.escalaTrabalho.updateMany({
-                where: {
-                    id_operador: { in: ids_operadores },
-                    id_empresa: id_empresa
-                },
-                data: {
-                    id_setor: id_setor
+        if (!turnoFallback) throw new Error('Nenhum turno cadastrado na empresa')
+
+        // upsert um por um — cria se não existe, atualiza se existe
+        const resultados = await Promise.all(
+            ids_operadores.map(async (id_operador) => {
+
+                // tenta encontrar escala existente do operador
+                const escalaExistente = await prisma.escalaTrabalho.findFirst({
+                    where: { id_operador, id_empresa }
+                })
+
+                if (escalaExistente) {
+                    // atualiza o setor da escala existente
+                    return await prisma.escalaTrabalho.update({
+                        where: {
+                            id_operador_id_turno: {
+                                id_operador,
+                                id_turno: escalaExistente.id_turno
+                            }
+                        },
+                        data: { id_setor }
+                    })
+                } else {
+                    // cria nova escala com turno fallback
+                    return await prisma.escalaTrabalho.create({
+                        data: {
+                            id_operador,
+                            id_turno:   turnoFallback.id_turno,
+                            id_setor,
+                            id_empresa
+                        }
+                    })
                 }
-            });
+            })
+        )
 
-            return resultado;
+        return { count: resultados.length }
         } catch (error) {
             console.error('Erro ao associar operadores ao setor:', error);
             throw error;
@@ -315,22 +381,49 @@ class SetorModel {
                 include: {
                     operador: {
                         select: { id_usuario: true, nome: true, email: true, tipo: true }
+                    },
+                    turno: {
+                        select: {
+                            id_turno: true,
+                            nome_turno: true,
+                            dia_semana: true,
+                            hora_inicio: true,
+                            hora_fim: true
+                        }
+                    },
+                    maquina: {
+                        select: {
+                            id_maquina: true,
+                            nome: true
+                        }
                     }
                 }
             });
 
             // Retornar apenas os operadores únicos
-            const operadoresUnicos = [];
-            const idsVistos = new Set();
+            const operadoresPorId = new Map();
 
             for (const escala of escalas) {
-                if (!idsVistos.has(escala.id_operador)) {
-                    operadoresUnicos.push(escala.operador);
-                    idsVistos.add(escala.id_operador);
+                if (!operadoresPorId.has(escala.id_operador)) {
+                    operadoresPorId.set(escala.id_operador, {
+                        ...escala.operador,
+                        turnos: [],
+                        maquinas: []
+                    });
+                }
+
+                const operador = operadoresPorId.get(escala.id_operador);
+
+                if (escala.turno && !operador.turnos.some(turno => turno.id_turno === escala.turno.id_turno)) {
+                    operador.turnos.push(escala.turno);
+                }
+
+                if (escala.maquina && !operador.maquinas.some(maquina => maquina.id_maquina === escala.maquina.id_maquina)) {
+                    operador.maquinas.push(escala.maquina);
                 }
             }
 
-            return operadoresUnicos;
+            return Array.from(operadoresPorId.values());
         } catch (error) {
             console.error('Erro ao listar operadores do setor:', error);
             throw error;
@@ -639,11 +732,14 @@ class SetorModel {
             // Calcula a média
             const media = totalOperadoresEscalados / totalSetores;
 
-            // Retorna apenas o número (formatado com 1 casa decimal, por exemplo)
+            if(media>0 && media <1){
+                media = 1
+            }
+
             return {
                 titulo: "Número de operadores por setor (média)",
                 subtitulo: "Atualizado em tempo real",
-                valor: Number(media.toFixed(1))
+                valor: Number(Math.round(media))
             }
         } catch (error) {
             console.error('Erro ao calcular média de operadores por setor:', error);

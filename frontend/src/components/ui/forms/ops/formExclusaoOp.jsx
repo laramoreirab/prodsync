@@ -6,9 +6,9 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { opCrudService } from '@/services/opCrudService'; 
+import { opCrudService } from '@/services/opCrudService';
 
-export default function FormExclusaoOp({ opId, idMaquina, onExclusaoSucesso }) {
+export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusaoSucesso }) {
     const [carregando, setCarregando] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -16,13 +16,18 @@ export default function FormExclusaoOp({ opId, idMaquina, onExclusaoSucesso }) {
         setCarregando(true);
 
         try {
-            // id_ordem e id_maquina vão no body — backend: deletar
-            await opCrudService.delete(opId, idMaquina);
-            toast.success("Ordem de Produção excluída com sucesso!");
+            const ids = opId ? [opId] : opIds.filter(Boolean);
+            if (ids.length === 0) {
+                toast.error("Selecione pelo menos uma OP.");
+                return;
+            }
+
+            await Promise.all(ids.map((id) => opCrudService.delete(id, idMaquina)));
+            toast.success(ids.length === 1 ? "Ordem de produção excluída com sucesso!" : "Ordens de produção excluídas com sucesso!");
             if (onExclusaoSucesso) onExclusaoSucesso();
         } catch (error) {
             console.error("Erro ao excluir OP:", error);
-            toast.error("Erro ao excluir Ordem de Produção.");
+            toast.error("Erro ao excluir ordem de produção.");
         } finally {
             setCarregando(false);
         }
@@ -43,10 +48,10 @@ export default function FormExclusaoOp({ opId, idMaquina, onExclusaoSucesso }) {
                 <div className='w-full flex flex-col items-center justify-center gap-3'>
                     <TriangleAlert className='text-[#00357a] w-30 h-30' />
                     <h2 className='font-bold text-2xl text-center'>
-                        Você tem certeza que deseja <br />excluir esta OP?
+                        Voce tem certeza que deseja <br />excluir {opId ? "esta OP" : "as OPs selecionadas"}?
                     </h2>
                     <p className='text-center font-medium text-[#7c7c81]'>
-                        As informações serão excluídas <b>PERMANENTEMENTE</b> <br /> e não poderão ser restauradas após excluí-las!
+                        As informacoes serao excluidas <b>PERMANENTEMENTE</b> <br /> e nao poderao ser restauradas apos exclui-las!
                     </p>
                 </div>
 

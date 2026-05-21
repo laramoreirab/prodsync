@@ -14,8 +14,6 @@ import FormEdicaoOperadorGestor from "@/components/ui/forms/usuarios/formEdicaoO
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
 import { useUsuarios } from "@/hooks/useUsuarios";
 import { usePerfil } from "@/hooks/usePerfil";
-
-import { useEffect, useState } from "react";
 import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
 import { TurnosOperadoresWidget } from "@/features/usuarios/TurnosOperadoresWidget";
 import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
@@ -23,17 +21,6 @@ import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
 import { RotatividadeWidget } from "@/features/usuarios/RotatividadeWidget";
 import { ProducaoMediaUsuarioSetorWidget } from "@/features/usuarios/ProducaoMediaUsuarioSetorWidget";
 import { UsuarioTaxaRefugoWidget } from "@/features/usuarios/UsuarioTaxaRefugoWidget";
-
-import TableListagens from "@/components/table";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
-import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
-import FormCadastroOperadorGestor from "@/components/ui/forms/usuarios/formCadastroOperadorGestor";
-import FormEdicaoOperadorGestor from "@/components/ui/forms/usuarios/formEdicaoOperadorGestor";
-
 
 // Layout geral
 import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid } from "@/components/AnimatedComponents";

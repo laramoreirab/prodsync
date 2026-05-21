@@ -34,8 +34,13 @@ import {
   TabsContent,
 } from "@/components/ui/tabs";
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
+import {
+  filtrarPorDataInicio,
+  filtrarPorDuracaoMax,
+  duracaoEmMinutos,
+} from "@/lib/filterUtils";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
@@ -100,6 +105,7 @@ const colunasEventos = [
 const historicoEventosFilter = [
   { id: "tipo", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
   { id: "data", label: "Data", type: "date-range" },
+  { id: "duracao", label: "Duração máx.", type: "time-max" },
 ];
 
 const opcoesOrdenacao = [
@@ -130,16 +136,8 @@ export default function HistoricoEventos() {
       if (criterio === 'maquina') return a.maquina.localeCompare(b.maquina);
       if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
       if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
-      if (criterio === 'duracao_asc') {
-        const [hA, mA] = a.duracao.split(':').map(Number);
-        const [hB, mB] = b.duracao.split(':').map(Number);
-        return (hA * 60 + mA) - (hB * 60 + mB);
-      }
-      if (criterio === 'duracao_desc') {
-        const [hA, mA] = a.duracao.split(':').map(Number);
-        const [hB, mB] = b.duracao.split(':').map(Number);
-        return (hB * 60 + mB) - (hA * 60 + mA);
-      }
+      if (criterio === 'duracao_asc') return duracaoEmMinutos(a) - duracaoEmMinutos(b);
+      if (criterio === 'duracao_desc') return duracaoEmMinutos(b) - duracaoEmMinutos(a);
       return 0;
     });
     setDados(copia);
@@ -150,13 +148,13 @@ export default function HistoricoEventos() {
     if (filtros.tipo?.length > 0) {
       filtrados = filtrados.filter(e => filtros.tipo.includes(e.tipo));
     }
-    if (filtros.data?.start) {
-      filtrados = filtrados.filter(e => new Date(e.inicio) >= new Date(filtros.data.start));
+
+    dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
     }
-    if (filtros.data?.end) {
-      filtrados = filtrados.filter(e => new Date(e.inicio) <= new Date(filtros.data.end));
-    }
-    setDados(filtrados);
+
+    setDados(dadosFiltrados);
   };
 
   const dadosExibidos = dados.filter((evento) => {

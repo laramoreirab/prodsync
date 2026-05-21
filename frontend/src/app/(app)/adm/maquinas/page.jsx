@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 import { Plus, Search, Upload, File, Pencil, Trash2, Clock4, EyeIcon, Loader2 } from "lucide-react";
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import React, { useState, useEffect } from 'react';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import {
@@ -39,8 +39,15 @@ import {
 
 
 
-const maquinasFilter = [
-  { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
+const obterNomeSetor = (maquina) => {
+  const setor = maquina?.setor;
+  if (!setor) return "";
+  if (typeof setor === "string") return setor;
+  return setor.nome_setor ?? setor.nome ?? "";
+};
+
+const maquinasFilterBase = [
+  { id: "setor", label: "Setor", type: "checkbox", options: [] },
   { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
   { id: "data", label: "Parada", type: "date-range" }
 ];
@@ -48,7 +55,7 @@ const maquinasFilter = [
 const colunasMaquinas = [
   { id: 'id_maquina', key: 'id_maquina', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   { id: 'nome', key: 'nome', label: 'Nome' },
-  { id: 'setor', key: 'id_setor', label: 'Setor' },
+  { id: 'setor', key: 'setor', label: 'Setor', icone: (valor, row) => obterNomeSetor(row) || "-" },
   {
     id: 'status',
     key: 'status',
@@ -89,10 +96,18 @@ export default function Maquinas() {
   const [busca, setBusca] = useState("");
   const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
 
+  const maquinasFilter = maquinasFilterBase.map((filter) =>
+    filter.id === "setor"
+      ? {
+          ...filter,
+          options: [...new Set(maquinas.map(obterNomeSetor).filter(Boolean))],
+        }
+      : filter
+  );
+
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(maquinas);
-    console.log(maquinas)
   }, [maquinas]);
 
   //lógica de ordenação
@@ -103,7 +118,7 @@ export default function Maquinas() {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
       if (criterio === 'id_asc') return a.id_maquina - b.id_maquina;
       if (criterio === 'id_desc') return b.id_maquina - a.id_maquina;
-      if (criterio === 'setor') return a.id_setor.localeCompare(b.id_setor);
+      if (criterio === 'setor') return obterNomeSetor(a).localeCompare(obterNomeSetor(b));
       return 0;
     });
 
@@ -120,9 +135,9 @@ export default function Maquinas() {
       );
     }
 
-    if (filtrosSelecionados.setor && filtrosSelecionados.setor.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(maq =>
-        filtrosSelecionados.setor.includes(maq.setor)
+    if (filtrosSelecionados.setor?.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter((maq) =>
+        filtrosSelecionados.setor.includes(obterNomeSetor(maq))
       );
     }
 

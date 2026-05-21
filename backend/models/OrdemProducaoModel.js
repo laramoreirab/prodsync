@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
+import MaquinaModel from './MaquinaModel.js';
 
 class OrdemProducaoModel {
 
@@ -81,16 +82,85 @@ class OrdemProducaoModel {
                             id_maquina: true,
                             nome: true,
                             serie: true,
-                            setor: { select: { id_setor: true, nome_setor: true } }
+                            imagem: true,
+                            status_atual: true,
+                            setor: { select: { id_setor: true, nome_setor: true } },
+                            operador: { select: { id_usuario: true, nome: true } }
                         }
                     }
                 }
             })
-            return resultado
+
+            if (!resultado) return null;
+
+            const agregado = await prisma.apontamento.aggregate({
+                where: {
+                    id_ordemProducao: Number(id_ordem),
+                    id_empresa: Number(id_empresa)
+                },
+                _sum: { qtd_boa: true, qtd_refugo: true }
+            });
+
+            return {
+                ...resultado,
+                produzido: agregado._sum.qtd_boa ?? 0,
+                refugo_total: agregado._sum.qtd_refugo ?? 0
+            };
         } catch (error) {
             console.error('Erro ao buscar Ordem de Produção:', error);
             throw error;
         }
+    }
+
+    static async listarEventosOrdem(id_ordem, id_empresa, limite = 50) {
+        const eventos = await prisma.historico_Eventos.findMany({
+            where: {
+                id_ordemProducao: Number(id_ordem),
+                id_empresa: Number(id_empresa)
+            },
+            include: {
+                motivo_parada: { select: { descricao: true } }
+            },
+            orderBy: { inicio: 'desc' },
+            take: limite
+        });
+
+        return eventos.map((evento) => ({
+            id: evento.id_evento,
+            id_evento: evento.id_evento,
+            tipo: evento.status_atual,
+            evento: evento.status_atual,
+            inicio: evento.inicio,
+            fim: evento.termino,
+            duracao_minutos: evento.duracao ?? MaquinaModel.calcularDuracaoMinutos(evento.inicio, evento.termino),
+            motivo: evento.motivo_parada?.descricao ?? '-',
+            observacao: evento.observacao ?? '-'
+        }));
+    }
+
+    static async listarApontamentosOrdem(id_ordem, id_empresa, limite = 50) {
+        const apontamentos = await prisma.apontamento.findMany({
+            where: {
+                id_ordemProducao: Number(id_ordem),
+                id_empresa: Number(id_empresa)
+            },
+            include: {
+                operador: { select: { id_usuario: true, nome: true } }
+            },
+            orderBy: { data_hora_inicio: 'desc' },
+            take: limite
+        });
+
+        return apontamentos.map((ap) => ({
+            id: ap.id_apontamento,
+            inicio: ap.data_hora_inicio,
+            fim: ap.data_hora_fim,
+            produzido: String(ap.qtd_boa ?? 0),
+            refugo: String(ap.qtd_refugo ?? 0),
+            observacao: ap.observacao || '-',
+            operador: ap.operador?.nome ?? '-',
+            id_operador: ap.operador?.id_usuario ?? null
+        }));
     }
     static async buscarOrdemAtiva(id_maquina) {
         //retorna o ID da ordem de prodção pelo ID da máquina

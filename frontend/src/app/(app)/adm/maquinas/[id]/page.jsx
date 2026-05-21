@@ -26,6 +26,11 @@ import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modal
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
+import {
+  filtrarPorDuracaoMax,
+  filtrarPorNumberRange,
+  duracaoEmMinutos,
+} from "@/lib/filterUtils";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
 // Layout geral
@@ -207,6 +212,7 @@ export default function MaquinaDetalhePage({ params }) {
           .map((item) => ({
             ...item,
             op: item.ordem_producao?.codigo_lote || item.ordem_producao?.id_ordem || "-",
+            id_ordem: item.ordem_producao?.id_ordem ?? null,
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
@@ -252,13 +258,59 @@ export default function MaquinaDetalhePage({ params }) {
     setDados(copia);
   };
 
-  const aplicarFiltrosEventos = (filtros) => {
-    let filtrados = [...todosEventos];
-    if (filtros.tipoEvento?.length) filtrados = filtrados.filter(e => filtros.tipoEvento.includes(e.tipoEvento));
-    if (filtros.data?.start) filtrados = filtrados.filter(e => parseData(e.data) >= new Date(filtros.data.start));
-    if (filtros.data?.end) filtrados = filtrados.filter(e => parseData(e.data) <= new Date(filtros.data.end));
-    setDados(filtrados);
+
+  //filtros para eventos
+  const eventosFilter = [
+    { id: "tipoEvento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+    { id: "data", label: "Data", type: "date-range" },
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
+  ];
+
+  const aplicarFiltrosEventos = (filtrosSelecionados) => {
+    let dadosFiltrados = [...todosEventos];
+
+    // filtro por status
+    if (filtrosSelecionados.tipoEvento?.length) {
+      dadosFiltrados = dadosFiltrados.filter(evento =>
+        filtrosSelecionados.tipoEvento.includes(evento.tipoEvento)
+      );
+    }
+
+    // filtro por data
+    if (filtrosSelecionados.data) {
+      if (filtrosSelecionados.data.start) {
+        dadosFiltrados = dadosFiltrados.filter(evento =>
+          parseData(evento.data) >= new Date(filtrosSelecionados.data.start)
+        );
+      }
+
+      if (filtrosSelecionados.data.end) {
+        dadosFiltrados = dadosFiltrados.filter(evento =>
+          parseData(evento.data) <= new Date(filtrosSelecionados.data.end)
+        );
+      }
+    }
+
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(
+        dadosFiltrados.map((e) => ({ ...e, inicio: e.inicio ?? parseData(e.data), fim: e.fim })),
+        filtrosSelecionados.duracao.max
+      );
+    }
+
+    setDados(dadosFiltrados);
   };
+
+  //filtra os dados atuais de EVENTOS (filtrados e ordenados) pelo termo de busca
+  const dadosExibidos = dados.filter((evento) => {
+    const termo = buscaEvento.toLowerCase();
+
+    return (
+      (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
+      (evento.motivo?.toLowerCase() || "").includes(termo) ||
+      evento.id?.toString().includes(termo)
+    );
+  });
 
   // Ordenação apontamentos
   const handleSortApontamento = (criterio) => {
@@ -277,21 +329,33 @@ export default function MaquinaDetalhePage({ params }) {
     setDadosApontamentoState(copia);
   };
 
-  const aplicarFiltrosApontamento = (filtros) => {
-    let filtrados = [...todosApontamentos];
-    if (filtros.produzido?.min != null) filtrados = filtrados.filter(a => Number(a.produzido) >= filtros.produzido.min);
-    if (filtros.produzido?.max != null) filtrados = filtrados.filter(a => Number(a.produzido) <= filtros.produzido.max);
-    if (filtros.refugo?.min != null) filtrados = filtrados.filter(a => Number(a.refugo) >= filtros.refugo.min);
-    if (filtros.refugo?.max != null) filtrados = filtrados.filter(a => Number(a.refugo) <= filtros.refugo.max);
-    if (filtros.data?.start) filtrados = filtrados.filter(a => parseData(a.data) >= new Date(filtros.data.start));
-    if (filtros.data?.end) filtrados = filtrados.filter(a => parseData(a.data) <= new Date(filtros.data.end));
-    setDadosApontamentoState(filtrados);
-  };
 
-  const dadosExibidos = dados.filter((evento) => {
-    const t = buscaEvento.toLowerCase();
-    return (evento.tipoEvento?.toLowerCase() || "").includes(t) || (evento.motivo?.toLowerCase() || "").includes(t) || evento.id?.toString().includes(t);
-  });
+  //filtros para apontamentos
+  const apontamentoFilter = [
+    { id: "data", label: "Data", type: "date-range" },
+    { id: "produzido", label: "Produzido", type: "number-range" },
+    { id: "refugo", label: "Refugo", type: "number-range" }
+  ];
+
+  const aplicarFiltrosApontamento = (filtrosSelecionados) => {
+    let dadosFiltrados = [...todosApontamentos];
+
+    if (filtrosSelecionados.data?.start) {
+      dadosFiltrados = dadosFiltrados.filter((a) =>
+        parseData(a.data ?? a.inicio) >= new Date(filtrosSelecionados.data.start)
+      );
+    }
+    if (filtrosSelecionados.data?.end) {
+      dadosFiltrados = dadosFiltrados.filter((a) =>
+        parseData(a.data ?? a.inicio) <= new Date(filtrosSelecionados.data.end)
+      );
+    }
+
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "produzido", filtrosSelecionados.produzido);
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "refugo", filtrosSelecionados.refugo);
+
+    setDadosApontamentoState(dadosFiltrados);
+  };
 
   const dadosApontamentosFiltrados = dadosApontamentoState.filter((a) => {
     const t = buscaApontamento.toLowerCase();
@@ -457,15 +521,14 @@ export default function MaquinaDetalhePage({ params }) {
           )}
         </DetailListingSection>
 
-        {/* Listagem de Apontamentos */}
         <DetailListingSection
-          id="listagem_apontamentos"
+          id="listagem_histApontamentos"
           title="Histórico de Apontamentos da Máquina"
           search={
             <SearchBar
               value={buscaApontamento}
               onChange={(e) => setBuscaApontamento(e.target.value)}
-              placeholder="Busque por OP ou id..."
+              placeholder="Busque por id..."
             />
           }
           filterRow={
@@ -474,8 +537,15 @@ export default function MaquinaDetalhePage({ params }) {
               label="apontamentos"
               actions={
                 <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
-                  <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
+                  <OrdenarDropdown
+                    label="Ordenar por"
+                    options={opcoesOrdenacaoApontamento}
+                    onSortChange={handleSortApontamento}
+                  />
+                  <FilterDropdown
+                    filtersConfig={apontamentoFilter}
+                    onApply={aplicarFiltrosApontamento}
+                  />
                 </>
               }
             />
@@ -487,7 +557,7 @@ export default function MaquinaDetalhePage({ params }) {
               columns={colunasApontamento}
               acoesDropdown={(apontamento) => (
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`/adm/ordensDeProducao/${apontamento.op}`}>
+                  <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
                     <EyeIcon className="mr-2 h-4 w-4" />
                     Ver OP relacionada
                   </Link>
@@ -495,7 +565,10 @@ export default function MaquinaDetalhePage({ params }) {
               )}
             />
           ) : (
-            <EmptyState title="Nenhum apontamento encontrado" message={`Sem apontamentos para "${buscaApontamento}".`} />
+            <EmptyState
+              title="Nenhum apontamento encontrado"
+              message="Não encontramos apontamentos correspondentes ao filtro ou busca."
+            />
           )}
         </DetailListingSection>
 

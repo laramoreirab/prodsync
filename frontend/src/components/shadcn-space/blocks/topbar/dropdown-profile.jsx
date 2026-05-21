@@ -66,8 +66,10 @@ const ProfileDropdown = ({
 
           {PROFILE_ITEMS.map(({ label, icon: Icon }) => (
             <DropdownMenuItem key={label} className={itemClass}>
+              <Link href={settingsHref}>
               <Icon size={20} className="text-foreground" />
               <span>{label}</span>
+              </Link>
             </DropdownMenuItem>
           ))}
 

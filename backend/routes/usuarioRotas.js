@@ -25,6 +25,7 @@ router.get('/operadores/:id_setor', authMiddleware, autorizarSetorParam('id_seto
 router.get('/:id', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.buscarPorId)
 router.delete('/:id/deletar', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.deletarUsuario)
 router.put('/:id/atualizar', authMiddleware, autorizarUsuarioParam('id'), uploadImagens.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.atualizarUsuario)
+router.get('/:id/historico-eventos', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.listarHistoricoEventosUsuario)
 router.get('/:id/apontamentos', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.listarApontamentosUsuario)
 router.get('/:id/producao_por_hora', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getProducaoPorHora);
 router.get('/:id/produtividade_dia', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getProdutividadeDia);
