@@ -382,7 +382,7 @@ export default function OPDetalhePage({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="bg-[#7d95c6] px-7 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                <DialogTrigger className="bg-[var(--chart2)] px-7 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                   <Pencil className="mr-2" />
                   Justificar Evento
                 </DialogTrigger>

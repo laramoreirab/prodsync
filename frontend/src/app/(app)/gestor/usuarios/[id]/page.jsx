@@ -463,7 +463,7 @@ export default function UsuarioDetalheGestor({ params }) {
                     height={150}
                   />
                   <div className="flex flex-col gap-3 justify-center">
-                    <h2 className="text-3xl font-bold text-[#212e4b] uppercase">
+                    <h2 className="text-3xl font-bold text-[var(--chart4)] uppercase">
                       THAK-12345
                     </h2>
                     <DetailInfoField label="ID" value="00000" />

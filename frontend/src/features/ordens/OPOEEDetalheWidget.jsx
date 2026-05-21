@@ -5,18 +5,20 @@ import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemici
 import { oeeMetricasConfig } from "../producao/config/producaoChartConfig";
 
 const metricas = [
-  { key: "disponibilidade", label: "Disponibilidade",      color: "#00357a" },
-  { key: "performance",     label: "Performance",          color: "#00357a" },
-  { key: "qualidade",       label: "Qualidade",            color: "#00357a" },
-  { key: "oee",             label: "OEE Geral Consolidado", color: "#00357a" },
+  { key: "disponibilidade", label: "Disponibilidade", color: "#00357a" },
+  { key: "performance", label: "Performance", color: "#00357a" },
+  { key: "qualidade", label: "Qualidade", color: "#00357a" },
+  { key: "oee", label: "OEE Geral Consolidado", color: "#00357a" },
 ];
 
 export function OPOEEDetalheWidget({ opId, maquinaId }) {
   const { data, loading, error } = useOPOEEDetalhe(opId, maquinaId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
-  if (!data)   return null;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+
 
   return (
     <div className="flex flex-col gap-2">

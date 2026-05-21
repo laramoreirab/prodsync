@@ -16,6 +16,7 @@ export function ProducaoTotalWidget({ setorId }) {
   const [diasSelecionados, setDiasSelecionados] = useState(90);
 
   const [data, setData] = useState([]);
+  
 
   async function carregarDados() {
     try {
