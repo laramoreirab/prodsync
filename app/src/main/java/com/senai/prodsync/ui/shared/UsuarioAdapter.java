@@ -52,7 +52,9 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.UsuarioV
         Usuario usuario = listaFiltrada.get(position);
         holder.tvNome.setText(usuario.getNome());
         holder.tvId.setText("Id: " + usuario.getId());
-        holder.tvFuncao.setText("Função: " + usuario.getFuncao());
+        
+        String funcao = (usuario.getFuncao() != null) ? usuario.getFuncao() : "Não informado";
+        holder.tvFuncao.setText("Função: " + funcao);
         
         // Carregamento de imagem com Glide
         if (usuario.getFotoUrl() != null && !usuario.getFotoUrl().isEmpty()) {
@@ -62,8 +64,6 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.UsuarioV
                     .error(R.drawable.ic_account)
                     .circleCrop()
                     .into(holder.ivFoto);
-        } else if (usuario.getFotoRes() != 0) {
-            holder.ivFoto.setImageResource(usuario.getFotoRes());
         } else {
             holder.ivFoto.setImageResource(R.drawable.ic_account);
         }
@@ -87,12 +87,17 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.UsuarioV
         } else {
             String busca = texto.toLowerCase().trim();
             for (Usuario u : listaOriginal) {
-                boolean matchNomeIdFuncao = u.getNome().toLowerCase().contains(busca) ||
-                                           u.getId().toLowerCase().contains(busca) ||
-                                           u.getFuncao().toLowerCase().contains(busca);
+                String nome = u.getNome() != null ? u.getNome().toLowerCase() : "";
+                String id = u.getId() != null ? u.getId().toLowerCase() : "";
+                String funcao = u.getFuncao() != null ? u.getFuncao().toLowerCase() : "";
+                String setor = u.getSetor() != null ? u.getSetor().toLowerCase() : "";
+
+                boolean matchNomeIdFuncao = nome.contains(busca) ||
+                                           id.contains(busca) ||
+                                           funcao.contains(busca);
 
                 if ("adm".equals(userRole)) {
-                    if (matchNomeIdFuncao || (u.getSetor() != null && u.getSetor().toLowerCase().contains(busca))) {
+                    if (matchNomeIdFuncao || setor.contains(busca)) {
                         listaFiltrada.add(u);
                     }
                 } else {

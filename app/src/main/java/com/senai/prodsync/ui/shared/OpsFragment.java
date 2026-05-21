@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.senai.prodsync.ApiResponse;
 import com.senai.prodsync.OPService;
 import com.senai.prodsync.OrdemProducao;
-import com.senai.prodsync.PaginatedData;
 import com.senai.prodsync.R;
 
 import java.util.ArrayList;
@@ -69,7 +68,8 @@ public class OpsFragment extends Fragment {
         }
 
         adapter = new OpAdapter(new ArrayList<>(), userRole, op -> {
-            OpDetalheFragment fragment = OpDetalheFragment.newInstance(op.getId());
+            OpDetalheFragment fragment = OpDetalheFragment.newInstance(
+                    op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(), op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(), op.getDataFinal());
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainer, fragment)
                     .addToBackStack(null)
@@ -97,25 +97,31 @@ public class OpsFragment extends Fragment {
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
-        OPService.getClient().getOrdens(token).enqueue(new Callback<ApiResponse<PaginatedData<OrdemProducao>>>() {
+        OPService.getClient().getOrdens(token).enqueue(new Callback<ApiResponse<List<OrdemProducao>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<PaginatedData<OrdemProducao>>> call, Response<ApiResponse<PaginatedData<OrdemProducao>>> response) {
+            public void onResponse(Call<ApiResponse<List<OrdemProducao>>> call, Response<ApiResponse<List<OrdemProducao>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
-                    List<OrdemProducao> ordens = response.body().getDados().getList();
+                    List<OrdemProducao> ordens = response.body().getDados();
                     List<Op> listaUI = new ArrayList<>();
                     if (ordens != null) {
                         for (OrdemProducao item : ordens) {
                             listaUI.add(new Op(
                                     item.getId(),
-                                    item.getMaquinaId() != null ? item.getMaquinaId() : "N/A",
+                                    item.getNomeMaquina(),
                                     item.getPrioridade() != null ? item.getPrioridade() : "Normal",
                                     item.getDataFinal() != null ? item.getDataFinal() : "S/D",
-                                    item.getSetor() != null ? item.getSetor() : "Geral"
+                                    item.getSetor() != null ? item.getSetor() : "Geral",
+                                    item.getProduto() != null ? item.getProduto() : "Produto N/A",
+                                    item.getQuantidade(),
+                                    item.getStatus(),
+                                    item.getNomeOperador(),
+                                    item.getDataInicio()
                             ));
                         }
                     }
                     adapter = new OpAdapter(listaUI, userRole, op -> {
-                        OpDetalheFragment fragment = OpDetalheFragment.newInstance(op.getId());
+                        OpDetalheFragment fragment = OpDetalheFragment.newInstance(
+                                op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(), op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(), op.getDataFinal());
                         getParentFragmentManager().beginTransaction()
                                 .replace(R.id.fragmentContainer, fragment)
                                 .addToBackStack(null)
@@ -126,7 +132,7 @@ public class OpsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<PaginatedData<OrdemProducao>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<List<OrdemProducao>>> call, Throwable t) {
                 if (getContext() != null)
                     Toast.makeText(getContext(), "Erro ao carregar OPs", Toast.LENGTH_SHORT).show();
             }

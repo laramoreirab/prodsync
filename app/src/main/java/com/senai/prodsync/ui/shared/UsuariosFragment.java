@@ -64,12 +64,7 @@ public class UsuariosFragment extends Fragment {
         if (tvSetor != null) tvSetor.setVisibility("adm".equals(userRole) ? View.VISIBLE : View.GONE);
 
         adapter = new UsuarioAdapter(new ArrayList<>(), userRole, usuario -> {
-            // Chamada corrigida passando Nome, Função e Foto para o Detalhe
-            UsuarioDetalheFragment fragment = UsuarioDetalheFragment.newInstance(
-                    usuario.getNome(),
-                    usuario.getFuncao(),
-                    usuario.getFotoUrl()
-            );
+            UsuarioDetalheFragment fragment = UsuarioDetalheFragment.newInstance(usuario);
             
             if (getParentFragmentManager() != null) {
                 getParentFragmentManager().beginTransaction()
@@ -102,10 +97,29 @@ public class UsuariosFragment extends Fragment {
         SharedPreferences prefs = getContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
-        UserService.getClient().getUsuarios(token).enqueue(new Callback<ApiResponse<List<Usuario>>>() {
+        // Usando o endpoint base /usuarios que costuma ser mais completo
+        UserService.getClient().getUsuariosBase(token).enqueue(new Callback<ApiResponse<List<Usuario>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Usuario>>> call, Response<ApiResponse<List<Usuario>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
+                    adapter.atualizarLista(response.body().getDados());
+                } else {
+                    tentarFallback(token);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<Usuario>>> call, Throwable t) {
+                tentarFallback(token);
+            }
+        });
+    }
+
+    private void tentarFallback(String token) {
+        UserService.getClient().getUsuarios(token).enqueue(new Callback<ApiResponse<List<Usuario>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<Usuario>>> call, Response<ApiResponse<List<Usuario>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
                     adapter.atualizarLista(response.body().getDados());
                 }
             }

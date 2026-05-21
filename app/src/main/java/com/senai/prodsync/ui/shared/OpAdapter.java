@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.senai.prodsync.R;
 import java.util.ArrayList;
@@ -43,6 +44,22 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
         holder.tvPrioridade.setText("Prioridade: " + op.getPrioridade());
         holder.tvDataFinal.setText("Data Final: " + op.getDataFinal());
 
+        // Configuração do Badge de Status para OP
+        String status = (op.getStatus() != null) ? op.getStatus().toLowerCase() : "";
+        if (status.contains("andamento") || status.contains("produzindo") || status.contains("producao")) {
+            holder.tvStatus.setText("Produzindo");
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_badge_produzindo);
+            holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.txt_produzindo));
+        } else if (status.contains("concluida") || status.contains("finalizada")) {
+            holder.tvStatus.setText("Finalizada");
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_badge_setup); // Usando cor de setup para finalizada
+            holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.txt_setup));
+        } else {
+            holder.tvStatus.setText("Parada");
+            holder.tvStatus.setBackgroundResource(R.drawable.bg_badge_parada);
+            holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.txt_parada));
+        }
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onOpClick(op);
@@ -62,10 +79,15 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
         } else {
             String busca = texto.toLowerCase().trim();
             for (Op op : listaOriginal) {
-                boolean matchId = op.getId().toLowerCase().contains(busca);
-                boolean matchPrioridade = op.getPrioridade().toLowerCase().contains(busca);
-                boolean matchMaquina = op.getMaquina().toLowerCase().contains(busca);
-                boolean matchSetor = op.getSetor().toLowerCase().contains(busca);
+                String id = op.getId() != null ? op.getId().toLowerCase() : "";
+                String prioridade = op.getPrioridade() != null ? op.getPrioridade().toLowerCase() : "";
+                String maquina = op.getMaquina() != null ? op.getMaquina().toLowerCase() : "";
+                String setor = op.getSetor() != null ? op.getSetor().toLowerCase() : "";
+
+                boolean matchId = id.contains(busca);
+                boolean matchPrioridade = prioridade.contains(busca);
+                boolean matchMaquina = maquina.contains(busca);
+                boolean matchSetor = setor.contains(busca);
 
                 if ("adm".equals(userRole)) {
                     if (matchId || matchPrioridade || matchMaquina || matchSetor) {
@@ -87,7 +109,7 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
     }
 
     static class OpViewHolder extends RecyclerView.ViewHolder {
-        TextView tvId, tvMaquina, tvPrioridade, tvDataFinal;
+        TextView tvId, tvMaquina, tvPrioridade, tvDataFinal, tvStatus;
 
         public OpViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,6 +117,7 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
             tvMaquina = itemView.findViewById(R.id.tv_maquina_op);
             tvPrioridade = itemView.findViewById(R.id.tv_prioridade_op);
             tvDataFinal = itemView.findViewById(R.id.tv_data_final_op);
+            tvStatus = itemView.findViewById(R.id.tv_status_op_badge);
         }
     }
 }

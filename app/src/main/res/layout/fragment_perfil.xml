@@ -94,19 +94,18 @@
                     <TextView android:id="@+id/tv_accountid_val"  android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0000000" android:textSize="18sp"/>
                 </LinearLayout>
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <LinearLayout
+                    android:id="@+id/layout_email"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                     <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="Email: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
                     <TextView android:id="@+id/tv_accountemail_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="josezinho@gmail.com" android:textSize="18sp"/>
                 </LinearLayout>
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <LinearLayout
+                    android:id="@+id/layout_cpf"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                     <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="CPF: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
                     <TextView android:id="@+id/tv_accountcpf_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="443.651.730-65" android:textSize="18sp"/>
-                </LinearLayout>
-
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
-                    <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="Turno: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                    <TextView android:id="@+id/tv_accountturno_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tarde" android:textSize="18sp" />
                 </LinearLayout>
 
             </LinearLayout>

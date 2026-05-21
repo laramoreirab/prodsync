@@ -1,5 +1,6 @@
 package com.senai.prodsync;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -13,7 +14,7 @@ public interface MachineService {
     String BASE_URL = "https://prodsync-backend.onrender.com/api/";
 
     @GET("maquinas")
-    Call<ApiResponse<PaginatedData<Machine>>> getMaquinas(@Header("Authorization") String token);
+    Call<ApiResponse<List<Machine>>> getMaquinas(@Header("Authorization") String token);
 
     static MachineService getClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

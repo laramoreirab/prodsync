@@ -16,6 +16,15 @@ public interface UserService {
     @GET("usuarios/listarSemAdms")
     Call<ApiResponse<List<Usuario>>> getUsuarios(@Header("Authorization") String token);
 
+    @GET("usuarios/listar")
+    Call<ApiResponse<List<Usuario>>> getUsuariosCompleto(@Header("Authorization") String token);
+
+    @GET("usuarios")
+    Call<ApiResponse<List<Usuario>>> getUsuariosBase(@Header("Authorization") String token);
+
+    @GET("usuarios/{id}")
+    Call<ApiResponse<Usuario>> getUsuarioPorId(@Header("Authorization") String token, @retrofit2.http.Path("id") int id);
+
     static UserService getClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);

@@ -62,10 +62,8 @@ public class HomeActivity extends AppCompatActivity {
 
         setupMenus(userRole);
         
-        // Fragmento inicial
-        if ("operador".equals(userRole)) {
-            replaceFragment(new MaquinaDetalheFragment());
-        } else {
+        // Fragmento inicial - Apenas se for a primeira criação da Activity
+        if (savedInstanceState == null) {
             replaceFragment(new MaquinasFragment());
         }
 
@@ -127,11 +125,7 @@ public class HomeActivity extends AppCompatActivity {
     private boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.nav_maquinas) {
-            if ("operador".equals(userRole)) {
-                replaceFragment(new MaquinaDetalheFragment());
-            } else {
-                replaceFragment(new MaquinasFragment());
-            }
+            replaceFragment(new MaquinasFragment());
             return true;
         } else if (itemId == R.id.nav_ops) {
             replaceFragment(new OpsFragment());

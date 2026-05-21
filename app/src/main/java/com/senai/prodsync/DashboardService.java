@@ -13,7 +13,7 @@ import retrofit2.http.Path;
 public interface DashboardService {
     String BASE_URL = "https://prodsync-backend.onrender.com/api/";
 
-    @GET("oee/{maquinaId}")
+    @GET("dashboard/oee/{maquinaId}")
     Call<ApiResponse<OeeResponse>> getOee(@Header("Authorization") String token, @Path("maquinaId") String maquinaId);
 
     static DashboardService getClient() {

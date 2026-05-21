@@ -14,7 +14,7 @@ public interface OPService {
     String BASE_URL = "https://prodsync-backend.onrender.com/api/";
 
     @GET("ordens")
-    Call<ApiResponse<PaginatedData<OrdemProducao>>> getOrdens(@Header("Authorization") String token);
+    Call<ApiResponse<List<OrdemProducao>>> getOrdens(@Header("Authorization") String token);
 
     static OPService getClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

@@ -31,11 +31,12 @@ public class NotificationWorker extends Worker {
 
             if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
                 List<Machine> machines = response.body().getDados();
-
-                for (Machine machine : machines) {
-                    // Notifica se houver algo crítico (ex: status parado)
-                    if ("Vermelho".equalsIgnoreCase(machine.getStatus()) || "parada".equalsIgnoreCase(machine.getStatus())) {
-                        showNotification(machine.getNome(), "Máquina necessita de atenção!");
+                if (machines != null) {
+                    for (Machine machine : machines) {
+                        // Notifica se houver algo crítico (ex: status parado)
+                        if ("Vermelho".equalsIgnoreCase(machine.getStatus()) || "parada".equalsIgnoreCase(machine.getStatus())) {
+                            showNotification(machine.getNome(), "Máquina necessita de atenção!");
+                        }
                     }
                 }
             }

@@ -70,5 +70,19 @@
             app:layout_constraintTop_toBottomOf="@id/tv_prioridade_op"
             app:layout_constraintStart_toStartOf="@id/tv_prioridade_op" />
 
+        <TextView
+            android:id="@+id/tv_status_op_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parada"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:textSize="12sp"
+            android:fontFamily="@font/montserrat_semibold"
+            android:background="@drawable/bg_badge_parada"
+            android:textColor="@color/txt_parada"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

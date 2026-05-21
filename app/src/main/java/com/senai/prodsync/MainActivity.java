@@ -1,6 +1,7 @@
 package com.senai.prodsync;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -32,6 +34,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Carrega o tema salvo antes de criar a view
+        SharedPreferences themePrefs = getSharedPreferences("ThemePrefs", MODE_PRIVATE);
+        boolean isDarkMode = themePrefs.getBoolean("isDarkMode", false);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -87,10 +98,15 @@ public class MainActivity extends AppCompatActivity {
                                 .putInt("id_usuario", dados.getIdUsuario())
                                 .putInt("id_setor", dados.getIdSetor() != null ? dados.getIdSetor() : -1)
                                 .putInt("id_empresa", dados.getIdEmpresa())
+                                .putString("email", dados.getEmail())
+                                .putString("turno", dados.getTurno())
+                                .putString("cpf", dados.getCpf())
+                                .putString("foto", dados.getFotoUrl())
                                 .apply();
 
                         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                        intent.putExtra("USER_ROLE", dados.getTipo().toLowerCase());
+                        String role = (dados.getTipo() != null) ? dados.getTipo().toLowerCase() : "operador";
+                        intent.putExtra("USER_ROLE", role);
                         startActivity(intent);
                         finish();
                     } else {

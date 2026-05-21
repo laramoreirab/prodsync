@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.senai.prodsync.ApiResponse;
 import com.senai.prodsync.Machine;
 import com.senai.prodsync.MachineService;
-import com.senai.prodsync.PaginatedData;
 import com.senai.prodsync.R;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ public class MaquinasFragment extends Fragment {
     private EditText etSearch;
     private View layoutNoResults;
     private String userRole;
+    private View searchContainer, tvTitulo, tvSetor;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,23 +61,27 @@ public class MaquinasFragment extends Fragment {
         rvMaquinas = view.findViewById(R.id.rv_maquinas);
         etSearch = view.findViewById(R.id.et_search);
         layoutNoResults = view.findViewById(R.id.layout_no_results);
-        TextView tvSetor = view.findViewById(R.id.tv_setor);
+        tvSetor = view.findViewById(R.id.tv_setor);
+        searchContainer = view.findViewById(R.id.search_container);
+        tvTitulo = view.findViewById(R.id.tv_titulo);
 
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String meuSetor = prefs.getString("setor", "Geral");
 
         if (tvSetor != null) {
-            tvSetor.setText("Setor: " + meuSetor);
+            ((TextView)tvSetor).setText("Setor: " + meuSetor);
             tvSetor.setVisibility("adm".equalsIgnoreCase(userRole) ? View.VISIBLE : View.GONE);
         }
 
-        adapter = new MaquinaAdapter(new ArrayList<>(), userRole, maquina -> {
-            MaquinaDetalheFragment fragment = MaquinaDetalheFragment.newInstance(maquina.getId(), maquina.getStatus());
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        });
+        // Se for operador, oculta a interface de busca/lista enquanto carrega
+        if ("operador".equalsIgnoreCase(userRole)) {
+            if (searchContainer != null) searchContainer.setVisibility(View.GONE);
+            if (tvTitulo != null) tvTitulo.setVisibility(View.GONE);
+            if (tvSetor != null) tvSetor.setVisibility(View.GONE);
+            rvMaquinas.setVisibility(View.GONE);
+        }
+
+        adapter = new MaquinaAdapter(new ArrayList<>(), userRole, maquina -> abrirDetalhe(maquina, true));
 
         rvMaquinas.setLayoutManager(new LinearLayoutManager(getContext()));
         rvMaquinas.setAdapter(adapter);
@@ -100,25 +104,41 @@ public class MaquinasFragment extends Fragment {
         if (getContext() == null) return;
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
+        int currentUserId = prefs.getInt("id_usuario", -1);
 
-        MachineService.getClient().getMaquinas(token).enqueue(new Callback<ApiResponse<PaginatedData<Machine>>>() {
+        MachineService.getClient().getMaquinas(token).enqueue(new Callback<ApiResponse<List<Machine>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<PaginatedData<Machine>>> call, Response<ApiResponse<PaginatedData<Machine>>> response) {
+            public void onResponse(Call<ApiResponse<List<Machine>>> call, Response<ApiResponse<List<Machine>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    PaginatedData<Machine> data = response.body().getDados();
-                    if (data != null && data.getList() != null) {
+                    List<Machine> machines = response.body().getDados();
+                    if (machines != null) {
+                        
+                        // Fluxo especial para Operador: Tenta encontrar a máquina dele e abrir direto
+                        if ("operador".equalsIgnoreCase(userRole)) {
+                            for (Machine m : machines) {
+                                if (m.getIdOperador() != null && m.getIdOperador() == currentUserId) {
+                                    abrirDetalhe(new Maquina(m.getNome(), m.getId(), m.getSerie(), m.getSetor(), m.getStatus(), m.getFotoUrl(), m.getDataAquisicao(), m.getCapacidade(), m.getNomeOperador()), false);
+                                    return;
+                                }
+                            }
+                            // Se não encontrou por ID, mas só tem uma máquina, abre ela (fallback)
+                            if (machines.size() == 1) {
+                                Machine m = machines.get(0);
+                                abrirDetalhe(new Maquina(m.getNome(), m.getId(), m.getSerie(), m.getSetor(), m.getStatus(), m.getFotoUrl(), m.getDataAquisicao(), m.getCapacidade(), m.getNomeOperador()), false);
+                                return;
+                            }
+                            
+                            // Se chegou aqui, é operador mas não achou máquina específica. Mostra a lista ou erro.
+                            rvMaquinas.setVisibility(View.VISIBLE);
+                            if (tvTitulo != null) tvTitulo.setVisibility(View.VISIBLE);
+                        }
+
                         List<Maquina> listaUI = new ArrayList<>();
-                        for (Machine m : data.getList()) {
-                            listaUI.add(new Maquina(m.getNome(), m.getId(), m.getSerie(), m.getSetor(), m.getStatus()));
+                        for (Machine m : machines) {
+                            listaUI.add(new Maquina(m.getNome(), m.getId(), m.getSerie(), m.getSetor(), m.getStatus(), m.getFotoUrl(), m.getDataAquisicao(), m.getCapacidade(), m.getNomeOperador()));
                         }
                         
-                        adapter = new MaquinaAdapter(listaUI, userRole, maquina -> {
-                            MaquinaDetalheFragment fragment = MaquinaDetalheFragment.newInstance(maquina.getId(), maquina.getStatus());
-                            getParentFragmentManager().beginTransaction()
-                                    .replace(R.id.fragmentContainer, fragment)
-                                    .addToBackStack(null)
-                                    .commit();
-                        });
+                        adapter = new MaquinaAdapter(listaUI, userRole, maquina -> abrirDetalhe(maquina, true));
                         rvMaquinas.setAdapter(adapter);
                         rvMaquinas.setVisibility(listaUI.isEmpty() ? View.GONE : View.VISIBLE);
                         layoutNoResults.setVisibility(listaUI.isEmpty() ? View.VISIBLE : View.GONE);
@@ -132,11 +152,25 @@ public class MaquinasFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<PaginatedData<Machine>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<List<Machine>>> call, Throwable t) {
                 Log.e("API_ERROR", "Falha: " + t.getMessage());
                 if (getContext() != null)
                     Toast.makeText(getContext(), "Erro de conexão", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void abrirDetalhe(Maquina maquina, boolean addToBackStack) {
+        MaquinaDetalheFragment fragment = MaquinaDetalheFragment.newInstance(
+                maquina.getId(), maquina.getStatus(), maquina.getNome(), maquina.getSerie(), maquina.getFotoUrl(), maquina.getDataAquisicao(), maquina.getCapacidade(), maquina.getOperador());
+        
+        androidx.fragment.app.FragmentTransaction transaction = getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, fragment);
+        
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
+        
+        transaction.commit();
     }
 }

@@ -3,10 +3,12 @@ package com.senai.prodsync.ui.shared;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import com.senai.prodsync.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +45,22 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
         holder.tvId.setText("Id: " + maquina.getId());
         holder.tvSerie.setText("Série: " + maquina.getSerie());
 
+        if (maquina.getFotoUrl() != null && !maquina.getFotoUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(maquina.getFotoUrl())
+                    .placeholder(R.drawable.ic_ferramenta)
+                    .into(holder.ivMaquina);
+        } else {
+            holder.ivMaquina.setImageResource(R.drawable.ic_ferramenta);
+        }
+
         // ... (resto da lógica de status mantida)
         String status = maquina.getStatus().toLowerCase();
-        if (status.equals("produzindo")) {
+        if (status.contains("produzindo") || status.contains("produção") || status.contains("producao")) {
             holder.tvStatus.setText("Produzindo");
             holder.tvStatus.setBackgroundResource(R.drawable.bg_badge_produzindo);
             holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.txt_produzindo));
-        } else if (status.equals("setup")) {
+        } else if (status.contains("setup") || status.contains("ajuste")) {
             holder.tvStatus.setText("Setup");
             holder.tvStatus.setBackgroundResource(R.drawable.bg_badge_setup);
             holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.txt_setup));
@@ -79,12 +90,15 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
         } else {
             String busca = texto.toLowerCase().trim();
             for (Maquina m : listaOriginal) {
-                boolean matchNomeId = m.getNome().toLowerCase().contains(busca) || 
-                                     m.getId().toLowerCase().contains(busca);
+                String nome = m.getNome() != null ? m.getNome().toLowerCase() : "";
+                String id = m.getId() != null ? m.getId().toLowerCase() : "";
+                String setor = m.getSetor() != null ? m.getSetor().toLowerCase() : "";
+
+                boolean matchNomeId = nome.contains(busca) || id.contains(busca);
                 
                 if ("adm".equals(userRole)) {
                     // ADM busca por nome, id OU setor
-                    if (matchNomeId || m.getSetor().toLowerCase().contains(busca)) {
+                    if (matchNomeId || setor.contains(busca)) {
                         listaFiltrada.add(m);
                     }
                 } else {
@@ -101,6 +115,7 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
 
     static class MaquinaViewHolder extends RecyclerView.ViewHolder {
         TextView tvNome, tvId, tvSerie, tvStatus;
+        ImageView ivMaquina;
 
         public MaquinaViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,6 +123,7 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
             tvId = itemView.findViewById(R.id.tv_id_maquina);
             tvSerie = itemView.findViewById(R.id.tv_serie_maquina);
             tvStatus = itemView.findViewById(R.id.tv_status_badge);
+            ivMaquina = itemView.findViewById(R.id.iv_maquina);
         }
     }
 }

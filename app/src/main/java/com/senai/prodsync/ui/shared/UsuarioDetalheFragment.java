@@ -17,16 +17,28 @@ public class UsuarioDetalheFragment extends Fragment {
 
     // Nota: Como removemos o banco local, passaremos os dados básicos via Bundle
     // Ou você pode implementar um UserService.getById futuramente.
+    private static final String ARG_USER_ID = "user_id";
     private static final String ARG_USER_NOME = "user_nome";
     private static final String ARG_USER_FUNCAO = "user_funcao";
     private static final String ARG_USER_FOTO = "user_foto";
+    private static final String ARG_USER_EMAIL = "user_email";
+    private static final String ARG_USER_SETOR = "user_setor";
+    private static final String ARG_USER_TURNO = "user_turno";
+    private static final String ARG_USER_CPF = "user_cpf";
+    private static final String ARG_USER_MAQUINA = "user_maquina";
 
-    public static UsuarioDetalheFragment newInstance(String nome, String funcao, String fotoUrl) {
+    public static UsuarioDetalheFragment newInstance(Usuario u) {
         UsuarioDetalheFragment fragment = new UsuarioDetalheFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_USER_NOME, nome);
-        args.putString(ARG_USER_FUNCAO, funcao);
-        args.putString(ARG_USER_FOTO, fotoUrl);
+        args.putString(ARG_USER_ID, u.getId());
+        args.putString(ARG_USER_NOME, u.getNome());
+        args.putString(ARG_USER_FUNCAO, u.getFuncao());
+        args.putString(ARG_USER_FOTO, u.getFotoUrl());
+        args.putString(ARG_USER_EMAIL, u.getEmail());
+        args.putString(ARG_USER_SETOR, u.getSetor());
+        args.putString(ARG_USER_TURNO, u.getTurno());
+        args.putString(ARG_USER_CPF, u.getCpf());
+        args.putString(ARG_USER_MAQUINA, u.getMaquinaResponsavel() != null ? u.getMaquinaResponsavel() : "Nenhuma");
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,15 +54,33 @@ public class UsuarioDetalheFragment extends Fragment {
 
         TextView tvNome = view.findViewById(R.id.tv_nome_usuario_detalhe);
         ImageView ivFoto = view.findViewById(R.id.iv_usuario_foto);
+        TextView tvIdVal = view.findViewById(R.id.tv_id_val);
+        TextView tvEmailVal = view.findViewById(R.id.tv_email_val);
+        TextView tvSetorVal = view.findViewById(R.id.tv_setor_val);
+        TextView tvTurnoVal = view.findViewById(R.id.tv_turno_val);
         TextView tvFuncaoVal = view.findViewById(R.id.tv_funcao_val);
+        TextView tvCpfVal = view.findViewById(R.id.tv_cpf_val);
+        TextView tvMaquinaNome = view.findViewById(R.id.tv_maquina_nome);
 
         if (getArguments() != null) {
             String nome = getArguments().getString(ARG_USER_NOME);
             String funcao = getArguments().getString(ARG_USER_FUNCAO);
             String fotoUrl = getArguments().getString(ARG_USER_FOTO);
+            String id = getArguments().getString(ARG_USER_ID);
+            String email = getArguments().getString(ARG_USER_EMAIL);
+            String setor = getArguments().getString(ARG_USER_SETOR);
+            String turno = getArguments().getString(ARG_USER_TURNO);
+            String cpf = getArguments().getString(ARG_USER_CPF);
+            String maquina = getArguments().getString(ARG_USER_MAQUINA);
 
             tvNome.setText(nome);
-            tvFuncaoVal.setText(funcao);
+            tvFuncaoVal.setText(funcao != null ? funcao : "Não informado");
+            tvIdVal.setText(id != null ? id : "S/I");
+            tvEmailVal.setText(email != null ? email : "Não informado");
+            tvSetorVal.setText(setor != null ? setor : "Geral");
+            tvTurnoVal.setText(turno != null ? turno : "N/A");
+            tvCpfVal.setText(cpf != null ? cpf : "N/A");
+            tvMaquinaNome.setText(maquina);
 
             if (fotoUrl != null && !fotoUrl.isEmpty()) {
                 Glide.with(this).load(fotoUrl).placeholder(R.drawable.ic_account).circleCrop().into(ivFoto);

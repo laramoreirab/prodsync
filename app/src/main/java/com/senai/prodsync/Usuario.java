@@ -10,14 +10,18 @@ public class Usuario {
     
     private String nome;
     
-    @SerializedName("tipo")
+    @SerializedName(value = "tipo", alternate = {"cargo", "funcao", "role", "tipo_usuario", "nivel", "cargo_usuario", "tipo_acesso"})
     private String funcao;
     
     @SerializedName("setor")
     private SetorInfo setorInfo;
     
+    @SerializedName(value = "email", alternate = {"email_usuario", "contato"})
     private String email;
+
     private String turno;
+
+    @SerializedName(value = "cpf", alternate = {"cpf_usuario", "documento"})
     private String cpf;
     
     @SerializedName("maquina_responsavel")
@@ -46,6 +50,9 @@ public class Usuario {
     
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
+
+    public String getMaquinaResponsavel() { return maquinaResponsavel; }
+    public void setMaquinaResponsavel(String maquinaResponsavel) { this.maquinaResponsavel = maquinaResponsavel; }
 
     public String getSetor() { 
         return (setorInfo != null) ? setorInfo.nomeSetor : "Geral"; 

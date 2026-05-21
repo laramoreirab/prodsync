@@ -16,7 +16,7 @@
 
     <fragment
         android:id="@+id/UsuariosFragment"
-        android:name="com.senai.prodsync.ui.adm.UsuariosFragment"
+        android:name="com.senai.prodsync.ui.shared.UsuariosFragment"
         android:label="Usuários" />
 
     <fragment
