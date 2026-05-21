@@ -53,7 +53,7 @@ public class NotificationWorker extends Worker {
             nm.createNotificationChannel(channel);
         }
         NotificationCompat.Builder b = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo)
+                .setSmallIcon(R.drawable.s_logo)
                 .setContentTitle("Alerta: " + name)
                 .setContentText(msg)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
