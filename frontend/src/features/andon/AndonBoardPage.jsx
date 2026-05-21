@@ -56,12 +56,13 @@ export function AndonBoardPage({ scope = "factory" }) {
       />
 
       <ContentGrid cols={2} className="mt-2">
-          <AndonStatusWidget scope={scope} title={content.statusTitle} />
-
-
         <WidgetCard>
-          <AndonRankingWidget scope={scope} />
+          <AndonStatusWidget scope={scope} title={content.statusTitle} />
         </WidgetCard>
+
+          <WidgetCard>
+            <AndonRankingWidget scope={scope} />
+          </WidgetCard>
       </ContentGrid>
 
       {loading ? (
@@ -71,7 +72,7 @@ export function AndonBoardPage({ scope = "factory" }) {
       ) : null}
 
       {error ? (
-        <FadeUpItem className="mt-6 rounded-lg border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-destructive">
           Erro ao carregar os setores do Andon.
         </FadeUpItem>
       ) : null}
@@ -82,11 +83,11 @@ export function AndonBoardPage({ scope = "factory" }) {
         ? sections.map((section, index) => (
           <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
 
-          <AndonSectionMarquee
-            key={section.id}
-            reverse={scope === "factory" && index % 2 === 1}
-            section={section}
-          />
+            <AndonSectionMarquee
+              key={section.id}
+              reverse={scope === "factory" && index % 2 === 1}
+              section={section}
+            />
           </FadeUpItem>
         ))
         : null}

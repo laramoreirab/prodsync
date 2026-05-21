@@ -134,7 +134,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                 {/* tipo  */}
                 <div>
-                    <label className="text-2xl font-semibold text-black">1. Tipo de Evento</label>
+                    <label className="text-2xl font-semibold text-black dark:text-white">1. Tipo de Evento</label>
                     <div className="flex gap-3">
                         <button
                             type="button"
@@ -164,7 +164,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                 {/* setor */}
                 <div className="flex flex-col">
-                    <label className="text-2xl font-semibold text-black">2. Setor Afetado</label>
+                    <label className="text-2xl font-semibold text-black dark:text-white">2. Setor Afetado</label>
                     <button
                         type="button"
                         onClick={() => toggleMenu('setor')}
@@ -214,7 +214,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                 {/* maquina */}
                 <div className="flex flex-col">
-                    <label className="text-2xl font-semibold text-black">3. Máquina Afetada</label>
+                    <label className="text-2xl font-semibold text-black dark:text-white">3. Máquina Afetada</label>
                     <button
                         type="button"
                         onClick={() => toggleMenu('maquina')}
@@ -264,7 +264,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                 {/* op afetada */}
                 <div className="flex flex-col">
-                    <label className="text-2xl font-semibold text-black">4. OP Afetada</label>
+                    <label className="text-2xl font-semibold text-black dark:text-white">4. OP Afetada</label>
                     <button
                         type="button"
                         onClick={() => toggleMenu('op')}
@@ -310,12 +310,12 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                 {/* período — inicio e fim */}
                 <div>
-                    <label className="text-2xl font-semibold text-black">5. Período do Evento</label>
+                    <label className="text-2xl font-semibold text-black dark:text-white">5. Período do Evento</label>
 
                     <div className="space-y-4">
                         {/* início */}
                         <div>
-                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Início</span>
+                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2 dark:text-slate-300">Início</span>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="relative flex shadow-md items-center border border-gray-200 rounded-md px-3 py-2 bg-white">
                                     <Calendar className="w-4 h-4 text-gray-400 mr-2 shrink-0" />
@@ -340,7 +340,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                         {/* fim */}
                         <div>
-                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Fim</span>
+                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2 dark:text-slate-300">Fim</span>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="relative shadow-md flex items-center border border-gray-200 rounded-md px-3 py-2 bg-white">
                                     <Calendar className="w-4 h-4 text-gray-400 mr-2 shrink-0" />
@@ -367,12 +367,12 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                 {/* justificativa */}
                 <div>
-                    <label className="text-2xl font-semibold text-black">6. Justificativa</label>
+                    <label className="text-2xl font-semibold text-black dark:text-white">6. Justificativa</label>
 
                     <div className="space-y-3">
                         <div className="grid grid-cols-6 gap-3 items-end">
                             <div className="flex flex-col gap-2 col-span-4">
-                                <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
+                                <span className="block text-xl text-gray-700 font-medium mb-1 mt-2 dark:text-slate-300">Motivo Principal:</span>
                                 <div className="relative">
                                     <select
                                         value={idMotivoPrincipal}
@@ -408,7 +408,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
 
                         </div>
                         <div>
-                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Observação (Opcional):</span>
+                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2 dark:text-slate-300">Observação (Opcional):</span>
                             <textarea
                                 value={observacao}
                                 onChange={(e) => setObservacao(e.target.value)}
