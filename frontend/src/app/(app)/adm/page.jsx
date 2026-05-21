@@ -19,7 +19,7 @@ export default function DashboardGeralPage() {
       <PageHeader title="Dashboard Geral da Empresa" />
 
       <ContentGrid cols={1}>
-        <WidgetCard>
+        <WidgetCard centered>
           <ProducaoDiaWidget />
         </WidgetCard>
       </ContentGrid>
@@ -34,7 +34,7 @@ export default function DashboardGeralPage() {
         <WidgetCard>
           <ProducaoSetorWidget />
         </WidgetCard>
-        <WidgetCard centered>
+        <WidgetCard>
           <MaquinaStatusWidget />
         </WidgetCard>
       </ContentGrid>

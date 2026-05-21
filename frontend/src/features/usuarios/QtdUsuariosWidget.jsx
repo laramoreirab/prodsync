@@ -8,7 +8,7 @@ export function QtdUsuariosWidget() {
   
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
-  if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
 
     const operadores = data.find((item) => item.name.toLowerCase() === "operadores")?.value ?? 0;
