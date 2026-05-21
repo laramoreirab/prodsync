@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
-import { apiFetch } from "@/lib/apiFetch"
+import { apiFetch } from "@/lib/api"
 
 const adminTabs = [
   { id: "conta", label: "Conta", icon: UserRound },
@@ -131,34 +131,35 @@ function AccountSettings({ role }) {
   useEffect(() => {
     async function buscarDados() {
       const dadosUsuario = await apiFetch("/api/auth/perfil")
-      setFormData(dadosUsuario)
-
-      formData.id = dadosUsuario.id_usuario
-      formData.nome = dadosUsuario.nome || ""
-      formData.cpf = dadosUsuario.cpf || ""
-      formData.cargo = dadosUsuario.tipo || ""
-      formData.email = dadosUsuario.email || ""
-      formData.emailEmpresa = dadosUsuario.email|| ""
-      formData.telefoneEmpresa = dadosUsuario.telefone|| ""
-      formData.enderecoEmpresa = dadosUsuario.endereco|| ""
-      formData.cpfRepresentante = dadosUsuario.cpf_representante || ""
+      setFormData({
+      id : dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "", 
+      nome : dadosUsuario.dados.nome || "",
+      cpf : dadosUsuario.dados.cpf || "",
+      cargo : dadosUsuario.dados.tipo || "",
+      email : dadosUsuario.dados.email || "",
+      emailEmpresa : dadosUsuario.dados.email || "",
+      telefoneEmpresa : dadosUsuario.dados.telefone || "",
+      enderecoEmpresa : dadosUsuario.dados.endereco || "",
+      cpfRepresentante : dadosUsuario.dados.cpf_representante || ""
+    })
+      console.log("Dados do usuário:", dadosUsuario)
     }
     buscarDados()
   }, [])
 
 
-async function handleInputChange(e) {
-  const { id, value } = e.target
+  async function handleInputChange(e) {
+    const { id, value } = e.target
 
-  if(id === "cpfRepresentante" || id === "telefoneEmpresa"){
-    const valorSemMascara = value.replace(/\D/g, "")
+    if (id === "cpfRepresentante" || id === "telefoneEmpresa") {
+      const valorSemMascara = value.replace(/\D/g, "")
+    }
+
+    setFormData((dadosAnteriores) => ({
+      ...dadosAnteriores,
+      [id]: value, // Usa colchetes para transformar a string do 'id' em uma chave do objeto
+    }));
   }
-
-  setFormData((dadosAnteriores) => ({
-    ...dadosAnteriores,
-    [id]: value, // Usa colchetes para transformar a string do 'id' em uma chave do objeto
-  }));
-}
 
   const fields = isAdmin ? adminAccountFields : userAccountFields
 
@@ -173,7 +174,7 @@ async function handleInputChange(e) {
         {fields.map(({ id, label, type = "text", readOnly }) => {
           const isDisabled = !isAdmin || readOnly
 
-          const valorDoInput = dadosUsuario[id] || ""
+          const valorDoInput = formData[id] || ""
 
           return (
             <div key={id} className="space-y-1">
@@ -184,10 +185,10 @@ async function handleInputChange(e) {
                 id={id}
                 type={type}
                 disabled={isDisabled}
-                value = {valorDoInput}
-                onChange = {isDisabled ? undefined : handleInputChange(e)} 
+                value={valorDoInput}
+                onChange={isDisabled ? undefined : handleInputChange}
                 className={cn(
-                  isDisabled && "bg-zinc-100 text-zinc-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500"
+                  isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500"
                 )}
               />
             </div>

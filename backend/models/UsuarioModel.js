@@ -246,17 +246,16 @@ class UsuarioModel {
                 const resultado = await prisma.empresas.findFirst({
                     where: {
                         id_empresa: Number(id_empresa),
-                        usuarios: {
-                            some: {
-                                id_usuario: Number(id_usuario)
-                            }
-                        }
                     },
-                    include: { 
+                    include: {
                         usuarios: {
-                            select: { 
+                            where: {
+                                id_usuario: Number(id_usuario) 
+                            },
+                            select: {
                                 id_usuario: true
                             }
+
                         }
                     }
                 });
