@@ -7,6 +7,19 @@ import { AndonSectionMarquee } from "./AndonSectionMarquee";
 import { AndonStatusWidget } from "./AndonStatusWidget";
 import { useAndonSections } from "./hooks/useAndonSections";
 
+import {
+  PageLayout,
+  PageHeader,
+  SectionDivider,
+  StaggerWrapper,
+  FadeUpItem,
+  AnimatedTitle,
+  ContentGrid,
+  WidgetCard,
+  LoadingState,
+  EmptyState,
+} from "@/components/AnimatedComponents";
+
 const scopeContent = {
   factory: {
     pageTitle: "Andon Geral da Fábrica",
@@ -36,48 +49,48 @@ export function AndonBoardPage({ scope = "factory" }) {
   const { data: sections, loading, error } = useAndonSections(scope, idSetor);
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-6 p-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="inline-block border-b-4 border-secondary-foreground pb-1 text-3xl font-semibold text-slate-950 md:text-4xl">
-          {content.pageTitle}
-        </h1>
+    <PageLayout>
+      <PageHeader
+        title={content.pageTitle}
+        action={<AndonRelogioWidget />}
+      />
 
-        <div className="flex items-end">
-          <AndonRelogioWidget />
-        </div>
-      </div>
+      <ContentGrid cols={2} className="mt-2">
+        <WidgetCard>
+          <AndonStatusWidget scope={scope} title={content.statusTitle} />
+        </WidgetCard>
 
-      <section className="grid gap-4 xl:grid-cols-4">
-        <div className="xl:col-span-2 rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
-          <AndonStatusWidget scope={scope} idSetor={idSetor} title={content.statusTitle} />
-        </div>
-
-        <div className="xl:col-span-2 rounded-lg border border-slate-200 bg-white/95 p-5 shadow-sm md:p-6">
-          <AndonRankingWidget scope={scope} idSetor={idSetor} />
-        </div>
-      </section>
+          <WidgetCard>
+            <AndonRankingWidget scope={scope} />
+          </WidgetCard>
+      </ContentGrid>
 
       {loading ? (
-        <section className="rounded-lg border border-slate-200 bg-white/80 p-6 text-sm text-slate-500">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
           Carregando visão do Andon...
-        </section>
+        </FadeUpItem>
       ) : null}
 
       {error ? (
-        <section className="rounded-lg border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-destructive">
           Erro ao carregar os setores do Andon.
-        </section>
+        </FadeUpItem>
       ) : null}
 
+
+      {/* ESPERO NAO TER QUEBRADO NADA MAS SE SIM ME AVISA */}
       {!loading && !error
         ? sections.map((section, index) => (
-          <AndonSectionMarquee
-            key={section.id}
-            reverse={scope === "factory" && index % 2 === 1}
-            section={section}
-          />
+          <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
+
+            <AndonSectionMarquee
+              key={section.id}
+              reverse={scope === "factory" && index % 2 === 1}
+              section={section}
+            />
+          </FadeUpItem>
         ))
         : null}
-    </div>
+    </PageLayout>
   );
 }

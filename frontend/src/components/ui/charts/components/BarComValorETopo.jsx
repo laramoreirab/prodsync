@@ -24,8 +24,11 @@ export function BarComValorETopo({ data, config, title }) {
 
 
   const dataKey = Object.keys(config)[0];
-  const labelKey = data[0].setor ? "setor" : Object.keys(data[0]).find(key => key !== dataKey);
-
+const labelKey = data[0].operador
+    ? "operador"
+    : data[0].setor
+    ? "setor"
+    : Object.keys(data[0]).find((key) => key !== dataKey);
   return (
     <div className="w-full">
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}

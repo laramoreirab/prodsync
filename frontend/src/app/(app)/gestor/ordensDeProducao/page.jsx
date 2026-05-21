@@ -25,6 +25,23 @@ import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 import { usePerfil } from "@/hooks/usePerfil";
 
+
+// Layout geral
+import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid } from "@/components/AnimatedComponents";
+
+// Componentes de detalhe
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  UserProfileCard,
+  DetailSectionTitle,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  SectionHighlight,
+  DetailListingSection,
+  DetailActions,
+} from "@/components/DetailComponents";
+
 const colunasOrdemProd = [
   { id: "id", key: "id", label: "ID", className: "w-1/7" },
   { id: "codigo_lote", key: "codigo_lote", label: "Lote", className: "w-1/5" },
@@ -137,113 +154,151 @@ export default function OrdensDeProducaoGestor() {
   }
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="p-8">
-        <div className="w-full space-y-4">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-              Ordens de Producao
-            </h1>
-            <Dialog>
-              <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
-                <Plus className="mr-2" />
-                Criar OP
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroOp onCadastroSucesso={refresh} />
-              </DialogContent>
-            </Dialog>
-          </div>
+    <PageLayout>
 
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white border rounded-xl p-4 h-24"><OPAtivasKPIWidget setorId={setorId} /></div>
-            <div className="bg-white border rounded-xl p-4 h-24"><OPAtrasadasKPIWidget setorId={setorId} /></div>
-            <div className="bg-white border rounded-xl p-4 h-24"><OPPecasBoasKPIWidget setorId={setorId} /></div>
-            <div className="bg-white border rounded-xl p-4 h-24"><OPRefugoKPIWidget setorId={setorId} /></div>
-          </section>
+        <PageHeader title="Ordens de Produção" action={
 
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border rounded-xl p-6"><OPEficienciaWidget setorId={setorId} /></div>
-            <div className="bg-white border rounded-xl p-6"><OPTopRefugoWidget setorId={setorId} /></div>
-            <div className="bg-white border rounded-xl p-6"><OPCargaSetorWidget setorId={setorId} /></div>
-          </section>
+          <Dialog>
+            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+              <Plus className="mr-2" />
+              Criar OP
+            </DialogTrigger>
+            <DialogContent>
+              <FormCadastroOp onCadastroSucesso={refresh} />
+            </DialogContent>
+          </Dialog>
 
-          <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="bg-white border rounded-xl p-6 md:col-span-2"><OPStatusWidget setorId={setorId} /></div>
-            <div className="bg-white border rounded-xl p-6 md:col-span-3"><OPConcluidasDiaWidget setorId={setorId} /></div>
-          </section>
-        </div>
+        } />
 
-        <section>
-          <div className="flex items-center py-8 gap-5">
-            <h2 className="text-4xl w-30 font-semibold">OPs</h2>
-            <hr className="bg-black flex-1 h-1" />
-          </div>
 
-          <div className="flex searchbar mb-3">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full font-medium outline-none bg-transparent"
-                placeholder="Busque por id, lote ou produto..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
-              <button className="outline-none cursor-pointer mr-2"><Search /></button>
-            </div>
-          </div>
+          {/* GRÁFICOS */}
 
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3 mb-4">
-            <p>{dadosExibidos.length} OPs encontradas</p>
-            <div className="flex items-center gap-4">
-              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
-              <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
-            </div>
-          </div>
+        <KPIGrid cols={4} className="mt-4">
 
-          <TableListagens
-            data={dadosExibidos}
-            columns={colunasOrdemProd}
-            enableSelection
-            acoesDropdown={(op) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`ordensDeProducao/${op.id}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver Detalhes
-                  </Link>
-                </DropdownMenuItem>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <Pencil className="mr-2 h-4 w-4 text-primary" />
-                      Editar OP
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
-                  </DialogContent>
-                </Dialog>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormExclusaoOp
-                      opId={op.id}
+          <WidgetCard>
+            <OPAtivasKPIWidget setorId={setorId} />
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPAtrasadasKPIWidget setorId={setorId}/>
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPPecasBoasKPIWidget setorId={setorId}/>
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPRefugoKPIWidget setorId={setorId}/>
+          </WidgetCard>
+
+
+        </KPIGrid>
+
+        <KPIGrid cols={3} className="mt-4">
+
+          <WidgetCard>
+            <OPEficienciaWidget setorId={setorId}/>
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPTopRefugoWidget setorId={setorId}/>
+          </WidgetCard>
+
+          <WidgetCard>
+            <OPCargaSetorWidget setorId={setorId}/>
+          </WidgetCard>
+
+
+        </KPIGrid>
+
+        <ContentGrid cols={2} className="mt-6">
+          <WidgetCard>
+            <OPStatusWidget setorId={setorId}/>
+          </WidgetCard>
+          <WidgetCard>
+            <OPConcluidasDiaWidget setorId={setorId}/>
+          </WidgetCard>
+        </ContentGrid>
+
+
+        {/* Listagem de OPs */}
+<SectionDivider title="OPs" className="mt-8" />
+
+          {/* Busca */}
+<SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por id ou nome..."
+      />
+
+      <FilterRow
+        count={dadosExibidos.length}
+        label="OPs"
+        actions={
+          <>
+            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+            <FilterDropdown filtersConfig={opsFilter} onApply={aplicarFiltros} />
+          </>
+        }
+      />
+
+          {/* Tabela */}
+          <FadeUpItem className="mt-4">
+          {dadosExibidos.length > 0 ? (
+            <TableListagens
+              data={dadosExibidos}
+              columns={colunasOrdemProd}
+              enableSelection={true}
+              acoesDropdown={(op) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`ordensDeProducao/${op.id}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <Pencil className="mr-2 h-4 w-4 text-primary" />
+                        Editar OP
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh}/>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormExclusaoOp opId={op.id}
                       idMaquina={op.id_maquina}
-                      onExclusaoSucesso={() => excluirOp(op.id, op.id_maquina)}
+                      onExclusaoSucesso={refresh}/>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            />
+          ) : (
+            <EmptyState
+                      title="Nenhum resultado encontrado"
+                      message="Ajuste seus filtros ou termo de busca."
                     />
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-          />
-        </section>
-      </div>
-    </main>
+          )}
+          </FadeUpItem>
+    </PageLayout>
   );
 }

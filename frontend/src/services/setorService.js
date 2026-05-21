@@ -8,11 +8,31 @@ import {
   SetorMaquinaStatusSchema,
   SetorOEEMedioSchema,
   SetorOEEEvolucaoArraySchema,
+  SetorOEEPanelSchema,
   SetorTopOperadoresArraySchema,
   SetorMotivosParadaArraySchema,
   SetorProducaoSemanalArraySchema,
   SetorProducaoMaquinaArraySchema,
 } from "@features/setores/schemas/setorSchema";
+// import {
+//   mockSetores,
+//   mockSetorTotalKPI,
+//   mockOperadoresMediaKPI,
+//   mockOEEPorSetor,
+//   mockRefugoPorSetor,
+//   mockOEECritico,
+//   mockSetorProducaoSemanal,
+//   mockProducaoPorMaquinaSetor 
+// } from "./mockData";
+//  import {
+//     mockSetorMaquinaStatus,
+//     mockSetorOEEMedio,
+//     mockSetorOEEEvolucao,
+//     mockSetorTopOperadores,
+//     mockSetorMotivosParada,
+//   } from "./mockData";
+
+const USE_MOCK = false;
 
 export const setorService = {
   async getSetores() {

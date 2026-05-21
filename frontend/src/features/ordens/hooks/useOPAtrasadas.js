@@ -1,6 +1,6 @@
 "use client";
 import { useChartData } from "@/hooks/useChartData";
 import { opAtrasadasService } from "@services/ordenService";
-export function useOPAtrasadas() {
-  return useChartData(opAtrasadasService.getKPI);
+export function useOPAtrasadas(setorId = null) {
+  return useChartData(opAtrasadasService.getKPI, setorId);
 }

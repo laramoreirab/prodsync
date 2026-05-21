@@ -10,6 +10,9 @@ import { OEEMaquinaWidget }                from "@/features/operador/OEEMaquinaW
 
 import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
 
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+
+
 
 export default function DashboardGeralOperador() {
   const [operadorId, setOperadorId] = useState(null);
@@ -28,59 +31,35 @@ export default function DashboardGeralOperador() {
   }, []);
 
 
-  return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
+ return (
+  <PageLayout>
+    <PageHeader title="Dashboard Geral" />
 
-      {/* Título da Tela */}
-      <section className="p-8">
-        <div className="title_tela">
-          <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-            Dashboard Geral
-          </h1>
-        </div>
-      </section>
+    {/* SEÇÃO 1: OEE | Produtividade | Eficiência */}
+    <ContentGrid cols={3}>
+      <WidgetCard>
+        <OEEMaquinaWidget operadorId={operadorId} />
+      </WidgetCard>
+      <WidgetCard>
+        <ProdutividadeDiariaWidget operadorId={operadorId} />
+      </WidgetCard>
+      <WidgetCard>
+        <EficienciaMaquinaWidget operadorId={operadorId} />
+      </WidgetCard>
+    </ContentGrid>
 
-      {/* SEÇÃO 1: OEE | Produtividade | Eficiência */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          {/* OEE da Máquina */}
-          <div className="bg-white border rounded-xl p-4">
-            {/* <OEEMaquinaWidget operadorId={operadorId} /> */}
-          </div>
-
-          {/* Produtividade Diária */}
-          <div className="bg-white border rounded-xl p-4">
-            {/* <ProdutividadeDiariaWidget operadorId={operadorId} /> */}
-          </div>
-
-          {/* Eficiência por dia */}
-          <div className="bg-white border rounded-xl p-4">
-            {/* <EficienciaMaquinaWidget operadorId={operadorId} /> */}
-          </div>
-
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: Produção por Hora | Qualidade | Velocímetro */}
-      <section className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          <div className="bg-white border rounded-xl p-4">
-            {/* <ProducaoPorHoraOperadorWidget operadorId={operadorId} /> */}
-          </div>
-
-          <div className="bg-white border rounded-xl p-4">
-            {/* <QualidadeWidget operadorId={operadorId} /> */}
-          </div>
-
-          <div className="bg-white border rounded-xl p-4">
-            {/* <VelocimetroWidget operadorId={operadorId} /> */}
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-  );
+    {/* SEÇÃO 2: Produção por Hora | Qualidade | Velocímetro */}
+    <ContentGrid cols={3}>
+      <WidgetCard>
+        <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+      </WidgetCard>
+      <WidgetCard>
+        <QualidadeWidget operadorId={operadorId} />
+      </WidgetCard>
+      <WidgetCard>
+        <VelocimetroWidget operadorId={operadorId} />
+      </WidgetCard>
+    </ContentGrid>
+  </PageLayout>
+);
 }

@@ -2,6 +2,7 @@
 
 import { useOPOEEDetalhe } from "./hooks/useOPOEEDetalhe";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
+import { oeeMetricasConfig } from "../producao/config/producaoChartConfig";
 
 const metricas = [
   { key: "disponibilidade", label: "Disponibilidade",      color: "#00357a" },
@@ -25,7 +26,7 @@ export function OPOEEDetalheWidget({ opId, maquinaId }) {
       </div>
 
       <div className="flex items-end justify-around gap-4 flex-wrap py-4">
-        {metricas.map(({ key, label, color }) => (
+        {oeeMetricasConfig.map(({ key, label, color }) => (
           <div key={key} className="flex flex-col items-center">
             <GaugeSemicircular
               title={label}
