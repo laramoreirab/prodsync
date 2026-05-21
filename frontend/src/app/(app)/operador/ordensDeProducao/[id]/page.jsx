@@ -1,19 +1,11 @@
 "use client";
-import { use, useState } from "react";
-import { useEventos } from "@/hooks/useEventos";
+import { use, useState, useEffect, useCallback } from "react";
 
 import TableListagens from "@/components/table";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { DataEvento } from "@/components/ui/dataEvento";
 import { Badge } from "@/components/ui/badge";
-import {
-  ChevronDown,
-  Pencil,
-  Plus,
-  Flame,
-  Search,
-  EyeIcon,
-} from "lucide-react";
+import { ChevronDown, Pencil, Plus, Flame, Search, EyeIcon, Loader2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { OPProgressoWidget } from "@/features/ordens/OPProgressoWidget";
@@ -25,6 +17,28 @@ import Link from "next/link";
 import Image from "next/image";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
+import { opCrudService } from "@/services/opCrudService";
+import {
+  filtrarPorDataInicio,
+  filtrarPorDuracaoMax,
+  filtrarPorNumberRange,
+  duracaoEmMinutos,
+} from "@/lib/filterUtils";
+
+const prioridadeIcone = {
+  "Crítica": { icon: Flame, className: "border border-vermelho-vivido bg-transparent text-black" },
+  "Alta": { className: "border border-amber-400 bg-transparent text-black" },
+  "Média": { className: "border border-azul-cobalto bg-transparent text-black" },
+  "Baixa": { className: "border border-gray-400 bg-transparent text-black" },
+};
+
+function formatarDataHora(valor) {
+  if (!valor) return "-";
+  return new Date(valor).toLocaleString("pt-BR", {
+    day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
+}
 
 import { motion } from "framer-motion";
 
@@ -52,13 +66,45 @@ export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const opId = id;
 
-  const { eventos, loading, error } = useEventos();
+  const [op, setOp] = useState(null);
+  const [eventos, setEventos] = useState([]);
+  const [apontamentos, setApontamentos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // ------------------------------------ Eventos ------------------------------------
+  const carregarDados = useCallback(async () => {
+    if (!opId) return;
+    setLoading(true);
+    try {
+      const [opData, eventosData, apontamentosData] = await Promise.all([
+        opCrudService.getById(opId),
+        opCrudService.getHistoricoEventos(opId),
+        opCrudService.getApontamentos(opId),
+      ]);
+      setOp(opData);
+      setEventos(eventosData || []);
+      setApontamentos((apontamentosData || []).map((a) => ({
+        ...a,
+        data: a.data || (a.inicio && a.fim
+          ? `${formatarDataHora(a.inicio)} - ${formatarDataHora(a.fim)}`
+          : formatarDataHora(a.inicio)),
+      })));
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError("Falha ao carregar ordem de produção");
+    } finally {
+      setLoading(false);
+    }
+  }, [opId]);
+
+  useEffect(() => {
+    carregarDados();
+  }, [carregarDados]);
 
   const [buscaEvento, setBuscaEvento] = useState("");
-  const [eventosOrdenados, setEventosOrdenados] = useState(null); // null = usa o original
-  const [eventosFiltrados, setEventosFiltrados] = useState(null); // null = usa o original
+  const [eventosOrdenados, setEventosOrdenados] = useState(null);
+  const [eventosFiltrados, setEventosFiltrados] = useState(null);
 
   const dadosEventosBase = eventosFiltrados ?? eventos;
   const dadosEventosExibidos = (eventosOrdenados ?? dadosEventosBase).filter(
@@ -128,6 +174,8 @@ export default function OPDetalhePage({ params }) {
     { label: "ID Decrescente", value: "id_desc" },
     { label: "Data Crescente", value: "data_asc" },
     { label: "Data Decrescente", value: "data_desc" },
+    { label: "Duração Crescente", value: "duracao_asc" },
+    { label: "Duração Decrescente", value: "duracao_desc" },
   ];
 
   const handleSortEventos = (criterio) => {
@@ -135,10 +183,10 @@ export default function OPDetalhePage({ params }) {
     copia.sort((a, b) => {
       if (criterio === "id_asc") return a.id - b.id;
       if (criterio === "id_desc") return b.id - a.id;
-      if (criterio === "data_asc")
-        return new Date(a.inicio) - new Date(b.inicio);
-      if (criterio === "data_desc")
-        return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === "duracao_asc") return duracaoEmMinutos(a) - duracaoEmMinutos(b);
+      if (criterio === "duracao_desc") return duracaoEmMinutos(b) - duracaoEmMinutos(a);
       return 0;
     });
     setEventosOrdenados(copia);
@@ -152,6 +200,7 @@ export default function OPDetalhePage({ params }) {
       options: ["Parada", "Setup"],
     },
     { id: "data", label: "Data", type: "date-range" },
+    { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
 
   const aplicarFiltrosEventos = (filtrosSelecionados) => {
@@ -163,94 +212,21 @@ export default function OPDetalhePage({ params }) {
       );
     }
 
-    if (filtrosSelecionados.data?.start) {
-      dadosFiltrados = dadosFiltrados.filter(
-        (e) => new Date(e.inicio) >= new Date(filtrosSelecionados.data.start),
-      );
-    }
-
-    if (filtrosSelecionados.data?.end) {
-      dadosFiltrados = dadosFiltrados.filter(
-        (e) => new Date(e.inicio) <= new Date(filtrosSelecionados.data.end),
-      );
+    dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
+    if (filtrosSelecionados.duracao?.max) {
+      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
     }
 
     setEventosFiltrados(dadosFiltrados);
-    setEventosOrdenados(null); // reseta ordenação ao filtrar
+    setEventosOrdenados(null);
   };
 
-  // ------------------------------------ Apontamentos ------------------------------------
-
-  const dadosApontamento = [
-    {
-      id: 1,
-      op: "0098",
-      data: "26/03 (08:00 - 09:00)",
-      produzido: "15",
-      refugo: "2",
-      observacao: "Troca de ferramenta",
-    },
-    {
-      id: 2,
-      op: "1234",
-      data: "06/01 (09:30 - 10:15)",
-      produzido: "10",
-      refugo: "5",
-      observacao: "Manutenção corretiva",
-    },
-    {
-      id: 3,
-      op: "5678",
-      data: "13/09 (10:15 - 10:35)",
-      produzido: "20",
-      refugo: "1",
-      observacao: "Ajuste de parâmetros",
-    },
-    {
-      id: 4,
-      op: "9012",
-      data: "30/09 (11:00 - 12:00)",
-      produzido: "5",
-      refugo: "8",
-      observacao: "Refugo elevado devido a falta de aquecimento",
-    },
-    {
-      id: 5,
-      op: "1223",
-      data: "28/03 (12:00 - 14:00)",
-      produzido: "6",
-      refugo: "8",
-      observacao: "Retirada de amostras para o laboratório de qualidade",
-    },
-    {
-      id: 6,
-      op: "1206",
-      data: "30/07 (17:00 - 18:00)",
-      produzido: "13",
-      refugo: "6",
-      observacao: "Finalização de OP",
-    },
-    {
-      id: 7,
-      op: "8912",
-      data: "20/09 (16:00 - 19:00)",
-      produzido: "20",
-      refugo: "5",
-      observacao: "Falta de material",
-    },
-    {
-      id: 8,
-      op: "0607",
-      data: "20/09 (16:00 - 19:00)",
-      produzido: "20",
-      refugo: "5",
-      observacao: "Boa qualidade",
-    },
-  ];
-
-  const [dadosApontamentoState, setDadosApontamentoState] =
-    useState(dadosApontamento);
+  const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
   const [buscaApontamento, setBuscaApontamento] = useState("");
+
+  useEffect(() => {
+    setDadosApontamentoState(apontamentos);
+  }, [apontamentos]);
 
   const colunasApontamento = [
     {
@@ -323,41 +299,49 @@ export default function OPDetalhePage({ params }) {
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
-    let dadosFiltrados = [...dadosApontamento];
-
-    if (filtrosSelecionados.produzido?.min != null) {
-      dadosFiltrados = dadosFiltrados.filter(
-        (a) => Number(a.produzido) >= filtrosSelecionados.produzido.min,
-      );
-    }
-    if (filtrosSelecionados.produzido?.max != null) {
-      dadosFiltrados = dadosFiltrados.filter(
-        (a) => Number(a.produzido) <= filtrosSelecionados.produzido.max,
-      );
-    }
-    if (filtrosSelecionados.refugo?.min != null) {
-      dadosFiltrados = dadosFiltrados.filter(
-        (a) => Number(a.refugo) >= filtrosSelecionados.refugo.min,
-      );
-    }
-    if (filtrosSelecionados.refugo?.max != null) {
-      dadosFiltrados = dadosFiltrados.filter(
-        (a) => Number(a.refugo) <= filtrosSelecionados.refugo.max,
-      );
-    }
-
+    let dadosFiltrados = [...apontamentos];
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "produzido", filtrosSelecionados.produzido);
+    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "refugo", filtrosSelecionados.refugo);
     setDadosApontamentoState(dadosFiltrados);
   };
 
   const dadosApontamentosFiltrados = dadosApontamentoState.filter((a) => {
     const termo = buscaApontamento.toLowerCase();
-    return (
-      (a.op?.toLowerCase() || "").includes(termo) ||
-      a.id?.toString().includes(termo)
-    );
+    return a.id?.toString().includes(termo);
   });
 
-  // ------------------------------------ Render ------------------------------------
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-900" />
+      </main>
+    );
+  }
+
+  if (error || !op) {
+    return (
+      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed flex flex-col items-center justify-center p-8">
+        <p className="text-red-500 text-lg">{error || "Ordem não encontrada"}</p>
+        <Link href="/operador/ordensDeProducao" className="mt-4 text-blue-900 underline">Voltar</Link>
+      </main>
+    );
+  }
+
+  const titulo = op.codigo_lote || op.nome || `#${op.id ?? opId}`;
+  const maquinaNome = op.maquina?.nome || "-";
+  const maquinaImagem = op.maquina?.imagem || "/demo_maq.png";
+  const prioridade = op.prioridade || "-";
+  const statusOp = op.status_op || "-";
+  const prioConfig = prioridadeIcone[prioridade] || { className: "" };
+  const PrioIcon = prioConfig.icon;
+
+  const statusBadge = {
+    Produzindo: "bg-green-500/15 text-green-600",
+    Parada: "bg-red-100 text-red-700",
+    Setup: "bg-amber-100 text-amber-900",
+    "Concluída": "bg-blue-500/10 text-blue-600",
+    "Aguardando Início": "bg-gray-100 text-gray-600",
+  };
 
   return (
     <PageLayout padded={false}>
@@ -368,7 +352,7 @@ export default function OPDetalhePage({ params }) {
         />
 
         <DetailHeader
-          title="Ordem de Produção #AAA550"
+          title={`Ordem de Produção ${titulo}`}
           actions={
             <DetailActions>
               <Dialog>
@@ -377,7 +361,10 @@ export default function OPDetalhePage({ params }) {
                   Criar Apontamento
                 </DialogTrigger>
                 <DialogContent>
-                  <FormCriarApontamento />
+                  <FormCriarApontamento
+                    id_ordemProducao={opId}
+                    id_maquina={op.id_maquina ?? op.maquina?.id_maquina}
+                  />
                 </DialogContent>
               </Dialog>
 
@@ -394,43 +381,45 @@ export default function OPDetalhePage({ params }) {
           }
         />
 
-        {/* SEÇÃO 1: Info card + Progresso */}
-<section>
-  <motion.div
-    variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
-    initial="hidden"
-    animate="visible"
-    className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
-  >
-    <motion.div
-      variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-      className="md:col-span-2"
-    >
-      <div className="flex items-center">
+        <section>
+          <motion.div
+            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
+          >
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+              className="md:col-span-2"
+            >
+              <div className="flex items-center">
                 <div className="flex gap-2 bg-white border rounded-xl shadow-sm w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4">
-                  <Image src="/demo_maq.png" className="rounded-lg" alt="Máquina" width={150} height={150} />
-                  <p className="text-2xl">THAK-90334</p>
-                  <p className="text-[#7c7c81] text-2xl font-semibold">Meta: 300 peças</p>
+                  <Image src={maquinaImagem} className="rounded-lg object-cover" alt="Máquina" width={150} height={150} />
+                  <p className="text-2xl">{maquinaNome}</p>
+                  <p className="text-[#7c7c81] text-2xl font-semibold">Meta: {op.qtd_planejada ?? "-"} peças</p>
                 </div>
                 <div className="py-3 font-semibold text-gray-900 text-2xl">
                   <div className="flex flex-col gap-5">
                     <p>
                       Status:
-                      <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none ml-2">Produzindo</Badge>
+                      <Badge variant="outline" className={`ml-2 border-none font-semibold ${statusBadge[statusOp] || ""}`}>
+                        {statusOp}
+                      </Badge>
                     </p>
                     <p>
                       Prioridade:
-                      <Badge variant="outline" className="ml-2 border border-vermelho-vivido bg-transparent text-black text-sm font-medium">
-                        <Flame className="text-vermelho-vivido" />Crítica
+                      <Badge variant="outline" className={`ml-2 text-sm font-medium ${prioConfig.className}`}>
+                        {PrioIcon && <PrioIcon className="text-vermelho-vivido inline mr-1" />}
+                        {prioridade}
                       </Badge>
                     </p>
                     <div className="flex">
                       <p>Início:</p>
-                      <p className="text-2xl font-medium ml-2">26/03/2024 08:00</p>
+                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_hora_inicio)}</p>
                     </div>
                     <div className="flex">
                       <p>Prazo Final:</p>
-                      <p className="text-2xl font-medium ml-2">26/03/2024 18:00</p>
+                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_hora_fim)}</p>
                     </div>
                   </div>
                 </div>
@@ -446,43 +435,34 @@ export default function OPDetalhePage({ params }) {
   </motion.div>
 </section>
 
-        {/* SEÇÃO 2: OEE Gauges */}
- <SectionHighlight>
-        <OPOEEDetalheWidget opId={opId} />
-      </SectionHighlight>
+        <SectionHighlight>
+          <OPOEEDetalheWidget opId={opId} />
+        </SectionHighlight>
 
-      {/* Listagem de Eventos */}
-      <DetailListingSection
-        id="listagem_histEventos"
-        title="Histórico de Eventos da OP"
-        search={
-          <SearchBar
-            value={buscaEvento}
-            onChange={(e) => setBuscaEvento(e.target.value)}
-            placeholder="Busque por id ou tipo de evento..."
-          />
-        }
-        filterRow={
-          <FilterRow
-            count={dadosEventosExibidos.length}
-            label="eventos"
-            actions={
-              <>
-                <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-                <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-              </>
-            }
-          />
-        }
-      >
-
-          {loading ? (
-            <p className="text-gray-500 text-center py-8">
-              Carregando eventos...
-            </p>
-          ) : error ? (
-            <p className="text-red-500 text-center py-8">{error}</p>
-          ) : dadosEventosExibidos.length > 0 ? (
+        <DetailListingSection
+          id="listagem_histEventos"
+          title="Histórico de Eventos da OP"
+          search={
+            <SearchBar
+              value={buscaEvento}
+              onChange={(e) => setBuscaEvento(e.target.value)}
+              placeholder="Busque por id ou tipo de evento..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosEventosExibidos.length}
+              label="eventos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                </>
+              }
+            />
+          }
+        >
+          {dadosEventosExibidos.length > 0 ? (
             <TableListagens
               data={dadosEventosExibidos}
               columns={colunasOP}
@@ -507,14 +487,13 @@ export default function OPDetalhePage({ params }) {
               )}
             />
           ) : (
-<EmptyState
-            title="Nenhum evento encontrado"
-            message="Não encontramos nenhum evento com esse termo ou filtro."
-          />
+            <EmptyState
+              title="Nenhum evento encontrado"
+              message="Não encontramos nenhum evento com esse termo ou filtro."
+            />
           )}
-      </DetailListingSection>
+        </DetailListingSection>
 
-        {/* Listagem de Apontamentos */}
         <DetailListingSection
           id="listagem_histApontamentos"
           title="Histórico de Apontamentos da OP"

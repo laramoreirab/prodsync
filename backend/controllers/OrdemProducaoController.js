@@ -28,22 +28,58 @@ class OrdemProducaoController {
         try {
             const id_ordem = Number(req.params.id_ordem)
             if (!Number.isInteger(id_ordem) || id_ordem <= 0) {
-                return res.status(400).json({ sucesso: false, erro: 'ID da ordem invalido' })
+                return res.status(400).json({ sucesso: false, erro: 'ID da ordem inválido' })
             }
 
             const dados = await OrdemProducaoModel.buscarOrdem(id_ordem, req.user.id_empresa)
             if (!dados) {
-                return res.status(404).json({ sucesso: false, erro: 'Ordem de Producao nao encontrada' })
+                return res.status(404).json({ sucesso: false, erro: 'Ordem de Produção não encontrada' })
             }
 
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
-            console.error('Erro ao buscar Ordem de Producao', error)
+            console.error('Erro ao buscar Ordem de Produção', error)
             return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Nao foi possivel buscar Ordem de Producao'
+                mensagem: 'Não foi possível buscar a Ordem de Produção'
             })
+        }
+    }
+
+    static async listarHistoricoEventos(req, res) {
+        try {
+            const id_ordem = Number(req.params.id_ordem);
+            const id_empresa = req.user.id_empresa;
+            const limite = parseInt(req.query.limite) || 50;
+
+            if (!Number.isInteger(id_ordem) || id_ordem <= 0) {
+                return res.status(400).json({ sucesso: false, erro: 'ID da ordem inválido' });
+            }
+
+            const dados = await OrdemProducaoModel.listarEventosOrdem(id_ordem, id_empresa, limite);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar eventos da OP:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async listarApontamentos(req, res) {
+        try {
+            const id_ordem = Number(req.params.id_ordem);
+            const id_empresa = req.user.id_empresa;
+            const limite = parseInt(req.query.limite) || 50;
+
+            if (!Number.isInteger(id_ordem) || id_ordem <= 0) {
+                return res.status(400).json({ sucesso: false, erro: 'ID da ordem inválido' });
+            }
+
+            const dados = await OrdemProducaoModel.listarApontamentosOrdem(id_ordem, id_empresa, limite);
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar apontamentos da OP:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
 

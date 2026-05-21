@@ -175,6 +175,9 @@ class MaquinaController {
         } catch (error) {
             console.error('Erro ao atualizar máquina:', error);
             if (req.file) removerArquivoAntigo(req.file.filename);
+            if (error.message?.includes('Maquina ja vinculada')) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
             res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }

@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
+import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
+import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -83,9 +85,10 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         e.preventDefault();
 
         const payload = new FormData();
+        const cpfLimpo = formData.cpf.replace(/\D/g, '');
         //formData.append('campo', value)
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpf);
+        payload.append('cpf', formData.cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
@@ -122,7 +125,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                 try {
                     const options = { method : "GET"}
                     const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`,options)
-                    setListaTurnos(dados.dados);
+                    setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
                 } catch (error) {
                     console.log(error)
                     toast.error("Erro ao carregar turnos.");
@@ -276,6 +279,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
+                            mascara = {mascaraCPF}
                             required />
                     </div>
                     <div>

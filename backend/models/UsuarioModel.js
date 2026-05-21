@@ -2,6 +2,7 @@ import prisma from '../config/prisma.js';
 import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 import bcrypt from 'bcrypt'
 import { gerarIdUsuario } from '../dev-utils/gerarIdUsuario.js';
+import MaquinaModel from './MaquinaModel.js';
 
 class UsuarioModel {
     //Listar todos os usuários com paginacção
@@ -90,6 +91,7 @@ class UsuarioModel {
                 select: {
                     id_usuario: true,
                     nome: true,
+                    tipo: true,
                 }
             })
             return resposta
@@ -897,11 +899,27 @@ class UsuarioModel {
         return apontamentos.map(ap => ({
             id: ap.id_apontamento,
             op: ap.ordem_producao?.codigo_lote || String(ap.id_ordemProducao),
+            id_ordem: ap.ordem_producao?.id_ordem ?? ap.id_ordemProducao,
+            inicio: ap.data_hora_inicio,
+            fim: ap.data_hora_fim,
             data: `${ap.data_hora_inicio.toLocaleDateString('pt-BR')} (${ap.data_hora_inicio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - ${ap.data_hora_fim.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})`,
-            produzido: ap.qtd_boa ?? 0,
-            refugo: ap.qtd_refugo ?? 0,
+            produzido: String(ap.qtd_boa ?? 0),
+            refugo: String(ap.qtd_refugo ?? 0),
             observacao: ap.observacao || '-'
         }));
+    }
+
+    static async listarHistoricoEventosUsuario(id_empresa, id_usuario, limite = 50) {
+        const id_maquina = await this.obterMaquinaAtualOperador(id_empresa, id_usuario);
+        if (!id_maquina) return [];
+
+        const historico = await MaquinaModel.obterHistoricoEventosTabela(
+            id_maquina,
+            Number(id_empresa),
+            limite
+        );
+
+        return historico.filter((item) => item.tipo !== 'Producao');
     }
 
     static criarMapaSemana() {

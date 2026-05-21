@@ -263,31 +263,118 @@ class EscalaTrabalhoModel {
         }
     }
 
-    static async atualizar(id_operador, id_turno, diaSemanaOuDados, dadosAtualizados = null) {
-        try {
-            const dados = this.removerCamposInvalidos(dadosAtualizados ?? diaSemanaOuDados);
+   static async atualizar(id_operador, id_empresa, dados) {
 
-            if (dadosAtualizados === null && typeof diaSemanaOuDados === 'object') {
-                return await prisma.escalaTrabalho.updateMany({
-                    where: {
-                        id_operador: Number(id_operador),
-                        id_empresa: Number(id_turno)
-                    },
-                    data: dados
-                });
+    try {
+
+        const dadosValidos =
+            this.removerCamposInvalidos(dados);
+
+        if (dadosValidos.id_setor !== undefined) {
+            dadosValidos.id_setor =
+                Number(dadosValidos.id_setor);
+        }
+
+        if (dadosValidos.id_turno !== undefined) {
+            dadosValidos.id_turno =
+                Number(dadosValidos.id_turno);
+        }
+
+        if (dadosValidos.id_maquina !== undefined) {
+            dadosValidos.id_maquina =
+                Number(dadosValidos.id_maquina);
+        }
+
+        const idOperador = Number(id_operador);
+        const idEmpresa = Number(id_empresa);
+
+        const existente = await prisma.escalaTrabalho.findFirst({
+            where: { id_operador: idOperador, id_empresa: idEmpresa }
+        });
+
+        if (!existente) {
+            const idSetor = dadosValidos.id_setor;
+            const idTurno = dadosValidos.id_turno;
+            if (!idSetor || !idTurno) {
+                return { count: 0 };
             }
+            return await prisma.escalaTrabalho.create({
+                data: {
+                    id_operador: idOperador,
+                    id_empresa: idEmpresa,
+                    id_setor: idSetor,
+                    id_turno: idTurno,
+                    id_maquina: dadosValidos.id_maquina ?? null
+                }
+            });
+        }
 
-            return await prisma.escalaTrabalho.update({
+        const novoTurno = dadosValidos.id_turno ?? existente.id_turno;
+        if (novoTurno !== existente.id_turno) {
+            await prisma.escalaTrabalho.delete({
                 where: {
                     id_operador_id_turno: {
-                        id_operador: Number(id_operador),
-                        id_turno: Number(id_turno)
+                        id_operador: existente.id_operador,
+                        id_turno: existente.id_turno
                     }
-                },
-                data: dados
+                }
             });
+            return await prisma.escalaTrabalho.create({
+                data: {
+                    id_operador: idOperador,
+                    id_empresa: idEmpresa,
+                    id_setor: dadosValidos.id_setor ?? existente.id_setor,
+                    id_turno: novoTurno,
+                    id_maquina: dadosValidos.id_maquina !== undefined
+                        ? dadosValidos.id_maquina
+                        : existente.id_maquina
+                }
+            });
+        }
+
+        return await prisma.escalaTrabalho.updateMany({
+            where: {
+                id_operador: idOperador,
+                id_empresa: idEmpresa
+            },
+            data: dadosValidos
+        });
+
+    } catch (error) {
+
+        console.error(error);
+        throw error;
+    }
+}
+
+ static async atualizarSetorGestor(
+        id_gestor,
+        id_empresa,
+        id_setor
+    ) {
+
+        try {
+
+            // remove relação antiga
+            await prisma.setor_Gestor.deleteMany({
+                where: {
+                    id_gestor: Number(id_gestor),
+                    id_empresa: Number(id_empresa)
+                }
+            });
+
+            // cria nova relação
+            return await prisma.setor_Gestor.create({
+                data: {
+                    id_gestor: Number(id_gestor),
+                    id_empresa: Number(id_empresa),
+                    id_setor: Number(id_setor)
+                }
+            });
+
         } catch (error) {
-            console.error('Erro ao atualizar escala:', error);
+
+            console.error(error);
             throw error;
         }
     }

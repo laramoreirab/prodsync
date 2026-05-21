@@ -335,3 +335,15 @@ input{
   fill: rgba(125, 149, 198, 0.12) !important;
   stroke: rgba(125, 149, 198, 0.45) !important;
 }
+
+/* Remove setas dos inputs type="number" */
+input.input-no-spinner::-webkit-outer-spin-button,
+input.input-no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input.input-no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

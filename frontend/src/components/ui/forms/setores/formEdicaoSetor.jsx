@@ -6,6 +6,7 @@ import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { setorCrudService } from "@/services/setorCrudService"; 
+import { apiFetch } from "@/lib/api";
 
 export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     const [carregando, setCarregando] = useState(true);
@@ -16,12 +17,19 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
 
     // estados da máquina
     const [maquinaSelecionada, setMaquinaSelecionada] = useState("");
-    const [listaMaquinas, setListaMaquinas] = useState([]);  // ids_maquinas — backend: ids_maquinas (array)
+    const [listaMaquinas, setListaMaquinas] = useState([]);
+    const [maquinasDisponiveis, setMaquinasDisponiveis] = useState([]);
 
     // estados da equipe
     const [usuarioSelecionado, setUsuarioSelecionado] = useState("");
     const [funcaoSelecionada, setFuncaoSelecionada] = useState("");
     const [listaEquipe, setListaEquipe] = useState([]);
+    const [usuariosDisponiveis, setUsuariosDisponiveis] = useState([]);
+
+    const tipoUsuario = (usuario) => usuario?.tipo ?? usuario?.funcao;
+    const usuariosFiltrados = funcaoSelecionada
+        ? usuariosDisponiveis.filter((usuario) => tipoUsuario(usuario) === funcaoSelecionada)
+        : usuariosDisponiveis;
 
     // buscando os dados no banco assim que o modal abre
     useEffect(() => {
@@ -34,6 +42,10 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                 // Preenchendo os estados com os dados retornados
                 setNomeSetor(dados.nome_setor || '');
                 setLocalizacao(dados.localizacao || '');
+                setListaMaquinas((dados.maquinas || []).map((maquina) => ({
+                    label: maquina.nome,
+                    value: String(maquina.id_maquina)
+                })));
 
             } catch (error) {
                 console.error("Erro ao buscar dados do setor:", error);
@@ -46,17 +58,49 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
         if (setorId) buscarDadosDoSetor();
     }, [setorId]);
 
+    useEffect(() => {
+        async function carregarMaquinas() {
+            try {
+                const dados = await apiFetch(`/api/maquinas/`, { method: "GET" });
+                setMaquinasDisponiveis(dados.dados || []);
+            } catch (error) {
+                console.log(error);
+                toast.error("Erro ao carregar maquinas.");
+            }
+        }
+        carregarMaquinas();
+    }, []);
+
+    useEffect(() => {
+        async function carregarUsuarios() {
+            try {
+                const dados = await apiFetch(`/api/usuarios/listarSemAdms`, { method: "GET" });
+                setUsuariosDisponiveis(dados.dados || []);
+            } catch (error) {
+                console.log(error);
+                toast.error("Erro ao carregar usuarios.");
+            }
+        }
+        carregarUsuarios();
+    }, []);
+
     // funções para adicionar e remover máquinas
     const adicionarMaquina = (e) => {
         e.preventDefault();
         if (maquinaSelecionada && !listaMaquinas.find(m => m.value === maquinaSelecionada)) {
-            const opcoes = [
-                { label: "THAK-2", value: "1" },
-                { label: "Torno CNC 100", value: "2" },
-                { label: "Fresa Universal", value: "3" },
-            ];
-            const opcao = opcoes.find(o => o.value === maquinaSelecionada);
-            if (opcao) setListaMaquinas([...listaMaquinas, opcao]);
+            const maquina = maquinasDisponiveis.find((item) => String(item.id_maquina) === String(maquinaSelecionada));
+            if (maquina?.id_setor && String(maquina.id_setor) !== String(setorId)) {
+                toast.error("Esta maquina ja esta vinculada a outro setor.");
+                setMaquinaSelecionada("");
+                return;
+            }
+
+            if (maquina) {
+                setListaMaquinas([...listaMaquinas, {
+                    label: maquina.nome,
+                    value: String(maquina.id_maquina)
+                }]);
+            }
             setMaquinaSelecionada("");
         }
     };
@@ -67,13 +111,28 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     // funções para adicionar e remover colaboradores
     const adicionarColaborador = (e) => {
         e.preventDefault();
-        if (usuarioSelecionado && funcaoSelecionada) {
-            setListaEquipe([
-                ...listaEquipe,
-                { usuario: usuarioSelecionado, funcao: funcaoSelecionada }
-            ]);
-            setUsuarioSelecionado("");
-            setFuncaoSelecionada("");
+        const idUsuario = Number(usuarioSelecionado);
+        if (idUsuario && funcaoSelecionada && !listaEquipe.some(u => u.id_usuario === idUsuario)) {
+            const usuario = usuariosDisponiveis.find(u => u.id_usuario === idUsuario);
+
+            if (funcaoSelecionada === "Gestor" && tipoUsuario(usuario) !== "Gestor") {
+                toast.error("Apenas usuarios do tipo Gestor podem ser definidos como gestor do setor.");
+                return;
+            }
+
+            if (funcaoSelecionada === "Operador" && tipoUsuario(usuario) !== "Operador") {
+                toast.error("Apenas usuarios do tipo Operador podem ser definidos como operador do setor.");
+                return;
+            }
+
+            if (usuario) {
+                setListaEquipe([
+                    ...listaEquipe,
+                    { ...usuario, funcao: funcaoSelecionada }
+                ]);
+                setUsuarioSelecionado("");
+                setFuncaoSelecionada("");
+            }
         }
     };
     const removerColaborador = (indexParaRemover) => {
@@ -107,7 +166,7 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
             if (onEdicaoSucesso) onEdicaoSucesso();
         } catch (error) {
             console.error("Erro ao atualizar setor:", error);
-            toast.error("Erro ao atualizar setor.");
+            toast.error(error.message || "Erro ao atualizar setor.");
         }
     };
 
@@ -174,10 +233,14 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                                 className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
                             >
                                 <option value="" disabled>Selecione</option>
-                                {/* id_maquina — número — backend: ids_maquinas */}
-                                <option value="1">THAK-2</option>
-                                <option value="2">Torno CNC 100</option>
-                                <option value="3">Fresa Universal</option>
+                                {maquinasDisponiveis
+                                    .filter((maquina) => !maquina.id_setor || String(maquina.id_setor) === String(setorId))
+                                    .filter((maquina) => !listaMaquinas.some((item) => String(item.value) === String(maquina.id_maquina)))
+                                    .map((maquina) => (
+                                        <option key={maquina.id_maquina} value={maquina.id_maquina}>
+                                            {maquina.nome}
+                                        </option>
+                                    ))}
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                                 <ChevronDown className="h-4 w-4" />
@@ -225,9 +288,11 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                                     className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 bg-white focus:outline-none shadow-sm text-gray-400 text-lg"
                                 >
                                     <option value="" disabled>Selecione...</option>
-                                    <option value="Carlos Mendes">Carlos Mendes</option>
-                                    <option value="Luis Mariz">Luis Mariz</option>
-                                    <option value="Ana Souza">Ana Souza</option>
+                                    {usuariosFiltrados.map((usuario) => (
+                                        <option key={usuario.id_usuario} value={usuario.id_usuario}>
+                                            {usuario.nome} ({tipoUsuario(usuario)})
+                                        </option>
+                                    ))}
                                 </select>
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                                     <ChevronDown className="h-4 w-4" />
@@ -268,7 +333,7 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                             <div className="flex flex-wrap gap-3">
                                 {listaEquipe.map((membro, index) => (
                                     <div key={index} className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px]">
-                                        <span>{membro.usuario} ({membro.funcao})</span>
+                                        <span>{membro.nome ?? membro.usuario} ({membro.funcao})</span>
                                         <button
                                             onClick={(e) => { e.preventDefault(); removerColaborador(index); }}
                                             className="text-gray-500 hover:text-red-500 focus:outline-none"

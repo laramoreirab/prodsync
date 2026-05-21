@@ -13,8 +13,8 @@ import {
 import { Plus, Search, Info, File, Upload, ChevronDown, Trash2, TriangleAlert, EyeIcon, Pencil, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-import FilterDropdown from "@/components/ui/filterDropdown";
-import OrdenarDropdown from "@/components/ui/ordenarDropdown";
+import FilterDropdown from "@/components/ui/FilterDropdown";
+import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -22,17 +22,15 @@ import Link from 'next/link';
 
 import {
   PageLayout, PageHeader, SectionDivider,
-  StaggerWrapper, FadeUpItem, AnimatedTitle,
+  FadeUpItem,
   KPIGrid, ContentGrid, WidgetCard,
-  SearchBar, FilterRow, EmptyState, LoadingState,
-  PageSection,
+  SearchBar, FilterRow, EmptyState,
 } from "@/components/AnimatedComponents";
 
-//filtros para dropdown de filtros da tabela de usuários
-const usuariosFilter = [
-  { id: "id_setor", label: "Setor", type: "checkbox", options: ["Roscas", "Brocas"] },
+const usuariosFilterBase = [
+  { id: "setor", label: "Setor", type: "checkbox", options: [] },
   { id: "funcao", label: "Função", type: "checkbox", options: ["Operador", "Gestor"] },
-  { id: "id_turno", label: "Turno", type: "checkbox", options: ["Manhã", "Tarde", "Noite"] },
+  { id: "turno", label: "Turno", type: "checkbox", options: [] },
 ];
 
 //Widgets dashboard
@@ -46,34 +44,42 @@ import { ProducaoMediaSetorWidget } from "@/features/usuarios/ProducaoMediaSetor
 import FormCadastroUsuario from '@/components/ui/forms/usuarios/formCadastroUsuario';
 import FormEdicaoUsuario from '@/components/ui/forms/usuarios/formEdicaoUsuario';
 import FormExclusaoUsuario from '@/components/ui/forms/usuarios/formExclusaoUsuario';
-
-const setorLabel = { "1": "Roscas", "2": "Brocas" };
-const turnoLabel = { "1": "Manhã", "2": "Tarde", "3": "Noite" };
+import { setorCrudService } from '@/services/setorCrudService';
 
 const colunasUsuarios = [
   { id: 'nome', key: 'nome', label: 'Nome', className: 'w-1/4' },
   { id: 'id', key: 'id', label: 'ID', className: 'w-40' },
-  {
-    id: 'setor',
-    key: 'setor',
-    label: 'Setor',
-    className: 'w-2/9',
-    icone: (valor) => setorLabel[String(valor)] || valor
-  },
+  { id: 'setor', key: 'setor', label: 'Setor', className: 'w-2/9' },
   { id: 'funcao', key: 'funcao', label: 'Função' },
-  {
-    id: 'turno',
-    key: 'turno',
-    label: 'Turno',
-    icone: (valor) => turnoLabel[String(valor)] || valor
-  },
+  { id: 'turno', key: 'turno', label: 'Turno' },
 ];
 
 export default function Usuarios() {
   const { usuarios, loading, error, refresh } = useUsuarios();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+  const [setoresEmpresa, setSetoresEmpresa] = useState([]);
 
+  useEffect(() => {
+    setorCrudService.getAll()
+      .then((resp) => setSetoresEmpresa(resp?.dados || []))
+      .catch((err) => console.error("Erro ao carregar setores:", err));
+  }, []);
+
+  const usuariosFilter = usuariosFilterBase.map((filter) => {
+    if (filter.id === "setor") {
+      const daApi = setoresEmpresa.map((s) => s.nome_setor).filter(Boolean);
+      const dosUsuarios = usuarios.map((u) => u.setor).filter((s) => s && s !== "Sem setor");
+      return { ...filter, options: [...new Set([...daApi, ...dosUsuarios])] };
+    }
+    if (filter.id === "turno") {
+      return {
+        ...filter,
+        options: [...new Set(usuarios.map((u) => u.turno).filter((t) => t && t !== "Sem turno"))],
+      };
+    }
+    return filter;
+  });
 
   //sincronizar dados da API com estado local
   useEffect(() => {
@@ -101,23 +107,20 @@ export default function Usuarios() {
   const aplicarFiltros = (filtrosSelecionados) => {
     let dadosFiltrados = [...usuarios];
 
-    // setor
     if (filtrosSelecionados.setor?.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(user =>
+      dadosFiltrados = dadosFiltrados.filter((user) =>
         filtrosSelecionados.setor.includes(user.setor)
       );
     }
 
-    // função
     if (filtrosSelecionados.funcao?.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(user =>
+      dadosFiltrados = dadosFiltrados.filter((user) =>
         filtrosSelecionados.funcao.includes(user.funcao)
       );
     }
 
-    // turno
     if (filtrosSelecionados.turno?.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter(user =>
+      dadosFiltrados = dadosFiltrados.filter((user) =>
         filtrosSelecionados.turno.includes(user.turno)
       );
     }
@@ -245,7 +248,7 @@ export default function Usuarios() {
             acoesDropdown={(user) => (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`usuarios/${user.id}`}>
+                  <Link href={user.funcao === "Gestor" ? `/adm/usuarios/gestor/${user.id}` : `/adm/usuarios/${user.id}`}>
                     <EyeIcon className="mr-2 h-4 w-4" /> Ver Detalhes
                   </Link>
                 </DropdownMenuItem>
