@@ -108,7 +108,7 @@ export default function CriarSenha() {
     return (
         <section
             className="lg:h-[calc(100vh-80px)] flex items-center justify-center relative">
-            {step === 2 && (
+            {step === 1 && (
 
                 <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
 
@@ -177,7 +177,7 @@ export default function CriarSenha() {
 
 
 
-            {step === 1 && (
+            {step === 2 && (
 
                 <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
                     <Card className="px-6 py-8 sm:p-12 relative gap-6">
