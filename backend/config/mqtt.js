@@ -19,6 +19,7 @@ clienteMQTT.on('message', async (topic, message) => {
     const dados = JSON.parse(message.toString());
     console.log(dados)
     console.log(`[NOVO STATUS] Máquina: ${dados.maquina_id} | Status: ${dados.status}`);
+    const token = localStorage.getItem("token");
     const enviandoRequisicao = await fetch('https://prodsync-backend.onrender.com/api/eventos/maquina', {
       method: 'POST',
       headers: {
