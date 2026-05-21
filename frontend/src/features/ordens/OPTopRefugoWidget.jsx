@@ -4,8 +4,8 @@ import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 import { useOPTopRefugo } from "./hooks/useOPTopRefugo";
 import { opTopRefugoConfig } from "./config/ordensChartConfig";
 
-export function OPTopRefugoWidget() {
-  const { data, loading, error } = useOPTopRefugo();
+export function OPTopRefugoWidget({ setorId = null }) {
+  const { data, loading, error } = useOPTopRefugo(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;

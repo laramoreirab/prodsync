@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
+import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
@@ -58,7 +59,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                     apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, { method: "GET" }),
                     apiFetch(`/api/maquinas/setor/${formData.id_setor}`, { method: "GET" }),
                 ]);
-                setListaTurnos(turnos.dados || []);
+                setListaTurnos(deduplicarTurnosParaSelect(turnos.dados || []));
                 setListaMaquinas(maquinas.dados || []);
             } catch (error) {
                 console.error(error);

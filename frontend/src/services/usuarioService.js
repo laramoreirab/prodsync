@@ -8,6 +8,9 @@ import {
   RotatividadeArraySchema,
   CumprimentoMetaSetorArraySchema,
   ProducaoMediaSetorArraySchema,
+  ProducaoMediaUsuarioArraySchema,
+  UsuariosPorTurnoArraySchema,
+  UsuarioTaxaRefugoArraySchema,
 } from "@features/usuarios/schemas/usuarioSchema";
 import {
   mockQtdUsuariosPorPerfil,
@@ -17,7 +20,17 @@ import {
   mockRotatividade,
   mockCumprimentoMetaSetor,
   mockProducaoMediaSetor,
+  mockUsuariosPorTurno,
+  mockProducaoMediaUsuarioSetor,
+  mockUsuarioTaxaRefugo,
 } from "./mockData";
+
+const filterBySetorId = (items, setorId) => {
+  if (setorId == null || setorId === "") return items;
+  return items.filter(
+    (item) => item.setorId == null || Number(item.setorId) === Number(setorId)
+  );
+};
 
 const USE_MOCK = false;
 
@@ -74,5 +87,51 @@ export const producaoMediaSetorService = {
     if (USE_MOCK) return ProducaoMediaSetorArraySchema.parse(mockProducaoMediaSetor);
     const data = await apiFetch("/api/usuarios/dashboard/producaoMediaPorSetor");
     return ProducaoMediaSetorArraySchema.parse(data.dados);
+  },
+};
+
+export const turnosOperadoresService = {
+  async getTurnos(setorId) {
+    if (USE_MOCK) {
+      return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
+    }
+    try {
+      const data = await apiFetch("/api/usuarios/dashboard/turnosOperadores");
+      return UsuariosPorTurnoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
+    } catch {
+      return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
+    }
+  },
+};
+
+export const producaoMediaUsuarioSetorService = {
+  async getProducaoMedia(setorId) {
+    if (USE_MOCK) {
+      return ProducaoMediaUsuarioArraySchema.parse(
+        filterBySetorId(mockProducaoMediaUsuarioSetor, setorId)
+      );
+    }
+    try {
+      const data = await apiFetch("/api/usuarios/dashboard/producaoMediaUsuarioSetor");
+      return ProducaoMediaUsuarioArraySchema.parse(filterBySetorId(data.dados || [], setorId));
+    } catch {
+      return ProducaoMediaUsuarioArraySchema.parse(
+        filterBySetorId(mockProducaoMediaUsuarioSetor, setorId)
+      );
+    }
+  },
+};
+
+export const usuarioTaxaRefugoService = {
+  async getTaxaRefugo(setorId) {
+    if (USE_MOCK) {
+      return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
+    }
+    try {
+      const data = await apiFetch("/api/usuarios/dashboard/taxaRefugoOperadores");
+      return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
+    } catch {
+      return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
+    }
   },
 };

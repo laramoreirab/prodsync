@@ -8,6 +8,7 @@ export function OEEMaquinaWidget({ maquinaId }) {
  
   if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
+  if (error || !data) return <p className="text-sm text-destructive">Erro ao carregar os dados do OEE.</p>;
  
   return (
     <div className="flex flex-col gap-2">

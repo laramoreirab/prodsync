@@ -4,8 +4,8 @@ import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 import { useTopMotivosTempo } from "./hooks/useTopMotivosTempo";
 import { topMotivosTempoConfig } from "./config/topMotivosTempoConfig";
 
-export function TopMotivosTempoWidget() {
-  const { data, loading, error } = useTopMotivosTempo();
+export function TopMotivosTempoWidget({ setorId = null }) {
+  const { data, loading, error } = useTopMotivosTempo(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar motivos.</p>;

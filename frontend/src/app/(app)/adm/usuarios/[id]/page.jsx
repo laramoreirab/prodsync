@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { DataEvento } from "@/components/ui/dataEvento";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { EyeIcon, Pencil, Trash2, ChevronDown, Search, Plus, BellRing, Loader2 } from "lucide-react";
+import { EyeIcon, Pencil, Trash2, Plus, BellRing, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -24,8 +24,21 @@ import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhes
 import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
-import { usuariosCrudService } from "@/services/usuariosCrudService";
 import { apiFetch } from "@/lib/api";
+import { usuariosCrudService } from "@/services/usuariosCrudService";
+
+import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+import {
+  DetailPageContainer,
+  DetailBackLink,
+  UserProfileCard,
+  DetailSectionTitle,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  SectionHighlight,
+  DetailListingSection,
+  DetailActions,
+} from "@/components/DetailComponents";
 
 const colunasEventos = [
   { id: "id", key: "id", label: "ID", className: "w-20 text-center justify-center" },
@@ -326,68 +339,32 @@ export default function UsuarioDetalhePage({ params }) {
   }
 
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
-        <Link className="flex items-center" href="/adm/usuarios">
-          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Usuários</p>
-        </Link>
+    <PageLayout>
+      <DetailPageContainer>
+        <DetailBackLink href="/adm/usuarios" label="Voltar para Usuários" />
 
-        <section id="infos_user" className="flex flex-col">
-          <div className="flex justify-between items-start">
-            <div className="flex">
-              <Image
-                src={
-                  usuario?.imagem_perfil
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
-                    : "/userdefault.svg"
-                }
-                alt={usuario?.nome || "Usuário"}
-                className="rounded-xl"
-                width={250}
-                height={250}
-              />
-              <div className="flex flex-col ml-5">
-                <h1 className="text-3xl font-bold text-black">Nome: {usuario?.nome || "-"}</h1>
-                <div className="flex gap-10">
-                  <div className="flex flex-col gap-5 mt-2">
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                      <p className="text-xl font-medium text-black">{usuario?.id_usuario || operadorId}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Email:</p>
-                      <p className="text-xl font-medium text-black">{usuario?.email || "-"}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">CPF:</p>
-                      <p className="text-xl font-medium text-black">{usuario?.cpf || "-"}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-5 mt-2">
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Setor:</p>
-                      <p className="text-xl font-medium text-black">
-                        {usuario?.setor?.nome_setor || "-"}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Função:</p>
-                      <p className="text-xl font-medium text-black">{usuario?.tipo || usuario?.funcao || "-"}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Turno:</p>
-                      <p className="text-xl font-medium text-black">{usuario?.turno?.nome_turno || "-"}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
+        <UserProfileCard
+          imageSrc={
+            usuario?.imagem_perfil
+              ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
+              : "/userdefault.svg"
+          }
+          name={usuario?.nome || "-"}
+          fieldsLeft={[
+            { label: "ID", value: String(usuario?.id_usuario || operadorId) },
+            { label: "Email", value: usuario?.email || "-" },
+            { label: "CPF", value: usuario?.cpf || "-" },
+          ]}
+          fieldsRight={[
+            { label: "Setor", value: usuario?.setor?.nome_setor || "-" },
+            { label: "Função", value: usuario?.tipo || usuario?.funcao || "-" },
+            { label: "Turno", value: usuario?.turno?.nome_turno || "-" },
+          ]}
+          actions={
+            <DetailActions>
               <Dialog>
                 <DialogTrigger className="text-[#122f60] cursor-pointer">
-                  <Pencil size={36} className="mr-1" />
+                  <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
                   <FormEdicaoUsuario usuarioId={operadorId} onEdicaoSucesso={carregarDados} />
@@ -395,74 +372,67 @@ export default function UsuarioDetalhePage({ params }) {
               </Dialog>
               <Dialog>
                 <DialogTrigger className="text-[#b30000] cursor-pointer">
-                  <Trash2 className="w-9 h-9" />
+                  <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
                   <FormExclusaoUsuario usuarioId={operadorId} />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-        </section>
+            </DetailActions>
+          }
+        />
 
         {usuario?.maquina && (
-          <section id="maquina_responsavel" className="mt-5">
-            <h1 className="font-bold text-3xl">Responsável por:</h1>
+          <>
+            <DetailSectionTitle title="Responsável por:" />
             <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
-              <div className="bg-white w-full shadow-md border rounded-lg flex justify-between items-start p-8 mt-6">
-                <div className="flex">
-                  <Image src="/demo_maq.png" alt="Máquina" className="rounded-lg" width={200} height={150} />
-                  <div className="ml-8 flex flex-col gap-2">
-                    <h1 className="text-3xl font-bold text-[#212e4b] uppercase">{usuario.maquina.nome || "-"}</h1>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">ID:</p>
-                      <p className="text-xl font-medium text-black">{usuario.maquina.id_maquina || "-"}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Série:</p>
-                      <p className="text-xl font-medium text-black">{usuario.maquina.serie || "-"}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-xl font-semibold text-black mr-2">Status:</p>
-                      <p className="text-xl font-medium text-black">{usuario.maquina.status_atual || "-"}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <UserProfileCard
+                imageSrc="/demo_maq.png"
+                imageAlt={usuario.maquina.nome || "Máquina"}
+                name={usuario.maquina.nome || "-"}
+                fieldsLeft={[
+                  { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
+                  { label: "Série", value: usuario.maquina.serie || "-" },
+                ]}
+                fieldsRight={[
+                  { label: "Status", value: usuario.maquina.status_atual || "-" },
+                ]}
+              />
             </Link>
-          </section>
+          </>
         )}
 
-        <h1 className="font-bold text-3xl mt-8">Produção</h1>
-        <div className="flex flex-col gap-4">
-          <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
-            <OEEOperadorWidget operadorId={operadorId} />
-          </section>
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <PecasPorDiaWidget operadorId={operadorId} />
-            </div>
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
-            </div>
-            <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col items-center justify-center">
-              <MetaProducaoWidget operadorId={operadorId} />
-            </div>
-          </section>
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
-            </div>
-            <div className="bg-white border rounded-xl p-4 shadow-sm">
-              <EficienciaMaquinaWidget operadorId={operadorId} />
-            </div>
-          </section>
-        </div>
+        <DetailSectionTitle title="Produção" />
 
-        {/* Histórico de Eventos */}
-        <section id="listagem_eventos">
-          <div className="flex items-center justify-between gap-5 mt-8 mb-4">
-            <h1 className="text-4xl font-semibold">Histórico de Eventos do Usuário</h1>
+        <SectionHighlight>
+          <OEEOperadorWidget operadorId={operadorId} />
+        </SectionHighlight>
+
+        <DetailWidgetGrid cols={3}>
+          <DetailWidgetCard>
+            <PecasPorDiaWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard centered>
+            <MetaProducaoWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
+
+        <DetailWidgetGrid cols={2}>
+          <DetailWidgetCard>
+            <TempoParadoTempoProduzindoOperadorWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <EficienciaMaquinaWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+        </DetailWidgetGrid>
+
+        <DetailListingSection
+          id="listagem_eventos"
+          title="Histórico de Eventos do Usuário"
+          action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
                 <Plus size={28} className="text-white cursor-pointer" />
@@ -472,31 +442,27 @@ export default function UsuarioDetalhePage({ params }) {
                 <FormCadastroEvento onCadastroSucesso={carregarDados} />
               </DialogContent>
             </Dialog>
-          </div>
-
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por id, tipo ou motivo..."
-                value={buscaEvento}
-                onChange={(e) => setBuscaEvento(e.target.value)}
-              />
-              <button type="button" className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosEventosExibidos.length} eventos encontrados</p>
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-              <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-            </div>
-          </div>
-
+          }
+          search={
+            <SearchBar
+              value={buscaEvento}
+              onChange={(e) => setBuscaEvento(e.target.value)}
+              placeholder="Busque por id, tipo ou motivo..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosEventosExibidos.length}
+              label="eventos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                </>
+              }
+            />
+          }
+        >
           {dadosEventosExibidos.length > 0 ? (
             <TableListagens
               data={dadosEventosExibidos}
@@ -540,45 +506,36 @@ export default function UsuarioDetalhePage({ params }) {
               )}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhum evento encontrado</h2>
-              <p>Não há eventos vinculados à máquina deste usuário ou nenhum resultado para a busca.</p>
-            </div>
+            <EmptyState
+              title="Nenhum evento encontrado"
+              message="Não há eventos vinculados a este usuário ou nenhum resultado para a busca."
+            />
           )}
-        </section>
+        </DetailListingSection>
 
-        {/* Histórico de Apontamentos */}
-        <section id="listagem_apontamentos" className="mt-10">
-          <h1 className="text-4xl font-semibold mb-4">Histórico de Apontamentos do Usuário</h1>
-
-          <div className="flex searchbar">
-            <div className="flex searchid items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]">
-              <input
-                type="search"
-                className="p-2 w-full outline-none bg-transparent"
-                placeholder="Busque por OP ou id..."
-                value={buscaApontamento}
-                onChange={(e) => setBuscaApontamento(e.target.value)}
-              />
-              <button type="button" className="outline-none cursor-pointer mr-2">
-                <Search />
-              </button>
-            </div>
-          </div>
-
-          <div className="row_ord_fil_cont flex items-center justify-between mt-3">
-            <p>{dadosApontamentosFiltrados.length} apontamentos encontrados</p>
-            <div className="flex items-center gap-4 mb-3">
-              <OrdenarDropdown
-                label="Ordenar por"
-                options={opcoesOrdenacaoApontamento}
-                onSortChange={handleSortApontamento}
-              />
-              <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
-            </div>
-          </div>
-
+        <DetailListingSection
+          id="listagem_apontamentos"
+          title="Histórico de Apontamentos do Usuário"
+          search={
+            <SearchBar
+              value={buscaApontamento}
+              onChange={(e) => setBuscaApontamento(e.target.value)}
+              placeholder="Busque por OP ou id..."
+            />
+          }
+          filterRow={
+            <FilterRow
+              count={dadosApontamentosFiltrados.length}
+              label="apontamentos"
+              actions={
+                <>
+                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
+                  <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
+                </>
+              }
+            />
+          }
+        >
           {dadosApontamentosFiltrados.length > 0 ? (
             <TableListagens
               data={dadosApontamentosFiltrados}
@@ -593,14 +550,13 @@ export default function UsuarioDetalhePage({ params }) {
               )}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center p-8 text-gray-500">
-              <Search className="w-12 h-12 mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold">Nenhum apontamento encontrado</h2>
-              <p>Não encontramos apontamentos para este usuário.</p>
-            </div>
+            <EmptyState
+              title="Nenhum apontamento encontrado"
+              message={`Não encontramos resultados para "${buscaApontamento}".`}
+            />
           )}
-        </section>
-      </div>
-    </main>
+        </DetailListingSection>
+      </DetailPageContainer>
+    </PageLayout>
   );
 }

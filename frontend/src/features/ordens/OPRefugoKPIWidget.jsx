@@ -2,8 +2,8 @@
 import { KPI } from "@/components/ui/charts/components";
 import { useOPRefugoKPI } from "./hooks/useOPRefugoKPI";
 
-export function OPRefugoKPIWidget() {
-  const { data, loading, error } = useOPRefugoKPI();
+export function OPRefugoKPIWidget({ setorId = null }) {
+  const { data, loading, error } = useOPRefugoKPI(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;

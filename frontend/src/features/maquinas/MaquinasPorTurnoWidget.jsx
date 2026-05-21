@@ -4,8 +4,8 @@ import { BarStackedVertical } from "@/components/ui/charts/components/BarStacked
 import { useMaquinasPorTurno } from "./hooks/useMaquinasPorTurno";
 import { maquinasTurnoConfig } from "./config/maquinaChartConfig";
 
-export function MaquinasPorTurnoWidget() {
-  const { data, loading, error } = useMaquinasPorTurno();
+export function MaquinasPorTurnoWidget({ setorId }) {
+  const { data, loading, error } = useMaquinasPorTurno(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
