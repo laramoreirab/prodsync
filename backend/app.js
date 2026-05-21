@@ -24,7 +24,7 @@ app.use(helmet(
 ));
 
 app.use(cors({
-    origin: 'https://prodsync-six.vercel.app/', // Permitir todas as origens. Ajuste conforme necessário. Ex.: 'http://meufrontend.com'
+    origin: 'https://prodsync-six.vercel.app', // Permitir todas as origens. Ajuste conforme necessário. Ex.: 'http://meufrontend.com'
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
     preflightContinue: false, // Não passar para o próximo middleware
