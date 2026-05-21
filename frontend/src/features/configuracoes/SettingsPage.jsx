@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
+import { apiFetch } from "@/lib/apiFetch"
 
 const adminTabs = [
   { id: "conta", label: "Conta", icon: UserRound },
@@ -21,7 +22,7 @@ const userTabs = [
 ]
 
 const adminAccountFields = [
-  { id: "id", label: "ID" },
+  { id: "id", label: "ID", readOnly: true },
   { id: "emailEmpresa", label: "Email da Empresa", type: "email" },
   { id: "telefoneEmpresa", label: "Telefone da Empresa" },
   { id: "enderecoEmpresa", label: "Endereço da Empresa" },
@@ -29,11 +30,11 @@ const adminAccountFields = [
 ]
 
 const userAccountFields = [
-  { id: "id", label: "ID" },
-  { id: "nome", label: "Nome" },
-  { id: "cpf", label: "CPF" },
-  { id: "cargo", label: "Cargo" },
-  { id: "email", label: "E-mail", type: "email" },
+  { id: "id", label: "ID", readOnly: true },
+  { id: "nome", label: "Nome", readOnly: true },
+  { id: "cpf", label: "CPF", readOnly: true },
+  { id: "cargo", label: "Cargo", readOnly: true },
+  { id: "email", label: "E-mail", type: "email", readOnly: true },
 ]
 
 const passwordRules = [
@@ -114,7 +115,53 @@ function SettingsInput(props) {
 
 function AccountSettings({ role }) {
   const isAdmin = role === "admin"
+
+  const [formData, setFormData] = useState({
+    id: "",
+    nome: "",
+    cpf: "",
+    cargo: "",
+    email: "",
+    emailEmpresa: "",
+    telefoneEmpresa: "",
+    enderecoEmpresa: "",
+    cpfRepresentante: ""
+  })
+
+  useEffect(() => {
+    async function buscarDados() {
+      const dadosUsuario = await apiFetch("/api/auth/perfil")
+      setFormData(dadosUsuario)
+
+      formData.id = dadosUsuario.id_usuario
+      formData.nome = dadosUsuario.nome || ""
+      formData.cpf = dadosUsuario.cpf || ""
+      formData.cargo = dadosUsuario.tipo || ""
+      formData.email = dadosUsuario.email || ""
+      formData.emailEmpresa = dadosUsuario.email|| ""
+      formData.telefoneEmpresa = dadosUsuario.telefone|| ""
+      formData.enderecoEmpresa = dadosUsuario.endereco|| ""
+      formData.cpfRepresentante = dadosUsuario.cpf_representante || ""
+    }
+    buscarDados()
+  }, [])
+
+
+async function handleInputChange(e) {
+  const { id, value } = e.target
+
+  if(id === "cpfRepresentante" || id === "telefoneEmpresa"){
+    const valorSemMascara = value.replace(/\D/g, "")
+  }
+
+  setFormData((dadosAnteriores) => ({
+    ...dadosAnteriores,
+    [id]: value, // Usa colchetes para transformar a string do 'id' em uma chave do objeto
+  }));
+}
+
   const fields = isAdmin ? adminAccountFields : userAccountFields
+
   return (
     <div className="max-w-sm space-y-4">
       <SectionTitle
@@ -123,8 +170,10 @@ function AccountSettings({ role }) {
       />
 
       <form className="space-y-3">
-        {fields.map(({ id, label, type = "text" }) => {
-          const isDisabled = !isAdmin || id === "id"
+        {fields.map(({ id, label, type = "text", readOnly }) => {
+          const isDisabled = !isAdmin || readOnly
+
+          const valorDoInput = dadosUsuario[id] || ""
 
           return (
             <div key={id} className="space-y-1">
@@ -135,7 +184,8 @@ function AccountSettings({ role }) {
                 id={id}
                 type={type}
                 disabled={isDisabled}
-                readOnly={isDisabled}
+                value = {valorDoInput}
+                onChange = {isDisabled ? undefined : handleInputChange(e)} 
                 className={cn(
                   isDisabled && "bg-zinc-100 text-zinc-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500"
                 )}

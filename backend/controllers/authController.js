@@ -292,7 +292,7 @@ class AuthController {
     //GET api/auth/perfil - Obter perfil do usuário logado
     static async obterPerfil(req, res) {
         try {
-            const usuario = await UsuarioModel.buscarPorId(req.user.id_usuario, req.user.id_empresa);
+            const usuario = await UsuarioModel.obterPerfil(req.user.id_usuario, req.user.id_empresa, req.user.tipo);
 
             if (!usuario) {
                 return res.status(404).json({
