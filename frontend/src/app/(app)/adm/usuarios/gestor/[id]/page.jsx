@@ -15,7 +15,7 @@ import { SetorMaquinaStatusWidget } from "@/features/setores/SetorMaquinaStatusW
 import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
 import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
 import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaquinaWidget";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 import Link from "next/link";
 import { ChevronDown, Loader2 } from "lucide-react";
