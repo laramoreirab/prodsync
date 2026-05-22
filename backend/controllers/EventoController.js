@@ -78,47 +78,6 @@ class EventoController {
         }
     }
 
-    static async registrarEventoMaquina(req, res) {
-        try {
-            const id_empresa = req.user.id_empresa;
-            const id_maquina = Number(req.body.id_maquina);
-            const status_maquina = req.body.status
-
-            if (!status_maquina || String(status_maquina).trim() === '') {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'Status da maquina e obrigatorio'
-                });
-            }
-
-            if (!Number.isInteger(id_maquina) || id_maquina <= 0) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'ID da maquina invalido'
-                });
-            }
-
-            const evento = await EventoModel.registrarEventoMaquina(
-                id_empresa,
-                status_maquina,
-                id_maquina,
-                new Date()
-            );
-
-            return res.status(201).json({
-                sucesso: true,
-                mensagem: 'Evento registrado com sucesso',
-                dados: evento
-            });
-        } catch (error) {
-            console.error('Erro ao registrar evento:', error);
-            return res.status(500).json({
-                sucesso: false,
-                erro: 'Erro interno do servidor',
-                mensagem: 'Nao foi possivel registrar o evento'
-            });
-        }
-    }
 
     static async registrarEventoSistema(req, res) {
         try {
@@ -204,6 +163,7 @@ class EventoController {
     static async justificarEvento(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
+            const id_maquina = Number(req.body.id_maquina);
             const id_evento = Number(req.params.id ?? req.body.id_evento);
             const id_motivo_parada = Number(req.body.id_motivo_parada);
             const { observacao } = req.body;
@@ -227,7 +187,7 @@ class EventoController {
                 });
             }
 
-            const dados = await EventoModel.justificar(id_empresa, id_evento, id_motivo_parada, observacao);
+            const dados = await EventoModel.justificar(id_empresa, id_maquina, id_evento, id_motivo_parada, observacao);
 
             return res.status(201).json({
                 sucesso: true,
