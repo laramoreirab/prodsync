@@ -6,6 +6,7 @@ import { AndonRelogioWidget } from "./AndonRelogioWidget";
 import { AndonSectionMarquee } from "./AndonSectionMarquee";
 import { AndonStatusWidget } from "./AndonStatusWidget";
 import { useAndonSections } from "./hooks/useAndonSections";
+import { getUserFromToken } from "@/lib/auth";
 
 import {
   PageLayout,
@@ -36,14 +37,7 @@ export function AndonBoardPage({ scope = "factory" }) {
   const content = scopeContent[scope] ?? scopeContent.factory;
 
   useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      setIdSetor(payload?.id_setor ?? payload?.idSetor ?? null);
-    } catch {
-      setIdSetor(null);
-    }
+    setIdSetor(getUserFromToken()?.id_setor ?? null);
   }, []);
 
   const { data: sections, loading, error } = useAndonSections(scope, idSetor);

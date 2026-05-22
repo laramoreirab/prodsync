@@ -14,20 +14,15 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { getUserFromToken } from "@/lib/auth";
 
 
 export default function DashboardGeralGestor() {
   const [setorId, setSetorId] = useState(null);
 
   useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
-    } catch {
-      // token ausente ou malformado
-    }
+    const user = getUserFromToken();
+    if (user?.id_setor) setSetorId(user.id_setor);
   }, []);
 
   return (

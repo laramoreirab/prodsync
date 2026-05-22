@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import SuccessCard from "@/components/ui/modalCadastro";
+import { setAuthToken } from "@/lib/auth";
 
+const REMEMBER_ID_KEY = "rememberedLoginId";
 
 export default function LoginForm() {
     const router = useRouter()
@@ -14,8 +16,17 @@ export default function LoginForm() {
     const [open, setOpen] = useState(false);
     const [id, setId] = useState("");
     const [senha, setSenha] = useState("");
+    const [lembrarDeMim, setLembrarDeMim] = useState(false);
     const [carregando, setCarregando] = useState(false)
     const [erro, setErro] = useState("")
+
+    useEffect(() => {
+        const rememberedId = localStorage.getItem(REMEMBER_ID_KEY);
+        if (!rememberedId) return;
+
+        setId(rememberedId);
+        setLembrarDeMim(true);
+    }, []);
 
     async function handleLogin() {
         setCarregando(true)
@@ -39,9 +50,13 @@ export default function LoginForm() {
             }
 
 
-            //guarda o token no localstorage e o middleware le o header Autorization
-            localStorage.setItem('token', data.dados.token);
-            console.log('ESTA SALVANDO NO LOCAL STORAGE');
+            setAuthToken(data.dados.token, lembrarDeMim);
+
+            if (lembrarDeMim) {
+                localStorage.setItem(REMEMBER_ID_KEY, id);
+            } else {
+                localStorage.removeItem(REMEMBER_ID_KEY);
+            }
 
 
             //redireciona pelo tipo que vem no token
@@ -91,6 +106,8 @@ export default function LoginForm() {
                             <label className="flex items-center gap-2 cursor-pointer group">
                                 <input
                                     type="checkbox"
+                                    checked={lembrarDeMim}
+                                    onChange={(e) => setLembrarDeMim(e.target.checked)}
                                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary cursor-pointer"
                                 />
                                 <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
