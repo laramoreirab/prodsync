@@ -97,7 +97,7 @@ export function PageLayout({ children, className, padded = true, bg }) {
     <main className={cn("relative min-h-screen flex flex-col", className)}>
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
+        style={{ backgroundImage: bg ?? "url('/bg_app.svg') dark:bg-[#0b1020] dark:bg-none" }}
       />
       <div className={cn("flex flex-col flex-1", padded && "px-4 sm:px-6 lg:px-8 pb-12")}>
         {children}
