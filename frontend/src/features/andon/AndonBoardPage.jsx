@@ -77,13 +77,13 @@ export function AndonBoardPage({ scope = "factory" }) {
       </ContentGrid>
 
       {loading ? (
-        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white p-6 text-sm text-black-700">
           Carregando visão do Andon...
         </FadeUpItem>
       ) : null}
 
       {error ? (
-        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-destructive">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white p-6 text-sm text-destructive">
           Erro ao carregar os setores do Andon.
         </FadeUpItem>
       ) : null}
