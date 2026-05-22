@@ -7,6 +7,7 @@ import { ProducaoPorHoraOperadorWidget }   from "@/features/operador/ProducaoPor
 import { QualidadeWidget }                 from "@/features/operador/QualidadeWidget";
 import { VelocimetroWidget }               from "@/features/operador/VelocimetroWidget";
 import { OEEMaquinaWidget }                from "@/features/operador/OEEMaquinaWidget";
+import { getUserFromToken } from "@/lib/auth";
 
 import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
 
@@ -20,14 +21,8 @@ export default function DashboardGeralOperador() {
 
   // Lê o token só no cliente, após a hidratação
   useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_usuario) setOperadorId(payload.id_usuario);
-    } catch {
-      // token ausente ou malformado
-    }
+    const user = getUserFromToken();
+    if (user?.id_usuario) setOperadorId(user.id_usuario);
   }, []);
 
 

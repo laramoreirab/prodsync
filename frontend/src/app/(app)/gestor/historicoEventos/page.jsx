@@ -6,6 +6,7 @@ import { BellRing, EyeIcon, Loader2, Pencil, Plus, Search } from "lucide-react";
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
 import { useEventos } from "@/hooks/useEventos";
+import { usePerfil } from "@/hooks/usePerfil";
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";

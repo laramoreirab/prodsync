@@ -40,10 +40,22 @@ import {
 
 const turnoLabel = { 1: "Manhã", 2: "Tarde", 3: "Noite" };
 
+const opcoesOrdenacao = [
+  { id: "nome", label: "Nome (A-Z)" },
+  { id: "id_asc", label: "ID (Crescente)" },
+  { id: "id_desc", label: "ID (Decrescente)" },
+  { id: "turno", label: "Turno" },
+];
+
+const usuariosFilter = [
+  { id: "id_turno", label: "Turno", type: "checkbox", options: Object.values(turnoLabel) },
+  { id: "oee_medio", label: "OEE Médio", type: "range" },
+];
+
 const colunasUsuarios = [
   { id: "nome", key: "nome", label: "Nome", className: "w-1/5" },
   { id: "id", key: "id", label: "ID", className: "w-40" },
-  { id: "maquina", key: "maquina", label: "Maquina", className: "pl-15" },
+  { id: "maquina", key: "maquina", label: "Maquina", className: "pl-16" }, // Ajustado pl-15 para pl-16 (padrão Tailwind)
   {
     id: "id_turno",
     key: "id_turno",
@@ -51,6 +63,13 @@ const colunasUsuarios = [
     icone: (valor) => turnoLabel[String(valor)] || valor || "-",
   },
 ];
+
+// Função auxiliar para tratar o OEE (caso venha como string ex: "85%")
+function parseOEE(valor) {
+  if (valor === undefined || valor === null) return 0;
+  if (typeof valor === "number") return valor;
+  return parseFloat(String(valor).replace("%", "")) || 0;
+}
 
 function normalizarOperador(usuario) {
   return {
@@ -62,9 +81,13 @@ function normalizarOperador(usuario) {
 export default function UsuariosGestor() {
   const { usuarios, loading, refresh } = useUsuarios();
   const { setorId } = usePerfil();
-  const [dados, setDados] = useState([]);
+  
+  // Estados apenas para os critérios de exibição
   const [busca, setBusca] = useState("");
+  const [ordenacao, setOrdenacao] = useState("");
+  const [filtrosAtivos, setFiltrosAtivos] = useState({});
 
+  // 1. Filtra a lista original por Setor e Função
   const operadoresDoSetor = useMemo(() => {
     return (usuarios || [])
       .filter((usuario) => {
@@ -75,51 +98,50 @@ export default function UsuariosGestor() {
       .map(normalizarOperador);
   }, [usuarios, setorId]);
 
-  useEffect(() => {
-    setDados(operadoresDoSetor);
-  }, [operadoresDoSetor]);
+  // 2. Processa busca, filtros e ordenação de forma combinada e automática
+  const dadosExibidos = useMemo(() => {
+    let resultado = [...operadoresDoSetor];
 
-  const handleSort = (criterio) => {
-    const ordenado = [...dados].sort((a, b) => {
-      if (criterio === "nome") return a.nome.localeCompare(b.nome);
-      if (criterio === "id_asc") return Number(a.id) - Number(b.id);
-      if (criterio === "id_desc") return Number(b.id) - Number(a.id);
-      if (criterio === "turno") return String(a.id_turno || "").localeCompare(String(b.id_turno || ""));
-      return 0;
-    });
-    setDados(ordenado);
-  };
-
-  const aplicarFiltros = (filtrosSelecionados) => {
-    let filtrados = [...operadoresDoSetor];
-
-    if (filtrosSelecionados.id_turno?.length > 0) {
-      dadosFiltrados = dadosFiltrados.filter((user) =>
-        filtrosSelecionados.id_turno.includes(turnoLabel[user.id_turno]),
+    // Aplica a busca por texto
+    if (busca) {
+      const termo = busca.toLowerCase();
+      resultado = resultado.filter(
+        (user) => user.nome?.toLowerCase().includes(termo) || String(user.id).includes(termo)
       );
     }
 
-    // filtro por oee
-    if (filtrosSelecionados.oee_medio) {
-      const { min, max } = filtrosSelecionados.oee_medio;
-      const limiteMin = min !== "" && min !== undefined ? parseFloat(min) : 0;
-      const limiteMax =
-        max !== "" && max !== undefined ? parseFloat(max) : Infinity;
+    // Aplica o filtro de Turno
+    if (filtrosAtivos.id_turno?.length > 0) {
+      resultado = resultado.filter((user) =>
+        filtrosAtivos.id_turno.includes(turnoLabel[user.id_turno])
+      );
+    }
 
-      dadosFiltrados = dadosFiltrados.filter((item) => {
+    // Aplica o filtro de OEE
+    if (filtrosAtivos.oee_medio) {
+      const { min, max } = filtrosAtivos.oee_medio;
+      const limiteMin = min !== "" && min !== undefined ? parseFloat(min) : 0;
+      const limiteMax = max !== "" && max !== undefined ? parseFloat(max) : Infinity;
+
+      resultado = resultado.filter((item) => {
         const valorNumerico = parseOEE(item.oee_medio);
         return valorNumerico >= limiteMin && valorNumerico <= limiteMax;
       });
     }
 
-    setDados(dadosFiltrados);
-  };
+    // Aplica a ordenação
+    if (ordenacao) {
+      resultado.sort((a, b) => {
+        if (ordenacao === "nome") return a.nome.localeCompare(b.nome);
+        if (ordenacao === "id_asc") return Number(a.id) - Number(b.id);
+        if (ordenacao === "id_desc") return Number(b.id) - Number(a.id);
+        if (ordenacao === "turno") return String(a.id_turno || "").localeCompare(String(b.id_turno || ""));
+        return 0;
+      });
+    }
 
-  //filtra os dados atuais (filtrados e ordenados) pelo termo de busca
-  const dadosExibidos = dados.filter((user) => {
-    const termo = busca.toLowerCase();
-    return user.nome?.toLowerCase().includes(termo) || String(user.id).includes(termo);
-  });
+    return resultado;
+  }, [operadoresDoSetor, busca, filtrosAtivos, ordenacao]);
 
   if (loading) {
     return (
@@ -141,7 +163,7 @@ export default function UsuariosGestor() {
             </DialogTrigger>
 
             <DialogContent>
-              <FormCadastroOperadorGestor /*onCadastroSucesso={refresh} */ />
+              <FormCadastroOperadorGestor onCadastroSucesso={refresh} />
             </DialogContent>
           </Dialog>
         }
@@ -149,35 +171,19 @@ export default function UsuariosGestor() {
 
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-        <WidgetCard>
-          <QtdUsuariosWidget />
-        </WidgetCard>
-
-        <WidgetCard>
-          <TurnosOperadoresWidget setorId={setorId} />
-        </WidgetCard>
-
-        <WidgetCard>
-          <TopOperadoresWidget  setorId={setorId}/>
-        </WidgetCard>
+        <WidgetCard><QtdUsuariosWidget /></WidgetCard>
+        <WidgetCard><TurnosOperadoresWidget setorId={setorId} /></WidgetCard>
+        <WidgetCard><TopOperadoresWidget setorId={setorId}/></WidgetCard>
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
-        <WidgetCard>
-          <TempoSessaoWidget setorId={setorId} />
-        </WidgetCard>
-        <WidgetCard>
-           <RotatividadeWidget setorId={setorId} />
-        </WidgetCard>
+        <WidgetCard><TempoSessaoWidget setorId={setorId} /></WidgetCard>
+        <WidgetCard><RotatividadeWidget setorId={setorId} /></WidgetCard>
       </ContentGrid>
 
       <ContentGrid cols={2} className="mt-6">
-        <WidgetCard>
-          <ProducaoMediaUsuarioSetorWidget setorId={setorId} />
-        </WidgetCard>
-        <WidgetCard>
-          <UsuarioTaxaRefugoWidget setorId={setorId} />
-        </WidgetCard>
+        <WidgetCard><ProducaoMediaUsuarioSetorWidget setorId={setorId} /></WidgetCard>
+        <WidgetCard><UsuarioTaxaRefugoWidget setorId={setorId} /></WidgetCard>
       </ContentGrid>
 
       {/* Listagem */}
@@ -191,7 +197,6 @@ export default function UsuariosGestor() {
       />
 
       {/* Ordenar e Filtrar */}
-
       <FilterRow
         count={dadosExibidos.length}
         label="usuários"
@@ -200,11 +205,11 @@ export default function UsuariosGestor() {
             <OrdenarDropdown
               label="Ordenar por"
               options={opcoesOrdenacao}
-              onSortChange={handleSort}
+              onSortChange={setOrdenacao} // Apenas atualiza o estado do critério
             />
             <FilterDropdown
               filtersConfig={usuariosFilter}
-              onApply={aplicarFiltros}
+              onApply={setFiltrosAtivos} // Apenas atualiza o estado dos filtros
             />
           </>
         }
@@ -239,7 +244,8 @@ export default function UsuariosGestor() {
                   </DialogTrigger>
                   <DialogContent className="rounded-lg top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none max-h-screen overflow-y-auto">
                     <FormEdicaoOperadorGestor
-                      operadorId={user.id} /* onEdicaoSucesso={refresh}*/
+                      operadorId={user.id}
+                      onEdicaoSucesso={refresh}
                     />
                   </DialogContent>
                 </Dialog>
@@ -256,14 +262,13 @@ export default function UsuariosGestor() {
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <FormExclusaoUsuario />
+                    <FormExclusaoUsuario operadorId={user.id} onExclusaoSucesso={refresh} />
                   </DialogContent>
                 </Dialog>
               </>
             )}
           />
         ) : (
-          //caso não encontre nada correspondente
           <EmptyState
             title="Nenhum operador encontrado"
             message={`Não encontramos nenhum resultado para "${busca}".`}

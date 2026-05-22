@@ -120,9 +120,17 @@ const apiService = {
   },
 
   async justificar(dados) {
+    const idEvento = dados.id_evento ?? dados.id;
+    const payload = {
+      id_evento: idEvento,
+      id_maquina: dados.id_maquina,
+      id_motivo_parada: dados.id_motivo_parada,
+      observacao: dados.observacao ?? "",
+    };
+
     const response = await apiFetch(`${API_URL}/justificar`, {
       method: "POST",
-      body: JSON.stringify(dados),
+      body: JSON.stringify(payload),
     });
     return normalizarEvento(extrairDados(response));
   },

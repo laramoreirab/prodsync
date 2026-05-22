@@ -515,11 +515,7 @@ export default function UsuarioDetalhePage({ params }) {
 
         <DetailListingSection
           id="listagem_apontamentos"
-<<<<<<< HEAD
-          title="Histórico de Apontamentos Feitos pelo Usuário"
-=======
           title="Histórico de Apontamentos do Usuário"
->>>>>>> 5edcfe1eabecf35c5bc8f3b3a57ca948b0543269
           search={
             <SearchBar
               value={buscaApontamento}

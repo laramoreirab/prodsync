@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
+import { clearAuthSession } from "@/lib/auth";
 
 const PROFILE_ITEMS = [
   { label: "Meu Perfil", icon: User },
@@ -35,11 +36,18 @@ const ProfileDropdown = ({
   align = "end",
 }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const settingsHref = pathname?.startsWith("/gestor")
     ? "/gestor/configuracoes"
     : pathname?.startsWith("/operador")
       ? "/operador/configuracoes"
       : "/adm/configuracoes";
+
+  function handleLogout() {
+    clearAuthSession();
+    router.replace("/");
+    router.refresh();
+  }
 
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
@@ -88,7 +96,11 @@ const ProfileDropdown = ({
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem variant="destructive" className={itemClass}>
+          <DropdownMenuItem
+            variant="destructive"
+            className={itemClass}
+            onSelect={handleLogout}
+          >
             <LOGOUT_ITEM.icon size={20} />
             <span>{LOGOUT_ITEM.label}</span>
           </DropdownMenuItem>

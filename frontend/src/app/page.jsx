@@ -5,6 +5,7 @@ import Testimonial01 from "@/components/shadcn-space/blocks/testimonial";
 import Header from "@/components/ui/headerHome";
 import Footer from "@/components/shadcn-space/blocks/footer/footer";
 import Faq from "@/components/shadcn-space/blocks/faq/faq";
+import HomeAuthRedirect from "@/components/auth/HomeAuthRedirect";
 
 export default function Home() {
 
@@ -30,6 +31,7 @@ export default function Home() {
 
   return (
     <>
+    <HomeAuthRedirect />
     <Header navigationData={navigationData} />
       <AgencyHeroSection />
       <AboutAndStats01 />
