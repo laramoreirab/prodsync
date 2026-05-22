@@ -1,4 +1,11 @@
 const TOKEN_KEY = "token";
+const LEGACY_TYPE_KEY = "tipo";
+
+const HOME_BY_USER_TYPE = {
+  Adm: "/adm",
+  Gestor: "/gestor",
+  Operador: "/operador",
+};
 
 export function getAuthToken() {
   if (typeof window === "undefined") return null;
@@ -25,6 +32,18 @@ export function clearAuthToken() {
   window.sessionStorage.removeItem(TOKEN_KEY);
 }
 
+export function clearAuthSession() {
+  if (typeof window === "undefined") return;
+
+  clearAuthToken();
+  window.localStorage.removeItem(LEGACY_TYPE_KEY);
+  window.sessionStorage.removeItem(LEGACY_TYPE_KEY);
+}
+
+export function getHomePathByUserType(tipo) {
+  return HOME_BY_USER_TYPE[tipo] ?? null;
+}
+
 //ISSO AQUI E UM EXEMPLO DE COMO PEGAR O USUARIO DO TOKEN JWT
 //PASSIVEL DE MUDANCAS
 //PESSOAL DO BACK OLHEM AQUI
@@ -36,6 +55,12 @@ export function getUserFromToken() {
 
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
+
+    if (payload.exp && payload.exp * 1000 <= Date.now()) {
+      clearAuthSession();
+      return null;
+    }
+
     return {
       id_usuario: payload.id_usuario,
       id_empresa: payload.id_empresa,

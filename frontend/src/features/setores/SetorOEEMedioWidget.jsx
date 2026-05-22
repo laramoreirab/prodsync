@@ -9,7 +9,7 @@ const oeeConfig = {
 };
 
 export function SetorOEEMedioWidget({ setorId }) {
-  const { data, loading, error } = useSetorOEEPanel(setorId);
+  const { data, loading, error } = useSetorOEEMedio(setorId);
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {

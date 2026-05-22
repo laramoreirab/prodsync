@@ -18,7 +18,7 @@ class AuthController {
     //POST api/auth/login - Fazer login
     static async login(req, res) {
         try {
-            const { id, senha } = req.body;
+            const { id, senha, lembrarDeMim = false } = req.body;
 
             console.log('Requisição chegando até aqui com o id:', id)
 
@@ -63,7 +63,7 @@ class AuthController {
             //gerar token
             const token = jwt.sign(dadosToken,
                 JWT_CONFIG.secret,
-                { expiresIn: JWT_CONFIG.expiresIn }
+                { expiresIn: lembrarDeMim ? JWT_CONFIG.rememberExpiresIn : JWT_CONFIG.expiresIn }
             );
 
 
