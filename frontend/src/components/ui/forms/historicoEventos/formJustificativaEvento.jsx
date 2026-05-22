@@ -7,8 +7,8 @@ import { Badge } from '../../badge';
 import { eventosCrudService } from '@/services/eventosCrudService';
 
 const BADGE = {
-    Setup: "rounded-xl px-3 text-amarelo font-semibold bg-[#fffbea]",
-    Parada: "rounded-xl px-3 text-[#b30000] font-semibold bg-red-100",
+    Setup: "rounded-xl px-3 text-amarelo font-semibold bg-[var(--amarelo-setup)]",
+    Parada: "rounded-xl px-3 text-[var(--trash)] font-semibold bg-red-100",
 };
 
 export default function FormJustificativaEvento({ onFechar }) {

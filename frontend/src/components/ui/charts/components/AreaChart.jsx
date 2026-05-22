@@ -37,6 +37,8 @@ export function AreaChartBase({
   const { color } = useChart(config, yKey);
   const gradientId = `grad-${yKey}`;
 
+  const safeData = data || [];
+
   return (
     <div>
       <h3 className="text-sm font-medium mb-1">{title}</h3>

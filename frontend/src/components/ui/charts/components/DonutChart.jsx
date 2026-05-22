@@ -24,7 +24,7 @@ export function DonutChart({ data, config, title, dataKey, nameKey, compact = fa
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
       <ChartContainer config={config} className="h-[180px] w-full">
         <PieChart>
-          <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
           <Pie
             data={data}
             dataKey={dataKey}

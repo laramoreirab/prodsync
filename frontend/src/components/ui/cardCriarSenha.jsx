@@ -14,6 +14,7 @@ import InputSenha from "./inputSenha";
 import { useState } from "react";
 import { CheckCircle2, Info, Eye, EyeOff } from "lucide-react";
 import { apiFetch } from "@/lib/api"
+import { setAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
 
 export default function CriarSenha() {
@@ -58,7 +59,7 @@ export default function CriarSenha() {
                 return;
             }
             if (data.dados.token){
-                localStorage.setItem("token", data.dados.token,);
+                setAuthToken(data.dados.token, true);
                 localStorage.setItem("tipo", data.dados.tipo,);
                 setStep(2);
             }

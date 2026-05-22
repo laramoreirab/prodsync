@@ -1,4 +1,4 @@
 export const paradasComparadasConfig = {
-  produzindo:  { label: "Produzindo:",   color: "#00357a" },
-  parado:      { label: "Parado:",       color: "#7d95c6" },
+  "Tempo Produzido": { label: "Produzindo:", color: "var(--chart1)" },
+  "Tempo Parado":    { label: "Parado:",     color: "var(--chart2)" },
 };

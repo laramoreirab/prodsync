@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { EyeIcon, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { EyeIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard } from "@/components/AnimatedComponents";
+import SearchBar from "@/components/ui/searchBar";
+import { FilterRow } from "@/components/AnimatedComponents";
+import { EmptyState } from "@/components/AnimatedComponents";
 
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
@@ -24,8 +28,9 @@ import { MaquinasPorTurnoWidget } from "@/features/maquinas/MaquinasPorTurnoWidg
 import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 
 const colunasMaquinas = [
-  { id: "nome", key: "nome", label: "Nome", className: "w-1/8" },
-  { id: "id_maquina", key: "id_maquina", label: "ID", className: "w-30 text-center justify-center" },
+  // Ajuste nas classes do Tailwind: w-1/8 -> w-[12.5%], w-30 -> w-32, w-45 -> w-48, w-1/7 -> w-[14%]
+  { id: "nome", key: "nome", label: "Nome", className: "w-[12.5%]" },
+  { id: "id_maquina", key: "id_maquina", label: "ID", className: "w-32 text-center justify-center" },
   {
     id: "status",
     key: "status",
@@ -46,8 +51,8 @@ const colunasMaquinas = [
       );
     },
   },
-  { id: "oee_atual", key: "oee_atual", label: "OEE Atual", className: "w-45" },
-  { id: "operador", key: "operador", label: "Operador", className: "w-1/7" },
+  { id: "oee_atual", key: "oee_atual", label: "OEE Atual", className: "w-48" },
+  { id: "operador", key: "operador", label: "Operador", className: "w-[14%]" },
 ];
 
 const maquinasFilter = [
@@ -73,42 +78,52 @@ function normalizarMaquina(maquina) {
 export default function MaquinasGestor() {
   const { setorId } = usePerfil();
   const { maquinas, loading, refresh, excluirMaquina } = useMaquinas();
+  
+  // Estados declarativos apenas para os critérios
   const [busca, setBusca] = useState("");
-  const [dados, setDados] = useState([]);
+  const [ordenacao, setOrdenacao] = useState("");
+  const [filtrosAtivos, setFiltrosAtivos] = useState({});
 
+  // 1. Memoiza apenas as máquinas tratadas e do setor correto
   const maquinasDoSetor = useMemo(() => {
     return (maquinas || [])
       .filter((maquina) => !setorId || String(maquina.id_setor) === String(setorId))
       .map(normalizarMaquina);
   }, [maquinas, setorId]);
 
-  useEffect(() => {
-    setDados(maquinasDoSetor);
-  }, [maquinasDoSetor]);
+  // 2. Aplica busca, filtro e ordenação automaticamente em cascata
+  const dadosExibidos = useMemo(() => {
+    let resultado = [...maquinasDoSetor];
 
-  const handleSort = (criterio) => {
-    const ordenado = [...dados].sort((a, b) => {
-      if (criterio === "nome") return a.nome.localeCompare(b.nome);
-      if (criterio === "id_asc") return Number(a.id_maquina) - Number(b.id_maquina);
-      if (criterio === "id_desc") return Number(b.id_maquina) - Number(a.id_maquina);
-      if (criterio === "status") return String(a.status).localeCompare(String(b.status));
-      return 0;
-    });
-    setDados(ordenado);
-  };
-
-  const aplicarFiltros = (filtrosSelecionados) => {
-    let filtrados = [...maquinasDoSetor];
-    if (filtrosSelecionados.status?.length > 0) {
-      filtrados = filtrados.filter((maquina) => filtrosSelecionados.status.includes(maquina.status));
+    // Aplica a busca por texto
+    if (busca) {
+      const termo = busca.toLowerCase();
+      resultado = resultado.filter((maquina) => 
+        maquina.nome?.toLowerCase().includes(termo) || 
+        String(maquina.id_maquina).includes(termo)
+      );
     }
-    setDados(filtrados);
-  };
 
-  const dadosExibidos = dados.filter((maquina) => {
-    const termo = busca.toLowerCase();
-    return maquina.nome?.toLowerCase().includes(termo) || String(maquina.id_maquina).includes(termo);
-  });
+    // Aplica o filtro de status
+    if (filtrosAtivos.status?.length > 0) {
+      resultado = resultado.filter((maquina) => 
+        filtrosAtivos.status.includes(maquina.status)
+      );
+    }
+
+    // Aplica a ordenação
+    if (ordenacao) {
+      resultado.sort((a, b) => {
+        if (ordenacao === "nome") return a.nome.localeCompare(b.nome);
+        if (ordenacao === "id_asc") return Number(a.id_maquina) - Number(b.id_maquina);
+        if (ordenacao === "id_desc") return Number(b.id_maquina) - Number(a.id_maquina);
+        if (ordenacao === "status") return String(a.status).localeCompare(String(b.status));
+        return 0;
+      });
+    }
+
+    return resultado;
+  }, [maquinasDoSetor, busca, filtrosAtivos, ordenacao]);
 
   if (loading) {
     return (
@@ -127,35 +142,23 @@ export default function MaquinasGestor() {
             Cadastrar
           </DialogTrigger>
 
-          <FormCadastroMaquina onCadastroSucesso={refresh} />
+          <DialogContent>
+             <FormCadastroMaquina onCadastroSucesso={refresh} />
+          </DialogContent>
         </Dialog>
       } />
+      
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-
-        <WidgetCard>
-          <MaquinaStatusDonutWidget setorId={setorId} />
-        </WidgetCard>
-
-        <WidgetCard>
-          <MaquinasPorSetorWidget setorId={setorId}/>
-        </WidgetCard>
-
-        <WidgetCard>
-          <TempoMedioParadaWidget setorId={setorId}/>
-        </WidgetCard>
-
+        <WidgetCard><MaquinaStatusDonutWidget setorId={setorId} /></WidgetCard>
+        <WidgetCard><MaquinasPorSetorWidget setorId={setorId}/></WidgetCard>
+        <WidgetCard><TempoMedioParadaWidget setorId={setorId}/></WidgetCard>
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
-        <WidgetCard>
-          <ProducaoDefeitosWidget setorId={setorId} />
-        </WidgetCard>
-        <WidgetCard>
-          <MaquinasPorTurnoWidget />
-        </WidgetCard>
+        <WidgetCard><ProducaoDefeitosWidget setorId={setorId} /></WidgetCard>
+        <WidgetCard><MaquinasPorTurnoWidget /></WidgetCard>
       </ContentGrid>
-
 
       <FadeUpItem className="mt-8">
         <div className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
@@ -164,7 +167,7 @@ export default function MaquinasGestor() {
       </FadeUpItem>
 
       {/* LISTAGEM MAQUINAS */}
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="Inventário de Máquinas" className="mt-8" />
 
       {/* Busca */}
       <SearchBar
@@ -175,11 +178,19 @@ export default function MaquinasGestor() {
 
       <FilterRow
         count={dadosExibidos.length}
-        label="maquinas"
+        label="máquinas"
         actions={
           <>
-            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
-            <FilterDropdown filtersConfig={aplicarFiltros} onApply={aplicarFiltros} />
+            <OrdenarDropdown 
+              label="Ordenar por" 
+              options={opcoesOrdenacao} 
+              onSortChange={setOrdenacao} 
+            />
+            {/* CORREÇÃO DO ERRO AQUI: Passando maquinasFilter no lugar da função */}
+            <FilterDropdown 
+              filtersConfig={maquinasFilter} 
+              onApply={setFiltrosAtivos} 
+            />
           </>
         }
       />
@@ -187,13 +198,11 @@ export default function MaquinasGestor() {
       {/* Tabela */}
       <FadeUpItem className="mt-4">
         {dadosExibidos.length > 0 ? (
-
           <TableListagens
-            /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-            data={dadosExibidos} columns={colunasMaquinas}
+            data={dadosExibidos} 
+            columns={colunasMaquinas}
             acoesDropdown={(maquina) => (
               <>
-
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link href={`maquinas/${maquina.id_maquina}`}>
                     <EyeIcon className="mr-2 h-4 w-4" />
@@ -227,20 +236,16 @@ export default function MaquinasGestor() {
                     />
                   </DialogContent>
                 </Dialog>
-
               </>
             )}
-
           />
         ) : (
-          //caso não encontre nada correspondente
           <EmptyState
             title="Nenhuma máquina encontrada"
             message={`Não encontramos nenhum resultado para "${busca}".`}
           />
         )}
       </FadeUpItem>
-
     </PageLayout >
   );
 }

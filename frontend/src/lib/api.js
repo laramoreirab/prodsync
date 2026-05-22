@@ -1,7 +1,9 @@
+import { clearAuthSession, getAuthToken } from "@/lib/auth";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function apiFetch(rota, opcoes = {}) {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -18,7 +20,7 @@ export async function apiFetch(rota, opcoes = {}) {
   });
 
   if (res.status === 401) {
-    localStorage.removeItem("token");
+    clearAuthSession();
     window.location.href = "/";
     return;
   }

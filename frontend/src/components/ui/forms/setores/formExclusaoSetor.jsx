@@ -68,7 +68,7 @@ export default function FormExclusaoSetor({ setorId, setorIds = [], onExclusaoSu
                     <button
                         type="submit"
                         disabled={carregando}
-                        className='py-3 px-5 bg-[#b30000] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
+                        className='py-3 px-5 bg-[var(--trash)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
                     >
                         {carregando && <Loader2 className="w-4 h-4 animate-spin" />}
                         Excluir

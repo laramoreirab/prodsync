@@ -25,7 +25,7 @@ export function BarVerticalBase({
 }) {
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
-  if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
   if (!data?.length) return null;
 
   // Pegamos todas as chaves do config para gerar as barras automaticamente

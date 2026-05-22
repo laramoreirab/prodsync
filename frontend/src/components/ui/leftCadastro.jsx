@@ -17,7 +17,7 @@ export default function LeftCards() {
       </div>
 
       {/* Front card */}
-      <div className="relative w-[85%] h-[80%] bg-[#004aad] rounded-3xl z-10 overflow-hidden flex items-center justify-center shadow-2xl border border-white/10">
+      <div className="relative w-[85%] h-[80%] bg-[var(--azul-cobalto)] rounded-3xl z-10 overflow-hidden flex items-center justify-center shadow-2xl border border-white/10">
         
       <div 
            className="absolute inset-0 opacity-20" 

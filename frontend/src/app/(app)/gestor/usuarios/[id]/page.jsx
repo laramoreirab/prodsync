@@ -428,7 +428,7 @@ export default function UsuarioDetalheGestor({ params }) {
           actions={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[#122f60] cursor-pointer">
+                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={36} className="mr-1" />
                 </DialogTrigger>
                 <DialogContent>
@@ -437,7 +437,7 @@ export default function UsuarioDetalheGestor({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="text-[#b30000] cursor-pointer">
+                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
                   <Trash2 className=" w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>
@@ -463,7 +463,7 @@ export default function UsuarioDetalheGestor({ params }) {
                     height={150}
                   />
                   <div className="flex flex-col gap-3 justify-center">
-                    <h2 className="text-3xl font-bold text-[#212e4b] uppercase">
+                    <h2 className="text-3xl font-bold text-[var(--chart4)] uppercase">
                       THAK-12345
                     </h2>
                     <DetailInfoField label="ID" value="00000" />
@@ -516,7 +516,7 @@ export default function UsuarioDetalheGestor({ params }) {
         {/* Listagem de Apontamentos feito pelo Usuário */}
         <DetailListingSection
           id="listagem_apontamentos"
-          title="Histórico de Apontamentos"
+          title="Histórico de Apontamentos Feitos pelo Usuário"
           search={
             <SearchBar
               value={buscaApontamento}

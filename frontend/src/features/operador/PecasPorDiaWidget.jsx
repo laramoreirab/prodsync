@@ -6,6 +6,12 @@ import { pecasPorDiaConfig } from "@/features/operador/config/operadorConfig"
 
 export function PecasPorDiaWidget({ operadorId }) {
   const { data, loading, error } = usePecasPorDia(operadorId);
+  
+  if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+
 
   return (
     <div className="p-4 ">
@@ -19,7 +25,7 @@ export function PecasPorDiaWidget({ operadorId }) {
       <BarVerticalBase
         data={data}
         config={pecasPorDiaConfig}
-        xKey="dia" 
+        xKey="dia"
         loading={loading}
         error={error}
       />

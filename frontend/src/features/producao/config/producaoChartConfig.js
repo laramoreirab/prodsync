@@ -1,14 +1,14 @@
 export const producaoSetorConfig = {
   qtd: {
     label: "Peças produzidas:",
-    color: "var(--color-grafico-colunas)",
+    color: "var(--chart2)",
   },
 };
 
 export const producaoDiaConfig = {
   pcs: {
     label: "Peças/hora:",
-    color: "var(--color-grafico-area)",
+    color: "var(--chart1)",
   },
 };
 

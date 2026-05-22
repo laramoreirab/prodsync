@@ -1,11 +1,10 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import { AndonRankingWidget } from "./AndonRankingWidget";
 import { AndonRelogioWidget } from "./AndonRelogioWidget";
 import { AndonSectionMarquee } from "./AndonSectionMarquee";
 import { AndonStatusWidget } from "./AndonStatusWidget";
 import { useAndonSections } from "./hooks/useAndonSections";
+import { usePerfil } from "@/hooks/usePerfil";
 
 import {
   PageLayout,
@@ -32,21 +31,33 @@ const scopeContent = {
 };
 
 export function AndonBoardPage({ scope = "factory" }) {
-  const [idSetor, setIdSetor] = useState(null);
+  const { loading: loadingPerfil, setorId } = usePerfil();
+  const idSetor = scope === "sector" ? setorId : null;
   const content = scopeContent[scope] ?? scopeContent.factory;
 
-  useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      setIdSetor(payload?.id_setor ?? payload?.idSetor ?? null);
-    } catch {
-      setIdSetor(null);
-    }
-  }, []);
-
   const { data: sections, loading, error } = useAndonSections(scope, idSetor);
+
+  if (scope === "sector" && loadingPerfil) {
+    return (
+      <PageLayout>
+        <PageHeader title={content.pageTitle} action={<AndonRelogioWidget />} />
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
+          Carregando setor...
+        </FadeUpItem>
+      </PageLayout>
+    );
+  }
+
+  if (scope === "sector" && !idSetor) {
+    return (
+      <PageLayout>
+        <PageHeader title={content.pageTitle} action={<AndonRelogioWidget />} />
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-destructive">
+          Nenhum setor vinculado ao seu perfil.
+        </FadeUpItem>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>
@@ -56,12 +67,13 @@ export function AndonBoardPage({ scope = "factory" }) {
       />
 
       <ContentGrid cols={2} className="mt-2">
-          <AndonStatusWidget scope={scope} title={content.statusTitle} />
-
-
         <WidgetCard>
-          <AndonRankingWidget scope={scope} />
+          <AndonStatusWidget scope={scope} idSetor={idSetor} title={content.statusTitle} />
         </WidgetCard>
+
+          <WidgetCard>
+            <AndonRankingWidget scope={scope} idSetor={idSetor} />
+          </WidgetCard>
       </ContentGrid>
 
       {loading ? (
@@ -71,7 +83,7 @@ export function AndonBoardPage({ scope = "factory" }) {
       ) : null}
 
       {error ? (
-        <FadeUpItem className="mt-6 rounded-lg border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700">
+        <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-destructive">
           Erro ao carregar os setores do Andon.
         </FadeUpItem>
       ) : null}
@@ -80,13 +92,12 @@ export function AndonBoardPage({ scope = "factory" }) {
       {/* ESPERO NAO TER QUEBRADO NADA MAS SE SIM ME AVISA */}
       {!loading && !error
         ? sections.map((section, index) => (
-          <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
+          <FadeUpItem key={section.id} className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
 
-          <AndonSectionMarquee
-            key={section.id}
-            reverse={scope === "factory" && index % 2 === 1}
-            section={section}
-          />
+            <AndonSectionMarquee
+              reverse={scope === "factory" && index % 2 === 1}
+              section={section}
+            />
           </FadeUpItem>
         ))
         : null}

@@ -25,7 +25,9 @@
  */
 
 import { motion, AnimatePresence } from "motion/react";
+import { SPACING } from "@/lib/spacing"
 import { Search, Loader2 } from "lucide-react";
+import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 // ─────────────────────────────────────────────
@@ -92,14 +94,11 @@ const VARIANTS = {
  */
 export function PageLayout({ children, className, padded = true, bg }) {
   return (
-    <main
-      className={cn(
-        "min-h-screen flex flex-col",
-         "bg-cover bg-scroll sm:bg-fixed bg-center bg-no-repeat",
-        className
-      )}
-      style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
-    >
+    <main className={cn("relative min-h-screen flex flex-col", className)}>
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
+      />
       <div className={cn("flex flex-col flex-1", padded && "px-4 sm:px-6 lg:px-8 pb-12")}>
         {children}
       </div>
@@ -126,7 +125,9 @@ export function PageHeader({ title, action, className, underline = true, subtitl
       initial="hidden"
       animate="visible"
       className={cn(
-        "flex flex-col sm:flex-row sm:items-start justify-between gap-6 sm:gap-4 pt-10 pb-4", 
+        "flex flex-col sm:flex-row sm:items-start justify-between gap-6 sm:gap-4",
+        SPACING.pageTop,
+        SPACING.afterHeader,
         className
       )}
     >
@@ -168,7 +169,7 @@ export function SectionDivider({ title, action, className }) {
       whileInView="visible"
       viewport={{ once: true }}
       className={cn(
-        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-8",
+        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2",
         className
       )}
     >
@@ -367,18 +368,18 @@ export function SearchBar({ value, onChange, placeholder = "Buscar...", classNam
   return (
     <FadeUpItem
       className={cn(
-        "flex items-center w-full p-1 justify-between rounded-md bg-[#EFEFEF]",
+        "flex items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]",
         className
       )}
     >
       <input
         type="search"
-        className="p-2 w-full outline-none bg-transparent font-medium text-sm"
+        className="p-2 w-full outline-none bg-transparent font-medium text-sm rounded-sm"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
       />
-      <span className="mr-2 text-muted-foreground">
+      <span className="m-2 text-muted-foreground">
         <Search className="w-4 h-4" />
       </span>
     </FadeUpItem>

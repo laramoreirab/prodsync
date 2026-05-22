@@ -10,17 +10,19 @@ const makeConfig = (cor) => ({
 
 const metricas = [
   { key: "disponibilidade", label: "Disponibilidade", cor: "#00357a" },
-  { key: "performance",     label: "Performance",     cor: "#00357a" },
-  { key: "qualidade",       label: "Qualidade",       cor: "#00357a" },
-  { key: "oee",             label: "OEE geral",       cor: "#00357a" },
+  { key: "performance", label: "Performance", cor: "#00357a" },
+  { key: "qualidade", label: "Qualidade", cor: "#00357a" },
+  { key: "oee", label: "OEE geral", cor: "#00357a" },
 ];
 
 export function MaquinaOEEWidget() {
   const { data, loading, error } = useOEEMaquinaDetalhes();
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro.</p>;
-  if (!data) return null;
+  if (error) return <p className="text-sm text-destructive">Erro.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+
 
   return (
     <div className="flex flex-col gap-4">
@@ -29,14 +31,12 @@ export function MaquinaOEEWidget() {
         <h2 className="text-2xl font-semibold underline decoration-secondary-foreground underline-offset-4 decoration-4">
           {data.nome_maquina}
         </h2>
-        <Badge className={`flex items-center gap-1.5 px-3 py-1 text-sm font-semibold ${
-          data.status === "Produzindo" 
-            ? "bg-green-100 text-green-700" 
+        <Badge className={`flex items-center gap-1.5 px-3 py-1 text-sm font-semibold ${data.status === "Produzindo"
+            ? "bg-green-100 text-green-700"
             : "bg-red-100 text-red-700"
-        }`}>
-          <span className={`w-2 h-2 rounded-full ${
-            data.status === "Produzindo" ? "bg-green-500" : "bg-red-500"
-          }`} />
+          }`}>
+          <span className={`w-2 h-2 rounded-full ${data.status === "Produzindo" ? "bg-green-500" : "bg-red-500"
+            }`} />
           {data.status}
         </Badge>
       </div>

@@ -360,7 +360,7 @@ export default function SetorEspecificoPage({ params }) {
           action={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[#122f60] cursor-pointer">
+                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -369,7 +369,7 @@ export default function SetorEspecificoPage({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="text-[#b30000] cursor-pointer">
+                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -461,7 +461,7 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Listagem de Máquinas ── */}
         <DetailListingSection
           id="listagem_maquinas"
-          title="Inventário de Máquinas do Setor"
+          title=" Inventário de Máquinas do Setor"
           action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
@@ -556,7 +556,7 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Listagem de Usuários ── */}
         <DetailListingSection
           id="listagem_usuarios"
-          title="Listagem de Usuários do Setor"
+          title=" Listagem de Usuários do Setor"
           action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">

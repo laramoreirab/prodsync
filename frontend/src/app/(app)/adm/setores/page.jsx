@@ -158,7 +158,6 @@ export default function PageSetores() {
 
   return (
     <PageLayout>
-      <div className="w-full mt-2 pt-0 pb-10 px-4 space-y-4">
         <section className="graphs_cadastro">
           {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
           <div className="flex justify-between">
@@ -203,7 +202,7 @@ export default function PageSetores() {
             </Dialog>
           </div>
         </section>
-      </div>
+
       {/* Gráficos */}
 
       {/* SEÇÃO 1 */}
@@ -236,7 +235,7 @@ export default function PageSetores() {
 
       {/* Listagem */}
 
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="Listagem de Setores" className="mt-8" />
 
       {/* Busca */}
 

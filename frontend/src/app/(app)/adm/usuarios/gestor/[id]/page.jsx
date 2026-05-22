@@ -1,4 +1,12 @@
-"use client";
+"use client"
+
+import { use } from "react";
+import { Pencil, Trash2, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
+import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
 
 import { OEEOperadorWidget } from "@/features/operador/OEEOperadorWidget";
 import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
