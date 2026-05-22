@@ -5,6 +5,7 @@ var PIN_VERDE = D32;
 var PIN_AMARELO = D33;  
 var PIN_VERMELHO = D25; 
 
+var EMPRESA_ID = 10;
 var MAQUINA_ID = 20;
 var statusAtual = null; 
 var clienteMQTT = null;
@@ -59,6 +60,7 @@ function enviaStatus(novoStatus) {
   statusAtual = novoStatus;
   
   var dados = JSON.stringify({
+    id_empresa: EMPRESA_ID,
     maquina_id: MAQUINA_ID,
     status: statusAtual
   });
