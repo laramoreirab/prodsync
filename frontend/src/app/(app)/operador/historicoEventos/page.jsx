@@ -80,7 +80,7 @@ const colunasEventos = [
       const config = {
         Setup: {
           variant: "secondary",
-          className: "bg-[#fffbea] text-amarelo font-semibold text-sm ",
+          className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm ",
         },
         Parada: {
           variant: "destructive",

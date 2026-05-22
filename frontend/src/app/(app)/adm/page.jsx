@@ -15,9 +15,8 @@ import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/comp
 
 export default function DashboardGeralPage() {
   return (
-    <PageLayout>
+    <div className="pb-12">
       <PageHeader title="Dashboard Geral da Empresa" />
-
       <ContentGrid cols={1}>
         <WidgetCard centered>
           <ProducaoDiaWidget />
@@ -62,6 +61,6 @@ export default function DashboardGeralPage() {
           <ProducaoPorTurnoLotesWidget />
         </WidgetCard>
       </KPIGrid>
-    </PageLayout>
+    </div>
   );
 }

@@ -9,7 +9,10 @@ export function MetaProducaoWidget({ operadorId }) {
   const { data, loading, error } = useMetaProducao(operadorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar meta.</p>;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar meta.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+
 
   const chartData = [
     { name: "completo", value: data.completo },
@@ -35,8 +38,8 @@ export function MetaProducaoWidget({ operadorId }) {
         <div className="flex gap-4 mt-2">
           {Object.entries(metaConfig).map(([key, item]) => (
             <div key={key} className="flex items-center gap-1.5">
-              <div 
-                className="w-3 h-3 rounded-full" 
+              <div
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
               <span className="text-xs font-medium text-gray-600">
