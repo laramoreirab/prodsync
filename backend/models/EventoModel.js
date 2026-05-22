@@ -62,6 +62,17 @@ class EventoModel {
     }
 
     static formatarEvento(evento) {
+        const duracaoMinutos = evento.duracao ?? (
+            evento.inicio
+                ? this.calcularDuracao(evento.inicio, evento.termino ?? new Date())
+                : null
+        );
+        const horas = duracaoMinutos != null ? Math.floor(duracaoMinutos / 60) : 0;
+        const mins = duracaoMinutos != null ? duracaoMinutos % 60 : 0;
+        const duracaoTexto = duracaoMinutos != null
+            ? `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+            : null;
+
         return {
             ...evento,
             inicio_formatado: evento.inicio
@@ -69,7 +80,8 @@ class EventoModel {
                 : null,
             termino_formatado: evento.termino
                 ? new Date(evento.termino).toLocaleString('pt-BR')
-                : null
+                : null,
+            duracao: duracaoTexto
         };
     }
 
@@ -463,7 +475,11 @@ class EventoModel {
             let status_op = null
             let prioridade = null
 
-        if (observacao && observacao.toLowerCase().includes('finalizada') || observacao.toLowerCase().includes('terminada') ) {
+        if (
+            observacao &&
+            (observacao.toLowerCase().includes('finalizada') ||
+                observacao.toLowerCase().includes('terminada'))
+        ) {
             status_op = 'Finalizada';
             prioridade = 'Baixa';
         }
