@@ -40,6 +40,7 @@ import {
   KPIGrid, ContentGrid, WidgetCard,
   SearchBar, FilterRow, EmptyState, LoadingState,
   PageSection,
+  AsymmetricGrid,
 } from "@/components/AnimatedComponents";
 
 const setoresFilter = [
@@ -158,72 +159,69 @@ export default function PageSetores() {
 
   return (
     <PageLayout>
-        <section className="graphs_cadastro">
-          {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
-          <div className="flex justify-between">
-            <div className="title_tela">
-              <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-                Setores
-              </h1>
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                <Plus className="mr-2" />
-                Criar
-                <ChevronDown className="ml-2 w-5 h-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-48">
-                <DropdownMenuItem
-                  className="cursor-pointer text-base font-medium"
-                  onClick={() => setCriarAberto("setor")}
-                >
-                  Setor
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer text-base font-medium"
-                  onClick={() => setCriarAberto("turno")}
-                >
-                  Turno (todos os setores)
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Dialog open={criarAberto === "setor"} onOpenChange={(open) => !open && setCriarAberto(null)}>
-              <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <FormCadastroSetor onCadastroSucesso={() => { refresh(); setCriarAberto(null); }} />
-              </DialogContent>
-            </Dialog>
-
-            <Dialog open={criarAberto === "turno"} onOpenChange={(open) => !open && setCriarAberto(null)}>
-              <DialogContent>
-                <FormCadastroTurnoGeral onSuccess={() => { refresh(); setCriarAberto(null); }} />
-              </DialogContent>
-            </Dialog>
+      <section className="graphs_cadastro">
+        {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
+        <div className="flex justify-between">
+          <div className="title_tela">
+            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+              Setores
+            </h1>
           </div>
-        </section>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <Plus className="mr-2" />
+              Criar
+              <ChevronDown className="ml-2 w-5 h-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-48">
+              <DropdownMenuItem
+                className="cursor-pointer text-base font-medium"
+                onClick={() => setCriarAberto("setor")}
+              >
+                Setor
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer text-base font-medium"
+                onClick={() => setCriarAberto("turno")}
+              >
+                Turno (todos os setores)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Dialog open={criarAberto === "setor"} onOpenChange={(open) => !open && setCriarAberto(null)}>
+            <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
+              <FormCadastroSetor onCadastroSucesso={() => { refresh(); setCriarAberto(null); }} />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={criarAberto === "turno"} onOpenChange={(open) => !open && setCriarAberto(null)}>
+            <DialogContent>
+              <FormCadastroTurnoGeral onSuccess={() => { refresh(); setCriarAberto(null); }} />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </section>
 
       {/* Gráficos */}
 
-      {/* SEÇÃO 1 */}
-      <KPIGrid cols={3} className="mt-4">
-
-        <WidgetCard>
-          <SetorTotalWidget />
-        </WidgetCard>
-
-        <WidgetCard>
-          <OperadoresMediaWidget />
-        </WidgetCard>
-
+      <AsymmetricGrid>
         <WidgetCard>
           <OEEPorSetorWidget />
         </WidgetCard>
+        <div className="flex flex-col justify-around gap-4 h-full">
+          <WidgetCard>
+            <SetorTotalWidget />
+          </WidgetCard>
 
-      </KPIGrid>
+          <WidgetCard>
+            <OperadoresMediaWidget />
+          </WidgetCard>
 
-
-      {/* SEÇÃO 2 */}
+        </div>
+      </AsymmetricGrid>
+      
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <RefugoPorSetorWidget />

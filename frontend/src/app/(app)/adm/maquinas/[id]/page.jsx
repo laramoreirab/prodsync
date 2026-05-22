@@ -34,7 +34,7 @@ import {
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
 // Layout geral
-import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+import { PageLayout, SearchBar, FilterRow, EmptyState, AsymmetricGrid } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
 import {
@@ -423,22 +423,22 @@ export default function MaquinaDetalhePage({ params }) {
         {/* Seção Produção */}
         <DetailSectionTitle title="Produção" />
 
-        <DetailWidgetGrid cols={2}>
+        <AsymmetricGrid>
           <DetailWidgetCard>
-            <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
+            <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
           </DetailWidgetCard>
+          <SectionHighlight>
+            <OEEMaquinaWidget maquinaId={maquinaId} />
+          </SectionHighlight>
+
+        </AsymmetricGrid>
+
+        <DetailWidgetGrid cols={3}>
           <DetailWidgetCard>
             <MotivoSetupMaquinaWidget maquinaId={maquinaId} />
           </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        <SectionHighlight>
-          <OEEMaquinaWidget maquinaId={maquinaId} />
-        </SectionHighlight>
-
-        <DetailWidgetGrid cols={2}>
           <DetailWidgetCard>
-            <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
+            <MotivoRefugoMaquinaWidget maquinaId={maquinaId} />
           </DetailWidgetCard>
           <DetailWidgetCard>
             <VelocidadeMaquinaWidget maquinaId={maquinaId} />

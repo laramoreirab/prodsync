@@ -42,6 +42,7 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
+  AsymmetricGrid,
 } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
@@ -354,7 +355,6 @@ export default function SetorEspecificoPage({ params }) {
         {/* Voltar */}
         <DetailBackLink href="/adm/setores" label="Voltar para Setores" />
 
-        {/* Cabeçalho: nome do setor + ações de editar/excluir */}
         <PageHeader
           title={`Setor: ${setor?.nome_setor || id}`}
           action={
@@ -428,35 +428,29 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Gráficos ── */}
         <DetailSectionTitle title="Desempenho do Setor" />
 
-        {/* Linha 1: status de máquinas + OEE médio */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard colSpan="md:col-span-2">
-            <SetorMaquinaStatusWidget setorId={id} />
-          </DetailWidgetCard>
-          <DetailWidgetCard centered>
-            <SetorOEEMedioWidget setorId={id} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        {/* Linha 2: produção semanal + top operadores */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard colSpan="md:col-span-2">
-            <SetorProducaoSemanalWidget setorId={id} />
-          </DetailWidgetCard>
-          <DetailWidgetCard>
-            <SetorTopOperadoresWidget setorId={id} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        {/* Linha 3: motivos de parada + evolução OEE */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard>
-            <SetorMotivosParadaWidget setorId={id} />
-          </DetailWidgetCard>
+        <AsymmetricGrid>
           <DetailWidgetCard colSpan="md:col-span-2">
             <SetorOEEEvolucaoWidget setorId={id} />
           </DetailWidgetCard>
-        </DetailWidgetGrid>
+          <DetailWidgetCard centered>
+            <SetorOEEMedioWidget setorId={id} />
+            <SetorMaquinaStatusWidget setorId={id} />
+          </DetailWidgetCard>
+        </AsymmetricGrid>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6 w-full">
+          <DetailWidgetCard>
+            <SetorProducaoSemanalWidget setorId={id} />
+          </DetailWidgetCard>
+
+          <DetailWidgetCard>
+            <SetorTopOperadoresWidget setorId={id} />
+          </DetailWidgetCard>
+
+          <DetailWidgetCard>
+            <SetorMotivosParadaWidget setorId={id} />
+          </DetailWidgetCard>
+        </div>
 
         {/* ── Listagem de Máquinas ── */}
         <DetailListingSection

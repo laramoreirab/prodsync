@@ -181,15 +181,24 @@ export default function Usuarios() {
         {/* Gráficos */}
       </section>
 
-      {/* SEÇÃO 1: Charts */}
-      <KPIGrid cols={3} className="mt-4">
+      <ContentGrid cols={2} className="mt-6">
 
         <WidgetCard>
-          <QtdUsuariosWidget />
+          <ProducaoMediaSetorWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <CumprimentoMetaSetorWidget />
+        </WidgetCard>
+      </ContentGrid>
+
+      {/* SEÇÃO 1: Charts */}
+      <KPIGrid cols={3} className="mt-4">
+        <WidgetCard>
+          <QtdUsuariosPorSetorWidget />
         </WidgetCard>
 
         <WidgetCard>
-          <QtdUsuariosPorSetorWidget />
+          <QtdUsuariosWidget />
         </WidgetCard>
 
         <WidgetCard>
@@ -201,22 +210,15 @@ export default function Usuarios() {
 
       {/* Gráficos — 2 colunas */}
       <ContentGrid cols={2} className="mt-6">
-        <WidgetCard>
-          <TempoSessaoWidget />
-        </WidgetCard>
+
         <WidgetCard>
           <RotatividadeWidget />
         </WidgetCard>
+                <WidgetCard>
+          <TempoSessaoWidget />
+        </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={2} className="mt-6">
-        <WidgetCard>
-          <CumprimentoMetaSetorWidget />
-        </WidgetCard>
-        <WidgetCard>
-          <ProducaoMediaSetorWidget />
-        </WidgetCard>
-      </ContentGrid>
 
       {/* Listagem */}
 
@@ -242,41 +244,41 @@ export default function Usuarios() {
       <FadeUpItem className="mt-4">
         {dadosExibidos.length > 0 ? (
           <div className="w-full overflow-x-auto">
-          <TableListagens
-            data={dadosExibidos}
-            columns={colunasUsuarios}
-            acoesDropdown={(user) => (
-              <>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={user.funcao === "Gestor" ? `/adm/usuarios/gestor/${user.id}` : `/adm/usuarios/${user.id}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" /> Ver Detalhes
-                  </Link>
-                </DropdownMenuItem>
+            <TableListagens
+              data={dadosExibidos}
+              columns={colunasUsuarios}
+              acoesDropdown={(user) => (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={user.funcao === "Gestor" ? `/adm/usuarios/gestor/${user.id}` : `/adm/usuarios/${user.id}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" /> Ver Detalhes
+                    </Link>
+                  </DropdownMenuItem>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <Pencil className="mr-2 h-4 w-4 text-primary" /> Editar
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
-                    <FormEdicaoUsuario usuarioId={user.id} onEdicaoSucesso={refresh} />
-                  </DialogContent>
-                </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Pencil className="mr-2 h-4 w-4 text-primary" /> Editar
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
+                      <FormEdicaoUsuario usuarioId={user.id} onEdicaoSucesso={refresh} />
+                    </DialogContent>
+                  </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" /> Excluir
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-          />
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" /> Excluir
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            />
           </div>
         ) : (
           <EmptyState

@@ -11,23 +11,21 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
 
 export default function DashboardGeralPage() {
   return (
     <div className="pb-12">
       <PageHeader title="Dashboard Geral da Empresa" />
-      <ContentGrid cols={1}>
+      
+      <AsymmetricGrid>
         <WidgetCard>
           <ProducaoDiaWidget />
         </WidgetCard>
-      </ContentGrid>
-
-      <ContentGrid cols={1} className="mt-6">
         <WidgetCard centered>
           <OEEWidget />
         </WidgetCard>
-      </ContentGrid>
+      </AsymmetricGrid>
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
@@ -40,10 +38,10 @@ export default function DashboardGeralPage() {
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
-          <MotivosFrequentesWidget />
+          <TendendiaRefugoWidget />       
         </WidgetCard>
         <WidgetCard>
-          <TendendiaRefugoWidget />
+          <MotivosFrequentesWidget />    
         </WidgetCard>
       </ContentGrid>
 

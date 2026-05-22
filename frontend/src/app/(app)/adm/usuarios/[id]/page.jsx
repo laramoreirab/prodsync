@@ -409,11 +409,12 @@ export default function UsuarioDetalhePage({ params }) {
         </SectionHighlight>
 
         <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard>
-            <PecasPorDiaWidget operadorId={operadorId} />
-          </DetailWidgetCard>
+
           <DetailWidgetCard>
             <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <PecasPorDiaWidget operadorId={operadorId} />
           </DetailWidgetCard>
           <DetailWidgetCard centered>
             <MetaProducaoWidget operadorId={operadorId} />

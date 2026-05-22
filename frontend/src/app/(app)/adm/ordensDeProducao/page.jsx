@@ -39,7 +39,8 @@ import {
   FilterRow,
   EmptyState,
   LoadingState,
-  FadeUpItem
+  FadeUpItem,
+  AsymmetricGrid
 } from "@/components/AnimatedComponents";
 
 
@@ -279,86 +280,76 @@ export default function OrdensDeProducao() {
   return (
     <PageLayout>
 
-        <PageHeader title="Ordens de Produção" action={
+      <PageHeader title="Ordens de Produção" action={
 
-          <Dialog>
-            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
-              <Plus className="mr-2" />
-              Criar OP
-            </DialogTrigger>
-            <DialogContent>
-              <FormCadastroOp onCadastroSucesso={refresh} />
-            </DialogContent>
-          </Dialog>
+        <Dialog>
+          <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+            <Plus className="mr-2" />
+            Criar OP
+          </DialogTrigger>
+          <DialogContent>
+            <FormCadastroOp onCadastroSucesso={refresh} />
+          </DialogContent>
+        </Dialog>
 
-        } />
-
-
-        {/* SEÇÃO 1: Graphs */}
-
-        <KPIGrid cols={4} className="mt-4">
-
-          <WidgetCard>
-            <OPAtivasKPIWidget />
-          </WidgetCard>
-
-          <WidgetCard>
-            <OPAtrasadasKPIWidget />
-          </WidgetCard>
-
-          <WidgetCard>
-            <OPPecasBoasKPIWidget />
-          </WidgetCard>
-
-          <WidgetCard>
-            <OPRefugoKPIWidget />
-          </WidgetCard>
+      } />
 
 
-        </KPIGrid>
+      {/* SEÇÃO 1: Graphs */}
+
+      <AsymmetricGrid>
+        <WidgetCard>
+          <OPConcluidasDiaWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <OPEficienciaWidget />
+        </WidgetCard>
 
 
-        {/* SEÇÃO 2: Graphs */}
+      </AsymmetricGrid>
+      <ContentGrid cols={3} className="mt-6">
+        <WidgetCard>
+          <OPStatusWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <OPCargaSetorWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <OPTopRefugoWidget />
+        </WidgetCard>
 
-        <KPIGrid cols={3} className="mt-4">
+      </ContentGrid>
 
-          <WidgetCard>
-            <OPEficienciaWidget />
-          </WidgetCard>
+      <KPIGrid cols={4} className="mt-4">
 
-          <WidgetCard>
-            <OPTopRefugoWidget />
-          </WidgetCard>
+        <WidgetCard>
+          <OPAtivasKPIWidget />
+        </WidgetCard>
 
-          <WidgetCard>
-            <OPCargaSetorWidget />
-          </WidgetCard>
+        <WidgetCard>
+          <OPAtrasadasKPIWidget />
+        </WidgetCard>
 
+        <WidgetCard>
+          <OPPecasBoasKPIWidget />
+        </WidgetCard>
 
-        </KPIGrid>
-
-
-        {/* SEÇÃO 3: Graphs */}
-
-        <ContentGrid cols={2} className="mt-6">
-          <WidgetCard>
-            <OPStatusWidget />
-          </WidgetCard>
-          <WidgetCard>
-            <OPConcluidasDiaWidget />
-          </WidgetCard>
-        </ContentGrid>
+        <WidgetCard>
+          <OPRefugoKPIWidget />
+        </WidgetCard>
 
 
-       {/* Listagem */}
+      </KPIGrid>
+
+      {/* Listagem */}
       <SectionDivider title="OPs" className="mt-8" />
- 
+
       <SearchBar
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
         placeholder="Busque por id ou nome..."
       />
- 
+
       <FilterRow
         count={dadosExibidos.length}
         label="OPs"
@@ -370,11 +361,11 @@ export default function OrdensDeProducao() {
         }
       />
       <FadeUpItem className="mt-4">
-      {dadosExibidos.length > 0 ? (
-        <TableListagens
-          data={dadosExibidos}
-          columns={colunasOrdemProd}
-          enableSelection={true}
+        {dadosExibidos.length > 0 ? (
+          <TableListagens
+            data={dadosExibidos}
+            columns={colunasOrdemProd}
+            enableSelection={true}
             onSelectedChange={setSelecionados}
             excluirLote={
               <DialogContent>
@@ -384,49 +375,49 @@ export default function OrdensDeProducao() {
                 />
               </DialogContent>
             }
-          acoesDropdown={(op) => (
-            <>
-              <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/ordensDeProducao/${op.id}`}>
-                  <EyeIcon className="mr-2 h-4 w-4" />
-                  Ver Detalhes
-                </Link>
-              </DropdownMenuItem>
- 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                    <Pencil className="mr-2 h-4 w-4 text-primary" />
-                    Editar OP
-                  </DropdownMenuItem>
-                </DialogTrigger>
-                <DialogContent>
-                  <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
-                </DialogContent>
-              </Dialog>
- 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DialogTrigger>
-                <DialogContent>
-                  <FormExclusaoOp opId={op.id} idMaquina={op.id_maquina} onExclusaoSucesso={refresh} />
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
-        />
-      ) : (
-        <EmptyState
-          title="Nenhum resultado encontrado"
-          message="Ajuste seus filtros ou termo de busca."
-        />
-      )}
+            acoesDropdown={(op) => (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`/adm/ordensDeProducao/${op.id}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver Detalhes
+                  </Link>
+                </DropdownMenuItem>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar OP
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormExclusaoOp opId={op.id} idMaquina={op.id_maquina} onExclusaoSucesso={refresh} />
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          />
+        ) : (
+          <EmptyState
+            title="Nenhum resultado encontrado"
+            message="Ajuste seus filtros ou termo de busca."
+          />
+        )}
       </FadeUpItem>
- 
+
     </PageLayout>
   );
 }

@@ -40,44 +40,63 @@ const VARIANTS = {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.05,
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
       },
     },
   },
 
   fadeUp: {
-    hidden: { opacity: 0, y: 18 },
+    hidden: { opacity: 0, y: 80, scale: 0.85 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      scale: 1,
+      transition: {
+        type: "spring",
+        bounce: 0.30,
+        duration: 0.8
+      },
     },
   },
 
   fadeIn: {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, scale: 0.5 },
     visible: {
       opacity: 1,
-      transition: { duration: 0.35 },
+      scale: 1,
+      transition: {
+        type: "spring",
+        bounce: 0.4,
+        duration: 0.6
+      },
     },
   },
 
   slideLeft: {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, x: -150, rotate: -10 },
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.45, ease: "easeOut" },
+      rotate: 0,
+      transition: {
+        type: "spring",
+        bounce: 0.4,
+        duration: 0.75
+      },
     },
   },
 
   scaleIn: {
-    hidden: { opacity: 0, scale: 0.96 },
+    hidden: { opacity: 0, scale: 0.3, rotate: 15 },
     visible: {
       opacity: 1,
-      scale: 1,
-      transition: { duration: 0.35, ease: "easeOut" },
+      scale: [1.2, 0.95, 1],
+      rotate: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeInOut"
+      },
     },
   },
 };
@@ -86,21 +105,35 @@ const VARIANTS = {
 // PAGE LAYOUT
 // Wrapper principal com bg padrão da app
 // ─────────────────────────────────────────────
-
 /**
  * @param {string}  className   — classes extras
  * @param {boolean} padded      — aplica px-8 padrão (default: true)
  * @param {string}  bg          — override do bg (default: bg_app.svg)
+ * @param {boolean} center      — se true, centraliza e deixa o conteúdo com 70% de largura (default: false)
  */
-export function PageLayout({ children, className, padded = true, bg }) {
+export function PageLayout({ children, className, padded = true, bg, center = false }) {
   return (
     <main className={cn("relative min-h-screen flex flex-col", className)}>
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
       />
-      <div className={cn("flex flex-col flex-1", padded && "px-4 sm:px-6 lg:px-8 pb-12")}>
-        {children}
+      
+      <div 
+        className={cn(
+          "flex flex-col flex-1 w-full", 
+          padded && "px-4 sm:px-6 lg:px-8 pb-12",
+          center && "items-center pt-16"
+        )}
+      >
+        <div 
+          className={cn(
+            "w-full min-w-0",
+            center && "md:max-w-[70%] mx-auto flex flex-col items-center justify-center"
+          )}
+        >
+          {children}
+        </div>
       </div>
     </main>
   );
@@ -131,12 +164,11 @@ export function PageHeader({ title, action, className, underline = true, subtitl
         className
       )}
     >
-      <div className="flex flex-col gap-1">
-        <h1
+<div className="flex flex-col gap-1 min-w-0 flex-1">        <h1
           className={cn(
-            "text-4xl font-semibold text-black",
+            "text-5xl font-semibold text-black",
             underline &&
-              "underline decoration-secondary-foreground underline-offset-9 decoration-[5px]"
+            "underline decoration-secondary-foreground underline-offset-9 decoration-[5px]"
           )}
         >
           {title}
@@ -147,11 +179,13 @@ export function PageHeader({ title, action, className, underline = true, subtitl
       </div>
 
       <div className="flex items-center gap-3 flex-shrink-0 pt-1 w-full sm:w-auto">
-          {action}
-        </div>
+        {action}
+      </div>
     </motion.div>
   );
-}// ─────────────────────────────────────────────
+}
+
+// ─────────────────────────────────────────────
 // SECTION DIVIDER
 // Linha horizontal com título — padrão das páginas
 // ─────────────────────────────────────────────
@@ -179,13 +213,13 @@ export function SectionDivider({ title, action, className }) {
         </h2>
         <hr className="hidden sm:block bg-black flex-1 h-[3px] rounded-full" />
       </div>
-      
+
       {action && (
         <div className="flex-shrink-0 w-full sm:w-auto">
           {action}
         </div>
       )}
-    </motion.div> 
+    </motion.div>
   );
 }
 // ─────────────────────────────────────────────
@@ -321,7 +355,34 @@ export function ContentGrid({ children, cols = 2, className }) {
 
   return (
     <StaggerWrapper
-      className={cn("grid gap-10", colClasses[cols] ?? colClasses[2], className)}
+      className={cn("grid gap-8", colClasses[cols] ?? colClasses[2], className)}
+    >
+      {children}
+    </StaggerWrapper>
+  );
+}
+
+// ─────────────────────────────────────────────
+// ASYMMETRIC CONTENT GRID
+// Grid de 2 colunas: um retângulo grande e um fino
+// ─────────────────────────────────────────────
+
+/**
+ * @param {string}  side      
+ * @param {string}  className
+ */
+export function AsymmetricGrid({ children, side = "left", className }) {
+  const layoutClasses = side === "left" 
+    ? "[&>*:nth-child(1)]:md:col-span-2 [&>*:nth-child(2)]:md:col-span-1" 
+    : "[&>*:nth-child(1)]:md:col-span-1 [&>*:nth-child(2)]:md:col-span-2";
+
+  return (
+    <StaggerWrapper
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-3 gap-8 mt-6", 
+        layoutClasses, 
+        className
+      )}
     >
       {children}
     </StaggerWrapper>
@@ -405,27 +466,27 @@ export { SectionDivider as ListingHeader };
  * @param {string}    className
  */
 export function FilterRow({ count, label = "resultados", actions, className }) {
-    return (
-      <FadeUpItem
-        className={cn(
-          // Mudança principal: flex-col no mobile, flex-row no desktop
-          "flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-3",
-          className
-        )}
-      >
-        <p className="text-sm text-gray-600">
-          {count} {label} encontrado{count !== 1 ? "s" : ""}
-        </p>
-        
-        {actions && (
-          // Garante que os botões fiquem alinhados e não quebrem linha entre si
-          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-            {actions}
-          </div>
-        )}
-      </FadeUpItem>
-    );
-  }
+  return (
+    <FadeUpItem
+      className={cn(
+        // Mudança principal: flex-col no mobile, flex-row no desktop
+        "flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-3",
+        className
+      )}
+    >
+      <p className="text-sm text-gray-600">
+        {count} {label} encontrado{count !== 1 ? "s" : ""}
+      </p>
+
+      {actions && (
+        // Garante que os botões fiquem alinhados e não quebrem linha entre si
+        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+          {actions}
+        </div>
+      )}
+    </FadeUpItem>
+  );
+}
 
 // ─────────────────────────────────────────────
 // EMPTY STATE

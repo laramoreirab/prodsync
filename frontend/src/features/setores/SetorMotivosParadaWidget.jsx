@@ -1,8 +1,8 @@
 "use client";
 
-import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
 import { useSetorMotivosParada } from "./hooks/useSetorMotivosParada";
 import { setorMotivosParadaConfig } from "./config/setoresChartConfig";
+import { BarHorizontal } from "@/components/ui/charts/components";
 
 export function SetorMotivosParadaWidget({ setorId }) {
   const { data, loading, error } = useSetorMotivosParada(setorId);
@@ -19,7 +19,7 @@ export function SetorMotivosParadaWidget({ setorId }) {
       <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
 
       <div className="mt-2">
-        <BarVerticalBase
+        <BarHorizontal
           data={data}
           xKey="motivo"
           config={setorMotivosParadaConfig}
