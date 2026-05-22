@@ -730,7 +730,7 @@ class SetorModel {
             if (totalSetores === 0) return 0;
 
             // Calcula a média
-            const media = totalOperadoresEscalados / totalSetores;
+            let media = totalOperadoresEscalados / totalSetores;
 
             if(media>0 && media <1){
                 media = 1
