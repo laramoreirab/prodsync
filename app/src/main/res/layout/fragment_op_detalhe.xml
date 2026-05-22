@@ -296,5 +296,40 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Container de Loading -->
+        <LinearLayout
+            android:id="@+id/layout_loading_op"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@color/azul_marinho" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Sincronizando dados da OP"
+                android:textColor="@color/azul_marinho"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Group para controle de visibilidade -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_conteudo_op"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tv_titulo_op_detalhe,underline,card_maquina_meta,layout_info_op,card_progresso,card_oee_resumo" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

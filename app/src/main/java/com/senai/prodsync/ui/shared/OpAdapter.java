@@ -29,6 +29,12 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
         this.listener = listener;
     }
 
+    public void atualizarLista(List<Op> novaLista) {
+        this.listaOriginal = new ArrayList<>(novaLista);
+        this.listaFiltrada = new ArrayList<>(novaLista);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public OpViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

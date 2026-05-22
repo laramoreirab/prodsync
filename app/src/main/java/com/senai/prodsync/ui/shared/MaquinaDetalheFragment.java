@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Group;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -43,6 +44,9 @@ public class MaquinaDetalheFragment extends Fragment {
     private String dataAquisicao;
     private String capacidade;
     private String operador;
+    
+    private View layoutLoading;
+    private Group groupConteudo;
 
     public static MaquinaDetalheFragment newInstance(String maquinaId, String status, String nome, String serie, String fotoUrl, String dataAquisicao, String capacidade, String operador) {
         MaquinaDetalheFragment fragment = new MaquinaDetalheFragment();
@@ -91,6 +95,9 @@ public class MaquinaDetalheFragment extends Fragment {
         TextView tvVelocidade = view.findViewById(R.id.tv_velocidade_val);
         TextView tvOperador = view.findViewById(R.id.tv_operador_val);
         android.widget.ImageView ivMaquina = view.findViewById(R.id.iv_maquina_grande);
+        
+        layoutLoading = view.findViewById(R.id.layout_loading_detalhe);
+        groupConteudo = view.findViewById(R.id.group_conteudo_detalhe);
 
         if (maquinaId != null) {
             tvId.setText(maquinaId);
@@ -118,12 +125,18 @@ public class MaquinaDetalheFragment extends Fragment {
     private void carregarDadosOee(View view) {
         if (getContext() == null) return;
         
+        if (layoutLoading != null) layoutLoading.setVisibility(View.VISIBLE);
+        if (groupConteudo != null) groupConteudo.setVisibility(View.GONE);
+        
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
         DashboardService.getClient().getOee(token, maquinaId).enqueue(new Callback<ApiResponse<OeeResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<OeeResponse>> call, Response<ApiResponse<OeeResponse>> response) {
+                if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+                if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
+
                 if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
                     OeeResponse oee = response.body().getDados();
                     if (oee != null) {
@@ -140,14 +153,16 @@ public class MaquinaDetalheFragment extends Fragment {
                         if (pbConsolidado != null) pbConsolidado.setProgress((int)(oee.getOeeTotal() * 100));
                     }
                 } else {
-                    // Se falhar, mantém os placeholders ou mostra erro
                     Log.e("API_OEE", "Erro ao carregar OEE: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<OeeResponse>> call, Throwable t) {
+                if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+                if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
                 Log.e("API_OEE", "Falha na conexão: " + t.getMessage());
+                Toast.makeText(getContext(), "Erro ao carregar dados da API", Toast.LENGTH_SHORT).show();
             }
         });
     }

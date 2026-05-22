@@ -25,10 +25,16 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
     private OnMaquinaClickListener listener;
 
     public MaquinaAdapter(List<Maquina> lista, String userRole, OnMaquinaClickListener listener) {
-        this.listaOriginal = lista;
+        this.listaOriginal = new ArrayList<>(lista);
         this.listaFiltrada = new ArrayList<>(lista);
         this.userRole = userRole;
         this.listener = listener;
+    }
+
+    public void atualizarLista(List<Maquina> novaLista) {
+        this.listaOriginal = new ArrayList<>(novaLista);
+        this.listaFiltrada = new ArrayList<>(novaLista);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -54,7 +60,6 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
             holder.ivMaquina.setImageResource(R.drawable.ic_ferramenta);
         }
 
-        // ... (resto da lógica de status mantida)
         String status = maquina.getStatus().toLowerCase();
         if (status.contains("produzindo") || status.contains("produção") || status.contains("producao")) {
             holder.tvStatus.setText("Produzindo");
@@ -70,7 +75,6 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
             holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.txt_parada));
         }
 
-        // Clique no item
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onMaquinaClick(maquina);
@@ -97,12 +101,10 @@ public class MaquinaAdapter extends RecyclerView.Adapter<MaquinaAdapter.MaquinaV
                 boolean matchNomeId = nome.contains(busca) || id.contains(busca);
                 
                 if ("adm".equals(userRole)) {
-                    // ADM busca por nome, id OU setor
                     if (matchNomeId || setor.contains(busca)) {
                         listaFiltrada.add(m);
                     }
                 } else {
-                    // GESTOR/OPERADOR busca APENAS por nome ou id
                     if (matchNomeId) {
                         listaFiltrada.add(m);
                     }

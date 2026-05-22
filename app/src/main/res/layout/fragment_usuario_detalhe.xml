@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="12dp"
-            android:text="Nome: José Adamastor Luís da Silva"
+            android:text="Carregando..."
             android:textColor="@color/black"
             android:textSize="22sp"
             android:fontFamily="@font/montserrat_bold"
@@ -50,33 +50,33 @@
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                 <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="ID: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                <TextView android:id="@+id/tv_id_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="00000" android:textSize="18sp"/>
+                <TextView android:id="@+id/tv_id_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textSize="18sp"/>
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                 <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="E-mail: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                <TextView android:id="@+id/tv_email_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="josezinho@gmail.com" android:textSize="18sp"/>
+                <TextView android:id="@+id/tv_email_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textSize="18sp"/>
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                 <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="Setor: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                <TextView android:id="@+id/tv_setor_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Engrenagens" android:textSize="18sp"/>
+                <TextView android:id="@+id/tv_setor_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textSize="18sp"/>
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                 <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="Turno: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                <TextView android:id="@+id/tv_turno_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Noite" android:textSize="18sp"/>
+                <TextView android:id="@+id/tv_turno_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textSize="18sp"/>
             </LinearLayout>
 
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                 <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="Função: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                <TextView android:id="@+id/tv_funcao_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Operador" android:textSize="18sp"/>
+                <TextView android:id="@+id/tv_funcao_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textSize="18sp"/>
             </LinearLayout>
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                 <TextView android:layout_width="wrap_content" android:fontFamily="@font/montserrat_semibold" android:layout_height="wrap_content" android:text="CPF: " android:textStyle="bold" android:textSize="18sp" android:textColor="@color/black"/>
-                <TextView android:id="@+id/tv_cpf_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="443.651.730-65" android:textSize="18sp"/>
+                <TextView android:id="@+id/tv_cpf_val" android:fontFamily="@font/montserrat_semibold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="---" android:textSize="18sp"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -126,7 +126,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="THAK-909816"
+                    android:text="---"
                     android:textSize="20sp"
                     android:fontFamily="@font/montserrat_bold"
                     android:textColor="@color/machine_title" />
@@ -134,6 +134,41 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- Container de Loading -->
+        <LinearLayout
+            android:id="@+id/layout_loading_usuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@color/azul_marinho" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Sincronizando dados do usuário..."
+                android:textColor="@color/azul_marinho"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Group para controle de visibilidade -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_conteudo_usuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="tv_nome_usuario_detalhe,iv_usuario_foto,layout_info_lista,tv_responsavel_label,card_maquina_responsavel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

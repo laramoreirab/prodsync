@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Group;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -30,6 +31,8 @@ public class UsuarioDetalheFragment extends Fragment {
 
     private TextView tvNome, tvIdVal, tvEmailVal, tvSetorVal, tvTurnoVal, tvFuncaoVal, tvCpfVal, tvMaquinaNome;
     private ImageView ivFoto;
+    private View layoutLoading;
+    private Group groupConteudo;
 
     public static UsuarioDetalheFragment newInstance(Usuario u) {
         UsuarioDetalheFragment fragment = new UsuarioDetalheFragment();
@@ -57,6 +60,8 @@ public class UsuarioDetalheFragment extends Fragment {
         tvFuncaoVal = view.findViewById(R.id.tv_funcao_val);
         tvCpfVal = view.findViewById(R.id.tv_cpf_val);
         tvMaquinaNome = view.findViewById(R.id.tv_maquina_nome);
+        layoutLoading = view.findViewById(R.id.layout_loading_usuario);
+        groupConteudo = view.findViewById(R.id.group_conteudo_usuario);
 
         if (getArguments() != null) {
             String userId = getArguments().getString(ARG_USER_ID);
@@ -69,6 +74,9 @@ public class UsuarioDetalheFragment extends Fragment {
     private void carregarDadosDoUsuario(String userId) {
         if (getContext() == null) return;
 
+        if (layoutLoading != null) layoutLoading.setVisibility(View.VISIBLE);
+        if (groupConteudo != null) groupConteudo.setVisibility(View.GONE);
+
         SharedPreferences prefs = getContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
@@ -77,6 +85,9 @@ public class UsuarioDetalheFragment extends Fragment {
             UserService.getClient().getUsuarioPorId(token, idInt).enqueue(new Callback<ApiResponse<Usuario>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Usuario>> call, Response<ApiResponse<Usuario>> response) {
+                    if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+                    if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
+
                     if (response.isSuccessful() && response.body() != null && response.body().getDados() != null) {
                         preencherCampos(response.body().getDados());
                     } else {
@@ -86,11 +97,15 @@ public class UsuarioDetalheFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<ApiResponse<Usuario>> call, Throwable t) {
+                    if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+                    if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
                     if (getContext() != null)
                         Toast.makeText(getContext(), "Erro de conexão", Toast.LENGTH_SHORT).show();
                 }
             });
         } catch (NumberFormatException e) {
+            if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+            if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
             Toast.makeText(getContext(), "ID inválido", Toast.LENGTH_SHORT).show();
         }
     }

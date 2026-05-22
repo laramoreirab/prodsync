@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Group;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -46,6 +47,9 @@ public class OpDetalheFragment extends Fragment {
     private String operador;
     private String dataInicio;
     private String dataFinal;
+
+    private View layoutLoading;
+    private Group groupConteudo;
 
     public static OpDetalheFragment newInstance(String opId, String maquinaId, String prioridade, String setor, String produto, int quantidade, String status, String operador, String dataInicio, String dataFinal) {
         OpDetalheFragment fragment = new OpDetalheFragment();
@@ -100,12 +104,15 @@ public class OpDetalheFragment extends Fragment {
         TextView tvDataInicio = view.findViewById(R.id.tv_data_inicio_op);
         TextView tvPrazoFinal = view.findViewById(R.id.tv_prazo_final_op);
 
+        layoutLoading = view.findViewById(R.id.layout_loading_op);
+        groupConteudo = view.findViewById(R.id.group_conteudo_op);
+
         if (opId != null) {
             tvTitulo.setText("OP #" + opId);
             tvMaquina.setText(maquinaId != null ? maquinaId : "N/A");
             tvSetor.setText(setor != null ? setor : "Geral");
             tvPrioridade.setText(prioridade != null ? prioridade : "Normal");
-            tvMeta.setText("Quantidade: " + quantidade + " peças");
+            tvMeta.setText("Meta: " + quantidade + " peças");
             tvOperador.setText(operador != null ? operador : "Nenhum");
             
             if (dataInicio != null && !dataInicio.isEmpty()) {
@@ -126,7 +133,6 @@ public class OpDetalheFragment extends Fragment {
         if (maquinaId != null && !maquinaId.equals("N/A")) {
             carregarDadosOee(view);
         } else {
-            // Valores padrão se não houver máquina associada
             setupOeeGauge(view.findViewById(R.id.op_gauge_disponibilidade), "Disponibilidade", "0%", 0);
             setupOeeGauge(view.findViewById(R.id.op_gauge_performance), "Performance", "0%", 0);
             setupOeeGauge(view.findViewById(R.id.op_gauge_qualidade), "Qualidade", "0%", 0);
@@ -136,12 +142,18 @@ public class OpDetalheFragment extends Fragment {
     private void carregarDadosOee(View view) {
         if (getContext() == null) return;
 
+        if (layoutLoading != null) layoutLoading.setVisibility(View.VISIBLE);
+        if (groupConteudo != null) groupConteudo.setVisibility(View.GONE);
+
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
         DashboardService.getClient().getOee(token, maquinaId).enqueue(new Callback<ApiResponse<OeeResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<OeeResponse>> call, Response<ApiResponse<OeeResponse>> response) {
+                if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+                if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
+
                 if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
                     OeeResponse oee = response.body().getDados();
                     if (oee != null) {
@@ -164,6 +176,8 @@ public class OpDetalheFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ApiResponse<OeeResponse>> call, Throwable t) {
+                if (layoutLoading != null) layoutLoading.setVisibility(View.GONE);
+                if (groupConteudo != null) groupConteudo.setVisibility(View.VISIBLE);
                 Log.e("API_OEE", "Falha na conexão OEE OP: " + t.getMessage());
             }
         });

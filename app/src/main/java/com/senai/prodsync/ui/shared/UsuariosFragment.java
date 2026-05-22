@@ -36,7 +36,9 @@ public class UsuariosFragment extends Fragment {
     private UsuarioAdapter adapter;
     private EditText etSearch;
     private View layoutNoResults;
+    private View layoutLoading;
     private String userRole;
+    private boolean isLoading = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,12 +62,12 @@ public class UsuariosFragment extends Fragment {
         etSearch = view.findViewById(R.id.et_search);
         TextView tvSetor = view.findViewById(R.id.tv_setor);
         layoutNoResults = view.findViewById(R.id.layout_no_results);
+        layoutLoading = view.findViewById(R.id.layout_loading);
 
         if (tvSetor != null) tvSetor.setVisibility("adm".equals(userRole) ? View.VISIBLE : View.GONE);
 
         adapter = new UsuarioAdapter(new ArrayList<>(), userRole, usuario -> {
             UsuarioDetalheFragment fragment = UsuarioDetalheFragment.newInstance(usuario);
-            
             if (getParentFragmentManager() != null) {
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainer, fragment)
@@ -84,7 +86,10 @@ public class UsuariosFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                adapter.filtrar(s.toString());
+                if (adapter != null && !isLoading) {
+                    int countResults = adapter.filtrar(s.toString());
+                    atualizarVisibilidade(countResults == 0);
+                }
             }
             @Override
             public void afterTextChanged(Editable s) {}
@@ -94,15 +99,18 @@ public class UsuariosFragment extends Fragment {
     private void sincronizarComApi() {
         if (getContext() == null) return;
         
+        showLoading(true);
         SharedPreferences prefs = getContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
-        // Usando o endpoint base /usuarios que costuma ser mais completo
         UserService.getClient().getUsuariosBase(token).enqueue(new Callback<ApiResponse<List<Usuario>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Usuario>>> call, Response<ApiResponse<List<Usuario>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
-                    adapter.atualizarLista(response.body().getDados());
+                    showLoading(false);
+                    List<Usuario> dados = response.body().getDados();
+                    adapter.atualizarLista(dados);
+                    atualizarVisibilidade(dados == null || dados.isEmpty());
                 } else {
                     tentarFallback(token);
                 }
@@ -119,16 +127,40 @@ public class UsuariosFragment extends Fragment {
         UserService.getClient().getUsuarios(token).enqueue(new Callback<ApiResponse<List<Usuario>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Usuario>>> call, Response<ApiResponse<List<Usuario>>> response) {
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
-                    adapter.atualizarLista(response.body().getDados());
+                    List<Usuario> dados = response.body().getDados();
+                    adapter.atualizarLista(dados);
+                    atualizarVisibilidade(dados == null || dados.isEmpty());
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<Usuario>>> call, Throwable t) {
+                showLoading(false);
                 if (getContext() != null)
                     Toast.makeText(getContext(), "Erro ao carregar usuários", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showLoading(boolean loading) {
+        this.isLoading = loading;
+        if (layoutLoading != null) {
+            layoutLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
+        }
+        if (loading) {
+            rvUsuarios.setVisibility(View.GONE);
+            layoutNoResults.setVisibility(View.GONE);
+        }
+    }
+
+    private void atualizarVisibilidade(boolean vazio) {
+        if (isLoading) {
+            if (layoutNoResults != null) layoutNoResults.setVisibility(View.GONE);
+            return;
+        }
+        if (rvUsuarios != null) rvUsuarios.setVisibility(vazio ? View.GONE : View.VISIBLE);
+        if (layoutNoResults != null) layoutNoResults.setVisibility(vazio ? View.VISIBLE : View.GONE);
     }
 }

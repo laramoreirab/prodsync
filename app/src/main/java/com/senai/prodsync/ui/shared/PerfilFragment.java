@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +42,8 @@ public class PerfilFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private TextView tvNome, tvId, tvEmail, tvCpf;
     private ImageView ivFoto;
+    private ProgressBar pbLoading;
+    private View layoutContent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,6 +60,9 @@ public class PerfilFragment extends Fragment {
         tvId = view.findViewById(R.id.tv_accountid_val);
         tvEmail = view.findViewById(R.id.tv_accountemail_val);
         tvCpf = view.findViewById(R.id.tv_accountcpf_val);
+        
+        pbLoading = view.findViewById(R.id.pb_loading_perfil);
+        layoutContent = view.findViewById(R.id.layout_perfil_content);
         
         switchTema = view.findViewById(R.id.switch_tema);
         btnSair = view.findViewById(R.id.btn_sair);
@@ -108,19 +114,25 @@ public class PerfilFragment extends Fragment {
     private void sincronizarDadosComServidor() {
         if (getContext() == null) return;
         
+        showLoading(true);
+        
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
         int currentId = prefs.getInt("id_usuario", -1);
 
-        if (currentId == -1) return;
+        if (currentId == -1) {
+            showLoading(false);
+            return;
+        }
 
-        // Chamada direta para buscar o usuário logado pelo ID (mais confiável e completo)
+        // Chamada direta para buscar o usuário logado pelo ID
         UserService.getClient().getUsuarioPorId(token, currentId).enqueue(new Callback<ApiResponse<Usuario>>() {
             @Override
             public void onResponse(Call<ApiResponse<Usuario>> call, Response<ApiResponse<Usuario>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getDados() != null) {
                     atualizarUI(response.body().getDados(), prefs);
                 }
+                showLoading(false);
             }
 
             @Override
@@ -143,10 +155,20 @@ public class PerfilFragment extends Fragment {
                         }
                     }
                 }
+                showLoading(false);
             }
             @Override
-            public void onFailure(Call<ApiResponse<List<Usuario>>> call, Throwable t) {}
+            public void onFailure(Call<ApiResponse<List<Usuario>>> call, Throwable t) {
+                showLoading(false);
+            }
         });
+    }
+
+    private void showLoading(boolean loading) {
+        if (pbLoading != null && layoutContent != null) {
+            pbLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
+            layoutContent.setVisibility(loading ? View.GONE : View.VISIBLE);
+        }
     }
 
     private void atualizarUI(Usuario u, SharedPreferences prefs) {

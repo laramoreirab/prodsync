@@ -36,7 +36,9 @@ public class OpsFragment extends Fragment {
     private OpAdapter adapter;
     private EditText etSearch;
     private View layoutNoResults;
+    private View layoutLoading;
     private String userRole;
+    private boolean isLoading = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +61,7 @@ public class OpsFragment extends Fragment {
         rvOps = view.findViewById(R.id.rv_ops);
         etSearch = view.findViewById(R.id.et_search);
         layoutNoResults = view.findViewById(R.id.layout_no_results);
+        layoutLoading = view.findViewById(R.id.layout_loading);
         TextView tvSetor = view.findViewById(R.id.tv_setor);
 
         if (tvSetor != null) {
@@ -86,7 +89,10 @@ public class OpsFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                adapter.filtrar(s.toString());
+                if (adapter != null && !isLoading) {
+                    int countResults = adapter.filtrar(s.toString());
+                    atualizarVisibilidade(countResults == 0);
+                }
             }
             @Override
             public void afterTextChanged(Editable s) {}
@@ -94,12 +100,16 @@ public class OpsFragment extends Fragment {
     }
 
     private void carregarOps() {
+        if (getContext() == null) return;
+        
+        showLoading(true);
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
 
         OPService.getClient().getOrdens(token).enqueue(new Callback<ApiResponse<List<OrdemProducao>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<OrdemProducao>>> call, Response<ApiResponse<List<OrdemProducao>>> response) {
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
                     List<OrdemProducao> ordens = response.body().getDados();
                     List<Op> listaUI = new ArrayList<>();
@@ -119,23 +129,37 @@ public class OpsFragment extends Fragment {
                             ));
                         }
                     }
-                    adapter = new OpAdapter(listaUI, userRole, op -> {
-                        OpDetalheFragment fragment = OpDetalheFragment.newInstance(
-                                op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(), op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(), op.getDataFinal());
-                        getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragmentContainer, fragment)
-                                .addToBackStack(null)
-                                .commit();
-                    });
-                    rvOps.setAdapter(adapter);
+                    adapter.atualizarLista(listaUI);
+                    atualizarVisibilidade(listaUI.isEmpty());
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<OrdemProducao>>> call, Throwable t) {
+                showLoading(false);
                 if (getContext() != null)
                     Toast.makeText(getContext(), "Erro ao carregar OPs", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showLoading(boolean loading) {
+        this.isLoading = loading;
+        if (layoutLoading != null) {
+            layoutLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
+        }
+        if (loading) {
+            rvOps.setVisibility(View.GONE);
+            layoutNoResults.setVisibility(View.GONE);
+        }
+    }
+
+    private void atualizarVisibilidade(boolean vazio) {
+        if (isLoading) {
+            if (layoutNoResults != null) layoutNoResults.setVisibility(View.GONE);
+            return;
+        }
+        if (rvOps != null) rvOps.setVisibility(vazio ? View.GONE : View.VISIBLE);
+        if (layoutNoResults != null) layoutNoResults.setVisibility(vazio ? View.VISIBLE : View.GONE);
     }
 }

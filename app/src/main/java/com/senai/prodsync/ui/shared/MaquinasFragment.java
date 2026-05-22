@@ -37,8 +37,10 @@ public class MaquinasFragment extends Fragment {
     private MaquinaAdapter adapter;
     private EditText etSearch;
     private View layoutNoResults;
+    private View layoutLoading;
     private String userRole;
     private View searchContainer, tvTitulo, tvSetor;
+    private boolean isLoading = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class MaquinasFragment extends Fragment {
         rvMaquinas = view.findViewById(R.id.rv_maquinas);
         etSearch = view.findViewById(R.id.et_search);
         layoutNoResults = view.findViewById(R.id.layout_no_results);
+        layoutLoading = view.findViewById(R.id.layout_loading);
         tvSetor = view.findViewById(R.id.tv_setor);
         searchContainer = view.findViewById(R.id.search_container);
         tvTitulo = view.findViewById(R.id.tv_titulo);
@@ -73,7 +76,6 @@ public class MaquinasFragment extends Fragment {
             tvSetor.setVisibility("adm".equalsIgnoreCase(userRole) ? View.VISIBLE : View.GONE);
         }
 
-        // Se for operador, oculta a interface de busca/lista enquanto carrega
         if ("operador".equalsIgnoreCase(userRole)) {
             if (searchContainer != null) searchContainer.setVisibility(View.GONE);
             if (tvTitulo != null) tvTitulo.setVisibility(View.GONE);
@@ -82,7 +84,6 @@ public class MaquinasFragment extends Fragment {
         }
 
         adapter = new MaquinaAdapter(new ArrayList<>(), userRole, maquina -> abrirDetalhe(maquina, true));
-
         rvMaquinas.setLayoutManager(new LinearLayoutManager(getContext()));
         rvMaquinas.setAdapter(adapter);
 
@@ -93,7 +94,10 @@ public class MaquinasFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (adapter != null) adapter.filtrar(s.toString());
+                if (adapter != null && !isLoading) {
+                    int resultsCount = adapter.filtrar(s.toString());
+                    atualizarVisibilidade(resultsCount == 0);
+                }
             }
             @Override
             public void afterTextChanged(Editable s) {}
@@ -102,6 +106,9 @@ public class MaquinasFragment extends Fragment {
 
     private void carregarMaquinas() {
         if (getContext() == null) return;
+        
+        showLoading(true);
+        
         SharedPreferences prefs = requireActivity().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         String token = "Bearer " + prefs.getString("token", "");
         int currentUserId = prefs.getInt("id_usuario", -1);
@@ -109,11 +116,10 @@ public class MaquinasFragment extends Fragment {
         MachineService.getClient().getMaquinas(token).enqueue(new Callback<ApiResponse<List<Machine>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Machine>>> call, Response<ApiResponse<List<Machine>>> response) {
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     List<Machine> machines = response.body().getDados();
                     if (machines != null) {
-                        
-                        // Fluxo especial para Operador: Tenta encontrar a máquina dele e abrir direto
                         if ("operador".equalsIgnoreCase(userRole)) {
                             for (Machine m : machines) {
                                 if (m.getIdOperador() != null && m.getIdOperador() == currentUserId) {
@@ -121,14 +127,11 @@ public class MaquinasFragment extends Fragment {
                                     return;
                                 }
                             }
-                            // Se não encontrou por ID, mas só tem uma máquina, abre ela (fallback)
                             if (machines.size() == 1) {
                                 Machine m = machines.get(0);
                                 abrirDetalhe(new Maquina(m.getNome(), m.getId(), m.getSerie(), m.getSetor(), m.getStatus(), m.getFotoUrl(), m.getDataAquisicao(), m.getCapacidade(), m.getNomeOperador()), false);
                                 return;
                             }
-                            
-                            // Se chegou aqui, é operador mas não achou máquina específica. Mostra a lista ou erro.
                             rvMaquinas.setVisibility(View.VISIBLE);
                             if (tvTitulo != null) tvTitulo.setVisibility(View.VISIBLE);
                         }
@@ -137,27 +140,39 @@ public class MaquinasFragment extends Fragment {
                         for (Machine m : machines) {
                             listaUI.add(new Maquina(m.getNome(), m.getId(), m.getSerie(), m.getSetor(), m.getStatus(), m.getFotoUrl(), m.getDataAquisicao(), m.getCapacidade(), m.getNomeOperador()));
                         }
-                        
-                        adapter = new MaquinaAdapter(listaUI, userRole, maquina -> abrirDetalhe(maquina, true));
-                        rvMaquinas.setAdapter(adapter);
-                        rvMaquinas.setVisibility(listaUI.isEmpty() ? View.GONE : View.VISIBLE);
-                        layoutNoResults.setVisibility(listaUI.isEmpty() ? View.VISIBLE : View.GONE);
-                    }
-                } else {
-                    Log.e("API_ERROR", "Status: " + response.code());
-                    if (response.code() == 403) {
-                        Toast.makeText(getContext(), "Acesso negado às máquinas (Verifique seu cargo)", Toast.LENGTH_LONG).show();
+                        adapter.atualizarLista(listaUI);
+                        atualizarVisibilidade(listaUI.isEmpty());
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<Machine>>> call, Throwable t) {
-                Log.e("API_ERROR", "Falha: " + t.getMessage());
+                showLoading(false);
                 if (getContext() != null)
                     Toast.makeText(getContext(), "Erro de conexão", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showLoading(boolean loading) {
+        this.isLoading = loading;
+        if (layoutLoading != null) {
+            layoutLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
+        }
+        if (loading) {
+            rvMaquinas.setVisibility(View.GONE);
+            layoutNoResults.setVisibility(View.GONE);
+        }
+    }
+
+    private void atualizarVisibilidade(boolean vazio) {
+        if (isLoading) {
+            layoutNoResults.setVisibility(View.GONE);
+            return;
+        }
+        rvMaquinas.setVisibility(vazio ? View.GONE : View.VISIBLE);
+        layoutNoResults.setVisibility(vazio ? View.VISIBLE : View.GONE);
     }
 
     private void abrirDetalhe(Maquina maquina, boolean addToBackStack) {
@@ -170,7 +185,6 @@ public class MaquinasFragment extends Fragment {
         if (addToBackStack) {
             transaction.addToBackStack(null);
         }
-        
         transaction.commit();
     }
 }

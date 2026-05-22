@@ -11,6 +11,14 @@
         android:layout_height="wrap_content"
         android:paddingBottom="32dp">
 
+        <!-- Grupo para controlar a visibilidade de todo o conteúdo -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_conteudo_detalhe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="tv_nome_maquina_detalhe,underline,iv_maquina_grande,layout_info,cv_oee" />
+
         <TextView
             android:id="@+id/tv_nome_maquina_detalhe"
             android:layout_width="wrap_content"
@@ -87,6 +95,7 @@
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cv_oee"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
@@ -169,5 +178,34 @@
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <!-- Container de Loading -->
+        <LinearLayout
+            android:id="@+id/layout_loading_detalhe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ProgressBar
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:indeterminateTint="@color/azul_marinho" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/montserrat_semibold"
+                android:text="Sincronizando detalhes da máquina..."
+                android:textColor="@color/azul_marinho"
+                android:textSize="16sp" />
+        </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
