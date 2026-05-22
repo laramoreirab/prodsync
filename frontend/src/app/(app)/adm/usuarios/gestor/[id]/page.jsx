@@ -1,8 +1,7 @@
 "use client"
 
 import { use } from "react";
-import { Pencil, Trash2, ChevronDown } from "lucide-react";
-import Link from "next/link";
+import { Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
@@ -15,7 +14,7 @@ import { SetorMaquinaStatusWidget } from "@/features/setores/SetorMaquinaStatusW
 import { SetorMotivosParadaWidget } from "@/features/setores/SetorMotivosParadaWidget";
 import { SetorProducaoSemanalWidget } from "@/features/setores/SetorProducaoSemanalWidget";
 import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaquinaWidget";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 import Link from "next/link";
 import { ChevronDown, Loader2 } from "lucide-react";
