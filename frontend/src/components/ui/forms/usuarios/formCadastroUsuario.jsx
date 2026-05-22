@@ -152,7 +152,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
             carregarMaquinas();
         }, [formData.id_setor]);
 
-    const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
+    const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block dark:text-slate-300";
     const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
 
     return (
@@ -296,7 +296,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <select
                             id="id_setor"
                             onChange={handleInputChange}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
                             required
                         >
                             <option value="">Selecione...</option>
@@ -320,7 +320,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <label htmlFor="funcao" className={labelStyle}>Função</label>
                         <select
                             id="funcao"
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
                             onChange={handleInputChange}
                             required
                         >
@@ -335,7 +335,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <select
                             id="id_turno"
                             onChange={handleInputChange}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
                             disable={!formData.id_setor}
                             required
                         >

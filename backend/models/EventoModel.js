@@ -267,6 +267,8 @@ class EventoModel {
                 throw new Error('Nenhum turno ativo encontrado para o horario informado');
             }
 
+            //fazer um if se o status for produzindo mudar status da op vinculada a máquina para em_andamento, se vier setup ou parada buscar a op ativa e setar status
+
             // busca a ordem de produção ativa da máquina
             const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
 

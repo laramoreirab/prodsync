@@ -61,7 +61,7 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
 
             <form onSubmit={handleSubmitMotivo} className="px-2 flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                    <label className="text-lg font-semibold text-black">Descrição</label>
+                    <label className="text-lg font-semibold text-black dark:text-white">Descrição</label>
                     <input
                         required
                         type="text"
@@ -72,7 +72,7 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                    <label className="text-lg font-semibold text-black">Tipo</label>
+                    <label className="text-lg font-semibold text-black dark:text-white">Tipo</label>
                     <select
                         value={tipo}
                         onChange={(e) => setTipo(e.target.value)}
