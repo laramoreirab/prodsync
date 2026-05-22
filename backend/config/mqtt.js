@@ -1,5 +1,5 @@
 import mqtt from 'mqtt';
-import EventoModel  from '../models/EventoModel.js';
+import EventoModel from '../models/EventoModel.js';
 
 // Conexão via WebSockets seguros para não travar na escola e rodar direto no Render
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
