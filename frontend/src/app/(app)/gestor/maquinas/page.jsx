@@ -167,7 +167,7 @@ export default function MaquinasGestor() {
       </FadeUpItem>
 
       {/* LISTAGEM MAQUINAS */}
-      <SectionDivider title="Listagem" className="mt-8" />
+      <SectionDivider title="Inventário de Máquinas" className="mt-8" />
 
       {/* Busca */}
       <SearchBar

@@ -2,7 +2,7 @@ export const oeeSetorConfig = {
   oee: {
     key: "oee:",
     label: "OEE Médio",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
 
@@ -16,35 +16,35 @@ export const refugoSetorConfig = {
 export const setorOEEEvolucaoConfig = {
   oee: {
     label: "OEE (%):",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
  
 export const setorTopOperadoresConfig = {
   qtd: {
     label: "Peças produzidas:",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
  
 export const setorMotivosParadaConfig = {
   qtd: {
     label: "Ocorrências:",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
 
 export const setorProducaoSemanalConfig = {
   qtd: {
     label: "Produção Semanal:",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
 
 export const setorProducaoMaquinaConfig = {
   qtd: {
     label: "Peças produzidas:",
-    color: "#00357a",
+    color: "var(--chart1)",
   },
 };
 

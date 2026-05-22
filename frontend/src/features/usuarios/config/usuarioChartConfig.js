@@ -1,10 +1,10 @@
 export const qtdUsuariosPerfilConfig = {
-  gestores:   { label: "Gestores:",   color: "#00357a" },
+  gestores:   { label: "Gestores:",   color: "var(--chart1)" },
   operadores: { label: "Operadores:", color: "#212e4b" },
 };
 
 export const qtdUsuariosSetorConfig = {
-  qtd: { label: "Usuários:", color: "#7d95c6" },
+  qtd: { label: "Usuários:", color: "var(--chart2)" },
 };
 
 export const topOperadoresConfig = {
@@ -15,16 +15,16 @@ export const tempoSessaoConfig = {
 };
 
 export const rotatividadeConfig = {
-  novos:      { label: "Novos:",      color: "#00357a" },
-  desligados: { label: "Desligados:", color: "#212e4b" },
+  novos:      { label: "Novos:",      color: "var(--chart1)" },
+  desligados: { label: "Desligados:", color: "var(--chart4)" },
 };
 
 export const cumprimentoMetaConfig = {
-  media: { label: "Máquinas/usuário:", color: "#00357a" },
+  media: { label: "Máquinas/usuário:", color: "var(--chart1)" },
 };
 
 export const producaoMediaConfig = {
-  media: { label: "Peças/dia:", color: "#4a7ff7" },
+  media: { label: "Peças/dia:", color: "var(--chart-primary)" },
 };
 
 export const turnosOperadoresConfig = {

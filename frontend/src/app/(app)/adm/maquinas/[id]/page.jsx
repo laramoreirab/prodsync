@@ -401,7 +401,7 @@ export default function MaquinaDetalhePage({ params }) {
           actions={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[#122f60] cursor-pointer">
+                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -409,7 +409,7 @@ export default function MaquinaDetalhePage({ params }) {
                 </DialogContent>
               </Dialog>
               <Dialog>
-                <DialogTrigger className="text-[#b30000] cursor-pointer">
+                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -448,7 +448,7 @@ export default function MaquinaDetalhePage({ params }) {
         {/* Listagem de Eventos */}
         <DetailListingSection
           id="listagem_eventos"
-          title="Eventos da Máquina"
+          title="Histórico de Eventos da Máquina"
           action={
             <Dialog>
               <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-lg gap-2">

@@ -1,16 +1,17 @@
 // Status Operacional (DonutChart/PieChart)
 export const maquinaStatusConfig = {
-  produzindo:  { label: "Máquinas ativas:",     color: "#004aad" },
-  parada: { label: "Máquinas paradas:",    color: "#00357a" },
-  setup:  { label: "Máquinas Setup:",       color:"#7d95c6" },
-  manutencao:  { label: "Máquinas em manutenção:",       color: "#122f60" },
+  produzindo:  { label: "Máquinas ativas:",     color: "var(--chart1)" },
+  parada: { label: "Máquinas paradas:",    color: "var(--chart2)" },
+  setup:  { label: "Máquinas Setup:",       color:"var(--chart3)" },
+  manutencao:  { label: "Máquinas em manutenção:",       color: "var(--chart4)" },
+  
 };
 
 // Quantidade de máquinas por setor (BarHorizontal)
 export const qtdMaquinasPorSetorConfig = {
   quantidade: {
     label: "Qtd. Máquinas:",
-    color: "#7d95c6",
+    color: "var(--chart2)",
   },
 };
 
@@ -18,27 +19,27 @@ export const qtdMaquinasPorSetorConfig = {
 export const tempoMedioParadaConfig = {
   minutos: {
     label: "Minutos",
-    color: "#7d95c6",
+    color: "var(--chart2)",
   },
 };
 
 // Produção vs Defeito por setor (BarStackedHorizontal)
 export const producaoDefeitosConfig = {
-  produzidas: { label: "Produzidas:",  color: "#00357a" },
-  defeito:    { label: "Com Defeito:", color: "#7d95c6" },
+  produzidas: { label: "Produzidas:",  color: "var(--chart1" },
+  defeito:    { label: "Com Defeito:", color: "var(--chart2)" },
 };
 
 // Status por turno (BarStackedVertical)
 export const maquinasTurnoConfig = {
-  ativas:     { label: "Ativas:",        color: "#004aad" },
-  paradas:    { label: "Paradas:",       color: "#7d95c6" },
-  manutencao: { label: "Setup:", color: "#122f60" },
+  ativas:     { label: "Ativas:",        color: "var(--chart1)" },
+  paradas:    { label: "Paradas:",       color: "var(--chart2)" },
+  manutencao: { label: "Setup:", color: "var(--pencil)" },
 };
 
 // Produção total (AreaChart)
 export const producaoTotalConfig = {
   total: {
     label: "Peças produzidas:",
-    color: "var(--color-grafico-area)",
+    color: "var(--chart1)",
   },
 };
