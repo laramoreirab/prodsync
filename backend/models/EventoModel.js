@@ -327,7 +327,7 @@ class EventoModel {
                     id_maquina,
                     id_ordemProducao: ordemProducaoId,
                     id_turno: turno.id_turno,
-                    status_atual: status_maquina,
+                    status_atual: capitalizar(status_maquina),
                     setor_afetado: maquina.id_setor ?? 0,
                     inicio,
                     observacao: ''
@@ -342,6 +342,10 @@ class EventoModel {
 
     static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, maquinas, inicio, fim, id_motivo_parada, observacao = null) {
         try {
+            function capitalizar(texto) {
+                if (!texto) return '';
+                return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+            }
             const inicioConvertido = this.converterTimestamp(inicio)
             const fimConvertido = this.converterTimestamp(fim)
             const duracao = this.calcularDuracao(inicio, fim)
@@ -385,7 +389,7 @@ class EventoModel {
                     id_maquina,
                     id_ordemProducao: ordem?.id_ordem ?? null,
                     id_turno: turno.id_turno,
-                    status_atual: status_maquina,
+                    status_atual: capitalizar(status_maquina),
                     setor_afetado: Number.isInteger(setorNumerico)
                         ? setorNumerico
                         : (setorPorMaquina.get(id_maquina) ?? 0),
