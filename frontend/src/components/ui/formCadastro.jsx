@@ -8,6 +8,7 @@ import SuccessCard from "@/components/ui/modalCadastro";
 import { cadastroService } from "@/services/cadastroService";
 import { ZodError } from "zod";
 import { useRouter } from "next/navigation";
+import { setAuthToken } from "@/lib/auth";
 
 import { Eye, EyeOff, CheckCircle2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -45,7 +46,7 @@ export default function RegisterForm() {
     try {
       const data = await cadastroService.cadastrar(form);
       if (data.dados.token) {
-        localStorage.setItem("token", data.dados.token);
+        setAuthToken(data.dados.token, true);
         setOpen(true);
       } else {
         // Caso o backend retorne 200 mas sem token por algum motivo

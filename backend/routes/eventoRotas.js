@@ -15,8 +15,7 @@ router.get('/motivos-parada', MotivoParadaController.listarMotivosEmpresa);
 router.get('/justificadas', aplicarEscopoGestor, paginacaoMiddleware, EventoController.listarJustificadas);
 router.get('/nao-justificadas', aplicarEscopoGestor, paginacaoMiddleware, EventoController.listarNaoJustificadas);
 router.post('/sistema', validarBodySetorGestor('setor_afetado'), autorizarMaquinasBody('maquinas'), EventoController.registrarEventoSistema);
-router.post('/maquina', autorizarMaquinaParam('id_maquina'), EventoController.registrarEventoMaquina);
-router.post('/justificar', autorizarEventoParam('id'), EventoController.justificarEvento);
+router.post('/justificar', autorizarEventoParam('id_evento'), EventoController.justificarEvento);
 router.post('/:id/justificar', autorizarEventoParam('id'), EventoController.justificarEvento);
 router.put('/:id', autorizarEventoParam('id'), validarBodySetorGestor('setor_afetado'), EventoController.atualizarEvento);
 

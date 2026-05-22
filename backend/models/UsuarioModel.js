@@ -240,14 +240,51 @@ class UsuarioModel {
         }
     }
 
+    static async obterPerfil(id_usuario, id_empresa, tipo) {
+        try {
+            if (tipo === 'Adm') {
+                const resultado = await prisma.empresas.findFirst({
+                    where: {
+                        id_empresa: Number(id_empresa),
+                    },
+                    include: {
+                        usuarios: {
+                            where: {
+                                id_usuario: Number(id_usuario) 
+                            },
+                            select: {
+                                id_usuario: true
+                            }
+
+                        }
+                    }
+                });
+
+                return resultado
+            }
+            if (tipo === 'Gestor' || tipo === 'Operador') {
+                const resultado = await prisma.usuarios.findFirst({
+                    where: {
+                        id_empresa: Number(id_empresa),
+                        id_usuario: Number(id_usuario)
+                    }
+                })
+                return resultado
+            }
+        } catch (error) {
+            console.error('Erro ao obter perfil do usuário:', error);
+            throw error;
+        }
+    }
+
     //verificar se o id ainda não possui senha cadastrada
-        static async verificaSenhaUsuario(id) {
+    static async verificaSenhaUsuario(id) {
         try {
             const usuarioSenha = await prisma.usuarios.findUnique({
                 where: { id_usuario: Number(id) },
                 select: { senha: true }
             });
-    
+
             return !!(usuarioSenha?.senha && usuarioSenha.senha.trim() !== "");
         } catch (error) {
             console.error('Erro ao verificar se o ID possui senha cadastrada:', error);
@@ -397,41 +434,41 @@ class UsuarioModel {
     }
 
     static async qtdPorSetor(id_empresa) {
-    try {
-        const qtdOperadores = await prisma.escalaTrabalho.groupBy({
-            by: ['id_setor'],
-            where: { id_empresa },
-            _count: { id_operador: true }
-        })
+        try {
+            const qtdOperadores = await prisma.escalaTrabalho.groupBy({
+                by: ['id_setor'],
+                where: { id_empresa },
+                _count: { id_operador: true }
+            })
 
-        const qtdGestores = await prisma.setor_Gestor.groupBy({
-            by: ['id_setor'],
-            where: { id_empresa },
-            _count: { id_gestor: true }
-        })
+            const qtdGestores = await prisma.setor_Gestor.groupBy({
+                by: ['id_setor'],
+                where: { id_empresa },
+                _count: { id_gestor: true }
+            })
 
-        // 1. Buscamos os setores primeiro para ter a lista real de setores e seus nomes
-        const setores = await prisma.setores.findMany({
-            where: { id_empresa },
-            select: { id_setor: true, nome_setor: true }
-        })
+            // 1. Buscamos os setores primeiro para ter a lista real de setores e seus nomes
+            const setores = await prisma.setores.findMany({
+                where: { id_empresa },
+                select: { id_setor: true, nome_setor: true }
+            })
 
-        // 2. Criamos mapas para busca rápida (O(1)) dos contadores
-        const mapOperadores = Object.fromEntries(qtdOperadores.map(o => [o.id_setor, o._count.id_operador]))
-        const mapGestores = Object.fromEntries(qtdGestores.map(g => [g.id_setor, g._count.id_gestor]))
+            // 2. Criamos mapas para busca rápida (O(1)) dos contadores
+            const mapOperadores = Object.fromEntries(qtdOperadores.map(o => [o.id_setor, o._count.id_operador]))
+            const mapGestores = Object.fromEntries(qtdGestores.map(g => [g.id_setor, g._count.id_gestor]))
 
-        // 3. Montamos o resultado final baseando-se nos setores reais da empresa
-        const resultado = setores.map(setor => {
-            const totalOperadores = mapOperadores[setor.id_setor] || 0;
-            const totalGestores = mapGestores[setor.id_setor] || 0;
+            // 3. Montamos o resultado final baseando-se nos setores reais da empresa
+            const resultado = setores.map(setor => {
+                const totalOperadores = mapOperadores[setor.id_setor] || 0;
+                const totalGestores = mapGestores[setor.id_setor] || 0;
 
-            return {
-                setor: setor.nome_setor,
-                qtd: totalGestores + totalOperadores
-            }
-        })
+                return {
+                    setor: setor.nome_setor,
+                    qtd: totalGestores + totalOperadores
+                }
+            })
 
-        return resultado.sort((a, b) => b.qtd - a.qtd)
+            return resultado.sort((a, b) => b.qtd - a.qtd)
 
         } catch (error) {
             console.error('Erro ao contar quantidade de usuários por setor no banco de dados:', error);
@@ -470,58 +507,58 @@ class UsuarioModel {
     }
 
     static async producaoMediaPorDiaSetor(id_empresa, setorId = null) {
-    try {
-        const setores = await prisma.setores.findMany({
-            where: { 
-                id_empresa: Number(id_empresa), // Proteção de tipo para o Prisma
-                ...(setorId ? { id_setor: Number(setorId) } : {})
-            },
-            select: {
-                id_setor: true,
-                nome_setor: true,
-                maquinas: {
-                    select: {
-                        apontamentos: {
-                            select: {
-                                data_hora_inicio: true,
-                                qtd_boa: true
+        try {
+            const setores = await prisma.setores.findMany({
+                where: {
+                    id_empresa: Number(id_empresa), // Proteção de tipo para o Prisma
+                    ...(setorId ? { id_setor: Number(setorId) } : {})
+                },
+                select: {
+                    id_setor: true,
+                    nome_setor: true,
+                    maquinas: {
+                        select: {
+                            apontamentos: {
+                                select: {
+                                    data_hora_inicio: true,
+                                    qtd_boa: true
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-
-        const resultado = setores.map(s => {
-            const nomeSetor = s.nome_setor;
-            const apontamentos = s.maquinas.flatMap(m => m.apontamentos);
-
-            const porDia = {};
-            apontamentos.forEach(ap => {
-                // Extrai apenas a data (YYYY-MM-DD)
-                const dia = ap.data_hora_inicio.toISOString().split('T')[0];
-                porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa;
             });
 
-            const valores = Object.values(porDia);
-            const mediaDiaria = valores.length > 0
-                ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
-                : 0;
+            const resultado = setores.map(s => {
+                const nomeSetor = s.nome_setor;
+                const apontamentos = s.maquinas.flatMap(m => m.apontamentos);
 
-            return { 
-                setor: nomeSetor, 
-                media: mediaDiaria 
-            };
-        });
+                const porDia = {};
+                apontamentos.forEach(ap => {
+                    // Extrai apenas a data (YYYY-MM-DD)
+                    const dia = ap.data_hora_inicio.toISOString().split('T')[0];
+                    porDia[dia] = (porDia[dia] || 0) + ap.qtd_boa;
+                });
 
-        // Ordena do setor com maior média para o menor
-        return resultado.sort((a, b) => b.media - a.media);
+                const valores = Object.values(porDia);
+                const mediaDiaria = valores.length > 0
+                    ? Math.round(valores.reduce((a, b) => a + b, 0) / valores.length)
+                    : 0;
 
-    } catch (error) {
-        console.error('Erro ao calcular produção média por setor:', error);
-        throw error;
+                return {
+                    setor: nomeSetor,
+                    media: mediaDiaria
+                };
+            });
+
+            // Ordena do setor com maior média para o menor
+            return resultado.sort((a, b) => b.media - a.media);
+
+        } catch (error) {
+            console.error('Erro ao calcular produção média por setor:', error);
+            throw error;
+        }
     }
-}
 
     static async rotatividade(id_empresa, setorId = null) {
         try {

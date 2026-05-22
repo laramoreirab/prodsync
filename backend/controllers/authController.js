@@ -18,7 +18,7 @@ class AuthController {
     //POST api/auth/login - Fazer login
     static async login(req, res) {
         try {
-            const { id, senha } = req.body;
+            const { id, senha, lembrarDeMim = false } = req.body;
 
             console.log('Requisição chegando até aqui com o id:', id)
 
@@ -63,7 +63,7 @@ class AuthController {
             //gerar token
             const token = jwt.sign(dadosToken,
                 JWT_CONFIG.secret,
-                { expiresIn: JWT_CONFIG.expiresIn }
+                { expiresIn: lembrarDeMim ? JWT_CONFIG.rememberExpiresIn : JWT_CONFIG.expiresIn }
             );
 
 
@@ -292,7 +292,7 @@ class AuthController {
     //GET api/auth/perfil - Obter perfil do usuário logado
     static async obterPerfil(req, res) {
         try {
-            const usuario = await UsuarioModel.buscarPorId(req.user.id_usuario, req.user.id_empresa);
+            const usuario = await UsuarioModel.obterPerfil(req.user.id_usuario, req.user.id_empresa, req.user.tipo);
 
             if (!usuario) {
                 return res.status(404).json({

@@ -12,7 +12,10 @@ export function QtdUsuariosWidget() {
    if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
-    const operadores = data.find((item) => item.name.toLowerCase() === "operadores")?.value ?? 0;
+    const operadores = data.find((item) => {
+      const name = item.name?.toLowerCase();
+      return name === "operador" || name === "operadores";
+    })?.value ?? 0;
   return (
     <div className="h-full">
       <KPI title="Quantidade de operadores" value={operadores} />

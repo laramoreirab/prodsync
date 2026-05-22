@@ -78,47 +78,6 @@ class EventoController {
         }
     }
 
-    static async registrarEventoMaquina(req, res) {
-        try {
-            const id_empresa = req.user.id_empresa;
-            const id_maquina = Number(req.body.id_maquina);
-            const status_maquina = req.body.status
-
-            if (!status_maquina || String(status_maquina).trim() === '') {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'Status da maquina e obrigatorio'
-                });
-            }
-
-            if (!Number.isInteger(id_maquina) || id_maquina <= 0) {
-                return res.status(400).json({
-                    sucesso: false,
-                    erro: 'ID da maquina invalido'
-                });
-            }
-
-            const evento = await EventoModel.registrarEventoMaquina(
-                id_empresa,
-                status_maquina,
-                id_maquina,
-                new Date()
-            );
-
-            return res.status(201).json({
-                sucesso: true,
-                mensagem: 'Evento registrado com sucesso',
-                dados: evento
-            });
-        } catch (error) {
-            console.error('Erro ao registrar evento:', error);
-            return res.status(500).json({
-                sucesso: false,
-                erro: 'Erro interno do servidor',
-                mensagem: 'Nao foi possivel registrar o evento'
-            });
-        }
-    }
 
     static async registrarEventoSistema(req, res) {
         try {
@@ -204,30 +163,80 @@ class EventoController {
     static async justificarEvento(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
-            const id_evento = Number(req.params.id ?? req.body.id_evento);
+            const id_evento = Number(req.params.id ?? req.params.id_evento ?? req.body.id_evento);
             const id_motivo_parada = Number(req.body.id_motivo_parada);
             const { observacao } = req.body;
 
             if (!Number.isInteger(id_evento) || id_evento <= 0) {
-                return res.status(400).json({ sucesso: false, erro: 'ID do evento invalido' });
+                return res.status(400).json({ sucesso: false, erro: 'ID do evento inválido' });
             }
 
             if (!Number.isInteger(id_motivo_parada) || id_motivo_parada <= 0) {
                 return res.status(400).json({
                     sucesso: false,
-                    erro: 'O motivo da parada e obrigatorio para registrar justificativa'
+                    erro: 'O motivo da parada é obrigatório para registrar a justificativa'
                 });
             }
 
-            const possuiJustificativa = await EventoModel.verificaJustificativa(id_empresa, id_evento);
-            if (possuiJustificativa) {
+            const eventoRef = await prisma.historico_Eventos.findFirst({
+                where: { id_empresa, id_evento },
+                select: { id_maquina: true, id_motivo_parada: true }
+            });
+
+            if (!eventoRef) {
+                return res.status(404).json({
+                    sucesso: false,
+                    erro: 'Evento não encontrado'
+                });
+            }
+
+            let id_maquina = Number(req.body.id_maquina);
+            if (!Number.isInteger(id_maquina) || id_maquina <= 0) {
+                id_maquina = eventoRef.id_maquina;
+            }
+
+            if (id_maquina !== eventoRef.id_maquina) {
                 return res.status(400).json({
                     sucesso: false,
-                    erro: 'O evento ja possui justificativa'
+                    erro: 'A máquina informada não corresponde ao evento'
                 });
             }
 
-            const dados = await EventoModel.justificar(id_empresa, id_evento, id_motivo_parada, observacao);
+            if (req.user.tipo === 'Operador') {
+                const id_maquinaOperador = await EventoModel.obterMaquinaOperador(
+                    id_empresa,
+                    req.user.id_usuario
+                );
+
+                if (!id_maquinaOperador) {
+                    return res.status(403).json({
+                        sucesso: false,
+                        erro: 'Operador sem máquina vinculada na escala de trabalho'
+                    });
+                }
+
+                if (id_maquina !== id_maquinaOperador) {
+                    return res.status(403).json({
+                        sucesso: false,
+                        erro: 'Sem permissão para justificar eventos de outra máquina'
+                    });
+                }
+            }
+
+            if (eventoRef.id_motivo_parada) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'O evento já possui justificativa'
+                });
+            }
+
+            const dados = await EventoModel.justificar(
+                id_empresa,
+                id_maquina,
+                id_evento,
+                id_motivo_parada,
+                observacao
+            );
 
             return res.status(201).json({
                 sucesso: true,
@@ -239,7 +248,7 @@ class EventoController {
             return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Nao foi possivel registrar a justificativa do evento'
+                mensagem: 'Não foi possível registrar a justificativa do evento'
             });
         }
     }
