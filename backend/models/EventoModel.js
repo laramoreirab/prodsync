@@ -257,6 +257,10 @@ class EventoModel {
 
     static async registrarEventoMaquina(id_empresa, status_maquina, id_maquina, datastamp) {
         try {
+            function capitalizar(texto) {
+                if (!texto) return '';
+                return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+            }
             const inicio = this.converterTimestamp(datastamp);
             let status_op = null
             let prioridade = null
@@ -282,18 +286,18 @@ class EventoModel {
             }
 
             //fazer um if se o status for produzindo mudar status da op vinculada a máquina para em_andamento, se vier setup ou parada buscar a op ativa e setar status
-            switch (status_maquina.toUpperCase()) {
-                case 'PRODUZINDO':
+            switch (capitalizar(status_maquina)) {
+                case 'Produzindo':
                     status_op = 'Em_Andamento'
                     prioridade = 'Media'
                     break;
 
-                case 'SETUP':
+                case 'Setup':
                     status_op = 'Setup'
                     prioridade = 'Alta'
 
                     break;
-                case 'PARADA':
+                case 'Parada':
                     status_op = 'Parada'
                     prioridade = 'Critica'
                     break;
@@ -313,7 +317,7 @@ class EventoModel {
                         prioridade: prioridade
                     }
                 });
-            } else if (status_maquina.toUpperCase() === 'PRODUZINDO' && !ordemProducaoId) {
+            } else if (capitalizar(status_maquina) === 'Produzindo' && !ordemProducaoId) {
                 console.warn(`[ALERTA] Máquina ${id_maquina} está PRODUZINDO, mas nenhuma OP ativa foi encontrada no sistema!`);
             }
 
@@ -475,16 +479,16 @@ class EventoModel {
             let status_op = null
             let prioridade = null
 
-        if (
-            observacao &&
-            (observacao.toLowerCase().includes('finalizada') ||
-                observacao.toLowerCase().includes('terminada'))
-        ) {
-            status_op = 'Finalizada';
-            prioridade = 'Baixa';
-        }
+            if (
+                observacao &&
+                (observacao.toLowerCase().includes('finalizada') ||
+                    observacao.toLowerCase().includes('terminada'))
+            ) {
+                status_op = 'Finalizada';
+                prioridade = 'Baixa';
+            }
 
-        const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
+            const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(id_maquina);
 
             if (ordemProducaoId && status_op) {
                 await prisma.ordemProducao.update({
