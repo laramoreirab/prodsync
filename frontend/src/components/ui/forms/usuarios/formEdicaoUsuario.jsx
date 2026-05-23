@@ -11,6 +11,7 @@ import { usuariosCrudService } from '@/services/usuariosCrudService'; // Importa
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
+import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
@@ -123,8 +124,9 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         e.preventDefault();
 
         const payload = new FormData();
+        const cpfLimpo = formData.cpf.replace(/\D/g, '');
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpf);
+        payload.append('cpf', formData.cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
@@ -268,6 +270,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
+                            mascara={mascaraCPF}
                             required />
                     </div>
                     <div>

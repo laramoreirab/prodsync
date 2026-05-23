@@ -6,6 +6,7 @@ import { File, Upload, ChevronDown, Pencil, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
+import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);

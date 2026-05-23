@@ -12,7 +12,6 @@ import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
-import { mascaraCPF } from '@/utils/mascaras';
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -25,19 +24,19 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [listaMaquinas, setListaMaquinas] = useState([])
 
     useEffect(() => {
-            async function carregarSetores() {
-                try {
-                    const dados = await setorCrudService.getAll();
-                    setListaSetores(dados.dados);
-                } catch (error) {
-                    console.log(error)
-                    toast.error("Erro ao carregar setores.");
-                }
-    
+        async function carregarSetores() {
+            try {
+                const dados = await setorCrudService.getAll();
+                setListaSetores(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar setores.");
             }
-    
-            carregarSetores();
-        }, []);
+
+        }
+
+        carregarSetores();
+    }, []);
 
 
     const estadoInicialForm = {
@@ -81,6 +80,26 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
+    const mascaraCPF = (valor) => {
+        return valor
+            .replace(/\D/g, "") // Remove tudo o que não é número
+            .replace(/(\d{3})(\d)/, "$1.$2") // Coloca o primeiro ponto
+            .replace(/(\d{3})(\d)/, "$1.$2") // Coloca o segundo ponto
+            .replace(/(\d{3})(\d{1,2})$/, "$1-$2") // Coloca o traço
+            .substring(0, 14); // Garante que não passe de 14 caracteres
+    };
+
+    // A função que vai rodar quando o usuário digitar:
+    const handleCpfChange = (e) => {
+        const valorMascarado = mascaraCPF(e.target.value);
+
+        // Atualiza o seu estado do formData com o valor já formatado
+        setFormData({
+            ...formData,
+            cpf: valorMascarado
+        });
+    };
+
     const handleSubmitIndividual = async (e) => {
         e.preventDefault();
 
@@ -120,37 +139,37 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         //integrar endpoint de cadastro em lote quando o backend disponibilizar
     };
 
-     useEffect(() => {
-            async function carregarTurnos() {
-                try {
-                    const options = { method : "GET"}
-                    const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`,options)
-                    setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
-                } catch (error) {
-                    console.log(error)
-                    toast.error("Erro ao carregar turnos.");
-                }
-    
+    useEffect(() => {
+        async function carregarTurnos() {
+            try {
+                const options = { method: "GET" }
+                const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
+                setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar turnos.");
             }
-    
-            carregarTurnos();
-        }, [formData.id_setor]);
 
-        useEffect(() => {
-            async function carregarMaquinas() {
-                try {
-                    const options = { method : "GET"}
-                    const dados = await apiFetch(`/api/maquinas/setor/${formData.id_setor}`,options)
-                    setListaMaquinas(dados.dados);
-                } catch (error) {
-                    console.log(error)
-                    toast.error("Erro ao carregar setores.");
-                }
-    
+        }
+
+        carregarTurnos();
+    }, [formData.id_setor]);
+
+    useEffect(() => {
+        async function carregarMaquinas() {
+            try {
+                const options = { method: "GET" }
+                const dados = await apiFetch(`/api/maquinas/setor/${formData.id_setor}`, options)
+                setListaMaquinas(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar setores.");
             }
-    
-            carregarMaquinas();
-        }, [formData.id_setor]);
+
+        }
+
+        carregarMaquinas();
+    }, [formData.id_setor]);
 
     const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block dark:text-slate-300";
     const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
@@ -276,10 +295,9 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <label htmlFor="cpf" className={labelStyle}>CPF</label>
                         <input
                             id="cpf"
-                            onChange={handleInputChange}
+                            onChange={handleCpfChange}
                             type="text"
                             className={inputStyle}
-                            mascara = {mascaraCPF}
                             required />
                     </div>
                     <div>
@@ -300,17 +318,17 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             required
                         >
                             <option value="">Selecione...</option>
-                                 {listaSetores.map((setor) => (
+                            {listaSetores.map((setor) => (
 
-                                    <option
-                                        key={setor.id_setor}
-                                        value={setor.id_setor}
-                                    >
-                                        {setor.nome_setor}
-                                    </option>
+                                <option
+                                    key={setor.id_setor}
+                                    value={setor.id_setor}
+                                >
+                                    {setor.nome_setor}
+                                </option>
 
-                                ))}
-                            </select>
+                            ))}
+                        </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
@@ -339,18 +357,18 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             disable={!formData.id_setor}
                             required
                         >
-                              <option value="">Selecione...</option>
-                                 {listaTurnos.map((turno) => (
+                            <option value="">Selecione...</option>
+                            {listaTurnos.map((turno) => (
 
-                                    <option
-                                        key={turno.id_turno}
-                                        value={turno.id_turno}
-                                    >
-                                        {turno.nome_turno}
-                                    </option>
+                                <option
+                                    key={turno.id_turno}
+                                    value={turno.id_turno}
+                                >
+                                    {turno.nome_turno}
+                                </option>
 
-                                ))}
-                            </select>
+                            ))}
+                        </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
@@ -366,18 +384,18 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             disable={!formData.id_setor}
                             required
                         >
-                             <option value="">Selecione...</option>
-                                 {listaMaquinas.map((maquina) => (
+                            <option value="">Selecione...</option>
+                            {listaMaquinas.map((maquina) => (
 
-                                    <option
-                                        key={maquina.id_maquina}
-                                        value={maquina.id_maquina}
-                                    >
-                                        {maquina.nome}
-                                    </option>
+                                <option
+                                    key={maquina.id_maquina}
+                                    value={maquina.id_maquina}
+                                >
+                                    {maquina.nome}
+                                </option>
 
-                                ))}
-                            </select>
+                            ))}
+                        </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}
