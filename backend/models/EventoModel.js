@@ -271,7 +271,8 @@ class EventoModel {
             if(eventoAberto){
                 console.warn(`[AVISO] Máquina ${id_maquina} já possui um evento aberto de ${eventoAberto.status_atual} desde ${eventoAberto.inicio}. É necessário justificar este evento antes de registrar um novo status.`)
                 return `[AVISO] Máquina ${id_maquina} já possui um evento aberto de ${eventoAberto.status_atual} desde ${eventoAberto.inicio}. É necessário justificar este evento antes de registrar um novo status.`
-            }
+                break;
+            }else{
             function capitalizar(texto) {
                 if (!texto) return '';
                 return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
@@ -357,6 +358,7 @@ class EventoModel {
                 }
             });
             return this.formatarEvento(resultado);
+        }
         } catch (error) {
             console.error('Erro registrar evento da maquina no banco de dados:', error);
             throw error;
