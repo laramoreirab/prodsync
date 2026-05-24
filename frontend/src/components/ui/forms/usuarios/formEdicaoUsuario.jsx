@@ -118,6 +118,16 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
         carregarSetores();
     }, []);
+      // A função que vai rodar quando o usuário digitar:
+    const handleCpfChange = (e) => {
+        const valorMascarado = mascaraCPF(e.target.value);
+
+        // Atualiza o seu estado do formData com o valor já formatado
+        setFormData({
+            ...formData,
+            cpf: valorMascarado
+        });
+    };
 
     // Função que lida com o envio do form usando FormData
     const handleSubmitIndividual = async (e) => {
@@ -126,7 +136,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         const payload = new FormData();
         const cpfLimpo = formData.cpf.replace(/\D/g, '');
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpfLimpo);
+        payload.append('cpf', cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
@@ -260,6 +270,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
+                            placeholder="Nome completo"
                             required />
                     </div>
                     <div>
@@ -267,10 +278,10 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                         <input
                             id="cpf"
                             value={formData.cpf}
-                            onChange={handleInputChange}
+                            onChange={handleCpfChange}
                             type="text"
                             className={inputStyle}
-                            mascara={mascaraCPF}
+                            placeholder="000.000.000-00"
                             required />
                     </div>
                     <div>
@@ -281,6 +292,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             onChange={handleInputChange}
                             type="email"
                             className={inputStyle}
+                            placeholder="usuario@email.com"
                             required />
                     </div>
 

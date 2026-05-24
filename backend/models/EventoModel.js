@@ -271,7 +271,6 @@ class EventoModel {
             if(eventoAberto){
                 console.warn(`[AVISO] Máquina ${id_maquina} já possui um evento aberto de ${eventoAberto.status_atual} desde ${eventoAberto.inicio}. É necessário justificar este evento antes de registrar um novo status.`)
                 return `[AVISO] Máquina ${id_maquina} já possui um evento aberto de ${eventoAberto.status_atual} desde ${eventoAberto.inicio}. É necessário justificar este evento antes de registrar um novo status.`
-                break;
             }else{
             function capitalizar(texto) {
                 if (!texto) return '';

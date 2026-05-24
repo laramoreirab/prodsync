@@ -107,7 +107,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         const cpfLimpo = formData.cpf.replace(/\D/g, '');
         //formData.append('campo', value)
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpfLimpo);
+        payload.append('cpf', cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
@@ -141,6 +141,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
 
     useEffect(() => {
         async function carregarTurnos() {
+            if (!formData.id_setor) return;
             try {
                 const options = { method: "GET" }
                 const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
@@ -157,6 +158,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
 
     useEffect(() => {
         async function carregarMaquinas() {
+            if (!formData.id_setor) return;
             try {
                 const options = { method: "GET" }
                 const dados = await apiFetch(`/api/maquinas/setor/${formData.id_setor}`, options)
@@ -288,16 +290,20 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             id="nome"
                             onChange={handleInputChange}
                             type="text"
+                            value={formData.nome}
                             className={inputStyle}
+                            placeholder="Nome completo"
                             required />
                     </div>
                     <div>
                         <label htmlFor="cpf" className={labelStyle}>CPF</label>
                         <input
                             id="cpf"
+                            value = {formData.cpf}
                             onChange={handleCpfChange}
                             type="text"
                             className={inputStyle}
+                            placeholder="000.000.000-00"
                             required />
                     </div>
                     <div>
@@ -306,7 +312,9 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             id="email"
                             onChange={handleInputChange}
                             type="email"
+                            value={formData.email}
                             className={inputStyle}
+                            placeholder="usuario@email.com"
                             required />
                     </div>
                     <div className="relative">
@@ -314,7 +322,8 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <select
                             id="id_setor"
                             onChange={handleInputChange}
-                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
+                            value={formData.id_setor}
+                            className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
                         >
                             <option value="">Selecione...</option>
@@ -338,7 +347,8 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <label htmlFor="funcao" className={labelStyle}>Função</label>
                         <select
                             id="funcao"
-                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
+                            value={formData.funcao}
+                            className={`${inputStyle} appearance-none pr-10 bg-white`}
                             onChange={handleInputChange}
                             required
                         >
@@ -353,8 +363,9 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <select
                             id="id_turno"
                             onChange={handleInputChange}
+                            value={formData.id_turno}
                             className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
-                            disable={!formData.id_setor}
+                            disabled={!formData.id_setor}
                             required
                         >
                             <option value="">Selecione...</option>
@@ -380,8 +391,9 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                         <select
                             id="id_maquina"
                             onChange={handleInputChange}
+                            value={formData.id_maquina}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            disable={!formData.id_setor}
+                            disabled={!formData.id_setor}
                             required
                         >
                             <option value="">Selecione...</option>
