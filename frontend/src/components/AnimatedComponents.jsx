@@ -24,11 +24,12 @@
  *   <LoadingState>           — spinner de carregamento padronizado
  */
 
-import { motion, AnimatePresence } from "motion/react";
-import { SPACING } from "@/lib/spacing"
+import { motion, AnimatePresence, scale } from "motion/react";
+import { SPACING } from "@/lib/spacing";
 import { Search, Loader2 } from "lucide-react";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 // ─────────────────────────────────────────────
 // VARIANTES DE ANIMAÇÃO (centralizadas)
@@ -54,8 +55,8 @@ const VARIANTS = {
       scale: 1,
       transition: {
         type: "spring",
-        bounce: 0.30,
-        duration: 0.8
+        bounce: 0.3,
+        duration: 0.8,
       },
     },
   },
@@ -68,7 +69,7 @@ const VARIANTS = {
       transition: {
         type: "spring",
         bounce: 0.4,
-        duration: 0.6
+        duration: 0.6,
       },
     },
   },
@@ -82,7 +83,7 @@ const VARIANTS = {
       transition: {
         type: "spring",
         bounce: 0.4,
-        duration: 0.75
+        duration: 0.75,
       },
     },
   },
@@ -95,10 +96,11 @@ const VARIANTS = {
       rotate: 0,
       transition: {
         duration: 0.6,
-        ease: "easeInOut"
+        ease: "easeInOut",
       },
     },
   },
+
 };
 
 // ─────────────────────────────────────────────
@@ -111,25 +113,32 @@ const VARIANTS = {
  * @param {string}  bg          — override do bg (default: bg_app.svg)
  * @param {boolean} center      — se true, centraliza e deixa o conteúdo com 70% de largura (default: false)
  */
-export function PageLayout({ children, className, padded = true, bg, center = false }) {
+export function PageLayout({
+  children,
+  className,
+  padded = true,
+  bg,
+  center = false,
+}) {
   return (
     <main className={cn("relative min-h-screen flex flex-col", className)}>
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: bg ?? "url('/bg_app.svg')" }}
       />
-      
-      <div 
+
+      <div
         className={cn(
-          "flex flex-col flex-1 w-full", 
+          "flex flex-col flex-1 w-full",
           padded && "px-4 sm:px-6 lg:px-8 pb-12",
-          center && "items-center pt-16"
+          center && "items-center pt-16",
         )}
       >
-        <div 
+        <div
           className={cn(
             "w-full min-w-0",
-            center && "md:max-w-[70%] mx-auto flex flex-col items-center justify-center"
+            center &&
+              "md:max-w-[70%] mx-auto flex flex-col items-center justify-center",
           )}
         >
           {children}
@@ -151,7 +160,13 @@ export function PageLayout({ children, className, padded = true, bg, center = fa
  * @param {boolean}     underline   — sublinhado estilo padrão (default: true)
  * @param {string}      subtitle    — subtítulo abaixo do título (opcional)
  */
-export function PageHeader({ title, action, className, underline = true, subtitle }) {
+export function PageHeader({
+  title,
+  action,
+  className,
+  underline = true,
+  subtitle,
+}) {
   return (
     <motion.div
       variants={VARIANTS.fadeUp}
@@ -161,20 +176,24 @@ export function PageHeader({ title, action, className, underline = true, subtitl
         "flex flex-col sm:flex-row sm:items-start justify-between gap-6 sm:gap-4",
         SPACING.pageTop,
         SPACING.afterHeader,
-        className
+        className,
       )}
     >
-<div className="flex flex-col gap-1 min-w-0 flex-1">        <h1
+      <div className="flex flex-col gap-1 min-w-0 flex-1">
+        {" "}
+        <h1
           className={cn(
             "text-5xl font-semibold text-black",
             underline &&
-            "underline decoration-secondary-foreground underline-offset-9 decoration-[5px]"
+              "underline decoration-secondary-foreground underline-offset-9 decoration-[5px]",
           )}
         >
           {title}
         </h1>
         {subtitle && (
-          <p className="text-base text-muted-foreground font-medium">{subtitle}</p>
+          <p className="text-base text-muted-foreground font-medium">
+            {subtitle}
+          </p>
         )}
       </div>
 
@@ -204,7 +223,7 @@ export function SectionDivider({ title, action, className }) {
       viewport={{ once: true }}
       className={cn(
         "flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2",
-        className
+        className,
       )}
     >
       <div className="flex items-center gap-5 flex-1 min-w-0">
@@ -214,11 +233,7 @@ export function SectionDivider({ title, action, className }) {
         <hr className="hidden sm:block bg-black flex-1 h-[3px] rounded-full" />
       </div>
 
-      {action && (
-        <div className="flex-shrink-0 w-full sm:w-auto">
-          {action}
-        </div>
-      )}
+      {action && <div className="flex-shrink-0 w-full sm:w-auto">{action}</div>}
     </motion.div>
   );
 }
@@ -368,20 +383,21 @@ export function ContentGrid({ children, cols = 2, className }) {
 // ─────────────────────────────────────────────
 
 /**
- * @param {string}  side      
+ * @param {string}  side
  * @param {string}  className
  */
 export function AsymmetricGrid({ children, side = "left", className }) {
-  const layoutClasses = side === "left" 
-    ? "[&>*:nth-child(1)]:md:col-span-2 [&>*:nth-child(2)]:md:col-span-1" 
-    : "[&>*:nth-child(1)]:md:col-span-1 [&>*:nth-child(2)]:md:col-span-2";
+  const layoutClasses =
+    side === "left"
+      ? "[&>*:nth-child(1)]:md:col-span-2 [&>*:nth-child(2)]:md:col-span-1"
+      : "[&>*:nth-child(1)]:md:col-span-1 [&>*:nth-child(2)]:md:col-span-2";
 
   return (
     <StaggerWrapper
       className={cn(
-        "grid grid-cols-1 md:grid-cols-3 gap-8 mt-6", 
-        layoutClasses, 
-        className
+        "grid grid-cols-1 md:grid-cols-3 gap-8 mt-6",
+        layoutClasses,
+        className,
       )}
     >
       {children}
@@ -406,7 +422,7 @@ export function WidgetCard({ children, className, colSpan, centered }) {
         "bg-white border border-gray-100 rounded-xl p-8 shadow-sm",
         centered && "flex flex-col items-center justify-center",
         colSpan,
-        className
+        className,
       )}
     >
       {children}
@@ -425,12 +441,17 @@ export function WidgetCard({ children, className, colSpan, centered }) {
  * @param {string}    placeholder   — placeholder do input
  * @param {string}    className     — classes extras
  */
-export function SearchBar({ value, onChange, placeholder = "Buscar...", className }) {
+export function SearchBar({
+  value,
+  onChange,
+  placeholder = "Buscar...",
+  className,
+}) {
   return (
     <FadeUpItem
       className={cn(
         "flex items-center w-full p-1 justify-between rounded-md bg-[var(--cinza-claro)]",
-        className
+        className,
       )}
     >
       <input
@@ -471,7 +492,7 @@ export function FilterRow({ count, label = "resultados", actions, className }) {
       className={cn(
         // Mudança principal: flex-col no mobile, flex-row no desktop
         "flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-3",
-        className
+        className,
       )}
     >
       <p className="text-sm text-gray-600">
@@ -509,12 +530,14 @@ export function EmptyState({
     <FadeUpItem
       className={cn(
         "flex flex-col items-center justify-center p-12 text-gray-500 w-full",
-        className
+        className,
       )}
     >
       <Icon className="w-12 h-12 mb-4 text-gray-300" />
       <h2 className="text-xl font-semibold">{title}</h2>
-      {message && <p className="text-sm text-gray-400 mt-1 text-center">{message}</p>}
+      {message && (
+        <p className="text-sm text-gray-400 mt-1 text-center">{message}</p>
+      )}
     </FadeUpItem>
   );
 }
@@ -532,7 +555,7 @@ export function LoadingState({ message = "Carregando...", className }) {
     <div
       className={cn(
         "min-h-screen flex items-center justify-center bg-[url('/bg_app.svg')] bg-cover bg-fixed",
-        className
+        className,
       )}
     >
       <motion.div

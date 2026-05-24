@@ -161,7 +161,6 @@ export default function Usuarios() {
 
   return (
     <PageLayout>
-      <section className="graphs_cadastro">
         {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
         <PageHeader title="Usuários" action={
           <Dialog>
@@ -179,7 +178,7 @@ export default function Usuarios() {
         } />
 
         {/* Gráficos */}
-      </section>
+
 
       <ContentGrid cols={2} className="mt-6">
 

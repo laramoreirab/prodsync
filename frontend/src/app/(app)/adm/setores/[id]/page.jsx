@@ -458,10 +458,12 @@ export default function SetorEspecificoPage({ params }) {
           title=" Inventário de Máquinas do Setor"
           action={
             <Dialog>
+              <AnimatedButton asChild>
               <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
                 <Plus size={22} />
                 Cadastrar
               </DialogTrigger>
+              </AnimatedButton>
               <DialogContent>
                 <FormCadastroMaquina onCadastroSucesso={refresh} />
               </DialogContent>
