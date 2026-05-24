@@ -29,11 +29,21 @@ export function usePerfil() {
     };
   }, []);
 
+  const setor =
+    perfil?.setor ??
+    perfil?.setores_geridos?.[0]?.setor ??
+    null;
+
   return {
     perfil,
     loading,
     erro,
-    setorId: perfil?.id_setor ?? perfil?.setor?.id_setor ?? null,
+    setorId:
+      perfil?.id_setor ??
+      setor?.id_setor ??
+      perfil?.setores_geridos?.[0]?.id_setor ??
+      null,
+    setorNome: setor?.nome_setor ?? setor?.nome ?? null,
     tipo: perfil?.tipo ?? perfil?.funcao ?? null
   };
 }

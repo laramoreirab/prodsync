@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useOps } from "@/hooks/useOps";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, ArrowDown, Flame, MoveHorizontal, Pencil, Plus, Search, Loader2, EyeIcon, Trash2 } from 'lucide-react';
@@ -16,6 +16,10 @@ import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import { filtrarPorNumberRange } from "@/lib/filterUtils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { OPProgressoCell } from "@/features/ordens/OPProgressoCell";
+import { MetaProducaoWidget } from "@/features/operador/MetaProducaoWidget";
+import { getUserFromToken } from "@/lib/auth";
 import{PageLayout, PageHeader, PageSection, SectionDivider, SearchBar, FilterRow, EmptyState, StaggerWrapper, FadeUpItem} from "@/components/AnimatedComponents";
 
 const opsFilter = [
@@ -24,8 +28,28 @@ const opsFilter = [
   { id: "progresso", label: "Progresso", type: "number-range" }
 ];
 
+function contarOpsPorStatus(lista) {
+  return (lista ?? []).reduce(
+    (acc, op) => {
+      const status = op.status_op;
+
+      if (status === "Concluída") {
+        acc.concluidas += 1;
+      } else if (status === "Aguardando Início" || status === "Setup") {
+        acc.aguardando += 1;
+      } else if (["Produzindo", "Parada"].includes(status)) {
+        acc.emAndamento += 1;
+      }
+
+      return acc;
+    },
+    { aguardando: 0, emAndamento: 0, concluidas: 0 }
+  );
+}
 
 export default function OrdensDeProducao() {
+  const pathname = usePathname();
+  const [operadorId, setOperadorId] = useState(null);
 
   const colunasOrdemProd = [
     {
@@ -113,17 +137,37 @@ export default function OrdensDeProducao() {
       id: "progresso",
       key: "progresso",
       label: "Progresso",
-      className: "text-center"
+      className: "text-center w-[130px] max-w-[130px]",
+      icone: (valor) => <OPProgressoCell valor={valor} />,
     },
   ];
 
   const { ops, loading, error, refresh } = useOps();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
+
+  const resumoOps = useMemo(() => contarOpsPorStatus(ops), [ops]);
+
+  useEffect(() => {
+    const user = getUserFromToken();
+    if (user?.id_usuario) setOperadorId(user.id_usuario);
+  }, []);
   
   useEffect(() => {
     setDados(ops);
   }, [ops]);
+
+  useEffect(() => {
+    refresh();
+  }, [pathname, refresh]);
+
+  useEffect(() => {
+    const aoVoltarParaPagina = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", aoVoltarParaPagina);
+    return () => document.removeEventListener("visibilitychange", aoVoltarParaPagina);
+  }, [refresh]);
 
 
   //lógica de ordenação
@@ -205,23 +249,23 @@ return (
     <PageHeader title="Ordens de Produção" />
 
     <StaggerWrapper className="grid grid-cols-5 gap-6 w-full">
-      <FadeUpItem className="col-span-1 bg-[var(--cinza-claro)] p-5 flex flex-col gap-15 rounded-lg shadow-sm h-60">
+      <FadeUpItem className="col-span-1 bg-[-var(--cinza-claro)] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
         <h1 className="text-[#545454] text-lg text-center font-semibold align-text-top">Aguardando Início</h1>
-        <span className="text-black text-center text-4xl font-bold">2</span>
+        <span className="text-black text-center text-4xl font-bold">{resumoOps.aguardando}</span>
       </FadeUpItem>
 
       <FadeUpItem className="col-span-1 bg-[#effff5] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
         <h1 className="text-[#369948] text-lg text-center font-semibold">Em Andamento</h1>
-        <span className="text-black text-4xl text-center font-bold">3</span>
+        <span className="text-black text-4xl text-center font-bold">{resumoOps.emAndamento}</span>
       </FadeUpItem>
 
       <FadeUpItem className="col-span-1 bg-[#e8f0ff] p-6 flex flex-col gap-15 rounded-lg shadow-sm">
         <h1 className="text-[#00357a] text-lg text-center font-semibold">Concluídas</h1>
-        <span className="text-black text-4xl text-center font-bold">4</span>
+        <span className="text-black text-4xl text-center font-bold">{resumoOps.concluidas}</span>
       </FadeUpItem>
 
-      <FadeUpItem className="col-span-2 bg-white border border-gray-100 shadow-sm p-4 rounded-lg flex flex-col justify-between gap-2">
-        {/* Aqui */}
+      <FadeUpItem className="col-span-2 bg-white border border-gray-100 shadow-sm p-4 rounded-lg flex flex-col justify-center min-h-60">
+        <MetaProducaoWidget operadorId={operadorId} />
       </FadeUpItem>
     </StaggerWrapper>
 

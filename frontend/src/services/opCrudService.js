@@ -27,6 +27,19 @@ const statusParaTela = {
 
 const extrairDados = (response) => response?.dados ?? response;
 
+/** Percentual 0–100 a partir de peças boas apontadas e meta planejada. */
+const calcularProgressoOP = (produzido, planejado, progressoInformado) => {
+  const produzidoNum = Number(produzido) || 0;
+  const planejadoNum = Number(planejado) || 0;
+
+  if (planejadoNum > 0) {
+    return Math.min(100, Math.round((produzidoNum / planejadoNum) * 100));
+  }
+
+  const informado = Number(progressoInformado);
+  return Number.isFinite(informado) ? Math.min(100, Math.max(0, informado)) : 0;
+};
+
 const normalizarPayload = (dados) => {
   const payload = {
     ...dados,
@@ -43,18 +56,27 @@ const normalizarPayload = (dados) => {
 const normalizarOp = (op) => {
   if (!op) return op;
 
-  const produzido = op.produzido ?? op.qtd_produzida ?? 0;
+  const produzido = Number(op.produzido ?? op.qtd_produzida ?? 0);
   const planejado = Number(op.qtd_planejada) || 0;
-  const progressoNumero = planejado > 0 ? Math.round((produzido / planejado) * 100) : 0;
+  const progresso = calcularProgressoOP(produzido, planejado, op.progresso);
+
+  const setor = op.maquina?.setor ?? op.setor;
 
   return {
     ...op,
     id: op.id ?? op.id_ordem,
+    id_maquina: op.id_maquina ?? op.maquina?.id_maquina ?? null,
     nome: op.nome ?? op.codigo_lote ?? op.produto,
-    setor: op.setor ?? op.maquina?.setor?.nome_setor ?? op.id_setor,
+    setor: typeof setor === "string" ? setor : setor?.nome_setor ?? op.id_setor,
+    id_setor: op.id_setor ?? setor?.id_setor ?? null,
     prioridade: prioridadeParaTela[op.prioridade] ?? op.prioridade,
     status_op: statusParaTela[op.status_op] ?? op.status_op,
-    progresso: op.progresso ?? progressoNumero,
+    produzido,
+    progresso,
+    data_inicio: op.data_inicio ?? null,
+    data_fim: op.data_fim ?? null,
+    data_hora_inicio: op.data_inicio ?? op.data_hora_inicio ?? null,
+    data_hora_fim: op.data_fim ?? op.data_hora_fim ?? null,
   };
 };
 

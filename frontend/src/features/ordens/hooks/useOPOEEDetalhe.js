@@ -5,7 +5,10 @@ import { opOEEDetalheService } from "@services/ordenService";
 
 export function useOPOEEDetalhe(opId, maquinaId) {
   const fetcher = useCallback(
-    () => opOEEDetalheService.getOEE(opId, maquinaId),
+    () => {
+      if (!opId) return Promise.resolve(null);
+      return opOEEDetalheService.getOEE(opId, maquinaId);
+    },
     [opId, maquinaId]
   );
   return useChartData(fetcher);

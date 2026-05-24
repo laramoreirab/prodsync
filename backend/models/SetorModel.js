@@ -193,20 +193,30 @@ class SetorModel {
     // Deleta um setor
     static async deletarSetor(id_setor, id_empresa) {
         try {
-            await prisma.maquinas.updateMany({
-                where: { id_setor, id_empresa },
-                data: { id_setor: null }
-            });
+            await prisma.$transaction(async (tx) => {
+                await tx.maquinas.updateMany({
+                    where: { id_setor, id_empresa },
+                    data: { id_setor: null }
+                });
 
-            const result = await prisma.setores.deleteMany({
-                where: {
-                    id_setor: id_setor,
-                    id_empresa: id_empresa
+                // Desvincula turnos antes de excluir o setor — evita cascade em Turno
+                // que falha quando existem apontamentos (FK RESTRICT em Apontamento.id_turno)
+                await tx.turno.updateMany({
+                    where: { id_setor, id_empresa },
+                    data: { id_setor: null }
+                });
+
+                const result = await tx.setores.deleteMany({
+                    where: {
+                        id_setor,
+                        id_empresa
+                    }
+                });
+
+                if (result.count === 0) {
+                    throw new Error('Setor não encontrado ou não pertence à empresa');
                 }
             });
-            if (result.count === 0) {
-                throw new Error('Setor não encontrado ou não pertence à empresa');
-            }
         } catch (error) {
             console.error('Erro ao deletar setor:', error);
             throw error;
