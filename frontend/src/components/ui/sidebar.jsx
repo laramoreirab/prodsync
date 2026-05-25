@@ -194,7 +194,7 @@ function Sidebar({
           data-slot="sidebar-container"
           data-side={side}
           className={cn(
-            "sticky top-24 hidden shrink-0 self-start transition-[width] duration-200 ease-linear md:flex",
+            "sticky top-20 hidden shrink-0 self-start transition-[width] duration-200 ease-linear md:flex",
             "group-data-[side=right]:ml-auto",
             collapsible === "icon"
               ? "w-(--sidebar-width) group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem)]"
@@ -205,7 +205,7 @@ function Sidebar({
           <div
             data-sidebar="sidebar"
             data-slot="sidebar-inner"
-            className="flex max-h-[calc(100svh-7rem)] w-full flex-col overflow-hidden rounded-[1.25rem] border border-sidebar-border/80 bg-sidebar shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
+            className="flex max-h-[calc(100svh-5rem)] w-full flex-col overflow-hidden rounded-[1.25rem] border border-sidebar-border/80 bg-sidebar shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
             {children}
           </div>
         </div>

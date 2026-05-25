@@ -26,7 +26,7 @@ function NavMainItem({
         isActive={isActive}
         className="h-10 rounded-xl bg-transparent px-3 text-sidebar-foreground/95 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center hover:bg-white/14 data-[active=true]:!bg-transparent data-[active=true]:text-sidebar-foreground data-[active=true]:hover:!bg-white/14">
         <Link href={item.url}>
-          <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground/90 [&_svg]:size-[1.1rem]">
+          <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground/90 [&_svg]:size-[1.2rem]">
             {item.icon}
           </div>
           <span className="font-medium">{item.title}</span>
@@ -53,11 +53,11 @@ export function NavMain({
   const pathname = usePathname()
 
   return (
-    <SidebarGroup className="gap-2 px-2 py-3 group-data-[collapsible=icon]:px-1">
+    <SidebarGroup className="h-full gap-2 px-2 py-3 group-data-[collapsible=icon]:px-1">
       <SidebarGroupLabel className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-white/65">
         ProdSync
       </SidebarGroupLabel>
-      <SidebarMenu className="gap-2">
+      <SidebarMenu className="gap-2 group-data-[collapsible=icon]:flex-1 group-data-[collapsible=icon]:justify-evenly">
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <NavMainItem item={item} pathname={pathname} />

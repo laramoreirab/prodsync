@@ -46,7 +46,7 @@ const data = {
     {
       title: "Ordem de Producao",
       url: "/adm/ordensDeProducao",
-      icon: <ListBulletsIcon size={32} />,
+      icon: <ListBulletsIcon />,
     },
     {
       title: "Andon",
