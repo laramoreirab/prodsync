@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
+import { Toaster } from "@/components/ui/sonner"
 
 const adminTabs = [
   { id: "conta", label: "Conta", icon: UserRound },
@@ -132,16 +133,16 @@ function AccountSettings({ role }) {
     async function buscarDados() {
       const dadosUsuario = await apiFetch("/api/auth/perfil")
       setFormData({
-      id : dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "", 
-      nome : dadosUsuario.dados.nome || "",
-      cpf : dadosUsuario.dados.cpf || "",
-      cargo : dadosUsuario.dados.tipo || "",
-      email : dadosUsuario.dados.email || "",
-      emailEmpresa : dadosUsuario.dados.email || "",
-      telefoneEmpresa : dadosUsuario.dados.telefone || "",
-      enderecoEmpresa : dadosUsuario.dados.endereco || "",
-      cpfRepresentante : dadosUsuario.dados.cpf_representante || ""
-    })
+        id: dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "",
+        nome: dadosUsuario.dados.nome || "",
+        cpf: dadosUsuario.dados.cpf || "",
+        cargo: dadosUsuario.dados.tipo || "",
+        email: dadosUsuario.dados.email || "",
+        emailEmpresa: dadosUsuario.dados.email || "",
+        telefoneEmpresa: dadosUsuario.dados.telefone || "",
+        enderecoEmpresa: dadosUsuario.dados.endereco || "",
+        cpfRepresentante: dadosUsuario.dados.cpf_representante || ""
+      })
       console.log("Dados do usuário:", dadosUsuario)
     }
     buscarDados()
@@ -258,7 +259,19 @@ function PasswordRuleList({ password }) {
 
 function SecuritySettings({ role }) {
   const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [carregando, setCarregando] = useState(false)
   const showDeleteAccount = role === "admin"
+
+  async function handleSubmit() {
+    e.preventDefault()
+    const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
+    if (senhasNaoBatem) {
+      Toaster("As senhas digitadas não estão iguais!")
+    }
+    const conferindo = apiFetch('/api/auth/verificar', )
+  }
 
   return (
     <div className="max-w-2xl space-y-5">
@@ -267,14 +280,18 @@ function SecuritySettings({ role }) {
         description="Proteja sua conta com credenciais robustas."
       />
 
-      <form className="space-y-3">
+      <form className="space-y-3" onSubmit={handleSubmit}>
         <div className="space-y-1">
           <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
             Senha Atual
           </label>
           <div className="relative max-w-sm">
             <LockKeyhole className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-            <SettingsInput id="senhaAtual" type="password" className="pl-8" />
+            <SettingsInput
+              id="senhaAtual"
+              type="password"
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              className="pl-8" />
           </div>
         </div>
 
@@ -294,13 +311,17 @@ function SecuritySettings({ role }) {
             <label htmlFor="confirmarSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
               Confirmar Nova Senha
             </label>
-            <SettingsInput id="confirmarSenha" type="password" />
+            <SettingsInput
+              id="confirmarSenha"
+              value={confirmPassword}
+              type="password"
+              onChange={(event) => setConfirmPassword(event.target.value)} />
           </div>
         </div>
 
         <PasswordRuleList password={newPassword} />
 
-        <Button type="button" className="h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+        <Button type="submit" className="h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold" disabled={carregando || senhasNaoBatem}>
           <Save className="size-4" />
           Salvar Senha
         </Button>
