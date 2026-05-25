@@ -16,7 +16,8 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2, ChevronDown } from "lucide-react";
+import { Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+import { PlusChevronToggleIcon } from "@/components/ui/PlusChevronToggleIcon";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import {
@@ -63,6 +64,7 @@ export default function PageSetores() {
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
   const [criarAberto, setCriarAberto] = useState(null);
+  const [menuCriarAberto, setMenuCriarAberto] = useState(false);
   const filtersConfig = setoresFilter.map((filter) =>
     filter.id === "nome_setor"
       ? { ...filter, options: setores.map((setor) => setor.nome_setor).filter(Boolean) }

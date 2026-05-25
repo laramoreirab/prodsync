@@ -364,6 +364,7 @@ export default function OPDetalhePage({ params }) {
                   <FormCriarApontamento
                     id_ordemProducao={opId}
                     id_maquina={op.id_maquina ?? op.maquina?.id_maquina}
+                    onSuccess={carregarDados}
                   />
                 </DialogContent>
               </Dialog>
@@ -415,11 +416,11 @@ export default function OPDetalhePage({ params }) {
                     </p>
                     <div className="flex">
                       <p>Início:</p>
-                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_hora_inicio)}</p>
+                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_inicio ?? op.data_hora_inicio)}</p>
                     </div>
                     <div className="flex">
                       <p>Prazo Final:</p>
-                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_hora_fim)}</p>
+                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_fim ?? op.data_hora_fim)}</p>
                     </div>
                   </div>
                 </div>
@@ -436,7 +437,7 @@ export default function OPDetalhePage({ params }) {
         </section>
 
         <SectionHighlight>
-          <OPOEEDetalheWidget opId={opId} />
+          <OPOEEDetalheWidget opId={opId} maquinaId={op.id_maquina ?? op.maquina?.id_maquina} />
         </SectionHighlight>
 
         <DetailListingSection

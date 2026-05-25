@@ -678,7 +678,8 @@ static async atualizarUsuario(req, res) {
         try {
             const id_usuario = parseInt(req.params.id) || req.body.id_usuario || req.user.id_usuario;
             const id_empresa = req.user.id_empresa
-            const id_maquina = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const escala = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const id_maquina = escala?.id_maquina ?? null
             const dados = await UsuarioModel.metaProducao(id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
@@ -691,7 +692,8 @@ static async atualizarUsuario(req, res) {
         try {
             const id_usuario = parseInt(req.params.id) ;
             const id_empresa = req.user.id_empresa
-            const id_maquina = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const escala = await MaquinaModel.obterMaquinaOperador(id_empresa, id_usuario)
+            const id_maquina = escala?.id_maquina ?? null
             const dados = await UsuarioModel.tempoParadoTempoProduzindoUsuario(id_empresa, id_usuario, id_maquina)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {

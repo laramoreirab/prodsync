@@ -540,7 +540,7 @@ export default function OPDetalhePage({ params }) {
         </section>
 
         <section className="bg-white border rounded-xl p-6 shadow-sm">
-          <OPOEEDetalheWidget opId={opId} />
+          <OPOEEDetalheWidget opId={opId} maquinaId={op?.id_maquina ?? maquina?.id_maquina} />
         </section>
 
         {/* Listagens */}

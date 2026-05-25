@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { deduplicarTurnosParaSelect } from "@/lib/filterUtils";
 
-export default function FormCriarApontamento({ id_maquina, id_ordemProducao }) {
+export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onSuccess }) {
     const [loading, setLoading] = useState(false);
 
     const [ordens, setOrdens] = useState([]);
@@ -102,6 +102,7 @@ export default function FormCriarApontamento({ id_maquina, id_ordemProducao }) {
             }
 
             toast.success(data.mensagem || 'Apontamento criado com sucesso!');
+            onSuccess?.();
 
             setForm({
                 id_ordemProducao: id_ordemProducao ? String(id_ordemProducao) : '',

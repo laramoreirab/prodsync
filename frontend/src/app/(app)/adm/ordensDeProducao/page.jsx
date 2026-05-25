@@ -25,6 +25,7 @@ import Link from "next/link";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
+import { OPProgressoCell } from "@/features/ordens/OPProgressoCell";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 
@@ -166,7 +167,8 @@ const colunasOrdemProd = [
     id: "progresso",
     key: "progresso",
     label: "Progresso",
-    className: "text-center"
+    className: "text-center min-w-[140px]",
+    icone: (valor) => <OPProgressoCell valor={valor} />,
   },
 ];
 

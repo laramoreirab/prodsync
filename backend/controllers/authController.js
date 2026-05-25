@@ -5,7 +5,12 @@ import { JWT_CONFIG } from '../config/jwt.js'
 
 class AuthController {
     static montarDadosAutenticacao(usuario) {
-        const id_setor = usuario.id_setor ?? usuario.setor?.id_setor ?? null;
+        const id_setor =
+            usuario?.id_setor ??
+            usuario?.setor?.id_setor ??
+            usuario?.setores_geridos?.[0]?.id_setor ??
+            usuario?.setores_geridos?.[0]?.setor?.id_setor ??
+            null;
 
         return {
             id_empresa: usuario.id_empresa,

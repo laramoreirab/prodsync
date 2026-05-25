@@ -5,7 +5,10 @@ import { TempoParadoTempoProduzindoOperadorService } from "@services/operadorSer
 
 export function useTempoParadoTempoProduzindoOperador(operadorId) {
   const fetcher = useCallback(
-    () => TempoParadoTempoProduzindoOperadorService.getTempoParadoTempoProduzindoOperador(operadorId),
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return TempoParadoTempoProduzindoOperadorService.getTempoParadoTempoProduzindoOperador(operadorId);
+    },
     [operadorId]
   );
   return useChartData(fetcher);

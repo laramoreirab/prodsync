@@ -14,6 +14,7 @@ import { DataEvento } from "@/components/ui/dataEvento";
 import { BellRing, Pencil, EyeIcon, Trash2, Plus, Search, Loader2 } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -166,6 +167,7 @@ const apontamentoFilter = [
 
 export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
+  const router = useRouter();
   const maquinaId = Number(id);
 
   const [maquina, setMaquina] = useState(null);
@@ -413,7 +415,11 @@ export default function MaquinaDetalhePage({ params }) {
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormExclusaoMaquina maquinaId={maquinaId} onExcluir={maquinaCrudService.delete} />
+                  <FormExclusaoMaquina
+                    maquinaId={maquinaId}
+                    onExcluir={maquinaCrudService.delete}
+                    onExclusaoSucesso={() => router.push("/adm/maquinas")}
+                  />
                 </DialogContent>
               </Dialog>
             </DetailActions>
