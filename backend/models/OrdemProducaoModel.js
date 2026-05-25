@@ -168,7 +168,7 @@ class OrdemProducaoModel {
             const ordem = await prisma.ordemProducao.findFirst({
                 where:{
                     id_maquina: id_maquina,
-                    status_op: 'Em_Andamento'
+                    status_op: { in: ['Em_Andamento', 'Parada', 'Setup'] }
                 },
                 select: {
                     id_ordem: true

@@ -6,6 +6,11 @@ import { File, Upload, ChevronDown, Pencil, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
+import { mascaraCPF } from '@/utils/mascaras';
+import { setorCrudService } from '@/services/setorCrudService';
+import { apiFetch } from '@/lib/apiFetch';
+import { deduplicarTurnosParaSelect } from '@/utils/deduplicarTurnosParaSelect';
+
 
 export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
@@ -13,6 +18,9 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
 
     // Estado de carregamento
     const [carregando, setCarregando] = useState(true);
+    const [listaTurnos, setListaTurnos] = useState([])
+    const [listaMaquinas, setListaMaquinas] = useState([])
+    const [setores, setSetores] = useState([]);
 
     const [formData, setFormData] = useState({
         nome: "",
@@ -76,12 +84,78 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
         if (operadorId) buscarDadosDoOperador();
     }, [operadorId]);
 
+    useEffect(() => {
+        async function carregarSetores() {
+            try {
+                const dados = await setorCrudService.getAll();
+                setSetores(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar setores.");
+            }
+
+        }
+
+        carregarSetores();
+    }, []);
+
+    useEffect(() => {
+        async function carregarTurnos() {
+            if (!formData.id_setor) {
+                setListaTurnos([]);
+                return;
+            }
+            try {
+                const options = { method: "GET" }
+                const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
+                setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar turnos.");
+            }
+
+        }
+
+        carregarTurnos();
+    }, [formData.id_setor]);
+
+    useEffect(() => {
+        async function carregarMaquinas() {
+            const idSetor = formData.id_setor;
+            if (!idSetor) {
+                setListaMaquinas([]);
+                return;
+            }
+            try {
+                const options = { method: "GET" }
+                const dados = await apiFetch(`/api/maquinas/setor/${idSetor}`, options)
+                setListaMaquinas(dados.dados);
+            } catch (error) {
+                console.log(error)
+                toast.error("Erro ao carregar máquinas.");
+            }
+
+        }
+        carregarMaquinas();
+    }, [formData.id_setor]);
+    // A função que vai rodar quando o usuário digitar:
+    const handleCpfChange = (e) => {
+        const valorMascarado = mascaraCPF(e.target.value);
+
+        // Atualiza o seu estado do formData com o valor já formatado
+        setFormData({
+            ...formData,
+            cpf: valorMascarado
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const cpfLimpo = formData.cpf.replace(/\D/g, '');
 
         const payload = new FormData();
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpf);
+        payload.append('cpf', cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', 'operador');              // função SEMPRE será operador!!
@@ -170,6 +244,7 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
+                            placeholder="Nome completo"
                             required />
                     </div>
                     <div>
@@ -177,9 +252,10 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                         <input
                             id="cpf"
                             value={formData.cpf}
-                            onChange={handleInputChange}
+                            onChange={handleCpfChange}
                             type="text"
                             className={inputStyle}
+                            placeholder="000.000.000-00"
                             required />
                     </div>
                     <div>
@@ -190,6 +266,7 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                             onChange={handleInputChange}
                             type="email"
                             className={inputStyle}
+                            placeholder="usuario@email.com"
                             required />
                     </div>
                 </div>
@@ -205,8 +282,16 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                             required
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Roscas</option>
-                            <option value="2">Brocas</option>
+                            {setores.map((setor) => (
+
+                                <option
+                                    key={setor.id_setor}
+                                    value={setor.id_setor}
+                                >
+                                    {setor.nome_setor}
+                                </option>
+
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -218,11 +303,19 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
+                            disabled={!formData.id_setor}
                         >
                             <option value="">Selecione...</option>
-                            <option value="1">Manhã</option>
-                            <option value="2">Tarde</option>
-                            <option value="3">Noite</option>
+                            {listaTurnos.map((turno) => (
+
+                                <option
+                                    key={turno.id_turno}
+                                    value={turno.id_turno}
+                                >
+                                    {turno.nome_turno}
+                                </option>
+
+                            ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -235,11 +328,20 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                         value={formData.id_maquina}
                         onChange={handleInputChange}
                         className={`${inputStyle} appearance-none pr-10 bg-white`}
+                        disabled={!formData.id_setor}
                         required
                     >
                         <option value="">Selecione...</option>
-                        <option value="1">Máquina 1</option>
-                        <option value="2">Máquina 2</option>
+                        {listaMaquinas.map((maquina) => (
+
+                            <option
+                                key={maquina.id_maquina}
+                                value={maquina.id_maquina}
+                            >
+                                {maquina.nome}
+                            </option>
+
+                        ))}
                     </select>
                     <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>

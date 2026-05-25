@@ -31,7 +31,7 @@ export default function DashboardGeralPage() {
         <WidgetCard>
           <ProducaoSetorWidget />
         </WidgetCard>
-        <WidgetCard centered>
+        <WidgetCard>
           <MaquinaStatusWidget />
         </WidgetCard>
       </ContentGrid>

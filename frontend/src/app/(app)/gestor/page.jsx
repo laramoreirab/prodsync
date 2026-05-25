@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { SetorProducaoDiariaWidget } from "@/features/setores/SetorProducaoDiariaWidget";
 import { SetorOEEMedioWidget } from "@/features/setores/SetorOEEMedioWidget";
 import { SetorOEEEvolucaoWidget } from "@/features/setores/SetorOEEEvolucaoWidget";
@@ -14,21 +13,29 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { usePerfil } from "@/hooks/usePerfil";
 
 
 export default function DashboardGeralGestor() {
-  const [setorId, setSetorId] = useState(null);
+  const { loading, setorId } = usePerfil();
 
-  useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload?.id_setor) setSetorId(payload.id_setor);
-    } catch {
-      // token ausente ou malformado
-    }
-  }, []);
+  if (loading) {
+    return (
+      <PageLayout>
+        <PageHeader title="Dashboard Geral do Setor" />
+        <p className="text-sm text-muted-foreground">Carregando dados do setor...</p>
+      </PageLayout>
+    );
+  }
+
+  if (!setorId) {
+    return (
+      <PageLayout>
+        <PageHeader title="Dashboard Geral do Setor" />
+        <p className="text-sm text-destructive">Nenhum setor vinculado ao seu perfil.</p>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>

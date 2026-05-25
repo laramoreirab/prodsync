@@ -166,17 +166,17 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                                 value={nomeSetor}
                                 onChange={(e) => setNomeSetor(e.target.value)}
                                 placeholder="Usinagem Pesada"
-                                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-300 placeholder-gray-300 outline-none shadow-sm text-lg"
+                                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 dark:text-gray-300 placeholder-gray-300 outline-none shadow-sm text-lg"
                             />
                         </div>
                         <div>
-                            <label className="block text-xl font-medium text-gray-300 mb-1 dark:text-slate-300">Localizacao Fisica</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Localizacao Fisica</label>
                             <input
                                 type="text"
                                 value={localizacao}
                                 onChange={(e) => setLocalizacao(e.target.value)}
                                 placeholder="Galpao B - Corredor 3"
-                                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 placeholder-gray-300 outline-none shadow-sm text-lg"
+                                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-700 dark:text-gray-300 placeholder-gray-300 outline-none shadow-sm text-lg"
                             />
                         </div>
                     </div>

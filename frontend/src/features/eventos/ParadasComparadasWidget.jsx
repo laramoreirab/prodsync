@@ -5,14 +5,14 @@ import { useParadasComparadas } from "./hooks/useParadasComparadas";
 import { paradasComparadasConfig } from "./config/paradasComparadasConfig";
 
 export function ParadasComparadasWidget({ setorId = null }) {
-  const { data: response, loading, error } = useParadasComparadas(setorId);
-
-  const listaDados = response?.dados || [];
+  const { data, loading, error } = useParadasComparadas(setorId);
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar eventos.</p>;
-  if (!response) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (listaDados.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (error) return <p className="text-sm text-destructive">Erro ao carregar eventos.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) {
+    return <p className="text-xs text-muted-foreground">Nenhum registro disponivel.</p>;
+  }
 
   return (
     <div>
@@ -25,9 +25,9 @@ export function ParadasComparadasWidget({ setorId = null }) {
 
       <div className="mt-2">
         <DonutChart
-          data={listaDados}
-          nameKey="nome"   
-          dataKey="valor"
+          data={data}
+          nameKey="name"
+          dataKey="value"
           config={paradasComparadasConfig}
         />
       </div>

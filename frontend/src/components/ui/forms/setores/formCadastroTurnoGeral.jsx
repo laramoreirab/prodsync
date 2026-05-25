@@ -107,18 +107,18 @@ export default function FormCadastroTurnoGeral({ onSuccess }) {
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
 
-            <p className="px-8 text-gray-600">
+            <p className="px-8 text-gray-600 dark:text-slate-300">
                 O turno será cadastrado em cada setor da empresa ({setores.length} setor(es)).
             </p>
 
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5">
-                    <label htmlFor="nome" className="text-xl font-medium text-[#545454]">Nome</label>
-                    <input type="text" id="nome" name="nome" className="w-full border border-[#e0e0e0] rounded-md px-3 py-2.5 text-xl text-[#333] outline-none focus:border-[#a0a0a0]" required />
+                    <label htmlFor="nome" className="text-xl font-medium text-[#545454] dark:text-white">Nome</label>
+                    <input type="text" id="nome" name="nome" className="w-full border border-[#e0e0e0] rounded-md px-3 py-2.5 text-xl text-[#333] dark:text-gray-300 outline-none focus:border-[#a0a0a0]" required />
                 </div>
 
                 <div className="flex flex-col gap-1.5" ref={dropdownRef}>
-                    <label className="text-xl font-medium text-[#545454]">Dias de Operação</label>
+                    <label className="text-xl font-medium text-[#545454] dark:text-white">Dias de Operação</label>
                     <div className="relative">
                         <button
                             type="button"
@@ -160,11 +160,11 @@ export default function FormCadastroTurnoGeral({ onSuccess }) {
 
                 <div className="flex gap-4">
                     <div className="flex flex-col gap-1.5 flex-1">
-                        <label htmlFor="inicio" className="text-xl font-medium text-[#545454]">Horário de Início</label>
+                        <label htmlFor="inicio" className="text-xl font-medium text-[#545454] dark:text-white">Horário de Início</label>
                         <input type="time" id="inicio" name="horario_inicio" className="w-full border border-[#e0e0e0] rounded-md py-2.5 px-2 text-xl" required />
                     </div>
                     <div className="flex flex-col gap-1.5 flex-1">
-                        <label htmlFor="fim" className="text-xl font-medium text-[#545454]">Horário de Fim</label>
+                        <label htmlFor="fim" className="text-xl font-medium text-[#545454] dark:text-white">Horário de Fim</label>
                         <input type="time" id="fim" name="horario_fim" className="w-full border border-[#e0e0e0] rounded-md py-2.5 px-2 text-xl" required />
                     </div>
                 </div>

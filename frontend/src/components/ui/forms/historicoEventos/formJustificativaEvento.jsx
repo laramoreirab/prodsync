@@ -45,6 +45,7 @@ export default function FormJustificativaEvento({ onFechar }) {
         try {
             await eventosCrudService.justificar({
                 id_evento: evento.id_evento,
+                id_maquina: evento.id_maquina,
                 id_motivo_parada: Number(motivo),
                 observacao
             });

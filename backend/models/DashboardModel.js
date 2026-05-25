@@ -3,8 +3,9 @@ import prisma from '../config/prisma.js';
 class DashboardModel {
 
     // Gráfico global de produção ao longo do dia (Agrupado por hora)
-    static async buscarProducaoDiaria(id_empresa) {
+    static async buscarProducaoDiaria(id_empresa, setorId = null) {
         try {
+            const idSetor = setorId ? Number(setorId) : null;
             // Pega o início do dia atual
             const inicioDoDia = new Date();
             inicioDoDia.setHours(0, 0, 0, 0);
@@ -12,7 +13,8 @@ class DashboardModel {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa: Number(id_empresa),
-                    data_hora_fim: { gte: inicioDoDia }
+                    data_hora_fim: { gte: inicioDoDia },
+                    ...(idSetor ? { maquina: { id_setor: idSetor } } : {})
                 },
                 select: {
                     data_hora_fim: true,
@@ -46,8 +48,9 @@ class DashboardModel {
     }
 
     // Gráfico de tendência de refugo (Últimos 7 dias)
-    static async buscarTendenciaRefugo(id_empresa) {
+    static async buscarTendenciaRefugo(id_empresa, setorId = null) {
         try {
+            const idSetor = setorId ? Number(setorId) : null;
             const seteDiasAtras = new Date();
             seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
             seteDiasAtras.setHours(0, 0, 0, 0); // Começa da meia-noite do dia 7
@@ -55,7 +58,8 @@ class DashboardModel {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa: Number(id_empresa),
-                    data_hora_fim: { gte: seteDiasAtras }
+                    data_hora_fim: { gte: seteDiasAtras },
+                    ...(idSetor ? { maquina: { id_setor: idSetor } } : {})
                 },
                 select: {
                     data_hora_fim: true,
@@ -88,8 +92,9 @@ class DashboardModel {
     }
 
     // Média de paradas por dia
-    static async mediaParadasPorDia(id_empresa) {
+    static async mediaParadasPorDia(id_empresa, setorId = null) {
         try {
+            const idSetor = setorId ? Number(setorId) : null;
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
 
@@ -99,6 +104,7 @@ class DashboardModel {
             const dadosParadas = await prisma.historico_Eventos.aggregate({
                 where: {
                     id_empresa: Number(id_empresa),
+                    ...(idSetor ? { setor_afetado: idSetor } : {}),
 
                     id_motivo_parada: {
                         not: null
@@ -148,13 +154,15 @@ class DashboardModel {
     }
 
     // Top 3 motivos de parada mais frequentes na fábrica
-    static async top3MotivosParadaGeral(id_empresa) {
+    static async top3MotivosParadaGeral(id_empresa, setorId = null) {
         try {
+            const idSetor = setorId ? Number(setorId) : null;
             // 1. Agrupa os eventos pelo ID do motivo e conta as ocorrências
             const motivosAgrupados = await prisma.historico_Eventos.groupBy({
                 by: ['id_motivo_parada'],
                 where: {
                     id_empresa,
+                    ...(idSetor ? { setor_afetado: idSetor } : {}),
                     id_motivo_parada: { not: null }, // Garante que apenas eventos com motivo entrem
                     status_atual: { in: ['Parada', 'Setup'] } // Foca nos estados de interesse
                 },

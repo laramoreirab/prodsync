@@ -51,26 +51,31 @@ export const qtdUsuariosSetorService = {
 };
 
 export const topOperadoresService = {
-  async getTopOperadores() {
+  async getTopOperadores(setorId) {
     if (USE_MOCK) return TopOperadoresArraySchema.parse(mockTopOperadores);
     const data = await apiFetch("/api/usuarios/dashboard/top5Operadores");
-    return TopOperadoresArraySchema.parse(data.dados);
+    const normalized = (data.dados || []).map((item) => ({
+      operador: item.operador ?? item.nome ?? "Sem nome",
+      media: item.media ?? item.pecas_boas ?? item.qtd ?? 0,
+      setorId: item.setorId ?? (setorId ? Number(setorId) : undefined),
+    }));
+    return TopOperadoresArraySchema.parse(filterBySetorId(normalized, setorId));
   },
 };
 
 export const tempoSessaoService = {
-  async getTempoSessao() {
+  async getTempoSessao(setorId) {
     if (USE_MOCK) return TempoSessaoPerfilArraySchema.parse(mockTempoSessaoPerfil);
     const data = await apiFetch("/api/usuarios/dashboard/tempo-medio-sessao-perfil");
-    return TempoSessaoPerfilArraySchema.parse(data.dados);
+    return TempoSessaoPerfilArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
 
 export const rotatividadeService = {
-  async getRotatividade() {
+  async getRotatividade(setorId) {
     if (USE_MOCK) return RotatividadeArraySchema.parse(mockRotatividade);
     const data = await apiFetch("/api/usuarios/dashboard/rotatividadeUsuarios");
-    return RotatividadeArraySchema.parse(data.dados);
+    return RotatividadeArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
 
@@ -96,7 +101,7 @@ export const turnosOperadoresService = {
       return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
     }
     try {
-      const data = await apiFetch("/api/usuarios/dashboard/turnosOperadores");
+      const data = await apiFetch("/api/usuarios/turnos");
       return UsuariosPorTurnoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
     } catch {
       return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
@@ -112,7 +117,7 @@ export const producaoMediaUsuarioSetorService = {
       );
     }
     try {
-      const data = await apiFetch("/api/usuarios/dashboard/producaoMediaUsuarioSetor");
+      const data = await apiFetch("/api/usuarios/producao_media_por_usuario");
       return ProducaoMediaUsuarioArraySchema.parse(filterBySetorId(data.dados || [], setorId));
     } catch {
       return ProducaoMediaUsuarioArraySchema.parse(
@@ -128,7 +133,7 @@ export const usuarioTaxaRefugoService = {
       return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
     }
     try {
-      const data = await apiFetch("/api/usuarios/dashboard/taxaRefugoOperadores");
+      const data = await apiFetch("/api/usuarios/taxa_refugo");
       return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
     } catch {
       return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
