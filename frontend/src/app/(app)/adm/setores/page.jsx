@@ -16,7 +16,7 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Search, EyeIcon, Pencil, Trash2, Loader2, ChevronDown } from "lucide-react";
 import { PlusChevronToggleIcon } from "@/components/ui/PlusChevronToggleIcon";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
@@ -172,7 +172,7 @@ export default function PageSetores() {
 
           <DropdownMenu>
             <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-              <Plus className="mr-2" />
+              <PlusChevronToggleIcon className="mr-2" />
               Criar
               <ChevronDown className="ml-2 w-5 h-5" />
             </DropdownMenuTrigger>
@@ -212,16 +212,15 @@ export default function PageSetores() {
         <WidgetCard>
           <OEEPorSetorWidget />
         </WidgetCard>
-        <div className="flex flex-col justify-around gap-4 h-full">
-          <WidgetCard>
-            <SetorTotalWidget />
-          </WidgetCard>
+<div className="flex flex-col justify-between gap-4 h-full">
+  <WidgetCard>
+    <SetorTotalWidget />
+  </WidgetCard>
 
-          <WidgetCard>
-            <OperadoresMediaWidget />
-          </WidgetCard>
-
-        </div>
+  <WidgetCard>
+    <OperadoresMediaWidget />
+  </WidgetCard>
+</div>
       </AsymmetricGrid>
       
       <ContentGrid cols={2} className="mt-6">

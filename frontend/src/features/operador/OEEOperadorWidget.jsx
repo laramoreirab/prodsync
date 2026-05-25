@@ -7,18 +7,17 @@ import { metricas } from "@/features/operador/config/operadorConfig";
 export function OEEOperadorWidget({ operadorId }) {
   const { data, loading, error } = useOEEOperador(operadorId);
 
-  // Feedbacks de carregamento e erros padronizados com padding
-  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando OEE...</p>;
-  if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar OEE.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;
+  if (loading) return <div className="flex items-center justify-center h-[214px] text-sm text-muted-foreground w-full">Carregando OEE...</div>;
+  if (error) return <div className="flex items-center justify-center h-[214px] text-sm text-destructive w-full">Erro ao carregar OEE.</div>;
+  if (!data || (Array.isArray(data) && data.length === 0)) {
+    return <div className="flex items-center justify-center h-[214px] text-xs text-muted-foreground w-full">Nenhum dado encontrado.</div>;
+  }
 
-  // Separação da métrica principal (oee) das secundárias
   const metricaOeeGeral = metricas.find((m) => m.key === "oee");
   const metricasSecundarias = metricas.filter((m) => m.key !== "oee");
 
   return (
-    <div className="flex flex-col gap-1 w-full p-4 h-full justify-between">
+    <div className="flex flex-col w-full h-[214px] justify-between p-0 select-none relative">
       {/* Cabeçalho */}
       <div className="text-left w-full">
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
@@ -28,15 +27,15 @@ export function OEEOperadorWidget({ operadorId }) {
       </div>
 
       {/* Container dos Gráficos */}
-      <div className="flex flex-col gap-1 w-full items-center">
+      <div className="flex flex-col w-full items-center justify-end flex-1 relative mt-2">
         
         {/* Gráfico Principal (OEE Geral do Operador) */}
         {metricaOeeGeral && (
-          <div className="flex flex-col items-center justify-center rounded-lg w-full">
+          <div className="flex flex-col items-center justify-center w-full transform scale-95 origin-bottom pb-4 relative">
             <GaugeSemicircular
-              title={metricaOeeGeral.label}
+              title="" 
               data={[{ value: data[metricaOeeGeral.key], fill: metricaOeeGeral.color }]}
-              size="xlg"
+              size="md"
               config={{
                 value: { label: metricaOeeGeral.label, color: metricaOeeGeral.color },
               }}
@@ -45,9 +44,9 @@ export function OEEOperadorWidget({ operadorId }) {
         )}
 
         {/* Gráficos Secundários (Disponibilidade, Performance, Qualidade) */}
-        <div className="-mt-8 grid grid-cols-3 gap-0.5 w-full items-start justify-items-center">
+        <div className="-mt-4 grid grid-cols-3 gap-1 w-full items-start justify-items-center transform scale-90 origin-top">
           {metricasSecundarias.map(({ key, label, color }) => (
-            <div key={key} className="flex flex-col items-center justify-center w-full">
+            <div key={key} className="flex flex-col items-center justify-center w-full text-center">
               <GaugeSemicircular
                 title={label}
                 data={[{ value: data[key], fill: color }]}

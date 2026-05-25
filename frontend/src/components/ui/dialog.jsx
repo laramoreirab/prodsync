@@ -133,14 +133,14 @@ function DialogTrigger({
   asChild = false,
   ...props
 }) {
-  const hoverState = { 
-    scale: 1.03, 
+  const hoverState = {
+    scale: 1.03,
     filter: "brightness(1.05)"
   };
-  
-  const tapState = { 
-    scale: 0.98, 
-    filter: "brightness(0.96)" 
+
+  const tapState = {
+    scale: 0.98,
+    filter: "brightness(0.96)"
   };
 
   if (asChild) {
@@ -153,8 +153,7 @@ function DialogTrigger({
         {...props}
         whileHover={hoverState}
         whileTap={tapState}
-        transition={SMOOTH_SPRING}
-      >
+        transition={{ type: "spring", stiffness: 400, damping: 18 }}      >
         {children}
       </MotionSlot>
     );
@@ -167,8 +166,7 @@ function DialogTrigger({
         className={cn("cursor-pointer", className)}
         whileHover={hoverState}
         whileTap={tapState}
-        transition={SMOOTH_SPRING}
-      >
+        transition={{ type: "spring", stiffness: 400, damping: 18 }}      >
         {children}
       </motion.button>
     </DialogPrimitive.Trigger>

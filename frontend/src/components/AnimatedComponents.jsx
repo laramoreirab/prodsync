@@ -29,7 +29,6 @@ import { SPACING } from "@/lib/spacing";
 import { Search, Loader2 } from "lucide-react";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { DialogTrigger } from "@/components/ui/dialog";
 
 // ─────────────────────────────────────────────
 // VARIANTES DE ANIMAÇÃO (centralizadas)

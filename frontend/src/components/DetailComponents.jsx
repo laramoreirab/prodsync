@@ -210,7 +210,7 @@ export function DetailSectionTitle({ title, size = "3xl", className }) {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className={cn("font-bold", SPACING.sectionGap, sizeClass, className)}
+      className={cn("font-bold ", SPACING.sectionGap, sizeClass, className)}
     >
       {title}
     </motion.h2>
@@ -340,7 +340,7 @@ export function UserProfileCard({
     <FadeUpItem>
       <div
         className={cn(
-          "flex flex-col sm:flex-row justify-between items-start gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-6",
+          "flex flex-col sm:flex-row justify-between items-start  h-[250px] gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-8",
           className
         )}
       >
@@ -358,7 +358,7 @@ export function UserProfileCard({
 
           {/* Dados */}
           <div className="flex flex-col gap-3 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-black leading-snug">{name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black leading-snug">{name}</h1>
 
             <div className="flex flex-col sm:flex-row gap-6 sm:gap-10">
               {/* Coluna esquerda */}

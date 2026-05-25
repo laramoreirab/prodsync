@@ -15,7 +15,7 @@ import { PageLayout, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGri
 
 export default function DashboardGeralPage() {
   return (
-    <div className="pb-12">
+    <PageLayout className="pb-12">
       <PageHeader title="Dashboard Geral da Empresa" />
       
       <AsymmetricGrid>
@@ -59,6 +59,6 @@ export default function DashboardGeralPage() {
           <ProducaoPorTurnoLotesWidget />
         </WidgetCard>
       </KPIGrid>
-    </div>
+    </PageLayout>
   );
 }

@@ -51,7 +51,7 @@ export function KPIHorizontal({ title, value, type = "number" }) {
     return (
         <div className="w-full flex flex-row items-center ">
 
-            <div className="flex flex-col items-start pr-6 pl-4">
+            <div className="flex flex-col items-start pr-6 pl-4 py-6">
                 <p className="text-sm font-semibold text-black tracking-tight leading-snug uppercase">
                     {title}
                 </p>

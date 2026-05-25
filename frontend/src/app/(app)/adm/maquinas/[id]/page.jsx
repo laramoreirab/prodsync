@@ -35,7 +35,7 @@ import {
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 
 // Layout geral
-import { PageLayout, SearchBar, FilterRow, EmptyState, AsymmetricGrid } from "@/components/AnimatedComponents";
+import { PageLayout, SearchBar, FilterRow, EmptyState, AsymmetricGrid, FadeUpItem } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
 import {
@@ -486,6 +486,7 @@ export default function MaquinaDetalhePage({ params }) {
             />
           }
         >
+          <FadeUpItem>
           {dadosExibidos.length > 0 ? (
             <TableListagens
               data={dadosExibidos}
@@ -525,6 +526,7 @@ export default function MaquinaDetalhePage({ params }) {
           ) : (
             <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
           )}
+          </FadeUpItem>
         </DetailListingSection>
 
         <DetailListingSection
@@ -557,6 +559,7 @@ export default function MaquinaDetalhePage({ params }) {
             />
           }
         >
+          <FadeUpItem>
           {dadosApontamentosFiltrados.length > 0 ? (
             <TableListagens
               data={dadosApontamentosFiltrados}
@@ -576,6 +579,7 @@ export default function MaquinaDetalhePage({ params }) {
               message="Não encontramos apontamentos correspondentes ao filtro ou busca."
             />
           )}
+          </FadeUpItem>
         </DetailListingSection>
 
       </DetailPageContainer>

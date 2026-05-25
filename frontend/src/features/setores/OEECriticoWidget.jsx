@@ -27,7 +27,7 @@ export function OEECriticoWidget() {
           <GaugeSemicircular
             title={data.setor}
             data={[{ value: data.oee, fill: "var(--color-grafico-area)" }]}
-            size="lg"
+            size="xlg"
             config={{
               value: { label: data.setor },
             }}

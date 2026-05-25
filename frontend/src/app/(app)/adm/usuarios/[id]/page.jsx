@@ -27,7 +27,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import { apiFetch } from "@/lib/api";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 
-import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+import { PageLayout, AsymmetricGrid, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
 import {
   DetailPageContainer,
   DetailBackLink,
@@ -384,29 +384,34 @@ export default function UsuarioDetalhePage({ params }) {
 
         {usuario?.maquina && (
           <>
-            <DetailSectionTitle title="Responsável por:" />
-            <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
-              <UserProfileCard
-                imageSrc="/demo_maq.png"
-                imageAlt={usuario.maquina.nome || "Máquina"}
-                name={usuario.maquina.nome || "-"}
-                fieldsLeft={[
-                  { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
-                  { label: "Série", value: usuario.maquina.serie || "-" },
-                ]}
-                fieldsRight={[
-                  { label: "Status", value: usuario.maquina.status_atual || "-" },
-                ]}
-              />
-            </Link>
+            <DetailSectionTitle className="mt-12" title="Responsável por:" />
+            <AsymmetricGrid side="left" className="mt-2">
+              <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
+                <UserProfileCard
+                  imageSrc="/demo_maq.png"
+                  imageAlt={usuario.maquina.nome || "Máquina"}
+                  name={usuario.maquina.nome || "-"}
+                  fieldsLeft={[
+                    { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
+                    { label: "Série", value: usuario.maquina.serie || "-" },
+                  ]}
+                  fieldsRight={[
+                    { label: "Status", value: usuario.maquina.status_atual || "-" },
+                  ]}
+                />
+              </Link>
+
+              <SectionHighlight>
+                <OEEOperadorWidget operadorId={operadorId} />
+              </SectionHighlight>
+
+            </AsymmetricGrid>
           </>
         )}
 
         <DetailSectionTitle title="Produção" />
 
-        <SectionHighlight>
-          <OEEOperadorWidget operadorId={operadorId} />
-        </SectionHighlight>
+
 
         <DetailWidgetGrid cols={3}>
 

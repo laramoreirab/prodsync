@@ -16,6 +16,13 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
       valueText: "text-sm font-semibold",
       labelText: "text-[10px]",
       labelOffset: "-mt-4",
+    },md: { 
+      container: "h-[105px] w-[120px]",
+      svgSize: 100,
+      strokeWidth: 8,
+      valueText: "text-xl font-bold",
+      labelText: "text-[11px]",
+      labelOffset: "-mt-6",
     },
     default: {
       container: "h-[120px] w-[130px]",
