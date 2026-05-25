@@ -2,9 +2,12 @@ package com.senai.prodsync;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
@@ -14,6 +17,7 @@ import retrofit2.Response;
 
 public class NotificationWorker extends Worker {
     private static final String CHANNEL_ID = "machine_status_channel";
+    private static final String TAG = "NotificationWorker";
 
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -24,40 +28,67 @@ public class NotificationWorker extends Worker {
     public Result doWork() {
         try {
             SharedPreferences prefs = getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
-            String token = "Bearer " + prefs.getString("token", "");
+            String token = prefs.getString("token", "");
+            
+            if (token.isEmpty()) return Result.failure();
+            
+            String bearerToken = "Bearer " + token;
 
-            // 1. Busca dados APENAS da API
-            Response<ApiResponse<List<Machine>>> response = MachineService.getClient().getMaquinas(token).execute();
+            // Busca as máquinas da API real (Render)
+            Response<ApiResponse<List<Machine>>> response = MachineService.getClient().getMaquinas(bearerToken).execute();
 
             if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
                 List<Machine> machines = response.body().getDados();
                 if (machines != null) {
                     for (Machine machine : machines) {
-                        // Notifica se houver algo crítico (ex: status parado)
-                        if ("Vermelho".equalsIgnoreCase(machine.getStatus()) || "parada".equalsIgnoreCase(machine.getStatus())) {
-                            showNotification(machine.getNome(), "Máquina necessita de atenção!");
+                        String status = machine.getStatus();
+                        int machineIdHash = machine.getId().hashCode();
+                        
+                        // 1. Notifica Paradas Críticas (Vermelho)
+                        if ("Vermelho".equalsIgnoreCase(status) || "parada".equalsIgnoreCase(status) || "parado".equalsIgnoreCase(status)) {
+                            showNotification("⚠️ ALERTA: " + machine.getNome(), 
+                                    "Máquina PARADA. Requer atenção imediata.", 
+                                    machineIdHash);
+                        } 
+                        // 2. Notifica Processo de Setup (Amarelo)
+                        else if ("Amarelo".equalsIgnoreCase(status) || "setup".equalsIgnoreCase(status) || "em_setup".equalsIgnoreCase(status)) {
+                            showNotification("⚙️ SETUP: " + machine.getNome(), 
+                                    "Máquina em processo de ajuste técnico (Setup).", 
+                                    machineIdHash + 1000);
                         }
                     }
                 }
             }
             return Result.success();
         } catch (Exception e) {
-            return Result.success();
+            Log.e(TAG, "Falha ao processar notificações", e);
+            return Result.retry(); 
         }
     }
 
-    private void showNotification(String name, String msg) {
+    private void showNotification(String title, String msg, int notificationId) {
         NotificationManager nm = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Alertas ProdSync", NotificationManager.IMPORTANCE_HIGH);
+            channel.enableVibration(true);
             nm.createNotificationChannel(channel);
         }
+
+        // Intent para abrir o app ao clicar na notificação
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        
         NotificationCompat.Builder b = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.s_logo)
-                .setContentTitle("Alerta: " + name)
+                .setContentTitle(title)
                 .setContentText(msg)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
-        nm.notify(name.hashCode(), b.build());
+
+        nm.notify(notificationId, b.build());
     }
 }
