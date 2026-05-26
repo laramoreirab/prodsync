@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
+import { Toaster } from "@/components/ui/sonner"
+import { json } from "zod"
 
 const adminTabs = [
   { id: "conta", label: "Conta", icon: UserRound },
@@ -132,16 +134,16 @@ function AccountSettings({ role }) {
     async function buscarDados() {
       const dadosUsuario = await apiFetch("/api/auth/perfil")
       setFormData({
-      id : dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "", 
-      nome : dadosUsuario.dados.nome || "",
-      cpf : dadosUsuario.dados.cpf || "",
-      cargo : dadosUsuario.dados.tipo || "",
-      email : dadosUsuario.dados.email || "",
-      emailEmpresa : dadosUsuario.dados.email || "",
-      telefoneEmpresa : dadosUsuario.dados.telefone || "",
-      enderecoEmpresa : dadosUsuario.dados.endereco || "",
-      cpfRepresentante : dadosUsuario.dados.cpf_representante || ""
-    })
+        id: dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "",
+        nome: dadosUsuario.dados.nome || "",
+        cpf: dadosUsuario.dados.cpf || "",
+        cargo: dadosUsuario.dados.tipo || "",
+        email: dadosUsuario.dados.email || "",
+        emailEmpresa: dadosUsuario.dados.email || "",
+        telefoneEmpresa: dadosUsuario.dados.telefone || "",
+        enderecoEmpresa: dadosUsuario.dados.endereco || "",
+        cpfRepresentante: dadosUsuario.dados.cpf_representante || ""
+      })
       console.log("Dados do usuário:", dadosUsuario)
     }
     buscarDados()
@@ -258,7 +260,100 @@ function PasswordRuleList({ password }) {
 
 function SecuritySettings({ role }) {
   const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [carregando, setCarregando] = useState(false)
+  const [deletando, setDeletando] = useState(false)
+  const [confirmCNPJ, setConfirmCNPJ] = useState("")
+  const [confirmPasswordDelete, setConfirmPasswordDelete] = useState("")
   const showDeleteAccount = role === "admin"
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
+    if (senhasNaoBatem) {
+      Toaster("As senhas digitadas não estão iguais!")
+      return
+    }
+
+    setCarregando(true)
+
+    try {
+      const response = await apiFetch('/api/auth/trocarSenha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          senhaAtual: currentPassword,
+          novaSenha: newPassword,
+          confirmacaoNovaSenha: confirmPassword
+        })
+      })
+
+      if (response.sucesso) {
+        Toaster("Senha alterada com sucesso!")
+        setCurrentPassword("")
+        setNewPassword("")
+        setConfirmPassword("")
+      } else {
+        Toaster("Erro ao alterar senha. Verifique os requisitos.")
+      }
+
+    } catch (error) {
+      console.error("Erro ao trocar senha:", error)
+      Toaster("Ocorreu um erro ao tentar alterar a senha.")
+
+    } finally {
+      setCarregando(false)
+    }
+  }
+
+  async function handleDeletarContar(e) {
+    if (!confirmCNPJ || !confirmPasswordDelete) {
+    Toaster("Por favor, preencha o CNPJ e a senha para confirmar.");
+    return;
+  }
+  
+    const confirmar = window.confirm(
+      "ATENÇÃO: Você está prestes a deletar sua conta de Administrador. Isso apagará PERMANENTEMENTE todos os dados da sua empresa e de seus funcionários. Deseja mesmo continuar?"
+    )
+
+    if (!confirmar) return
+
+    setDeletando(true)
+
+    try {
+      const response = await apiFetch('/api/usuarios/deletarEmpresa', {
+        method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        cnpj: confirmCNPJ,
+        senhaAdmin: confirmPasswordDelete
+      })
+      });
+
+      if (response.sucesso) {
+        Toaster.success("Conta e empresa excluídas com sucesso! Volte quando quiser, Prodsync está sempre pronto para te sincronizar!")
+
+        // Limpa o token e desloga o usuário após alguns segundos
+        setTimeout(() => {
+          localStorage.removeItem("token")
+          window.location.href = "/"
+        }, 2000)
+      } else {
+        Toaster.error("Não foi possível deletar a conta. Tente novamente.")
+      }
+    } catch (error) {
+      console.error("Erro ao deletar conta:", error)
+      Toaster.error("Erro interno ao tentar excluir a conta.")
+    } finally {
+      setDeletando(false)
+    }
+
+  }
 
   return (
     <div className="max-w-2xl space-y-5">
@@ -267,14 +362,19 @@ function SecuritySettings({ role }) {
         description="Proteja sua conta com credenciais robustas."
       />
 
-      <form className="space-y-3">
+      <form className="space-y-3" onSubmit={handleSubmit(e)}>
         <div className="space-y-1">
           <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
             Senha Atual
           </label>
           <div className="relative max-w-sm">
             <LockKeyhole className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-            <SettingsInput id="senhaAtual" type="password" className="pl-8" />
+            <SettingsInput
+              id="senhaAtual"
+              type="password"
+              value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              className="pl-8" />
           </div>
         </div>
 
@@ -294,15 +394,19 @@ function SecuritySettings({ role }) {
             <label htmlFor="confirmarSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
               Confirmar Nova Senha
             </label>
-            <SettingsInput id="confirmarSenha" type="password" />
+            <SettingsInput
+              id="confirmarSenha"
+              value={confirmPassword}
+              type="password"
+              onChange={(event) => setConfirmPassword(event.target.value)} />
           </div>
         </div>
 
         <PasswordRuleList password={newPassword} />
 
-        <Button type="button" className="h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+        <Button type="submit" className="h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold" disabled={carregando || senhasNaoBatem}>
           <Save className="size-4" />
-          Salvar Senha
+          {carregando ? "Salvando..." : "Salvar Senha"}
         </Button>
       </form>
 
@@ -316,13 +420,40 @@ function SecuritySettings({ role }) {
             <p className="mt-2 max-w-lg text-xs font-medium text-zinc-600 dark:text-zinc-300">
               Excluir permanentemente sua conta e todos os dados da empresa. Esta ação é irreversível.
             </p>
+            <div className="mt-4 grid max-w-md gap-3 sm:grid-cols-2">
+              <div className="space-y-1">
+                <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
+                  CNPJ da Empresa
+                </label>
+                <SettingsInput
+                  id="deleteCnpj"
+                  placeholder="Apenas números"
+                  value={confirmCNPJ}
+                  onChange={(e) => setConfirmCNPJ(e.target.value.replace(/\D/g, ""))} 
+                />
+              </div>
+              <div className="space-y-1">
+                <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
+                  Sua Senha de Administrador
+                </label>
+                <SettingsInput
+                  id="deletePassword"
+                  type="password"
+                  placeholder="Digite sua senha"
+                  value={confirmPasswordDelete}
+                  onChange={(e) => setConfirmPasswordDelete(e.target.value)}
+                />
+              </div>
+            </div>
             <Button
               type="button"
               variant="destructive"
+              onClick={handleDeletarContar}
               size="sm"
+              disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
               className="mt-3 h-7 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30"
             >
-              Excluir Conta
+              {deletando ? "Excluindo..." : "Excluir Conta"}
             </Button>
           </section>
         </div>

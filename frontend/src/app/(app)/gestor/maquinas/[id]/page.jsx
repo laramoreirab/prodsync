@@ -19,7 +19,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
-import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import { SolicitarJustificativaMenuItem } from "@/components/ui/forms/historicoEventos/solicitarJustificativaDialog";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import FormExclusaoMaquina from "@/components/ui/forms/maquinas/formExclusaoMaquina";
 import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina";
@@ -571,17 +571,12 @@ export default function MaquinaDetalheGestor({ params }) {
                     </DialogContent>
                   </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar Justificativa
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <ModalSucessNotificacao />
-                    </DialogContent>
-                  </Dialog>
+                  <SolicitarJustificativaMenuItem idEvento={maquina.id}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <BellRing className="mr-2 h-4 w-4" />
+                      Solicitar Justificativa
+                    </DropdownMenuItem>
+                  </SolicitarJustificativaMenuItem>
 
                   <Dialog>
                     <DialogTrigger asChild>

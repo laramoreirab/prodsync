@@ -16,7 +16,8 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2, ChevronDown } from "lucide-react";
+import { Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+import { PlusChevronToggleIcon } from "@/components/ui/PlusChevronToggleIcon";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import {
@@ -62,6 +63,7 @@ export default function PageSetores() {
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
   const [criarAberto, setCriarAberto] = useState(null);
+  const [menuCriarAberto, setMenuCriarAberto] = useState(false);
   const filtersConfig = setoresFilter.map((filter) =>
     filter.id === "nome_setor"
       ? { ...filter, options: setores.map((setor) => setor.nome_setor).filter(Boolean) }
@@ -167,24 +169,29 @@ export default function PageSetores() {
               </h1>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-                <Plus className="mr-2" />
+            <DropdownMenu open={menuCriarAberto} onOpenChange={setMenuCriarAberto}>
+              <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center gap-2 text-white text-xl font-semibold cursor-pointer">
+                <PlusChevronToggleIcon open={menuCriarAberto} />
                 Criar
-                <ChevronDown className="ml-2 w-5 h-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-48">
                 <DropdownMenuItem
                   className="cursor-pointer text-base font-medium"
-                  onClick={() => setCriarAberto("setor")}
+                  onClick={() => {
+                    setMenuCriarAberto(false);
+                    setCriarAberto("setor");
+                  }}
                 >
                   Setor
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer text-base font-medium"
-                  onClick={() => setCriarAberto("turno")}
+                  onClick={() => {
+                    setMenuCriarAberto(false);
+                    setCriarAberto("turno");
+                  }}
                 >
-                  Turno (todos os setores)
+                  Turno Geral
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -4,6 +4,13 @@ import MaquinaModel from './MaquinaModel.js';
 
 class OrdemProducaoModel {
 
+    static calcularProgresso(produzido, qtd_planejada) {
+        const planejado = Number(qtd_planejada) || 0;
+        const boas = Number(produzido) || 0;
+        if (planejado <= 0) return 0;
+        return Math.min(100, Math.round((boas / planejado) * 100));
+    }
+
     static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
@@ -31,6 +38,34 @@ class OrdemProducaoModel {
                 regrasDaBusca,
                 paginacao
             );
+
+            const ids = resultadoPaginado.dados.map((ordem) => ordem.id_ordem);
+            if (ids.length === 0) return resultadoPaginado;
+
+            const agregados = await prisma.apontamento.groupBy({
+                by: ['id_ordemProducao'],
+                where: {
+                    id_ordemProducao: { in: ids }
+                },
+                _sum: { qtd_boa: true, qtd_refugo: true }
+            });
+
+            const mapaProducao = Object.fromEntries(
+                agregados.map((item) => [
+                    item.id_ordemProducao,
+                    {
+                        produzido: item._sum.qtd_boa ?? 0,
+                        refugo: item._sum.qtd_refugo ?? 0
+                    }
+                ])
+            );
+
+            resultadoPaginado.dados = resultadoPaginado.dados.map((ordem) => {
+                const { produzido = 0, refugo = 0 } = mapaProducao[ordem.id_ordem] ?? {};
+                const progresso = OrdemProducaoModel.calcularProgresso(produzido, ordem.qtd_planejada);
+
+                return { ...ordem, produzido, refugo, progresso };
+            });
 
             return resultadoPaginado;
         } catch (error) {
@@ -95,16 +130,19 @@ class OrdemProducaoModel {
 
             const agregado = await prisma.apontamento.aggregate({
                 where: {
-                    id_ordemProducao: Number(id_ordem),
-                    id_empresa: Number(id_empresa)
+                    id_ordemProducao: Number(id_ordem)
                 },
                 _sum: { qtd_boa: true, qtd_refugo: true }
             });
 
+            const produzido = agregado._sum.qtd_boa ?? 0;
+            const refugo_total = agregado._sum.qtd_refugo ?? 0;
+
             return {
                 ...resultado,
-                produzido: agregado._sum.qtd_boa ?? 0,
-                refugo_total: agregado._sum.qtd_refugo ?? 0
+                produzido,
+                refugo_total,
+                progresso: OrdemProducaoModel.calcularProgresso(produzido, resultado.qtd_planejada)
             };
         } catch (error) {
             console.error('Erro ao buscar Ordem de Produção:', error);
@@ -302,7 +340,7 @@ class OrdemProducaoModel {
                     select: { qtd_planejada: true, produto: true }
                 }),
                 prisma.apontamento.aggregate({
-                    where: { id_empresa, id_ordemProducao: Number(id_ordem) },
+                    where: { id_ordemProducao: Number(id_ordem) },
                     _sum: { qtd_boa: true }
                 })
             ])
@@ -311,9 +349,7 @@ class OrdemProducaoModel {
 
             const produzidos = apontamentos._sum.qtd_boa ?? 0
             const aProduzir = Math.max(ordem.qtd_planejada - produzidos, 0)
-            const progresso = ordem.qtd_planejada > 0
-                ? Math.round((produzidos / ordem.qtd_planejada) * 100)
-                : 0
+            const progresso = OrdemProducaoModel.calcularProgresso(produzidos, ordem.qtd_planejada)
 
             return [
                 { nome: 'Produzidos', valor: produzidos, percentual: progresso },

@@ -44,7 +44,7 @@ import {
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
-import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import { SolicitarJustificativaMenuItem, SolicitarJustificativaConteudo } from "@/components/ui/forms/historicoEventos/solicitarJustificativaDialog";
 
 import {
   PageLayout,
@@ -177,7 +177,7 @@ export default function HistoricoEventos() {
 
   const modalJustificativa = (
     <DialogContent>
-      <ModalSucessNotificacao />
+      <SolicitarJustificativaConteudo idsEventos={selecionados.map((row) => row.id)} />
     </DialogContent>
   );
 
@@ -195,17 +195,12 @@ export default function HistoricoEventos() {
         </DialogContent>
       </Dialog>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-            <BellRing className="mr-2 h-4 w-4" />
-            Solicitar Justificativa
-          </DropdownMenuItem>
-        </DialogTrigger>
-        <DialogContent>
-          <ModalSucessNotificacao />
-        </DialogContent>
-      </Dialog>
+      <SolicitarJustificativaMenuItem idEvento={row.id}>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+          <BellRing className="mr-2 h-4 w-4" />
+          Solicitar Justificativa
+        </DropdownMenuItem>
+      </SolicitarJustificativaMenuItem>
 
       <Dialog>
         <DialogTrigger asChild>

@@ -5,7 +5,10 @@ import { opProgressoService } from "@services/ordenService";
 
 export function useOPProgresso(opId) {
   const fetcher = useCallback(
-    () => opProgressoService.getProgresso(opId),
+    () => {
+      if (!opId) return Promise.resolve(null);
+      return opProgressoService.getProgresso(opId);
+    },
     [opId]
   );
   return useChartData(fetcher);

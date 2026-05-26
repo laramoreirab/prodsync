@@ -46,9 +46,13 @@ clienteMQTT.on('message', async (topic, message) => {
         new Date()
     );
 
-    console.log('[MQTT SUCESSO] Evento registrado no banco via Model:', evento.id);
+    console.log('[MQTT SUCESSO] Evento registrado no banco via Model:', evento.id_evento ?? evento.id);
 
   } catch (erro) {
+    if (erro.code === 'EVENTO_PENDENTE') {
+      console.warn(`[MQTT BLOQUEADO] ${erro.message}`);
+      return;
+    }
     console.error('Erro ao processar mensagem MQTT:', erro);
   }
 });

@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api";
+import { opCrudService } from "@/services/opCrudService";
 import {
   OPKPISchema,
   OPEficienciaSchema,
@@ -154,40 +155,46 @@ export const opConcluidasDiaService = {
   },
 };
  
+const extrairProgressoOP = (dados) => {
+  const itens = Array.isArray(dados) ? dados : [];
+  const produzido = itens.find((i) => i.nome === "Produzidos") ?? itens[0];
+  const aProduzir = itens.find((i) => i.nome === "A Produzir") ?? itens[1];
+
+  return OPProgressoSchema.parse({
+    produzidos: Number(produzido?.valor ?? 0),
+    aProduzir: Number(aProduzir?.valor ?? 0),
+  });
+};
+
+const extrairOeeOP = (dados) =>
+  OPOEEDetalheSchema.parse({
+    disponibilidade: Number(dados?.disponibilidade ?? 0),
+    performance: Number(dados?.performance ?? 0),
+    qualidade: Number(dados?.qualidade ?? 0),
+    oee: Number(dados?.oee ?? 0),
+  });
+
 export const opProgressoService = {
   async getProgresso(opId) {
-    try {
-      const response = await apiFetch(`/api/ordens/dashboard/progresso/${opId}`);
-      const [produzido, aProduzir] = response.dados;
-      return OPProgressoSchema.parse({
-        produzidos: produzido.valor,
-        aProduzir: aProduzir.valor
-      });
-    } catch (error) {
-      console.error('Erro ao buscar progresso da OP:', error);
-    }
+    const response = await apiFetch(`/api/ordens/dashboard/progresso/${opId}`);
+    return extrairProgressoOP(response?.dados);
   },
 };
- 
+
 export const opOEEDetalheService = {
   async getOEE(opId, maquinaId) {
-    try {
-      // Se não tiver maquinaId, precisamos buscar a OP primeiro para descobrir a máquina
-      let id_maquina = maquinaId;
-      if (!id_maquina) {
-        const opResponse = await apiFetch(`/api/ordens?pagina=1&limite=50`);
-        const op = opResponse.dados?.find(o => o.id_ordem === Number(opId));
-        id_maquina = op?.id_maquina;
-      }
+    let id_maquina = maquinaId;
 
-      if (!id_maquina) {
-        console.warn(`Não foi possível encontrar a máquina para a OP ${opId}`);
-      }
-
-      const response = await apiFetch(`/api/oee/maquinas/${id_maquina}/ordens/${opId}`);
-      return OPOEEDetalheSchema.parse(response.dados);
-    } catch (error) {
-      console.error('Erro ao buscar OEE da OP:', error);
+    if (!id_maquina) {
+      const op = await opCrudService.getById(opId);
+      id_maquina = op?.id_maquina;
     }
+
+    if (!id_maquina) {
+      return extrairOeeOP(null);
+    }
+
+    const response = await apiFetch(`/api/oee/maquinas/${id_maquina}/ordens/${opId}`);
+    return extrairOeeOP(response?.dados);
   },
 };

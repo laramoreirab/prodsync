@@ -27,7 +27,7 @@ export default function FormExclusaoSetor({ setorId, setorIds = [], onExclusaoSu
             if (onExclusaoSucesso) onExclusaoSucesso();
         } catch (error) {
             console.error("Erro ao excluir setor:", error);
-            toast.error("Erro ao excluir setor.");
+            toast.error(error?.message || "Erro ao excluir setor.");
         } finally {
             setCarregando(false);
         }

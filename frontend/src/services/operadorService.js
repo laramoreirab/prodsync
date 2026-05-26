@@ -17,7 +17,7 @@ import {
 export const oeeOperadorService = {
   async getOEE(operadorId) {
     const maquina = await apiFetch(`/api/maquinas/obter-maquina-operador/${operadorId}`, { method: "GET" });
-    const maquinaId = maquina?.dados?.id_maquina || maquina?.id_maquina;
+    const maquinaId = maquina?.id_maquina ?? maquina?.dados?.id_maquina;
     if (!maquinaId) return OEEOperadorSchema.parse({ disponibilidade: 0, performance: 0, qualidade: 0, oee: 0 });
     const data = await apiFetch(`/api/oee/maquinas/${maquinaId}`);
     return OEEOperadorSchema.parse(data.dados);
@@ -89,14 +89,14 @@ export const velocimetroService = {
 
 export const oeeMaquinaService = {
   async getOEEMaquina(id_usuario) {
-    const data = await apiFetch(`/api/usuarios/${id_usuario}/oee_maquina`);
+    const data = await apiFetch(`/api/usuarios/${id_usuario}/oee_maquinas`);
     return data.dados;
   },
 };
 
 export const oeeMaquinaDetalhesService = {
   async getDetalhes(id_usuario) {
-    const data = await apiFetch(`/api/usuarios/${id_usuario}/maquina_oee_detalhes`);
+    const data = await apiFetch(`/api/usuarios/${id_usuario}/maquina_oee_detalhe`);
     return data.dados;
   },
 };

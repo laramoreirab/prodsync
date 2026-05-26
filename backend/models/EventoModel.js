@@ -1,6 +1,7 @@
 import prisma from '../config/prisma.js';
 import TurnoModel from './TurnoModel.js';
 import OrdemProducaoModel from './OrdemProducaoModel.js';
+import NotificacaoModel from './NotificacaoModel.js';
 import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 
 class EventoModel {
@@ -255,8 +256,40 @@ class EventoModel {
         }
     }
 
+    static requerJustificativa(status) {
+        return ['Parada', 'Setup', 'Manutencao'].includes(status);
+    }
+
+    static async obterUltimoEventoMaquina(id_empresa, id_maquina) {
+        return prisma.historico_Eventos.findFirst({
+            where: {
+                id_empresa,
+                id_maquina: Number(id_maquina),
+            },
+            orderBy: [{ inicio: 'desc' }, { id_evento: 'desc' }],
+        });
+    }
+
+    static async validarPodeRegistrarEvento(id_empresa, id_maquina) {
+        const ultimoEvento = await this.obterUltimoEventoMaquina(id_empresa, id_maquina);
+
+        if (
+            ultimoEvento &&
+            this.requerJustificativa(ultimoEvento.status_atual) &&
+            !ultimoEvento.id_motivo_parada
+        ) {
+            const erro = new Error(
+                `A máquina ${id_maquina} possui o evento #${ultimoEvento.id_evento} (${ultimoEvento.status_atual}) sem justificativa. Justifique-o antes de registrar um novo evento.`
+            );
+            erro.code = 'EVENTO_PENDENTE';
+            erro.id_evento = ultimoEvento.id_evento;
+            throw erro;
+        }
+    }
+
     static async registrarEventoMaquina(id_empresa, status_maquina, id_maquina, datastamp) {
         try {
+            await this.validarPodeRegistrarEvento(id_empresa, id_maquina);
             function capitalizar(texto) {
                 if (!texto) return '';
                 return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
@@ -278,6 +311,14 @@ class EventoModel {
 
             if (!maquina) {
                 throw new Error('Maquina nao encontrada ou inativa');
+            }
+
+            const atualizarMaquina = await prisma.maquinas.update({
+                where:{ id_empresa, id_maquina },
+                data:{ status_atual: capitalizar(status_maquina) }
+            })
+            if(!atualizarMaquina){
+                throw new Error('Erro ao atualizar status da máquina'); 
             }
 
             const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio);
@@ -333,6 +374,22 @@ class EventoModel {
                     observacao: ''
                 }
             });
+
+            const statusCapitalizado = capitalizar(status_maquina);
+            if (this.requerJustificativa(statusCapitalizado)) {
+                const maquinaInfo = await prisma.maquinas.findFirst({
+                    where: { id_empresa, id_maquina },
+                    select: { nome: true },
+                });
+                await NotificacaoModel.notificarEventoMaquina(
+                    id_empresa,
+                    resultado,
+                    maquinaInfo?.nome ?? `Máquina ${id_maquina}`
+                ).catch((err) => {
+                    console.error('Erro ao criar notificações do evento:', err);
+                });
+            }
+
             return this.formatarEvento(resultado);
         } catch (error) {
             console.error('Erro registrar evento da maquina no banco de dados:', error);
@@ -359,6 +416,10 @@ class EventoModel {
             const idsMaquinas = maquinas.map(Number).filter((id) => Number.isInteger(id) && id > 0);
             if (idsMaquinas.length === 0) {
                 throw new Error('Nenhuma maquina valida informada');
+            }
+
+            for (const id_maquina of idsMaquinas) {
+                await this.validarPodeRegistrarEvento(id_empresa, id_maquina);
             }
 
             const setorNumerico = Number(setor_afetado);

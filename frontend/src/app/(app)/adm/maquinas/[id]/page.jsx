@@ -14,6 +14,7 @@ import { DataEvento } from "@/components/ui/dataEvento";
 import { BellRing, Pencil, EyeIcon, Trash2, Plus, Search, Loader2 } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -22,7 +23,7 @@ import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina"
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
-import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import { SolicitarJustificativaMenuItem } from "@/components/ui/forms/historicoEventos/solicitarJustificativaDialog";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
@@ -166,6 +167,7 @@ const apontamentoFilter = [
 
 export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
+  const router = useRouter();
   const maquinaId = Number(id);
 
   const [maquina, setMaquina] = useState(null);
@@ -413,7 +415,11 @@ export default function MaquinaDetalhePage({ params }) {
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormExclusaoMaquina maquinaId={maquinaId} onExcluir={maquinaCrudService.delete} />
+                  <FormExclusaoMaquina
+                    maquinaId={maquinaId}
+                    onExcluir={maquinaCrudService.delete}
+                    onExclusaoSucesso={() => router.push("/adm/maquinas")}
+                  />
                 </DialogContent>
               </Dialog>
             </DetailActions>
@@ -495,15 +501,12 @@ export default function MaquinaDetalhePage({ params }) {
                     </DialogTrigger>
                     <DialogContent><DetalhesEvento eventoId={maq.id} /></DialogContent>
                   </Dialog>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar Justificativa
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent><ModalSucessNotificacao /></DialogContent>
-                  </Dialog>
+                  <SolicitarJustificativaMenuItem idEvento={maq.id}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <BellRing className="mr-2 h-4 w-4" />
+                      Solicitar Justificativa
+                    </DropdownMenuItem>
+                  </SolicitarJustificativaMenuItem>
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
