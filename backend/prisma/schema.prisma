@@ -22,6 +22,7 @@ model Empresas {
   historico_eventos  Historico_Eventos[]
   maquinas           Maquinas[]
   motivos_parada     Motivos_Parada[]
+  notificacoes       Notificacoes[]
   ordens_producao    OrdemProducao[]
   setor_gestores     Setor_Gestor[]
   setores            Setores[]
@@ -42,6 +43,7 @@ model Usuarios {
   escalas           EscalaTrabalho[]
   logs              Logs[]
   maquinas_operadas Maquinas[]
+  notificacoes      Notificacoes[]
   setores_geridos   Setor_Gestor[]
   empresa           Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
 }
@@ -77,10 +79,10 @@ model Maquinas {
   data_ativacao     DateTime?           @db.Date
   ativo             Boolean             @default(true)
   capacidade        String?             @db.VarChar(100)
+  categoria         String?             @db.VarChar(100)
   data_aquisicao    DateTime?           @db.Date
   id_operador       Int?
   imagem            String?             @db.VarChar(255)
-  categoria         String?             @db.VarChar(100)
   status            String?             @db.VarChar(50)
   apontamentos      Apontamento[]
   escala_trabalho   EscalaTrabalho[]
@@ -88,6 +90,7 @@ model Maquinas {
   empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   operador          Usuarios?           @relation(fields: [id_operador], references: [id_usuario])
   setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
+  notificacoes      Notificacoes[]
   ordens_producao   OrdemProducao[]
 }
 
@@ -179,7 +182,29 @@ model Historico_Eventos {
   motivo_parada    Motivos_Parada? @relation(fields: [id_motivo_parada], references: [id_motivo])
   ordem_producao   OrdemProducao?  @relation(fields: [id_ordemProducao], references: [id_ordem])
   turno            Turno           @relation(fields: [id_turno], references: [id_turno])
+  notificacoes     Notificacoes[]
 
+  @@index([id_empresa])
+}
+
+model Notificacoes {
+  id_notificacao  Int                @id @default(autoincrement())
+  id_empresa      Int
+  id_destinatario Int
+  tipo            TipoNotificacao
+  titulo          String             @db.VarChar(255)
+  mensagem        String             @db.VarChar(500)
+  id_evento       Int?
+  id_maquina      Int?
+  lida            Boolean            @default(false)
+  lida_em         DateTime?
+  criado_em       DateTime           @default(now())
+  destinatario    Usuarios           @relation(fields: [id_destinatario], references: [id_usuario], onDelete: Cascade)
+  empresa         Empresas           @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  evento          Historico_Eventos? @relation(fields: [id_evento], references: [id_evento])
+  maquina         Maquinas?          @relation(fields: [id_maquina], references: [id_maquina])
+
+  @@index([id_destinatario, lida])
   @@index([id_empresa])
 }
 
@@ -253,6 +278,7 @@ enum StatusOP {
   Em_Andamento @map("Em Andamento")
   Setup
   Finalizada
+  Aguardando
 }
 
 enum TipoMotivoParada {
@@ -265,4 +291,10 @@ enum TipoPrioridade {
   Media
   Baixa
   Critica
+}
+
+enum TipoNotificacao {
+  Maquina_Parada
+  Maquina_Setup
+  Solicitar_Justificativa
 }
