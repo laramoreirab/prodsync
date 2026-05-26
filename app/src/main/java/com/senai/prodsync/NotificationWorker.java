@@ -26,11 +26,15 @@ public class NotificationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.d(TAG, "Iniciando verificação de status das máquinas...");
         try {
             SharedPreferences prefs = getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE);
             String token = prefs.getString("token", "");
             
-            if (token.isEmpty()) return Result.failure();
+            if (token.isEmpty()) {
+                Log.w(TAG, "Token não encontrado. Worker encerrado.");
+                return Result.failure();
+            }
             
             String bearerToken = "Bearer " + token;
 
@@ -39,6 +43,7 @@ public class NotificationWorker extends Worker {
 
             if (response.isSuccessful() && response.body() != null && response.body().isSucesso()) {
                 List<Machine> machines = response.body().getDados();
+                Log.d(TAG, "API retornou " + (machines != null ? machines.size() : 0) + " máquinas.");
                 if (machines != null) {
                     for (Machine machine : machines) {
                         String status = machine.getStatus();
@@ -58,10 +63,13 @@ public class NotificationWorker extends Worker {
                         }
                     }
                 }
+                return Result.success();
+            } else {
+                Log.e(TAG, "Erro na resposta da API: " + response.code());
+                return Result.retry(); // Tenta novamente se for erro de servidor/rede
             }
-            return Result.success();
         } catch (Exception e) {
-            Log.e(TAG, "Falha ao processar notificações", e);
+            Log.e(TAG, "Falha crítica ao processar notificações", e);
             return Result.retry(); 
         }
     }

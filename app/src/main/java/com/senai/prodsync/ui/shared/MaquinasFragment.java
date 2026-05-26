@@ -180,6 +180,7 @@ public class MaquinasFragment extends Fragment {
                 maquina.getId(), maquina.getStatus(), maquina.getNome(), maquina.getSerie(), maquina.getFotoUrl(), maquina.getDataAquisicao(), maquina.getCapacidade(), maquina.getOperador());
         
         androidx.fragment.app.FragmentTransaction transaction = getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
                 .replace(R.id.fragmentContainer, fragment);
         
         if (addToBackStack) {

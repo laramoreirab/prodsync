@@ -2,6 +2,14 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.ProdSync" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
+        <item name="android:windowAnimationStyle">@style/WindowAnimationFade</item>
+    </style>
+
+    <style name="WindowAnimationFade" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/fade_out</item>
     </style>
 
     <style name="Theme.ProdSync" parent="Base.Theme.ProdSync" />

@@ -17,7 +17,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -70,7 +72,8 @@ public class HomeActivity extends AppCompatActivity {
         // 1. Pedir permissão de notificação (Android 13+)
         checkNotificationPermission();
 
-        // 2. Iniciar monitoramento automático (A cada 15 min - mínimo permitido)
+        // 2. Iniciar monitoramento automático e imediato
+        startImmediateCheck();
         startPeriodicCheck();
 
         // 3. Botão de teste momentâneo
@@ -89,14 +92,28 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    private void startImmediateCheck() {
+        OneTimeWorkRequest immediateRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class)
+                .setConstraints(new Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                .build();
+        WorkManager.getInstance(this).enqueue(immediateRequest);
+    }
+
     private void startPeriodicCheck() {
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
         PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(
                 NotificationWorker.class, 15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
                 .build();
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "MachineStatusCheck",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE, // UPDATE mantém a tarefa ativa com as novas configurações
                 periodicWorkRequest
         );
     }
@@ -143,6 +160,7 @@ public class HomeActivity extends AppCompatActivity {
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
         fragmentTransaction.replace(R.id.fragmentContainer, fragment);
         fragmentTransaction.commit();
     }

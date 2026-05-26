@@ -74,6 +74,7 @@ public class OpsFragment extends Fragment {
             OpDetalheFragment fragment = OpDetalheFragment.newInstance(
                     op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(), op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(), op.getDataFinal());
             getParentFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
                     .replace(R.id.fragmentContainer, fragment)
                     .addToBackStack(null)
                     .commit();
