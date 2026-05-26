@@ -42,6 +42,22 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
         super.onCreate(savedInstanceState);
+
+        //Caso o usuário já tenha feito Login alguma vez, e as informações (ex: token)
+        //já estiverem salvas, o login é automático e já será redirecionado para o home e não
+        //para a main activity, ou seja, não será necessário realizar o login toda vez
+        //que entrar no aplicativo...
+        SharedPreferences authPrefs = getSharedPreferences("AUTH", MODE_PRIVATE);
+        String token = authPrefs.getString("token", null);
+        if (token != null) {
+            String tipo = authPrefs.getString("tipo", "operador");
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            intent.putExtra("USER_ROLE", tipo.toLowerCase());
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
