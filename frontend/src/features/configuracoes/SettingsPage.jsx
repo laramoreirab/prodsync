@@ -266,11 +266,13 @@ function SecuritySettings({ role }) {
   const [deletando, setDeletando] = useState(false)
   const [confirmCNPJ, setConfirmCNPJ] = useState("")
   const [confirmPasswordDelete, setConfirmPasswordDelete] = useState("")
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false)
   const showDeleteAccount = role === "admin"
+
+  const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
     if (senhasNaoBatem) {
       Toaster("As senhas digitadas não estão iguais!")
       return
@@ -352,7 +354,17 @@ function SecuritySettings({ role }) {
     } finally {
       setDeletando(false)
     }
+  }
 
+  function aplicarMascaraCNPJ(valor) {
+    let v = valor.replace(/\D/g, "");
+
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+  
+    return v.substring(0, 18);
   }
 
   return (
@@ -362,7 +374,7 @@ function SecuritySettings({ role }) {
         description="Proteja sua conta com credenciais robustas."
       />
 
-      <form className="space-y-3" onSubmit={handleSubmit(e)}>
+      <form className="space-y-3" onSubmit={handleSubmit}>
         <div className="space-y-1">
           <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
             Senha Atual
@@ -412,49 +424,92 @@ function SecuritySettings({ role }) {
 
       {showDeleteAccount ? (
         <div className="border-t border-zinc-100 pt-4 dark:border-zinc-800">
-          <section className="rounded-lg border border-red-400 bg-red-50 px-4 py-3 dark:border-red-500/70 dark:bg-red-950/30">
+          <section className="rounded-lg border border-red-400 bg-red-50 px-4 py-4 dark:border-red-500/70 dark:bg-red-950/30">
             <div className="flex items-center gap-2 text-red-600 dark:text-red-300">
               <Trash2 className="size-4" />
-              <h3 className="text-sm font-bold">Deletar Conta</h3>
+              <h3 className="text-sm font-bold">Deletar Conta da Empresa</h3>
             </div>
             <p className="mt-2 max-w-lg text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              Excluir permanentemente sua conta e todos os dados da empresa. Esta ação é irreversível.
+              Excluir permanentemente sua conta de Administrador e todos os dados da empresa. Esta ação é irreversível.
             </p>
-            <div className="mt-4 grid max-w-md gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-                  CNPJ da Empresa
-                </label>
-                <SettingsInput
-                  id="deleteCnpj"
-                  placeholder="Apenas números"
-                  value={confirmCNPJ}
-                  onChange={(e) => setConfirmCNPJ(e.target.value.replace(/\D/g, ""))} 
-                />
+
+            {!mostrarConfirmacao ? (
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => setMostrarConfirmacao(true)} 
+                className="mt-4 h-8 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30"
+              >
+                Excluir Conta
+              </Button>
+            ) : (
+       
+              <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-xs font-bold text-red-600 dark:text-red-400">
+                  Para confirmar, preencha os dados abaixo:
+                </p>
+
+                <div className="mt-3 grid max-w-md gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">
+                      CNPJ da Empresa
+                    </label>
+                    <SettingsInput
+                      id="deleteCnpj"
+                      placeholder="00.000.000/0000-00"
+                      value={confirmCNPJ}
+                      className="placeholder:text-xs text-xs"
+                      onChange={(e) => {
+                        const valorComMascara = aplicarMascaraCNPJ(e.target.value);
+                        setConfirmCNPJ(valorComMascara);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">
+                      Senha de Administrador
+                    </label>
+                    <SettingsInput 
+                      id="deletePassword"
+                      type="password"
+                      placeholder="Digite sua senha"
+                      className="placeholder:text-xs text-xs"
+                      value={confirmPasswordDelete}
+                      onChange={(e) => setConfirmPasswordDelete(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-3">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeletarContar}
+                    size="sm"
+                    disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
+                    className="h-8 rounded-md bg-red-600 px-4 text-xs font-bold text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+                  >
+                    {deletando ? "Excluindo..." : "Confirmar Exclusão"}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setMostrarConfirmacao(false)
+                      setConfirmCNPJ("") 
+                      setConfirmPasswordDelete("") 
+                    }}
+                    size="sm"
+                    disabled={deletando}
+                    className="h-8 rounded-md px-4 text-xs font-bold"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-1">
-                <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-                  Sua Senha de Administrador
-                </label>
-                <SettingsInput
-                  id="deletePassword"
-                  type="password"
-                  placeholder="Digite sua senha"
-                  value={confirmPasswordDelete}
-                  onChange={(e) => setConfirmPasswordDelete(e.target.value)}
-                />
-              </div>
-            </div>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDeletarContar}
-              size="sm"
-              disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
-              className="mt-3 h-7 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30"
-            >
-              {deletando ? "Excluindo..." : "Excluir Conta"}
-            </Button>
+            )}
           </section>
         </div>
       ) : null}
