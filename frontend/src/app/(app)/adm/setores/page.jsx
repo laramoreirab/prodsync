@@ -191,7 +191,7 @@ export default function PageSetores() {
                     setCriarAberto("turno");
                   }}
                 >
-                  Turno (todos os setores)
+                  Turno Geral
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
