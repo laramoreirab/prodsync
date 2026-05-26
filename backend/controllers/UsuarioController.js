@@ -4,6 +4,8 @@ import SetorModel from '../models/SetorModel.js';
 import MaquinaModel from '../models/MaquinaModel.js'
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 import prisma from '../config/prisma.js';
+import { TypeOverrides } from 'pg';
+import EmpresaModel from '../models/EmpresaModel.js';
 
 class UsuarioController {
 
@@ -569,6 +571,25 @@ static async atualizarUsuario(req, res) {
             return res.status(200).json({ sucesso: true, dados });
         } catch (error) {
             console.error('Erro ao listar histórico de eventos do usuário:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
+        }
+    }
+
+    static async deletarEmpresa(req, res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_usuario = req.user.id_usuario
+            const { cnpj, senhaAdmin } = req.body
+
+            const deletar = await EmpresaModel.deletarEmpresa(id_empresa, id_usuario, cnpj, senhaAdmin)
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem:"Empresa deletada com sucesso!"
+            })
+
+        } catch (error) {
+             console.error('Erro ao deletar empresa:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
         }
     }

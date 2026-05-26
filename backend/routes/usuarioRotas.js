@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authMiddleware } from '../middlewares/authMiddleware.js'
+import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js'
 import UsuarioController from '../controllers/UsuarioController.js'
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js'
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js'
@@ -36,5 +36,6 @@ router.get('/:id/meta', authMiddleware, autorizarUsuarioParam('id'), UsuarioCont
 router.get('/:id/tempo_parado_tempo_produzindo_operador', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.tempoParadoTempoProduzindoUsuario);
 router.get('/:id/oee_maquinas', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquina);
 router.get('/:id/maquina_oee_detalhe', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquinaDetalhes);
+router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa)
 
 export default router

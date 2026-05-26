@@ -1,112 +1,204 @@
-"use client";;
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Headset, Salad, ScanText, Star, Video } from "lucide-react";
+import { useNotificacoes } from "@/hooks/useNotificacoes";
+import { getUserFromToken } from "@/lib/auth";
+import { AlertTriangle, BellRing, Loader2, Settings2, X } from "lucide-react";
 
-const PROFILE_ITEMS = [
-  {
-    textColor: "stroke-blue-500",
-    bgColor: "bg-blue-500/10",
-    icon: Star,
-    title: "Event Today",
-    desc: "Just reminder that you have to",
-    time: "9:00 AM",
-  },
-  {
-    textColor: "stroke-orange-400",
-    bgColor: "bg-orange-400/10",
-    icon: Video,
-    title: "Team Meeting",
-    desc: "Discuss project updates and next steps",
-    time: "10:00 AM",
-  },
-  {
-    textColor: "stroke-teal-400",
-    bgColor: "bg-teal-400/10",
-    icon: Salad,
-    title: "Lunch Break",
-    desc: "Take a break and recharge",
-    time: "12:30 PM",
-  },
-  {
+const ICONES_POR_TIPO = {
+  Maquina_Parada: {
+    icon: AlertTriangle,
     textColor: "stroke-red-500",
     bgColor: "bg-red-500/10",
-    icon: Headset,
-    title: "Client Call",
-    desc: "Monthly check-in with the client",
-    time: "3:00 PM",
   },
-  {
-    textColor: "stroke-sky-400",
-    bgColor: "bg-sky-400/10",
-    icon: ScanText,
-    title: "Project Review",
-    desc: "Review project deliverables with client",
-    time: "4:00 PM",
+  Maquina_Setup: {
+    icon: Settings2,
+    textColor: "stroke-amber-500",
+    bgColor: "bg-amber-500/10",
   },
-];
+  Solicitar_Justificativa: {
+    icon: BellRing,
+    textColor: "stroke-blue-500",
+    bgColor: "bg-blue-500/10",
+  },
+};
 
-const NotificationDropdown = ({
-  trigger,
-  defaultOpen,
-  align = "end"
-}) => {
+function formatarHora(dataIso) {
+  if (!dataIso) return "";
+  return new Date(dataIso).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function obterRotaNotificacao(tipoUsuario, notificacao) {
+  if (tipoUsuario === "Operador") {
+    const precisaJustificar =
+      notificacao.tipo === "Solicitar_Justificativa" ||
+      notificacao.tipo === "Maquina_Parada" ||
+      notificacao.tipo === "Maquina_Setup";
+
+    if (precisaJustificar) return "/operador/historicoEventos?justificar=1";
+    return null;
+  }
+
+  if (tipoUsuario === "Gestor") return "/gestor/historicoEventos";
+  if (tipoUsuario === "Adm") return "/adm/historicoEventos";
+
+  return null;
+}
+
+const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem }) => {
+  const router = useRouter();
+  const [aberto, setAberto] = useState(defaultOpen ?? false);
+  const { notificacoes, loading, marcarComoLida, marcarTodasComoLidas, excluir } =
+    useNotificacoes();
+  const tipoUsuario = getUserFromToken()?.tipo;
+
+  const handleClickNotificacao = async (notificacao) => {
+    if (!notificacao.lida) {
+      await marcarComoLida(notificacao.id);
+    }
+
+    const rota = obterRotaNotificacao(tipoUsuario, notificacao);
+    if (rota) {
+      setAberto(false);
+      router.push(rota);
+    }
+  };
+
+  const handleExcluir = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await excluir(id);
+  };
+
+  const naoLidas = notificacoes.filter((n) => !n.lida).length;
+  const badgeContagem = contagem ?? naoLidas;
+
   return (
-    <div className="flex items-center justify-center">
-      <DropdownMenu defaultOpen={defaultOpen}>
-        <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
+    <div className="relative flex items-center justify-center">
+      {badgeContagem > 0 && (
+        <span className="pointer-events-none absolute -top-1 -right-1 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] font-bold text-white">
+          {badgeContagem > 99 ? "99+" : badgeContagem}
+        </span>
+      )}
+
+      <DropdownMenu open={aberto} onOpenChange={setAberto}>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="relative flex items-center justify-center outline-none"
+            aria-label="Abrir notificações"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {trigger}
+          </button>
+        </DropdownMenuTrigger>
 
         <DropdownMenuContent
           align={align}
-          className="p-0 w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400">
+          className="p-0 w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
           <DropdownMenuGroup>
-            {/* title */}
             <DropdownMenuLabel className="flex items-center justify-between p-4">
-              <p className="text-base font-medium text-popover-foreground">
-                Notifications
-              </p>
-              <Badge className="h-5 font-normal leading-0">5 New</Badge>
+              <p className="text-base font-medium text-popover-foreground">Notificações</p>
+              {badgeContagem > 0 && (
+                <Badge className="h-5 bg-blue-600 font-normal leading-0 hover:bg-blue-600">
+                  {badgeContagem} {badgeContagem === 1 ? "nova" : "novas"}
+                </Badge>
+              )}
             </DropdownMenuLabel>
 
-            {/* Notifications */}
-            {PROFILE_ITEMS.map(({ bgColor, textColor, icon: Icon, title, desc, time }) => (
-              <DropdownMenuItem
-                key={title}
-                className={
-                  "mx-1.5 my-1 p-2 flex items-center justify-between cursor-pointer"
-                }>
-                <div className="flex items-center gap-3">
-                  <div className={cn("p-2.5 rounded-xl", bgColor)}>
-                    <Icon size={20} className={cn("size-5", textColor)} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-popover-foreground">
-                      {title}
-                    </p>
-                    <p className="max-w-52 truncate text-sm text-muted-foreground">
-                      {desc}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">{time}</p>
-              </DropdownMenuItem>
-            ))}
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : notificacoes.length === 0 ? (
+              <p className="px-4 pb-4 text-sm text-muted-foreground">Nenhuma notificação.</p>
+            ) : (
+              notificacoes.map((notificacao) => {
+                const config =
+                  ICONES_POR_TIPO[notificacao.tipo] ?? ICONES_POR_TIPO.Solicitar_Justificativa;
+                const Icon = config.icon;
+                const temRota = Boolean(obterRotaNotificacao(tipoUsuario, notificacao));
 
-            {/* button */}
-            <div className="mx-1.5 my-1 p-2">
-              <Button className="rounded-xl w-full cursor-pointer hover:bg-primary/80">
-                See All Notifications
-              </Button>
-            </div>
+                return (
+                  <div
+                    key={notificacao.id}
+                    className={cn(
+                      "mx-1.5 my-1 flex items-center gap-1 rounded-lg p-1",
+                      !notificacao.lida && "bg-blue-50/80 dark:bg-blue-950/30"
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleClickNotificacao(notificacao)}
+                      className={cn(
+                        "flex min-w-0 flex-1 items-center justify-between gap-2 rounded-md p-1 text-left outline-none",
+                        temRota && "cursor-pointer hover:bg-muted/50",
+                        !temRota && "cursor-default"
+                      )}
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className={cn("shrink-0 rounded-xl p-2.5", config.bgColor)}>
+                          <Icon size={20} className={cn("size-5", config.textColor)} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-popover-foreground">
+                            {notificacao.titulo}
+                          </p>
+                          <p className="truncate text-sm text-muted-foreground">
+                            {notificacao.mensagem}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="shrink-0 text-xs text-muted-foreground">
+                        {formatarHora(notificacao.criado_em)}
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-label="Excluir notificação"
+                      onClick={(e) => handleExcluir(e, notificacao.id)}
+                      className="shrink-0 rounded-md p-1.5 text-muted-foreground outline-none hover:bg-muted hover:text-foreground"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
+
+            {notificacoes.length > 0 && badgeContagem > 0 && (
+              <div className="mx-1.5 my-1 p-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full cursor-pointer rounded-xl"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    marcarTodasComoLidas();
+                  }}
+                >
+                  Marcar todas como lidas
+                </Button>
+              </div>
+            )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

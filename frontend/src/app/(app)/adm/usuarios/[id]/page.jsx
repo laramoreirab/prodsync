@@ -21,7 +21,7 @@ import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsua
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
-import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import { SolicitarJustificativaMenuItem } from "@/components/ui/forms/historicoEventos/solicitarJustificativaDialog";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import { apiFetch } from "@/lib/api";
@@ -486,17 +486,12 @@ export default function UsuarioDetalhePage({ params }) {
                       <DetalhesEvento eventoId={evento.id} />
                     </DialogContent>
                   </Dialog>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar Justificativa
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <ModalSucessNotificacao />
-                    </DialogContent>
-                  </Dialog>
+                  <SolicitarJustificativaMenuItem idEvento={evento.id}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <BellRing className="mr-2 h-4 w-4" />
+                      Solicitar Justificativa
+                    </DropdownMenuItem>
+                  </SolicitarJustificativaMenuItem>
                   <Dialog>
                     <DialogTrigger asChild>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
