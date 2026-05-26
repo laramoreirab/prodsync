@@ -48,7 +48,7 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
         holder.tvId.setText("OP #" + op.getId());
         holder.tvMaquina.setText("Máquina: " + op.getMaquina());
         holder.tvPrioridade.setText("Prioridade: " + op.getPrioridade());
-        holder.tvDataFinal.setText("Data Final: " + op.getDataFinal());
+        holder.tvDataFinal.setText("Data Final: " + formatarData(op.getDataFinal()));
 
         // Configuração do Badge de Status para OP
         String status = (op.getStatus() != null) ? op.getStatus().toLowerCase() : "";
@@ -125,5 +125,23 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
             tvDataFinal = itemView.findViewById(R.id.tv_data_final_op);
             tvStatus = itemView.findViewById(R.id.tv_status_op_badge);
         }
+    }
+
+    private String formatarData(String dataIso) {
+        if (dataIso == null || dataIso.isEmpty()) return "S/D";
+        try {
+            // Esperado: 2008-11-11T06:09:00.000Z
+            String datePart = dataIso.substring(0, 10); // yyyy-MM-dd
+            String timePart = dataIso.substring(11, 16); // HH:mm
+
+            String[] p = datePart.split("-");
+            if (p.length == 3) {
+                return p[2] + "/" + p[1] + "/" + p[0] + " às " + timePart;
+            }
+        } catch (Exception e) {
+            // Caso falhe, tenta pelo menos limpar o 'T' e o 'Z'
+            return dataIso.replace("T", " ").replace("Z", "");
+        }
+        return dataIso;
     }
 }

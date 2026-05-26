@@ -39,25 +39,27 @@
 
         <TextView
             android:id="@+id/tv_id_maquina"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Id: 1092"
             android:textColor="@color/machine_sub"
             android:textSize="16sp"
             android:fontFamily="@font/montserrat_medium"
             app:layout_constraintTop_toBottomOf="@id/tv_nome_maquina"
-            app:layout_constraintStart_toStartOf="@id/tv_nome_maquina" />
+            app:layout_constraintStart_toStartOf="@id/tv_nome_maquina"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/tv_serie_maquina"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Série: SX-900"
             android:textColor="@color/machine_sub"
             android:fontFamily="@font/montserrat_medium"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@id/tv_id_maquina"
-            app:layout_constraintStart_toStartOf="@id/tv_id_maquina" />
+            app:layout_constraintStart_toStartOf="@id/tv_id_maquina"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/tv_status_badge"
@@ -67,9 +69,11 @@
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
             android:textSize="12sp"
+            android:layout_marginTop="8dp"
             android:fontFamily="@font/montserrat_semibold"
             android:background="@drawable/bg_badge_parada"
             android:textColor="@color/txt_parada"
+            app:layout_constraintTop_toBottomOf="@id/tv_serie_maquina"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

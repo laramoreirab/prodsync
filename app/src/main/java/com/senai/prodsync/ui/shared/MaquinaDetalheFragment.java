@@ -197,9 +197,10 @@ public class MaquinaDetalheFragment extends Fragment {
     }
 
     private String formatarData(String dataIso) {
+        if (dataIso == null || dataIso.isEmpty() || dataIso.equals("null")) return "S/D";
         try {
-            // Esperado: 2006-11-11T00:00:00.000Z
-            String cleanDate = dataIso.split("T")[0]; // 2006-11-11
+            // Esperado: 2006-11-11T00:00:00.000Z ou similar
+            String cleanDate = dataIso.contains("T") ? dataIso.split("T")[0] : dataIso;
             String[] parts = cleanDate.split("-");
             if (parts.length == 3) {
                 return parts[2] + "/" + parts[1] + "/" + parts[0];

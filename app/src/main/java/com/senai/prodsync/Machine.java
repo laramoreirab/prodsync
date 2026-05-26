@@ -51,7 +51,10 @@ public class Machine {
 
     public String getSerie() { return (serie != null) ? serie : "S/N"; }
     public String getCapacidade() { return capacidade != null ? capacidade : "N/A"; }
-    public String getDataAquisicao() { return dataAquisicao; }
+    public String getDataAquisicao() { 
+        if (dataAquisicao == null || dataAquisicao.isEmpty() || dataAquisicao.equals("null")) return "Não Informado.";
+        return dataAquisicao; 
+    }
     public String getFotoUrl() { return fotoUrl; }
     
     public String getSetor() { 

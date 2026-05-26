@@ -1,6 +1,7 @@
 package com.senai.prodsync;
 
 import androidx.annotation.NonNull;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 public class OrdemProducao {
@@ -34,7 +35,7 @@ public class OrdemProducao {
     private String dataFinal;
     
     @SerializedName("setor")
-    private SetorInfo setorInfo;
+    private JsonElement setor;
 
     public String getId() { return id; }
     public String getNumero() { return numero != null ? numero : id; }
@@ -61,17 +62,36 @@ public class OrdemProducao {
     public String getDataFinal() { return dataFinal != null ? dataFinal : "S/D"; }
     
     public String getSetor() { 
-        return (setorInfo != null) ? setorInfo.nomeSetor : "Geral"; 
+        // 1. Tenta extrair do root da OP (se a API retornar direto)
+        String nome = extractString(setor, "nome_setor", null);
+        if (nome == null) nome = extractString(setor, "nome", null);
+        
+        // 2. Se não achou, tenta buscar dentro do objeto maquina (conforme o Model do backend)
+        if (nome == null && maquinaInfo != null) {
+            nome = extractString(maquinaInfo.setor, "nome_setor", null);
+            if (nome == null) nome = extractString(maquinaInfo.setor, "nome", null);
+        }
+        
+        return (nome != null) ? nome : "Geral";
     }
 
-    public static class SetorInfo {
-        @SerializedName("nome_setor")
-        public String nomeSetor;
+    private String extractString(JsonElement element, String fieldName, String defaultValue) {
+        if (element == null || element.isJsonNull()) return defaultValue;
+        if (element.isJsonPrimitive()) return element.getAsString();
+        if (element.isJsonObject()) {
+            JsonElement field = element.getAsJsonObject().get(fieldName);
+            if (field != null && !field.isJsonNull()) {
+                return field.getAsString();
+            }
+        }
+        return defaultValue;
     }
 
     public static class MaquinaInfo {
         public String nome;
         public OperadorInfo operador;
+        @SerializedName("setor")
+        public JsonElement setor;
     }
 
     public static class OperadorInfo {

@@ -213,12 +213,15 @@ public class OpDetalheFragment extends Fragment {
     }
 
     private String formatarData(String dataIso) {
+        if (dataIso == null || dataIso.isEmpty()) return "S/D";
         try {
-            // Ex: 2003-11-11T06:05:00.000Z
-            String cleanDate = dataIso.split("T")[0]; 
-            String[] parts = cleanDate.split("-");
-            if (parts.length == 3) {
-                return parts[2] + "/" + parts[1] + "/" + parts[0];
+            // Ex: 2008-11-11T06:09:00.000Z
+            String datePart = dataIso.substring(0, 10); // yyyy-MM-dd
+            String timePart = dataIso.substring(11, 16); // HH:mm
+
+            String[] p = datePart.split("-");
+            if (p.length == 3) {
+                return p[2] + "/" + p[1] + "/" + p[0] + " às " + timePart;
             }
         } catch (Exception e) {
             Log.e("FORMAT_DATE_OP", "Erro ao formatar data OP: " + dataIso);
