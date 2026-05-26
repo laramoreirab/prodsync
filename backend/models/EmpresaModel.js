@@ -62,6 +62,37 @@ class EmpresaModel {
             throw error;
         }
     };
+
+    static async deletarEmpresa(id_empresa, id_usuario, cnpj, senhaAdmin){
+        try {
+            const senhaUsuario = await prisma.usuarios.findUnique({
+                where:{
+                    id_usuario: id_usuario
+                },
+                select:{
+                    senha: true
+                }
+            })
+
+            const compararSenhas = await bcrypt.compare(senhaAdmin, senhaUsuario.senha)
+            if(!compararSenhas){
+                console.warn("A senha de administrador informada está incorreta, não é possível deletar a conta!")
+                return 
+            }
+
+            const resultado = await prisma.empresas.delete({
+                where:{
+                    id_empresa: id_empresa,
+                    cnpj: cnpj
+                }
+            })
+            return resultado
+            
+        } catch (error) {
+            console.error('Erro ao deletar empresa:', error);
+            throw error;
+        }
+    }
 }
 
 export default EmpresaModel

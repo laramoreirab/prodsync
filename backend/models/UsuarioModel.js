@@ -343,6 +343,40 @@ class UsuarioModel {
         }
     }
 
+    static async trocarSenha(id_usuario,id_empresa, senhaAtual, novaSenha) {
+        try{
+            const senhaAtualBanco = await prisma.usuarios.findUnique({
+                where:{
+                    id_usuario: id_usuario
+                },
+                select:{
+                    senha: true
+                }
+            })
+
+            const verificarSenhas = await bcrypt.compare(senhaAtual, senhaAtualBanco.senha);
+            if (!verificarSenhas) {
+                return null
+            }
+
+            const senhaHash = await bcrypt.hash(novaSenha, 10);
+
+            const resultado = await prisma.usuarios.update({
+                where : {
+                    id_empresa: id_empresa,
+                    id_usuario: id_usuario
+                },
+                data:{
+                    senha: senhaHash
+                }
+            })
+            return resultado
+        }catch(error){
+            console.error('Erro ao trocar senha do usuário:', error);
+            throw error;
+        }
+    }
+
     // -------------------------------------------------Dashboards-------------------------------------------------
 
     static filtroSetorUsuario(setorId) {

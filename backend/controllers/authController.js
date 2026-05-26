@@ -452,6 +452,62 @@ class AuthController {
             });
         }
     }
+
+    static async trocarSenha(req, res) {
+        try {
+            const id_usuario = req.user.id_usuario
+            const id_empresa = req.user.id_empresa
+            const { senhaAtual, novaSenha, confirmacaoNovaSenha } = req.body;
+
+            if (!senhaAtual || senhaAtual.trim() === '') {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Senha atual obrigatória',
+                    mensagem: 'Senha atual é obrigatória'
+                })
+            }
+
+            if (!novaSenha || novaSenha.trim() === '') {
+                 return res.status(400).json({
+                    sucesso: false,
+                    erro: ' Nova senha obrigatória',
+                    mensagem: 'Nova senha é obrigatória'
+                })
+            }
+            if (!confirmacaoNovaSenha || confirmacaoNovaSenha.trim() === '') {
+                 return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Confirmação da nova senha obrigatória',
+                    mensagem: 'Confirmação da nova senha é obrigatória'
+                })
+            }
+
+            const comparacao = await UsuarioModel.comparacaoDeSenhas(novaSenha, confirmacaoNovaSenha);
+
+            if (comparacao === false) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Nova senha e confirmação não correspondem',
+                    mensagem: 'Nova senha e confirmação não correspondem, digite senhas iguais!'
+                })
+            }
+
+            const resultado = await UsuarioModel.trocarSenha(id_usuario, id_empresa, senhaAtual, novaSenha);
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Senha trocada com sucesso!'
+            })
+            
+        } catch (error) {
+             console.error('Erro ao registrar nova senha', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível registrar nova senha'
+            });
+        }
+    }
 }
 
 export default AuthController;
