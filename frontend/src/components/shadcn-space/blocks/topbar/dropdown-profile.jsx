@@ -1,5 +1,6 @@
 "use client";
 
+import { isValidElement } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
 import { clearAuthSession } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 const PROFILE_ITEMS = [
   { label: "Meu Perfil", icon: User },
@@ -42,6 +44,8 @@ const ProfileDropdown = ({
     : pathname?.startsWith("/operador")
       ? "/operador/configuracoes"
       : "/adm/configuracoes";
+  const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
+  const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
   function handleLogout() {
     clearAuthSession();
@@ -51,7 +55,9 @@ const ProfileDropdown = ({
 
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
-      <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuTrigger className={cn(triggerIsFullWidth && "flex w-full items-center justify-center")}>
+        {trigger}
+      </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align={align}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">

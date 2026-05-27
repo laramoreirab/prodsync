@@ -594,6 +594,29 @@ export function PageSection({ children, id, className }) {
 }
 
 // ─────────────────────────────────────────────
+// KPI CARD DECORATED
+// Card otimizado para KPIs horizontais (mais compacto e com barra azul imponente)
+// ─────────────────────────────────────────────
+
+/**
+ * @param {string}  className   — classes extras para ajuste de layout
+ * @param {string}  colSpan     — controle de colunas no grid (ex: "md:col-span-2")
+ */
+export function KPICardDecorated({ children, className, colSpan }) {
+  return (
+    <FadeUpItem
+      className={cn(
+        "bg-white border border-gray-100 border-l-8 border-l-[#00357a] rounded-xl p-4 shadow-sm min-h-[90px] flex items-center justify-between",
+        colSpan,
+        className,
+      )}
+    >
+      {children}
+    </FadeUpItem>
+  );
+}
+
+// ─────────────────────────────────────────────
 // EXPORTED VARIANTS (para uso externo)
 // ─────────────────────────────────────────────
 

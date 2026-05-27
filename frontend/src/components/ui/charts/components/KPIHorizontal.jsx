@@ -49,19 +49,19 @@ export function KPIHorizontal({ title, value, type = "number" }) {
     };
 
     return (
-        <div className="w-full flex flex-row items-center ">
+        <div className="w-full flex flex-row items-center justify-between">
 
-            <div className="flex flex-col items-start pr-6 pl-4 py-6">
-                <p className="text-sm font-semibold text-black tracking-tight leading-snug uppercase">
+            <div className="flex flex-col items-start pl-3 py-2 flex-1">
+                <p className="text-base font-bold text-black tracking-tight leading-snug uppercase">
                     {title}
                 </p>
-                <p className="text-[10px] text-gray-400 font-semibold mt-1 self-start mb-2">
+                <p className="text-[11px] text-gray-400 font-medium mt-0.5 self-start">
                     *Atualizado em tempo real
                 </p>
             </div>
 
-            <div className="flex items-center justify-end tabular-nums">
-                <h2 className="text-3xl font-extrabold text-black tracking-tight leading-none md:text-4xl">
+            <div className="flex items-center justify-end tabular-nums pr-2">
+                <h2 className="text-3xl font-black text-black tracking-tight leading-none md:text-4xl">
                     {formatValue(displayValue)}
                 </h2>
             </div>

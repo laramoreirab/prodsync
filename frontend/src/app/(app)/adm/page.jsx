@@ -11,7 +11,7 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
-import { PageLayout, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, KPICardDecorated, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
 
 export default function DashboardGeralPage() {
   return (
@@ -46,18 +46,18 @@ export default function DashboardGeralPage() {
       </ContentGrid>
 
       <KPIGrid cols={4} className="mt-6 gap-6 lg:gap-8">
-        <WidgetCard>
+        <KPICardDecorated>
           <MediaParadasDiaWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <PecasPorMinutoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <MaquinaAtivaPorTurnoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <ProducaoPorTurnoLotesWidget />
-        </WidgetCard>
+        </KPICardDecorated>
       </KPIGrid>
     </PageLayout>
   );
