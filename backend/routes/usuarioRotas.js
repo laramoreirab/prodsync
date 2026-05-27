@@ -37,5 +37,6 @@ router.get('/:id/tempo_parado_tempo_produzindo_operador', authMiddleware, autori
 router.get('/:id/oee_maquinas', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquina);
 router.get('/:id/maquina_oee_detalhe', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquinaDetalhes);
 router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa)
+router.patch('/atualizarEmpresa', authMiddleware, adminMiddleware, UsuarioController.atualizarEmpresa)
 
 export default router

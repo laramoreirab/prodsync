@@ -335,9 +335,7 @@ static async atualizarUsuario(req, res) {
             });
         }
 
-        // -------------------------
         // dados usuario
-        // -------------------------
 
         const dadosUpdateUsuario = {};
 
@@ -373,11 +371,7 @@ static async atualizarUsuario(req, res) {
                 id_empresa,
                 dadosUpdateUsuario
             );
-
-        // -------------------------
         // operador
-        // -------------------------
-
         if (funcao === "Operador") {
 
             const dadosEscala = {};
@@ -400,10 +394,7 @@ static async atualizarUsuario(req, res) {
                 dadosEscala
             );
         }
-
-        // -------------------------
         // gestor
-        // -------------------------
 
         if (funcao === "Gestor" && id_setor) {
 
@@ -590,6 +581,46 @@ static async atualizarUsuario(req, res) {
 
         } catch (error) {
              console.error('Erro ao deletar empresa:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
+        }
+    }
+
+    static async atualizarEmpresa(req, res){
+        try {
+            const id_empresa = req.user.id_empresa
+            const { email, telefone, endereco, cpf_representante} = req.body
+
+            const dadosUpdateEmpresa = {};
+
+        if (telefone !== undefined)
+            dadosUpdateEmpresa.telefone = telefone;
+
+        if (endereco !== undefined)
+            dadosUpdateEmpresa.endereco = endereco;
+
+        if (email !== undefined)
+            dadosUpdateEmpresa.email = email;
+
+        if (cpf_representante !== undefined)
+            dadosUpdateEmpresa.cpf_representante = cpf_representante;
+
+        if (Object.keys(dadosUpdateEmpresa).length === 0) {
+            return res.status(400).json({ 
+                sucesso: false, 
+                mensagem: "Nenhum dado válido fornecido para atualização." 
+            });
+        }
+
+        const resposta = await UsuarioModel.atualizarEmpresa(id_empresa, dadosUpdateEmpresa)
+
+        return res.status(200).json({
+            sucesso: true,
+            mensagem: "Empresa atualizada com sucesso!",
+            dados: resposta
+        })
+
+        } catch (error) {
+            console.error('Erro ao atualizar empresa:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' });
         }
     }

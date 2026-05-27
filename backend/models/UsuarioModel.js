@@ -377,6 +377,25 @@ class UsuarioModel {
         }
     }
 
+    static async atualizarEmpresa(id_empresa, dadosEmpresa){
+        try {
+            const resposta = await prisma.empresas.update({
+                where:{
+                    id_empresa: Number(id_empresa)
+                },
+                data:{
+                    ...dadosEmpresa
+                }
+            })
+
+            return resposta
+            
+        } catch (error) {
+            console.error('Erro atualizar dados da empresa', error);
+            throw error;
+        }
+    }
+
     // -------------------------------------------------Dashboards-------------------------------------------------
 
     static filtroSetorUsuario(setorId) {

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
-import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { json } from "zod"
 
 const adminTabs = [
@@ -117,6 +117,7 @@ function SettingsInput(props) {
 
 function AccountSettings({ role }) {
   const isAdmin = role === "admin"
+  const [salvando, setSalvando] = useState(false)
 
   const [formData, setFormData] = useState({
     id: "",
@@ -151,10 +152,12 @@ function AccountSettings({ role }) {
 
 
   async function handleInputChange(e) {
-    const { id, value } = e.target
+    let { id, value } = e.target
 
-    if (id === "cpfRepresentante" || id === "telefoneEmpresa") {
-      const valorSemMascara = value.replace(/\D/g, "")
+    if (id === "telefoneEmpresa") {
+      value = aplicarMascaraTelefone(value)
+    } else if (id === "cpfRepresentante") {
+      value = aplicarMascaraCPF(value) 
     }
 
     setFormData((dadosAnteriores) => ({
@@ -165,6 +168,69 @@ function AccountSettings({ role }) {
 
   const fields = isAdmin ? adminAccountFields : userAccountFields
 
+  function aplicarMascaraTelefone(valor) {
+    if (!valor) return "";
+    // O String() transforma Número/Null em Texto, impedindo que o replace quebre
+    let v = String(valor).replace(/\D/g, "");
+    v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+    v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+    return v.substring(0, 15); 
+  }
+  
+  function aplicarMascaraCPF(valor) {
+    if (!valor) return "";
+    let v = String(valor).replace(/\D/g, "");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    return v.substring(0, 14);
+  }
+
+  async function handleSubmitPerfil(e) {
+    e.preventDefault() 
+    setSalvando(true)
+  
+    try {
+      // Movido para DENTRO do try para que qualquer erro seja capturado pelo catch
+      // Adicionado o fallback ( || "" ) e o String() por segurança
+      const dadosParaEnviar = {
+        email: formData.emailEmpresa,
+        telefone: String(formData.telefoneEmpresa || "").replace(/\D/g, ""), 
+        endereco: formData.enderecoEmpresa,
+        cpf_representante: String(formData.cpfRepresentante || "").replace(/\D/g, "") 
+      }
+
+      const response = await apiFetch('/api/usuarios/atualizarEmpresa', { 
+        method: 'PATCH', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dadosParaEnviar)
+      })
+  
+      if (response.sucesso) {
+        // Usando o toast no lugar do Toaster
+        toast.success("Informações da empresa atualizadas com sucesso!")
+        
+        if (response.dados) {
+          setFormData((dadosAnteriores) => ({
+            ...dadosAnteriores,
+            emailEmpresa: response.dados.email || dadosAnteriores.emailEmpresa,
+            telefoneEmpresa: response.dados.telefone ? aplicarMascaraTelefone(response.dados.telefone) : dadosAnteriores.telefoneEmpresa,
+            enderecoEmpresa: response.dados.endereco || dadosAnteriores.enderecoEmpresa,
+            cpfRepresentante: response.dados.cpf_representante ? aplicarMascaraCPF(response.dados.cpf_representante) : dadosAnteriores.cpfRepresentante,
+          }));
+        }
+        
+      } else {
+        toast.error(response.mensagem || "Erro ao atualizar dados. Verifique os campos.")
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error)
+      toast.error("Erro interno ao tentar salvar as alterações.")
+    } finally {
+      setSalvando(false)
+    }
+  }
+
   return (
     <div className="max-w-sm space-y-4">
       <SectionTitle
@@ -172,7 +238,7 @@ function AccountSettings({ role }) {
         description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
       />
 
-      <form className="space-y-3">
+      <form className="space-y-3" onSubmit={handleSubmitPerfil}> 
         {fields.map(({ id, label, type = "text", readOnly }) => {
           const isDisabled = !isAdmin || readOnly
 
@@ -198,9 +264,9 @@ function AccountSettings({ role }) {
         })}
 
         {isAdmin && (
-          <Button type="button" className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+          <Button type="submit"  disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
             <Save className="size-4" />
-            Salvar Alterações
+            {salvando ? "Salvando..." : "Salvar Alterações"}
           </Button>
         )}
       </form>
