@@ -125,6 +125,15 @@ class EventoController {
                 dados
             });
         } catch (error) {
+            if (error.code === 'EVENTO_PENDENTE') {
+                return res.status(409).json({
+                    sucesso: false,
+                    erro: 'Evento pendente de justificativa',
+                    mensagem: error.message,
+                    id_evento: error.id_evento,
+                });
+            }
+
             console.error('Erro ao registrar evento multiplo:', error);
             return res.status(500).json({
                 sucesso: false,

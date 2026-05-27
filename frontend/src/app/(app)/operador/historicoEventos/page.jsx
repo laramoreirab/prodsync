@@ -124,6 +124,13 @@ export default function HistoricoEventos() {
   const [selecionados, setSelecionados] = useState([]);
   const [justificativaAberta, setJustificativaAberta] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("justificar") === "1") {
+      setJustificativaAberta(true);
+    }
+  }, []);
+
   //sincronizar dados da API com estado local
   useEffect(() => {
     setDados(eventos);

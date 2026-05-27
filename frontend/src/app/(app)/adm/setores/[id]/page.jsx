@@ -117,6 +117,7 @@ export default function SetorEspecificoPage({ params }) {
   const [dadosExibidos, setDadosExibidos] = useState([]);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
   const [buscaUsuarios, setBuscaUsuarios] = useState("");
+  const [maquinaParaExcluir, setMaquinaParaExcluir] = useState(null);
 
   const gestor = setor?.gestores?.[0]?.gestor;
 
@@ -525,23 +526,16 @@ export default function SetorEspecificoPage({ params }) {
                     </DialogContent>
                   </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormExclusaoMaquina
-                        maquinaId={maquina.id_maquina}
-                        onExcluir={async (maquinaId) => {
-                          await maquinaCrudService.delete(maquinaId);
-                          await refresh();
-                        }}
-                      />
-                    </DialogContent>
-                  </Dialog>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setMaquinaParaExcluir(maquina.id_maquina);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                    Excluir
+                  </DropdownMenuItem>
                 </>
               )}
             />
@@ -649,6 +643,27 @@ export default function SetorEspecificoPage({ params }) {
         </DetailListingSection>
 
       </DetailPageContainer>
+
+      <Dialog
+        open={maquinaParaExcluir != null}
+        onOpenChange={(open) => {
+          if (!open) setMaquinaParaExcluir(null);
+        }}
+      >
+        <DialogContent>
+          {maquinaParaExcluir != null && (
+            <FormExclusaoMaquina
+              key={maquinaParaExcluir}
+              maquinaId={maquinaParaExcluir}
+              onExcluir={async (maquinaId) => {
+                await maquinaCrudService.delete(maquinaId);
+                await refresh();
+              }}
+              onExclusaoSucesso={() => setMaquinaParaExcluir(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 }

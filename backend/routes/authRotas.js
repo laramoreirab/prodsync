@@ -10,5 +10,6 @@ router.post('/primeiroAcesso', AuthController.primeiroAcesso)
 router.post('/registroSenha', authMiddleware, AuthController.registroSenha)
 //obter informações do perfil de quem está logado
 router.get('/perfil', authMiddleware, AuthController.obterPerfil)
+router.post('/trocarSenha', authMiddleware, AuthController.trocarSenha)
 
 export default router

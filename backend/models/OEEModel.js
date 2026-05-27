@@ -109,7 +109,7 @@ class OEEModel {
                     id_maquina,
                     id_empresa,
                     status_atual: {
-                        in: ['Parada', 'Setup', 'Manutencao']
+                        in: ['Parada', 'Setup']
                     },
                     duracao: {
                         not: null

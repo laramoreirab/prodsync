@@ -86,6 +86,17 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
+          // A função que vai rodar quando o usuário digitar:
+        const handleCpfChange = (e) => {
+            const valorMascarado = mascaraCPF(e.target.value);
+    
+            // Atualiza o seu estado do formData com o valor já formatado
+            setFormData({
+                ...formData,
+                cpf: valorMascarado
+            });
+        };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -93,7 +104,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
         const cpfLimpo = formData.cpf.replace(/\D/g, '');
         //formData.append('campo', value)
         payload.append('nome', formData.nome);
-        payload.append('cpf', formData.cpfLimpo);
+        payload.append('cpf', cpfLimpo);
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', 'Operador');
@@ -173,16 +184,19 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                             onChange={handleInputChange}
                             type="text"
                             className={inputStyle}
+                            value={formData.nome}
+                            placeholder="Nome completo"
                             required />
                     </div>
                     <div>
                         <label htmlFor="cpf" className={labelStyle}>CPF</label>
                         <input
                             id="cpf"
-                            onChange={handleInputChange}
+                            onChange={handleCpfChange}
                             type="text"
                             className={inputStyle}
-                            mascara={mascaraCPF}
+                            placeholder="000.000.000-00"
+                            value={formData.cpf}
                             required />
                     </div>
                     <div>
@@ -192,6 +206,8 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                             onChange={handleInputChange}
                             type="email"
                             className={inputStyle}
+                            placeholder="usuario@email.com"
+                            value={formData.email}
                             required />
                     </div>
                 </div>
@@ -202,6 +218,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                         <select
                             id="id_setor"
                             onChange={handleInputChange}
+                            value={formData.id_setor}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
                         >
@@ -219,6 +236,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                         <select
                             id="id_turno"
                             onChange={handleInputChange}
+                            value={formData.id_turno}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
                             required
                         >
@@ -237,6 +255,7 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
                     <select
                         id="id_maquina"
                         onChange={handleInputChange}
+                        value={formData.id_maquina}
                         className={`${inputStyle} appearance-none pr-10 bg-white`}
                         required
                     >

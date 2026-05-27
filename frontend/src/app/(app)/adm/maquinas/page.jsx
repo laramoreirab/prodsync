@@ -94,7 +94,7 @@ export default function Maquinas() {
   const { maquinas, loading, error, refresh, cadastrarMaquina, editarMaquina, excluirMaquina } = useMaquinas();
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
-  const [maquinaSelecionada, setMaquinaSelecionada] = useState(null);
+  const [maquinaParaExcluir, setMaquinaParaExcluir] = useState(null);
 
   const maquinasFilter = maquinasFilterBase.map((filter) =>
     filter.id === "setor"
@@ -287,20 +287,16 @@ export default function Maquinas() {
                         </DialogContent>
                       </Dialog>
 
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                            <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <FormExclusaoMaquina
-                            maquinaId={maquina.id_maquina}
-                            onExcluir={excluirMaquina}
-                          />
-                        </DialogContent>
-                      </Dialog>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setMaquinaParaExcluir(maquina.id_maquina);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                        Excluir
+                      </DropdownMenuItem>
                     </>
                 )}
               /> 
@@ -313,6 +309,24 @@ export default function Maquinas() {
           />
         )}
       </FadeUpItem>
+
+      <Dialog
+        open={maquinaParaExcluir != null}
+        onOpenChange={(open) => {
+          if (!open) setMaquinaParaExcluir(null);
+        }}
+      >
+        <DialogContent>
+          {maquinaParaExcluir != null && (
+            <FormExclusaoMaquina
+              key={maquinaParaExcluir}
+              maquinaId={maquinaParaExcluir}
+              onExcluir={excluirMaquina}
+              onExclusaoSucesso={() => setMaquinaParaExcluir(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
     </PageLayout>
   );

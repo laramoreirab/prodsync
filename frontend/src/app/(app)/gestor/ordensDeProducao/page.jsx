@@ -24,6 +24,7 @@ import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
 import { usePerfil } from "@/hooks/usePerfil";
+import { OPProgressoCell } from "@/features/ordens/OPProgressoCell";
 
 
 // Layout geral
@@ -89,7 +90,13 @@ const colunasOrdemProd = [
       );
     },
   },
-  { id: "progresso", key: "progresso", label: "Progresso", className: "text-center" },
+  {
+    id: "progresso",
+    key: "progresso",
+    label: "Progresso",
+    className: "text-center min-w-[140px]",
+    icone: (valor) => <OPProgressoCell valor={valor} />,
+  },
 ];
 
 const opcoesOrdenacao = [

@@ -35,7 +35,7 @@ import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhes
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
-import ModalSucessNotificacao from "@/components/ui/forms/historicoEventos/modalSucessNotificacao";
+import { SolicitarJustificativaMenuItem } from "@/components/ui/forms/historicoEventos/solicitarJustificativaDialog";
 import { opCrudService } from "@/services/opCrudService";
 
 // AnimatedComponents (FadeUpItem duplicado foi removido daqui e deixado só na desestruturação)
@@ -540,7 +540,7 @@ export default function OPDetalhePage({ params }) {
         </section>
 
         <section className="bg-white border rounded-xl p-6 shadow-sm">
-          <OPOEEDetalheWidget opId={opId} />
+          <OPOEEDetalheWidget opId={opId} maquinaId={op?.id_maquina ?? maquina?.id_maquina} />
         </section>
 
         {/* Listagens */}
@@ -614,20 +614,15 @@ export default function OPDetalhePage({ params }) {
                       </DialogContent>
                     </Dialog>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem
-                          onSelect={(e) => e.preventDefault()}
-                          className="cursor-pointer"
-                        >
-                          <BellRing className="mr-2 h-4 w-4" />
-                          Solicitar Justificativa
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <ModalSucessNotificacao />
-                      </DialogContent>
-                    </Dialog>
+                    <SolicitarJustificativaMenuItem idEvento={evento.id}>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <BellRing className="mr-2 h-4 w-4" />
+                        Solicitar Justificativa
+                      </DropdownMenuItem>
+                    </SolicitarJustificativaMenuItem>
 
                     <Dialog>
                       <DialogTrigger asChild>

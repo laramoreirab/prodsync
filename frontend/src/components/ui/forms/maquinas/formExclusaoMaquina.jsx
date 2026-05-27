@@ -1,4 +1,6 @@
-import { useState } from 'react';
+"use client";
+
+import { useRef, useState } from 'react';
 import { Trash2, TriangleAlert, Loader2 } from "lucide-react";
 import {
     DialogTitle,
@@ -6,21 +8,32 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { maquinaCrudService } from '@/services/maquinaCrudService';
 
-export default function FormExclusaoMaquina({ maquinaId,  onExcluir }) {
+export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSucesso }) {
     const [carregando, setCarregando] = useState(false);
-    
+    const [excluido, setExcluido] = useState(false);
+    const closeRef = useRef(null);
+    const idCongelado = useState(() => maquinaId)[0];
+
+    const fecharModal = () => {
+        closeRef.current?.click();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (carregando || excluido || idCongelado == null) return;
+
         setCarregando(true);
-        
+
         try {
-            await onExcluir(maquinaId);
+            await onExcluir(idCongelado);
+            setExcluido(true);
             toast.success("Máquina excluída com sucesso!");
+            onExclusaoSucesso?.();
+            fecharModal();
         } catch (error) {
             console.error("Erro ao excluir máquina:", error);
-            toast.error("Erro ao excluir a máquina.");
+            toast.error(error?.message || "Erro ao excluir a máquina.");
         } finally {
             setCarregando(false);
         }
@@ -37,6 +50,10 @@ export default function FormExclusaoMaquina({ maquinaId,  onExcluir }) {
                 </div>
             </div>
             <Separator className="my-2" />
+            <DialogClose asChild>
+                <button ref={closeRef} type="button" className="hidden" aria-hidden="true" tabIndex={-1} />
+            </DialogClose>
+
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className='w-full flex flex-col items-center justify-center gap-3'>
                     <TriangleAlert className='text-[#00357a] w-30 h-30' />
@@ -60,7 +77,7 @@ export default function FormExclusaoMaquina({ maquinaId,  onExcluir }) {
                     </DialogClose>
                     <button 
                         type="submit"
-                        disabled={carregando}
+                        disabled={carregando || excluido}
                         className='py-3 px-5 bg-[var(--trash)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
                     >
                         {carregando && <Loader2 className="w-4 h-4 animate-spin" />}

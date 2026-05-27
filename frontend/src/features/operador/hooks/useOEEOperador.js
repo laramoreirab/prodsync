@@ -5,7 +5,10 @@ import { oeeOperadorService } from "@services/operadorService";
 
 export function useOEEOperador(operadorId) {
   const fetcher = useCallback(
-    () => oeeOperadorService.getOEE(operadorId),
+    () => {
+      if (!operadorId) return Promise.resolve(null);
+      return oeeOperadorService.getOEE(operadorId);
+    },
     [operadorId]
   );
   return useChartData(fetcher);

@@ -76,11 +76,12 @@ function normalizarMaquina(maquina) {
 }
 
 export default function MaquinasGestor() {
-  const { setorId } = usePerfil();
+  const { setorId, setorNome } = usePerfil();
   const { maquinas, loading, refresh, excluirMaquina } = useMaquinas();
   
   // Estados declarativos apenas para os critérios
   const [busca, setBusca] = useState("");
+  const [maquinaParaExcluir, setMaquinaParaExcluir] = useState(null);
   const [ordenacao, setOrdenacao] = useState("");
   const [filtrosAtivos, setFiltrosAtivos] = useState({});
 
@@ -135,7 +136,7 @@ export default function MaquinasGestor() {
 
   return (
     <PageLayout>
-      <PageHeader title={`Máquinas do Setor ${setorId || 'Desconhecido'}`} action={
+      <PageHeader title={`Máquinas do Setor ${setorNome || 'Desconhecido'}`} action={
         <Dialog>
           <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
             <Plus className="mr-2" />
@@ -222,20 +223,16 @@ export default function MaquinasGestor() {
                   </DialogContent>
                 </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormExclusaoMaquina
-                      maquinaId={maquina.id_maquina}
-                      onExcluir={excluirMaquina}
-                    />
-                  </DialogContent>
-                </Dialog>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setMaquinaParaExcluir(maquina.id_maquina);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                  Excluir
+                </DropdownMenuItem>
               </>
             )}
           />
@@ -246,6 +243,24 @@ export default function MaquinasGestor() {
           />
         )}
       </FadeUpItem>
+
+      <Dialog
+        open={maquinaParaExcluir != null}
+        onOpenChange={(open) => {
+          if (!open) setMaquinaParaExcluir(null);
+        }}
+      >
+        <DialogContent>
+          {maquinaParaExcluir != null && (
+            <FormExclusaoMaquina
+              key={maquinaParaExcluir}
+              maquinaId={maquinaParaExcluir}
+              onExcluir={excluirMaquina}
+              onExclusaoSucesso={() => setMaquinaParaExcluir(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout >
   );
 }
