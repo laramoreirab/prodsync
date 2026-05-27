@@ -16,7 +16,12 @@ function NavMainItem({
   pathname,
 }) {
   const isRoute = item.url?.startsWith("/")
-  const isActive = isRoute ? pathname === item.url : false
+  const isDashboardRoot = isRoute && /^\/(adm|gestor|operador)$/.test(item.url)
+  const isActive = isRoute
+    ? isDashboardRoot
+      ? pathname === item.url
+      : pathname === item.url || pathname?.startsWith(`${item.url}/`)
+    : false
 
   if (isRoute) {
     return (
@@ -24,7 +29,7 @@ function NavMainItem({
         asChild
         tooltip={item.title}
         isActive={isActive}
-        className="h-10 rounded-xl bg-transparent px-3 text-sidebar-foreground/95 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center hover:bg-white/14 data-[active=true]:!bg-transparent data-[active=true]:text-sidebar-foreground data-[active=true]:hover:!bg-white/14">
+        className="h-10 rounded-xl border border-transparent bg-transparent px-3 text-sidebar-foreground/95 transition-all duration-200 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center hover:bg-white/14 data-[active=true]:!border-white/20 data-[active=true]:!bg-white/20 data-[active=true]:text-sidebar-foreground data-[active=true]:shadow-[inset_3px_0_0_0_rgba(255,255,255,0.92)] data-[active=true]:hover:!bg-white/20">
         <Link href={item.url}>
           <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground/90 [&_svg]:size-[1.1rem]">
             {item.icon}
