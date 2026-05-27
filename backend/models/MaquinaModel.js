@@ -3,6 +3,42 @@ import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 import OEEModel from './OEEModel.js';
 
 class MaquinaModel {
+    static gerarCodigoPareamento() {
+        // 6 dígitos, fácil de digitar em displays/serial
+        return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    // Cache em memória para sessões de pareamento (bom para MVP/local)
+    // Chave: `${id_empresa}:${id_maquina}` => { pairing_code, expires_at, created_by }
+    static _sessoesPareamentoPlaca = new Map();
+
+    static async criarSessaoSincronizacaoPlaca({ id_empresa, id_maquina, id_usuario }) {
+        // Valida que a máquina existe e pertence à empresa (autorizações já passam pelos middlewares)
+        const maquina = await prisma.maquinas.findFirst({
+            where: { id_empresa: Number(id_empresa), id_maquina: Number(id_maquina), ativo: true },
+            select: { id_maquina: true }
+        });
+        if (!maquina) {
+            throw new Error('Máquina não encontrada');
+        }
+
+        const pairing_code = this.gerarCodigoPareamento();
+        const expires_at = new Date(Date.now() + 5 * 60 * 1000); // 5 min
+
+        const key = `${Number(id_empresa)}:${Number(id_maquina)}`;
+        this._sessoesPareamentoPlaca.set(key, {
+            pairing_code,
+            expires_at,
+            created_by: Number(id_usuario),
+            created_at: new Date()
+        });
+
+        return {
+            id_maquina: Number(id_maquina),
+            pairing_code,
+            expires_at: expires_at.toISOString()
+        };
+    }
     static calcularDuracaoMinutos(inicio, fim) {
         if (!inicio || !fim) return 0;
 

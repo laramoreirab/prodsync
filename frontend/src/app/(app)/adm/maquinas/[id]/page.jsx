@@ -27,6 +27,8 @@ import { SolicitarJustificativaMenuItem } from "@/components/ui/forms/historicoE
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
+import SyncPlacaDialog from "@/components/ui/forms/maquinas/SyncPlacaDialog";
+import { usePerfil } from "@/hooks/usePerfil";
 import {
   filtrarPorDuracaoMax,
   filtrarPorNumberRange,
@@ -169,6 +171,7 @@ export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
   const router = useRouter();
   const maquinaId = Number(id);
+  const { tipo } = usePerfil();
 
   const [maquina, setMaquina] = useState(null);
   const [dados, setDados] = useState([]);
@@ -402,6 +405,9 @@ export default function MaquinaDetalhePage({ params }) {
           ]}
           actions={
             <DetailActions>
+              {["Adm", "Gestor"].includes(tipo) ? (
+                <SyncPlacaDialog maquinaId={maquinaId} iconSize={32} />
+              ) : null}
               <Dialog>
                 <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={32} />
