@@ -79,10 +79,10 @@ model Maquinas {
   data_ativacao     DateTime?           @db.Date
   ativo             Boolean             @default(true)
   capacidade        String?             @db.VarChar(100)
-  categoria         String?             @db.VarChar(100)
   data_aquisicao    DateTime?           @db.Date
   id_operador       Int?
   imagem            String?             @db.VarChar(255)
+  categoria         String?             @db.VarChar(100)
   status            String?             @db.VarChar(50)
   apontamentos      Apontamento[]
   escala_trabalho   EscalaTrabalho[]
