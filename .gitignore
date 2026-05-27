@@ -1,3 +1,5 @@
 # Esquecer lembretes
 lembretes
 node_modules
+.env
+.next
