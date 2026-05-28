@@ -100,10 +100,10 @@ export function DetailHeader({ title, actions, className }) {
       variants={DV.fadeUp}
       initial="hidden"
       animate="visible"
-      className={cn("flex flex-col sm:flex-row sm:items-center justify-between gap-4", className)}
+      className={cn("flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6", className)}
     >
-      <h1 className="text-3xl sm:text-4xl font-bold text-black leading-tight">{title}</h1>
-      {actions && <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>}
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-black leading-tight">{title}</h1>
+      {actions && <div className="flex items-center gap-2 flex-wrap flex-shrink-0">{actions}</div>}
     </motion.div>
   );
 }
@@ -120,7 +120,7 @@ export function DetailHeader({ title, actions, className }) {
  */
 export function DetailActions({ children, className }) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-2 flex-wrap", className)}>
       {children}
     </div>
   );
@@ -140,7 +140,7 @@ export function DetailInfoCard({ children, className, layout = "row" }) {
     <FadeUpItem>
       <div
         className={cn(
-          "bg-white border border-gray-200 rounded-2xl shadow-sm p-6",
+          "bg-white/95 backdrop-blur border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6 lg:p-7 transition-all duration-300 hover:shadow-md",
           layout === "row" ? "flex flex-col sm:flex-row items-start gap-6" : "flex flex-col gap-4",
           className
         )}
@@ -163,9 +163,9 @@ export function DetailInfoCard({ children, className, layout = "row" }) {
  */
 export function DetailInfoField({ label, value, className }) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <span className="text-base sm:text-lg font-semibold text-black">{label}:</span>
-      <span className="text-base sm:text-lg font-medium text-black">{value}</span>
+    <div className={cn("flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2", className)}>
+      <span className="text-sm sm:text-base font-semibold text-gray-700">{label}:</span>
+      <span className="text-sm sm:text-base font-medium text-black break-words">{value}</span>
     </div>
   );
 }
@@ -239,7 +239,7 @@ export function DetailWidgetGrid({ children, cols = 2, className }) {
 
   return (
     <StaggerWrapper
-      className={cn("grid gap-4", colMap[cols] ?? colMap[2], className)}
+      className={cn("grid gap-4 sm:gap-6", colMap[cols] ?? colMap[2], className)}
     >
       {children}
     </StaggerWrapper>
@@ -260,7 +260,7 @@ export function DetailWidgetCard({ children, colSpan, centered, className }) {
   return (
     <FadeUpItem
       className={cn(
-        "bg-white border border-gray-100 rounded-xl p-4 shadow-sm",
+        "group bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90",
         centered && "flex flex-col items-center justify-center",
         colSpan,
         className
@@ -292,23 +292,50 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className={cn("flex flex-col gap-4", className)}
+      className={cn("flex flex-col gap-4 sm:gap-5", className)}
     >
       {/* Cabeçalho: título + botão */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
-        <h2 className="text-3xl sm:text-4xl font-semibold">{title}</h2>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">{title}</h2>
         {action && <div className="flex-shrink-0">{action}</div>}
       </div>
 
       {/* Busca */}
-      {search && <div>{search}</div>}
+      {search && <div className="mt-3 sm:mt-4 rounded-xl">{search}</div>}
 
       {/* Linha de filtros */}
       {filterRow && <div>{filterRow}</div>}
 
       {/* Conteúdo (tabela ou empty state) */}
-      <div>{children}</div>
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-2 sm:p-3">{children}</div>
     </motion.section>
+  );
+}
+
+export function ListingTabs({ tabs, activeTab, onChange, className }) {
+  return (
+    <div className={cn("w-full", className)}>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => onChange(tab.id)}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs sm:text-sm font-semibold leading-none transition-all duration-200 border",
+                isActive
+                  ? "bg-[#00357a]/10 text-[#00357a] border-[#00357a]/25"
+                  : "bg-white text-slate-600 border-slate-300/80 hover:bg-slate-100 hover:text-slate-900"
+              )}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -340,7 +367,7 @@ export function UserProfileCard({
     <FadeUpItem>
       <div
         className={cn(
-          "flex flex-col sm:flex-row justify-between items-start  h-[250px] gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-8",
+          "flex flex-col xl:flex-row justify-between items-start gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6 lg:p-8",
           className
         )}
       >
@@ -358,7 +385,7 @@ export function UserProfileCard({
 
           {/* Dados */}
           <div className="flex flex-col gap-3 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-black leading-snug">{name}</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-black leading-snug">{name}</h1>
 
             <div className="flex flex-col sm:flex-row gap-6 sm:gap-10">
               {/* Coluna esquerda */}
@@ -416,11 +443,11 @@ export function MachineProfileCard({
 }) {
   return (
     <FadeUpItem>
-      <div className={cn("flex flex-col gap-4", className)}>
+      <div className={cn("flex flex-col gap-4 sm:gap-5", className)}>
         {/* Cabeçalho: nome + ações */}
-        <div className="flex items-center justify-between">
-          <div className="bg-white px-5 pb-3 rounded-tl-3xl rounded-tr-3xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a] inline-block">
-            <h1 className="text-2xl sm:text-3xl font-bold uppercase text-[#212e4b] px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="bg-white px-4 sm:px-5 pb-2 rounded-tl-3xl rounded-tr-3xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a] inline-block">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold uppercase text-[#212e4b] px-3 sm:px-4 py-2.5 sm:py-3">
               {machineName}
             </h1>
           </div>
@@ -430,7 +457,7 @@ export function MachineProfileCard({
         </div>
 
         {/* Corpo: foto + dados */}
-        <div className="flex flex-col sm:flex-row gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
           {/* Foto */}
           <div className="flex-shrink-0 bg-gray-50 rounded-xl p-4 flex items-center justify-center">
             <img

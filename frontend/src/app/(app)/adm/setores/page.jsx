@@ -161,15 +161,11 @@ export default function PageSetores() {
 
   return (
     <PageLayout>
-      <section className="graphs_cadastro">
+      <PageHeader
+        title="Setores"
+        action={(
+          <>
         {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
-        <div className="flex justify-between">
-          <div className="title_tela">
-            <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-              Setores
-            </h1>
-          </div>
-
           <DropdownMenu>
             <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
               <PlusChevronToggleIcon className="mr-2" />
@@ -203,24 +199,25 @@ export default function PageSetores() {
               <FormCadastroTurnoGeral onSuccess={() => { refresh(); setCriarAberto(null); }} />
             </DialogContent>
           </Dialog>
-        </div>
-      </section>
+          </>
+        )}
+      />
 
       {/* Gráficos */}
 
-      <AsymmetricGrid>
+      <AsymmetricGrid className="mt-6">
         <WidgetCard>
           <OEEPorSetorWidget />
         </WidgetCard>
-<div className="flex flex-col justify-between gap-4 h-full">
-  <WidgetCard>
-    <SetorTotalWidget />
-  </WidgetCard>
+        <div className="flex flex-col justify-between gap-4 h-full">
+          <WidgetCard>
+            <SetorTotalWidget />
+          </WidgetCard>
 
-  <WidgetCard>
-    <OperadoresMediaWidget />
-  </WidgetCard>
-</div>
+          <WidgetCard>
+            <OperadoresMediaWidget />
+          </WidgetCard>
+        </div>
       </AsymmetricGrid>
       
       <ContentGrid cols={2} className="mt-6">

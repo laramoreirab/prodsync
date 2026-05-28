@@ -46,6 +46,7 @@ import {
   DetailWidgetCard,
   SectionHighlight,
   DetailListingSection,
+  ListingTabs,
   DetailActions,
   MachineProfileCard,
   StatusBadge,
@@ -179,6 +180,7 @@ export default function MaquinaDetalhePage({ params }) {
   const [velocidade, setVelocidade] = useState("");
   const [buscaEvento, setBuscaEvento] = useState("");
   const [buscaApontamento, setBuscaApontamento] = useState("");
+  const [activeListTab, setActiveListTab] = useState("eventos");
 
   const imagemMaquina = (() => {
     const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
@@ -451,133 +453,144 @@ export default function MaquinaDetalhePage({ params }) {
           </DetailWidgetCard>
         </DetailWidgetGrid>
 
-        {/* Listagem de Eventos */}
-        <DetailListingSection
-          id="listagem_eventos"
-          title="Histórico de Eventos da Máquina"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-lg gap-2">
-                <Plus size={20} />
-                Cadastrar
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroEvento />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaEvento}
-              onChange={(e) => setBuscaEvento(e.target.value)}
-              placeholder="Busque por tipo, motivo ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosExibidos.length}
-              label="eventos"
-              actions={
-                <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-                </>
-              }
-            />
-          }
-        >
-          <FadeUpItem>
-          {dadosExibidos.length > 0 ? (
-            <TableListagens
-              data={dadosExibidos}
-              columns={colunasMaquina}
-              acoesDropdown={(maq) => (
-                <>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                        Ver Detalhes
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent><DetalhesEvento eventoId={maq.id} /></DialogContent>
-                  </Dialog>
-                  <SolicitarJustificativaMenuItem idEvento={maq.id}>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <BellRing className="mr-2 h-4 w-4" />
-                      Solicitar Justificativa
-                    </DropdownMenuItem>
-                  </SolicitarJustificativaMenuItem>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar Evento
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent><FormEdicaoEvento /></DialogContent>
-                  </Dialog>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
-          )}
-          </FadeUpItem>
-        </DetailListingSection>
+        <ListingTabs
+          className="mt-8"
+          activeTab={activeListTab}
+          onChange={setActiveListTab}
+          tabs={[
+            { id: "eventos", label: "Histórico de Eventos" },
+            { id: "apontamentos", label: "Histórico de Apontamentos" },
+          ]}
+        />
 
-        <DetailListingSection
-          id="listagem_histApontamentos"
-          title="Histórico de Apontamentos da Máquina"
-          search={
-            <SearchBar
-              value={buscaApontamento}
-              onChange={(e) => setBuscaApontamento(e.target.value)}
-              placeholder="Busque por id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosApontamentosFiltrados.length}
-              label="apontamentos"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoApontamento}
-                    onSortChange={handleSortApontamento}
-                  />
-                  <FilterDropdown
-                    filtersConfig={apontamentoFilter}
-                    onApply={aplicarFiltrosApontamento}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          <FadeUpItem>
-          {dadosApontamentosFiltrados.length > 0 ? (
-            <TableListagens
-              data={dadosApontamentosFiltrados}
-              columns={colunasApontamento}
-              acoesDropdown={(apontamento) => (
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver OP relacionada
-                  </Link>
-                </DropdownMenuItem>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum apontamento encontrado"
-              message="Não encontramos apontamentos correspondentes ao filtro ou busca."
-            />
-          )}
-          </FadeUpItem>
-        </DetailListingSection>
+        {activeListTab === "eventos" ? (
+          <DetailListingSection
+            id="listagem_eventos"
+            title="Histórico de Eventos da Máquina"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-lg gap-2">
+                  <Plus size={20} />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroEvento />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
+                value={buscaEvento}
+                onChange={(e) => setBuscaEvento(e.target.value)}
+                placeholder="Busque por tipo, motivo ou id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={dadosExibidos.length}
+                label="eventos"
+                actions={
+                  <>
+                    <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                    <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                  </>
+                }
+              />
+            }
+          >
+            <FadeUpItem>
+            {dadosExibidos.length > 0 ? (
+              <TableListagens
+                data={dadosExibidos}
+                columns={colunasMaquina}
+                acoesDropdown={(maq) => (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent><DetalhesEvento eventoId={maq.id} /></DialogContent>
+                    </Dialog>
+                    <SolicitarJustificativaMenuItem idEvento={maq.id}>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <BellRing className="mr-2 h-4 w-4" />
+                        Solicitar Justificativa
+                      </DropdownMenuItem>
+                    </SolicitarJustificativaMenuItem>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar Evento
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent><FormEdicaoEvento /></DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
+            )}
+            </FadeUpItem>
+          </DetailListingSection>
+        ) : (
+          <DetailListingSection
+            id="listagem_histApontamentos"
+            title="Histórico de Apontamentos da Máquina"
+            search={
+              <SearchBar
+                value={buscaApontamento}
+                onChange={(e) => setBuscaApontamento(e.target.value)}
+                placeholder="Busque por id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={dadosApontamentosFiltrados.length}
+                label="apontamentos"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoApontamento}
+                      onSortChange={handleSortApontamento}
+                    />
+                    <FilterDropdown
+                      filtersConfig={apontamentoFilter}
+                      onApply={aplicarFiltrosApontamento}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            <FadeUpItem>
+            {dadosApontamentosFiltrados.length > 0 ? (
+              <TableListagens
+                data={dadosApontamentosFiltrados}
+                columns={colunasApontamento}
+                acoesDropdown={(apontamento) => (
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver OP relacionada
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum apontamento encontrado"
+                message="Não encontramos apontamentos correspondentes ao filtro ou busca."
+              />
+            )}
+            </FadeUpItem>
+          </DetailListingSection>
+        )}
 
       </DetailPageContainer>
     </PageLayout>
