@@ -302,6 +302,7 @@ export function FadeUpItem({
 }) {
   const usedVariant = VARIANTS[variant] ?? VARIANTS.fadeUp;
   const shouldReduceMotion = useReducedMotion();
+  
 
   return (
     <motion.div
