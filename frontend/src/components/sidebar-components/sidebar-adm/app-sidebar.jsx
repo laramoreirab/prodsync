@@ -81,7 +81,7 @@ export function AppSidebar({
       {...props}>
       <SidebarHeader className="px-4 py-5 group-data-[collapsible=icon]:px-3">
         <a href="#" className="inline-flex items-center group-data-[collapsible=icon]:justify-center">
-          <img src="/logo.png" alt="Logo ProdSync" className="h-9 w-auto max-w-[2.75rem] transition-all duration-300 group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:block group-hover/sidebar:max-w-none" />
+          <img src="/logo.png" alt="Logo ProdSync" className="h-12 w-auto max-w-[2.75rem] brightness-0 invert transition-all duration-300 group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:block group-hover/sidebar:max-w-none" />
           <img src="/logo.svg" alt="Logo ProdSync" className="hidden h-16 w-16 brightness-0 invert transition-all duration-300 group-data-[state=collapsed]/sidebar:block group-data-[state=collapsed]/sidebar:group-hover/sidebar:hidden" />
         </a>
       </SidebarHeader>

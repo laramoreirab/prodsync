@@ -3,10 +3,11 @@ import { AppSidebar } from "@/components/sidebar-components/sidebar-adm/app-side
 export default function AdminLayout({ children }) {
   return (
     <div data-app-shell className="relative h-screen w-full overflow-hidden select-none">
-
-      <div
-        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/bg_app.svg')" }}
+      <img
+        src="/bg_app.svg"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none fixed -z-10 bottom-24 right-0 h-auto w-[140%] max-w-none sm:bottom-28 sm:w-[115%] lg:bottom-32 lg:w-[85%] xl:w-[75%]"
       />
       <div className="flex h-full w-full">
         <AppSidebar />
