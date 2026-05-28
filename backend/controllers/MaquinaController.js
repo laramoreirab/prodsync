@@ -37,6 +37,36 @@ class MaquinaController {
         }
     }
 
+    // POST /maquinas/:id/sincronizar-placa - Inicia sessão de pareamento da placa (ESP32)
+    static async iniciarSincronizacaoPlaca(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+            const id_usuario = req.user.id_usuario;
+
+            const sessao = await MaquinaModel.criarSessaoSincronizacaoPlaca({
+                id_empresa,
+                id_maquina,
+                id_usuario
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Sessão de sincronização iniciada.',
+                dados: sessao
+            });
+        } catch (error) {
+            console.error('Erro ao iniciar sincronização da placa:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível iniciar a sincronização da placa'
+            });
+        }
+    }
+
     // GET /maquinas/:id - Buscar máquina por ID
     static async buscarMaquinaPorId(req, res) {
         try {
