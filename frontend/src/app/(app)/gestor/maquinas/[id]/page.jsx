@@ -27,7 +27,6 @@ import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
 import { filtrarPorDuracaoMax, filtrarPorNumberRange } from "@/lib/filterUtils";
 import SyncPlacaDialog from "@/components/ui/forms/maquinas/SyncPlacaDialog";
-import { usePerfil } from "@/hooks/usePerfil";
 
 // Layout geral
 import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
@@ -129,7 +128,6 @@ const colunasApontamento = [
 export default function MaquinaDetalheGestor({ params }) {
   const { id } = use(params);
   const maquinaId = Number(id);
-  const { tipo } = usePerfil();
   const [maquina, setMaquina] = useState(null);
   const [dados, setDados] = useState([]);
   const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
@@ -473,9 +471,7 @@ export default function MaquinaDetalheGestor({ params }) {
           ]}
           actions={
             <DetailActions>
-              {["Adm", "Gestor"].includes(tipo) ? (
-                <SyncPlacaDialog maquinaId={maquinaId} iconSize={36} />
-              ) : null}
+              <SyncPlacaDialog maquinaId={maquinaId} iconSize={36} />
               <Dialog>
                 <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={36} className="mr-1" />

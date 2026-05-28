@@ -313,11 +313,11 @@ class EventoModel {
                 throw new Error('Maquina nao encontrada ou inativa');
             }
 
-            const atualizarMaquina = await prisma.maquinas.update({
-                where:{ id_empresa, id_maquina },
+            const atualizarMaquina = await prisma.maquinas.updateMany({
+                where:{ id_empresa, id_maquina, ativo: true },
                 data:{ status_atual: capitalizar(status_maquina) }
             })
-            if(!atualizarMaquina){
+            if(atualizarMaquina.count === 0){
                 throw new Error('Erro ao atualizar status da máquina'); 
             }
 
