@@ -26,6 +26,7 @@ import FormEdicaoMaquina from "@/components/ui/forms/maquinas/formEdicaoMaquina"
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { apiFetch } from "@/lib/api";
 import { filtrarPorDuracaoMax, filtrarPorNumberRange } from "@/lib/filterUtils";
+import SyncPlacaDialog from "@/components/ui/forms/maquinas/SyncPlacaDialog";
 
 // Layout geral
 import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
@@ -470,6 +471,7 @@ export default function MaquinaDetalheGestor({ params }) {
           ]}
           actions={
             <DetailActions>
+              <SyncPlacaDialog maquinaId={maquinaId} iconSize={36} />
               <Dialog>
                 <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
                   <Pencil size={36} className="mr-1" />

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import MaquinaController from '../controllers/MaquinaController.js';
-import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js';
+import { authMiddleware, adminMiddleware, gestorOuAdminMiddleware } from '../middlewares/authMiddleware.js';
 import { aplicarEscopoGestor, autorizarMaquinaParam, autorizarSetorParam, autorizarUsuarioParam } from '../middlewares/setorAccessMiddleware.js';
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js';
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
@@ -35,6 +35,9 @@ router.get('/:id/velocidade', autorizarMaquinaParam('id'), MaquinaController.obt
 router.get('/:id/historico-eventos', autorizarMaquinaParam('id'), MaquinaController.obterHistoricoEventosTabela);
 
 router.get('/eficienciaMaquina/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.eficienciaMaquina)
+
+// Pareamento / Sincronização de placa (ESP32)
+router.post('/:id/sincronizar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.iniciarSincronizacaoPlaca);
 
 router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);
 router.put('/:id', adminMiddleware, uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
