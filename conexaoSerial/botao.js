@@ -1,78 +1,83 @@
-// PROJETO TCC - Módulo ESP32 (Lado Dispositivo - Versão Serial / Plano B)
-
-// Limpa todos os watches e intervalos anteriores para evitar o erro "Unable to set watch"
 clearWatch();
 clearInterval();
 
-const BOTOES = [D25, D26, D27]; // Array de Botões, posteriorente utilizado no "BOTOES.forEach"
-let isLocked = false; // Mutex do código, serve para garantir que o pressionamento de múltiplos botões não seja reconhecido, apenas um funciona
-let alarmeSeguranca; // Variável para guardar o nosso timer
+const EMPRESA_ID = 10;
+const BOARD_UID = typeof getSerial === "function" ? "esp32-" + getSerial() : "esp32-prodsync-001";
+const FIRMWARE_VERSION = "serial-1.1.0";
 
-// Envia o payload via Serial e aguarda confirmação
+const PIN_PRODUZINDO = D25;
+const PIN_SETUP = D26;
+const PIN_PARADA = D27;
 
-function dispararEvento(id) {
-    if (isLocked) return; // Se houver processo em curso, ignora
+let isLocked = false;
+let alarmeSeguranca;
+let setupHoldTimer;
+let setupLongPressTriggered = false;
+
+function enviarPareamento() {
+    const payload = {
+        id_empresa: EMPRESA_ID,
+        board_uid: BOARD_UID,
+        firmware_version: FIRMWARE_VERSION
+    };
+
+    print("PAIRING:" + JSON.stringify(payload));
+}
+
+function dispararEvento(status) {
+    if (isLocked) return;
 
     isLocked = true;
-
-    // --- NOVA TRAVA DE SEGURANÇA (TIMEOUT DE 5 SEGUNDOS) ---
     alarmeSeguranca = setTimeout(() => {
         if (isLocked) {
             isLocked = false;
-            print("LOG: ⚠️ TIMEOUT! O PC nao respondeu. Mutex liberado por segurança.");
+            print("LOG: TIMEOUT! O PC nao respondeu. Mutex liberado por seguranca.");
         }
-    }, 5000); // 5000 milissegundos = 5 segundos
-    // -------------------------------------------------------
+    }, 5000);
 
-    // 1. Criando uma lista (Array) onde a posição reflete o ID do botão
-    // ID 0 = PRODUZINDO, ID 1 = SETUP/AJUSTE, ID 2 = PARADA
-    const STATUS_MAQUINA = ["PRODUZINDO", "SETUP/AJUSTE", "PARADA"];
-
-    // 2. Montando o payload de uma vez só (usando const, pois não vamos reatribuir)
     const payload = {
-        status: STATUS_MAQUINA[id], // Ele pega o texto automático baseado no ID!
-        maquina_id: 1,
-        /* timestamp: Date.now() Retirei o timestamp pois o ESP32 precisa se conectar a internet para
-        saber a hora, por isso, a data está sendo adicionada no próprio BackEnd */
+        board_uid: BOARD_UID,
+        status
     };
 
-    /* Usamos um prefixo 'DATA:' para o PC saber que isso é um dado, não um log
-       'DATA:' é posteriormente retirado da informação para que apenas o JSON seja enviado ao BackEnd */
     print("DATA:" + JSON.stringify(payload));
 }
 
-// Configuração dos Botões
-BOTOES.forEach((pin, index) => {
-    pinMode(pin, "input_pullup");
+pinMode(PIN_PRODUZINDO, "input_pullup");
+pinMode(PIN_SETUP, "input_pullup");
+pinMode(PIN_PARADA, "input_pullup");
 
-    setWatch(() => {
-        dispararEvento(index);
-    }, pin, { repeat: true, edge: "falling", debounce: 50 });
-});
+setWatch(() => {
+    dispararEvento("Produzindo");
+}, PIN_PRODUZINDO, { repeat: true, edge: "falling", debounce: 50 });
+
+setWatch(() => {
+    setupLongPressTriggered = false;
+    setupHoldTimer = setTimeout(() => {
+        setupLongPressTriggered = true;
+        enviarPareamento();
+    }, 3000);
+}, PIN_SETUP, { repeat: true, edge: "falling", debounce: 50 });
+
+setWatch(() => {
+    if (setupHoldTimer) clearTimeout(setupHoldTimer);
+    if (!setupLongPressTriggered) {
+        dispararEvento("Setup");
+    }
+}, PIN_SETUP, { repeat: true, edge: "rising", debounce: 50 });
+
+setWatch(() => {
+    dispararEvento("Parada");
+}, PIN_PARADA, { repeat: true, edge: "falling", debounce: 50 });
 
 function liberarMutex() {
     isLocked = false;
-    
-    // Desarma o alarme se ele existir
+
     if (alarmeSeguranca) {
         clearTimeout(alarmeSeguranca);
     }
-    
-    print("LOG: ✅ Mutex liberado pelo PC (Via Comando).");
+
+    print("LOG: Mutex liberado pelo PC.");
 }
 
-// /* Escuta a Serial: Quando o PC terminar o POST,
-//    ele deve enviar "OK" para liberar o próximo clique. */
-// Serial.on('data', function (data) {
-//     if (data.includes("RELEASE_MUTEX")) {
-//         isLocked = false;
-
-//         if (alarmeSeguranca) {
-//             clearTimeout(alarmeSeguranca);
-//         }
-
-//         print("LOG: Mutex liberado pelo PC.");
-//     }
-// });
-
-print("LOG: ESP32 iniciado e aguardando cliques.");
+print("LOG: ESP32 iniciado. Board UID: " + BOARD_UID);

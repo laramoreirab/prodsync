@@ -1,23 +1,49 @@
-var wifi = require("Wifi");
-var mqtt = require("tinyMQTT"); 
+clearWatch();
+clearInterval();
 
-var PIN_VERDE = D32;    
-var PIN_AMARELO = D33;  
-var PIN_VERMELHO = D25; 
+var wifi = require("Wifi");
+var mqtt = require("tinyMQTT");
+
+var PIN_VERDE = D32;
+var PIN_AMARELO = D33;
+var PIN_VERMELHO = D25;
 
 var EMPRESA_ID = 10;
-var MAQUINA_ID = 20;
-var statusAtual = null; 
-var clienteMQTT = null;
+var BOARD_UID = typeof getSerial === "function" ? "esp32-" + getSerial() : "esp32-prodsync-001";
+var FIRMWARE_VERSION = "wifi-1.1.0";
 
-// Este é o canal (Tópico) exclusivo da sua máquina
-var TOPICO = "phietro/fabrica/maquina1/status";
+var statusAtual = null;
+var clienteMQTT = null;
+var setupHoldTimer = null;
+var setupLongPressTriggered = false;
+
+var TOPICO_STATUS = "phietro/fabrica/" + BOARD_UID + "/status";
+var TOPICO_PAREAMENTO = "phietro/fabrica/pareamento";
+
+function obterMac() {
+  try {
+    var detalhes = wifi.getDetails ? wifi.getDetails() : null;
+    return detalhes && detalhes.mac ? detalhes.mac : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function publicaJson(topico, dados) {
+  if (!clienteMQTT) {
+    console.log("Aguarde, MQTT ainda nao conectou...");
+    return;
+  }
+
+  var payload = JSON.stringify(dados);
+  clienteMQTT.publish(topico, payload);
+  console.log("Publicado MQTT:", topico, payload);
+}
 
 function conectaWifi() {
-  console.log("Limpando conexões antigas...");
-  wifi.disconnect(); // Garante que o rádio do ESP32 comece do zero
+  console.log("Limpando conexoes antigas...");
+  wifi.disconnect();
 
-  // Aguarda 1 segundo para o chip limpar a memória antes de tentar reconectar
   setTimeout(function() {
     console.log("Tentando conectar ao Wi-Fi: Phietro...");
     wifi.connect("Phietro", { password: "123" }, function(err) {
@@ -26,20 +52,18 @@ function conectaWifi() {
         setTimeout(conectaWifi, 10000);
         return;
       }
-      console.log("✅ Wi-Fi Conectado! IP:", wifi.getIP().ip);
-      conectaBroker(); 
+      console.log("Wi-Fi conectado. IP:", wifi.getIP().ip);
+      conectaBroker();
     });
   }, 1000);
 }
 
 function conectaBroker() {
   console.log("Conectando ao broker MQTT...");
-  
-  // Conecta na porta padrão 1883 sem criptografia (zero travamentos de RAM)
   clienteMQTT = mqtt.create("broker.hivemq.com");
-  
+
   clienteMQTT.on("connected", function() {
-    console.log("Conectado ao Broker HiveMQ com sucesso!");
+    console.log("Conectado ao Broker HiveMQ.");
   });
 
   clienteMQTT.on("disconnected", function() {
@@ -50,24 +74,24 @@ function conectaBroker() {
   clienteMQTT.connect();
 }
 
-function enviaStatus(novoStatus) {
-  if (!clienteMQTT) {
-    console.log("Aguarde, MQTT ainda não conectou...");
-    return;
-  }
-  
-  if (statusAtual === novoStatus) return; 
-  statusAtual = novoStatus;
-  
-  var dados = JSON.stringify({
+function solicitarPareamento() {
+  publicaJson(TOPICO_PAREAMENTO, {
+    tipo: "PAIRING_REQUEST",
     id_empresa: EMPRESA_ID,
-    maquina_id: MAQUINA_ID,
+    board_uid: BOARD_UID,
+    mac: obterMac(),
+    firmware_version: FIRMWARE_VERSION
+  });
+}
+
+function enviaStatus(novoStatus) {
+  if (statusAtual === novoStatus) return;
+  statusAtual = novoStatus;
+
+  publicaJson(TOPICO_STATUS, {
+    board_uid: BOARD_UID,
     status: statusAtual
   });
-
-  // Publica a mensagem no canal de forma instantânea
-  clienteMQTT.publish(TOPICO, dados);
-  console.log("Publicado no canal MQTT:", dados);
 }
 
 function configuraBotoes() {
@@ -75,18 +99,30 @@ function configuraBotoes() {
   pinMode(PIN_AMARELO, "input_pullup");
   pinMode(PIN_VERMELHO, "input_pullup");
 
-  setWatch(function() { 
-    setTimeout(function() { enviaStatus("PRODUZINDO"); }, 10); 
+  setWatch(function() {
+    setTimeout(function() { enviaStatus("Produzindo"); }, 10);
   }, PIN_VERDE, { repeat: true, edge: "falling", debounce: 50 });
 
-  setWatch(function() { 
-    setTimeout(function() { enviaStatus("SETUP"); }, 10); 
+  setWatch(function() {
+    setupLongPressTriggered = false;
+    setupHoldTimer = setTimeout(function() {
+      setupLongPressTriggered = true;
+      solicitarPareamento();
+    }, 3000);
   }, PIN_AMARELO, { repeat: true, edge: "falling", debounce: 50 });
 
-  setWatch(function() { 
-    setTimeout(function() { enviaStatus("PARADA"); }, 10); 
+  setWatch(function() {
+    if (setupHoldTimer) clearTimeout(setupHoldTimer);
+    if (!setupLongPressTriggered) {
+      setTimeout(function() { enviaStatus("Setup"); }, 10);
+    }
+  }, PIN_AMARELO, { repeat: true, edge: "rising", debounce: 50 });
+
+  setWatch(function() {
+    setTimeout(function() { enviaStatus("Parada"); }, 10);
   }, PIN_VERMELHO, { repeat: true, edge: "falling", debounce: 50 });
 }
 
+console.log("ESP32 iniciado. Board UID:", BOARD_UID);
 configuraBotoes();
 conectaWifi();
