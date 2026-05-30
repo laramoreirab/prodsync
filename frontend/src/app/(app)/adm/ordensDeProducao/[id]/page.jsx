@@ -424,7 +424,7 @@ export default function OPDetalhePage({ params }) {
           <p className="text-xl font-semibold text-gray-800">Voltar para Ordens de Produção</p>
         </Link>
 
-        <section id="infos_op" className="flex flex-col">
+        <FadeUpItem id="infos_op" className="flex flex-col">
           <div className="flex justify-between items-center">
             <h1 className="text-4xl font-bold text-black">
               Ordem de Produção — {tituloOp}
@@ -451,7 +451,7 @@ export default function OPDetalhePage({ params }) {
               </Dialog>
             </div>
           </div>
-        </section>
+        </FadeUpItem>
 
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">

@@ -29,7 +29,7 @@
  */
 
 import { motion } from "motion/react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { SPACING } from "@/lib/spacing"
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -75,7 +75,7 @@ export function DetailBackLink({ href, label }) {
         href={href}
         className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 transition-colors font-semibold text-base group"
       >
-        <ChevronDown
+        <ChevronUp
           className="w-5 h-5 -rotate-90 group-hover:-translate-x-0.5 transition-transform"
         />
         <span>{label}</span>
