@@ -137,13 +137,13 @@ function AccountSettings({ role }) {
       setFormData({
         id: dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "",
         nome: dadosUsuario.dados.nome || "",
-        cpf: dadosUsuario.dados.cpf || "",
+        cpf: aplicarMascaraCPF(dadosUsuario.dados.cpf) || "",
         cargo: dadosUsuario.dados.tipo || "",
         email: dadosUsuario.dados.email || "",
         emailEmpresa: dadosUsuario.dados.email || "",
-        telefoneEmpresa: dadosUsuario.dados.telefone || "",
+        telefoneEmpresa: aplicarMascaraTelefone(dadosUsuario.dados.telefone) || "",
         enderecoEmpresa: dadosUsuario.dados.endereco || "",
-        cpfRepresentante: dadosUsuario.dados.cpf_representante || ""
+        cpfRepresentante: aplicarMascaraCPF(dadosUsuario.dados.cpf_representante) || ""
       })
       console.log("Dados do usuário:", dadosUsuario)
     }
@@ -169,12 +169,24 @@ function AccountSettings({ role }) {
   const fields = isAdmin ? adminAccountFields : userAccountFields
 
   function aplicarMascaraTelefone(valor) {
-    if (!valor) return "";
-    // O String() transforma Número/Null em Texto, impedindo que o replace quebre
-    let v = String(valor).replace(/\D/g, "");
-    v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-    v = v.replace(/(\d)(\d{4})$/, "$1-$2");
-    return v.substring(0, 15); 
+     let v = String(valor || "").replace(/\D/g, "");
+
+  // limita a 11 dígitos
+  v = v.slice(0, 11);
+
+  if (v.length <= 10) {
+    return v.replace(
+      /^(\d{2})(\d{0,4})(\d{0,4}).*/,
+      (_, ddd, parte1, parte2) =>
+        `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
+    );
+  }
+
+  return v.replace(
+    /^(\d{2})(\d{0,5})(\d{0,4}).*/,
+    (_, ddd, parte1, parte2) =>
+      `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
+  );
   }
   
   function aplicarMascaraCPF(valor) {
@@ -199,24 +211,24 @@ function AccountSettings({ role }) {
         endereco: formData.enderecoEmpresa,
         cpf_representante: String(formData.cpfRepresentante || "").replace(/\D/g, "") 
       }
-
+      console.log(dadosParaEnviar)
       const response = await apiFetch('/api/usuarios/atualizarEmpresa', { 
         method: 'PATCH', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dadosParaEnviar)
       })
+      console.log("resposta do endpoint:", response.dados)
   
       if (response.sucesso) {
         // Usando o toast no lugar do Toaster
         toast.success("Informações da empresa atualizadas com sucesso!")
-        
         if (response.dados) {
           setFormData((dadosAnteriores) => ({
             ...dadosAnteriores,
             emailEmpresa: response.dados.email || dadosAnteriores.emailEmpresa,
-            telefoneEmpresa: response.dados.telefone ? aplicarMascaraTelefone(response.dados.telefone) : dadosAnteriores.telefoneEmpresa,
+            telefoneEmpresa: aplicarMascaraTelefone(response.dados.telefone) ? aplicarMascaraTelefone(response.dados.telefone) : aplicarMascaraTelefone(dadosAnteriores.telefoneEmpresa),
             enderecoEmpresa: response.dados.endereco || dadosAnteriores.enderecoEmpresa,
-            cpfRepresentante: response.dados.cpf_representante ? aplicarMascaraCPF(response.dados.cpf_representante) : dadosAnteriores.cpfRepresentante,
+            cpfRepresentante: aplicarMascaraCPF(response.dados.cpf_representante) ? aplicarMascaraCPF(response.dados.cpf_representante) : aplicarMascaraCPF(dadosAnteriores.cpfRepresentante),
           }));
         }
         
@@ -340,7 +352,7 @@ function SecuritySettings({ role }) {
   async function handleSubmit(e) {
     e.preventDefault()
     if (senhasNaoBatem) {
-      Toaster("As senhas digitadas não estão iguais!")
+      toast("As senhas digitadas não estão iguais!")
       return
     }
 
@@ -360,17 +372,17 @@ function SecuritySettings({ role }) {
       })
 
       if (response.sucesso) {
-        Toaster("Senha alterada com sucesso!")
+        toast("Senha alterada com sucesso!")
         setCurrentPassword("")
         setNewPassword("")
         setConfirmPassword("")
       } else {
-        Toaster("Erro ao alterar senha. Verifique os requisitos.")
+       toast("Erro ao alterar senha. Verifique os requisitos.")
       }
 
     } catch (error) {
       console.error("Erro ao trocar senha:", error)
-      Toaster("Ocorreu um erro ao tentar alterar a senha.")
+      toast("Ocorreu um erro ao tentar alterar a senha.")
 
     } finally {
       setCarregando(false)
@@ -379,7 +391,7 @@ function SecuritySettings({ role }) {
 
   async function handleDeletarContar(e) {
     if (!confirmCNPJ || !confirmPasswordDelete) {
-    Toaster("Por favor, preencha o CNPJ e a senha para confirmar.");
+    toast("Por favor, preencha o CNPJ e a senha para confirmar.");
     return;
   }
   
@@ -404,7 +416,7 @@ function SecuritySettings({ role }) {
       });
 
       if (response.sucesso) {
-        Toaster.success("Conta e empresa excluídas com sucesso! Volte quando quiser, Prodsync está sempre pronto para te sincronizar!")
+        toast.success("Conta e empresa excluídas com sucesso! Volte quando quiser, Prodsync está sempre pronto para te sincronizar!")
 
         // Limpa o token e desloga o usuário após alguns segundos
         setTimeout(() => {
@@ -412,11 +424,11 @@ function SecuritySettings({ role }) {
           window.location.href = "/"
         }, 2000)
       } else {
-        Toaster.error("Não foi possível deletar a conta. Tente novamente.")
+        toast.error("Não foi possível deletar a conta. Tente novamente.")
       }
     } catch (error) {
       console.error("Erro ao deletar conta:", error)
-      Toaster.error("Erro interno ao tentar excluir a conta.")
+      toast.error("Erro interno ao tentar excluir a conta.")
     } finally {
       setDeletando(false)
     }
