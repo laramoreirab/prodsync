@@ -17,7 +17,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { Badge } from "@/components/ui/badge";
-import { FadeUpItem } from "@/components/AnimatedComponents";
 
 const statusConfig = {
   Produzindo: "bg-green-500/15 text-green-600",
@@ -61,7 +60,7 @@ export default function MaquinaDetalhePage({ params }) {
           <p className="text-xl font-semibold text-gray-800">Voltar para Máquinas</p>
         </Link>
 
-        <FadeUpItem id="infos_maquina" className="flex flex-col">
+        <section id="infos_maquina" className="flex flex-col">
           <div className="flex justify-between items-center">
             <div className="bg-white px-5 pb-3 rounded-tl-4xl rounded-tr-4xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a]">
               <h1 className="text-3xl font-bold uppercase text-[#212e4b] pb-0 inline-block px-6 py-4">
@@ -105,7 +104,7 @@ export default function MaquinaDetalhePage({ params }) {
               </div>
             </div>
           </div>
-        </FadeUpItem>
+        </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">

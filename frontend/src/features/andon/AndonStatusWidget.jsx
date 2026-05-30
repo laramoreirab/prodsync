@@ -30,6 +30,7 @@ export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) 
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
+
   return (
     <div className="space-y-4 w-full h-full flex flex-col">
       <p className="text-md font-semibold text-slate-950 flex-shrink-0">{heading}</p>
@@ -38,11 +39,10 @@ export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) 
         {cards.map(({ key, label, accent }) => (
           <div
             key={key}
-            className="flex w-full h-full flex-col rounded-xl border p-4 shadow-sm"
+            className="flex w-full h-full flex-col rounded-xl bg-transparent border p-4 shadow-sm"
             style={{
               borderColor: accent,
-              color: accent,
-              backgroundColor: `color-mix(in srgb, ${accent} 8%, transparent)`,
+              color: accent
             }}
           >
             <KPI

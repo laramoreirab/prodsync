@@ -21,8 +21,8 @@ export const opStatusConfig = {
     label: "Pausadas (Setup)", 
     color: "var(--chart4)" 
   },
-  "Pausadas": { 
-    label: "Pausadas", 
+  "Atrasadas (Paradas)": { 
+    label: "Atrasadas (Paradas)", 
     color: "var(--chart2)" 
   },
   "Aguardando Início": { 

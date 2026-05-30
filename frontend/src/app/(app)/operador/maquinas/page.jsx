@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@/lib/api";
 import { obterPerfil } from "@/services/authService";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
-import { FadeUpItem, PageHeader } from "@/components/AnimatedComponents";
 
 const statusConfig = {
   Produzindo: "bg-green-500/15 text-green-600",
@@ -74,9 +73,10 @@ export default function MaquinasOperadorPage() {
   return (
     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
       <div className="w-full mt-8 pb-10 px-8 space-y-6">
-        <PageHeader title="Minha Máquina" className="mt-0 mb-0" />
+        <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
+          Minha Máquina
+        </h1>
 
-        <FadeUpItem>
         <Link
           href={`/operador/maquinas/${maquina.id_maquina}`}
           className="block bg-white border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
@@ -100,7 +100,6 @@ export default function MaquinasOperadorPage() {
             <ChevronDown className="w-8 h-8 text-gray-400 transform -rotate-90" />
           </div>
         </Link>
-        </FadeUpItem>
       </div>
     </main>
   );

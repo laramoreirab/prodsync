@@ -34,7 +34,7 @@ const usuariosFilterBase = [
 ];
 
 //Widgets dashboard
-import { QtdUsuariosAdmWidget } from "@/features/usuarios/QtdUsuariosAdmWidget";
+import { QtdUsuariosWidget } from "@/features/usuarios/QtdUsuariosWidget";
 import { QtdUsuariosPorSetorWidget } from "@/features/usuarios/QtdUsuariosPorSetorWidget";
 import { TopOperadoresWidget } from "@/features/usuarios/TopOperadoresWidget";
 import { TempoSessaoWidget } from "@/features/usuarios/TempoSessaoWidget";
@@ -197,7 +197,7 @@ export default function Usuarios() {
         </WidgetCard>
 
         <WidgetCard>
-          <QtdUsuariosAdmWidget />
+          <QtdUsuariosWidget />
         </WidgetCard>
 
         <WidgetCard>

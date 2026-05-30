@@ -88,10 +88,13 @@ xlg: {
         />
       </svg>
 
+      {/* Container de texto centralizado com margem negativa ajustada para subir o texto */}
       <div className={`flex flex-col items-center w-full text-center ${s.labelOffset}`}>
+        {/* Alterado para text-black e tamanho maior */}
         <span className={`${s.valueText} font-bold tracking-tight text-black leading-none`}>
           {normalizedValue}%
         </span>
+        {/* Alterado para text-black e tamanho maior */}
         <span className={`${s.labelText} uppercase tracking-wider text-black font-semibold mt-1`}>
           {config[dataKey]?.label || "Gauge"}
         </span>
