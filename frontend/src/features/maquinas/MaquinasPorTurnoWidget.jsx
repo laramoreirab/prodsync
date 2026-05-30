@@ -27,8 +27,6 @@ export function MaquinasPorTurnoWidget({ setorId }) {
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
-
-  // Tratamento dos dados para converter números absolutos em percentagem
   const dataWithPercentages = data?.map((item) => {
     const total = (item.ativas || 0) + (item.paradas || 0) + (item.manutencao || 0);
 
@@ -44,6 +42,21 @@ export function MaquinasPorTurnoWidget({ setorId }) {
     };
   }) || [];
 
+  const localConfig = {
+    ativasPct: {
+      label: maquinasTurnoConfig.ativas?.label || "Ativas",
+      color: maquinasTurnoConfig.ativas?.color || "currentColor",
+    },
+    paradasPct: {
+      label: maquinasTurnoConfig.paradas?.label || "Paradas",
+      color: maquinasTurnoConfig.paradas?.color || "currentColor",
+    },
+    manutencaoPct: {
+      label: maquinasTurnoConfig.manutencao?.label || "Manutenção",
+      color: maquinasTurnoConfig.manutencao?.color || "currentColor",
+    },
+  };
+
   return (
     <div>
       <p className="text-sm font-semibold text-black">
@@ -54,8 +67,8 @@ export function MaquinasPorTurnoWidget({ setorId }) {
       </p>
 
       <div className="mt-2">
-        <ChartContainer config={maquinasTurnoConfig} className="h-[250px] w-full">
-          <BarChart data={dataWithPercentages} margin={{ top: 10 }}>
+        <ChartContainer config={localConfig} className="h-[280px] w-full">
+          <BarChart data={dataWithPercentages} margin={{ top: 10, bottom: 5 }}>
             <XAxis dataKey="turno" tickLine={false} axisLine={false} />
 
             <YAxis
@@ -76,7 +89,6 @@ export function MaquinasPorTurnoWidget({ setorId }) {
 
                     const originalKey = keyMap[entry.dataKey];
                     const quantidade = entry.payload[originalKey] || 0;
-
                     const valorFormatado = `${quantidade} ${quantidade === 1 ? 'máquina' : 'máquinas'}`;
 
                     return [valorFormatado, entry.name];
@@ -87,7 +99,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
 
             <ChartLegend content={<ChartLegendContent />} />
 
-            <Bar dataKey="ativasPct" name="Ativas" stackId="turno" fill="var(--color-ativas)">
+            <Bar dataKey="ativasPct" name="Ativas" stackId="turno" fill="var(--color-ativasPct)">
               <LabelList
                 dataKey="ativasPct"
                 position="center"
@@ -96,7 +108,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
               />
             </Bar>
 
-            <Bar dataKey="paradasPct" name="Paradas" stackId="turno" fill="var(--color-paradas)">
+            <Bar dataKey="paradasPct" name="Paradas" stackId="turno" fill="var(--color-paradasPct)">
               <LabelList
                 dataKey="paradasPct"
                 position="center"
@@ -105,7 +117,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
               />
             </Bar>
 
-            <Bar dataKey="manutencaoPct" name="Manutenção" stackId="turno" fill="var(--color-manutencao)" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="manutencaoPct" name="Manutenção" stackId="turno" fill="var(--color-manutencaoPct)" radius={[4, 4, 0, 0]}>
               <LabelList
                 dataKey="manutencaoPct"
                 position="center"
