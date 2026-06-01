@@ -3,9 +3,12 @@ import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.j
 import UsuarioController from '../controllers/UsuarioController.js'
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js'
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js'
+import multer from 'multer';
 import { aplicarEscopoGestor, autorizarSetorParam, autorizarUsuarioParam, validarBodySetorGestor } from '../middlewares/setorAccessMiddleware.js'
 
 const router = Router()
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Rotas de Dashboard do Operador
 router.get('/', authMiddleware, aplicarEscopoGestor, UsuarioController.listarUsuarios)
@@ -36,7 +39,8 @@ router.get('/:id/meta', authMiddleware, autorizarUsuarioParam('id'), UsuarioCont
 router.get('/:id/tempo_parado_tempo_produzindo_operador', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.tempoParadoTempoProduzindoUsuario);
 router.get('/:id/oee_maquinas', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquina);
 router.get('/:id/maquina_oee_detalhe', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquinaDetalhes);
-router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa)
-router.patch('/atualizarEmpresa', authMiddleware, adminMiddleware, UsuarioController.atualizarEmpresa)
+router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa);
+router.patch('/atualizarEmpresa', authMiddleware, adminMiddleware, UsuarioController.atualizarEmpresa);
+router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), UsuarioController.cadastroLote);
 
 export default router
