@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
-import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
 import { json } from "zod"
 
 const adminTabs = [
@@ -117,6 +117,7 @@ function SettingsInput(props) {
 
 function AccountSettings({ role }) {
   const isAdmin = role === "admin"
+  const [salvando, setSalvando] = useState(false)
 
   const [formData, setFormData] = useState({
     id: "",
@@ -136,13 +137,13 @@ function AccountSettings({ role }) {
       setFormData({
         id: dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "",
         nome: dadosUsuario.dados.nome || "",
-        cpf: dadosUsuario.dados.cpf || "",
+        cpf: aplicarMascaraCPF(dadosUsuario.dados.cpf) || "",
         cargo: dadosUsuario.dados.tipo || "",
         email: dadosUsuario.dados.email || "",
         emailEmpresa: dadosUsuario.dados.email || "",
-        telefoneEmpresa: dadosUsuario.dados.telefone || "",
+        telefoneEmpresa: aplicarMascaraTelefone(dadosUsuario.dados.telefone) || "",
         enderecoEmpresa: dadosUsuario.dados.endereco || "",
-        cpfRepresentante: dadosUsuario.dados.cpf_representante || ""
+        cpfRepresentante: aplicarMascaraCPF(dadosUsuario.dados.cpf_representante) || ""
       })
       console.log("Dados do usuário:", dadosUsuario)
     }
@@ -151,10 +152,12 @@ function AccountSettings({ role }) {
 
 
   async function handleInputChange(e) {
-    const { id, value } = e.target
+    let { id, value } = e.target
 
-    if (id === "cpfRepresentante" || id === "telefoneEmpresa") {
-      const valorSemMascara = value.replace(/\D/g, "")
+    if (id === "telefoneEmpresa") {
+      value = aplicarMascaraTelefone(value)
+    } else if (id === "cpfRepresentante") {
+      value = aplicarMascaraCPF(value) 
     }
 
     setFormData((dadosAnteriores) => ({
@@ -165,6 +168,81 @@ function AccountSettings({ role }) {
 
   const fields = isAdmin ? adminAccountFields : userAccountFields
 
+  function aplicarMascaraTelefone(valor) {
+     let v = String(valor || "").replace(/\D/g, "");
+
+  // limita a 11 dígitos
+  v = v.slice(0, 11);
+
+  if (v.length <= 10) {
+    return v.replace(
+      /^(\d{2})(\d{0,4})(\d{0,4}).*/,
+      (_, ddd, parte1, parte2) =>
+        `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
+    );
+  }
+
+  return v.replace(
+    /^(\d{2})(\d{0,5})(\d{0,4}).*/,
+    (_, ddd, parte1, parte2) =>
+      `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
+  );
+  }
+  
+  function aplicarMascaraCPF(valor) {
+    if (!valor) return "";
+    let v = String(valor).replace(/\D/g, "");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    return v.substring(0, 14);
+  }
+
+  async function handleSubmitPerfil(e) {
+    e.preventDefault() 
+    setSalvando(true)
+  
+    try {
+      // Movido para DENTRO do try para que qualquer erro seja capturado pelo catch
+      // Adicionado o fallback ( || "" ) e o String() por segurança
+      const dadosParaEnviar = {
+        email: formData.emailEmpresa,
+        telefone: String(formData.telefoneEmpresa || "").replace(/\D/g, ""), 
+        endereco: formData.enderecoEmpresa,
+        cpf_representante: String(formData.cpfRepresentante || "").replace(/\D/g, "") 
+      }
+      console.log(dadosParaEnviar)
+      const response = await apiFetch('/api/usuarios/atualizarEmpresa', { 
+        method: 'PATCH', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dadosParaEnviar)
+      })
+      console.log("resposta do endpoint:", response.dados)
+  
+      if (response.sucesso) {
+        // Usando o toast no lugar do Toaster
+        toast.success("Informações da empresa atualizadas com sucesso!")
+        if (response.dados) {
+          setFormData((dadosAnteriores) => ({
+            ...dadosAnteriores,
+            emailEmpresa: response.dados.email || dadosAnteriores.emailEmpresa,
+            telefoneEmpresa: aplicarMascaraTelefone(response.dados.telefone) ? aplicarMascaraTelefone(response.dados.telefone) : aplicarMascaraTelefone(dadosAnteriores.telefoneEmpresa),
+            enderecoEmpresa: response.dados.endereco || dadosAnteriores.enderecoEmpresa,
+            cpfRepresentante: aplicarMascaraCPF(response.dados.cpf_representante) ? aplicarMascaraCPF(response.dados.cpf_representante) : aplicarMascaraCPF(dadosAnteriores.cpfRepresentante),
+          }));
+        }
+        
+      } else {
+        toast.error(response.mensagem || "Erro ao atualizar dados. Verifique os campos.")
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error)
+      toast.error("Erro interno ao tentar salvar as alterações.")
+    } finally {
+      setSalvando(false)
+    }
+  }
+
   return (
     <div className="max-w-sm space-y-4">
       <SectionTitle
@@ -172,7 +250,7 @@ function AccountSettings({ role }) {
         description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
       />
 
-      <form className="space-y-3">
+      <form className="space-y-3" onSubmit={handleSubmitPerfil}> 
         {fields.map(({ id, label, type = "text", readOnly }) => {
           const isDisabled = !isAdmin || readOnly
 
@@ -198,9 +276,9 @@ function AccountSettings({ role }) {
         })}
 
         {isAdmin && (
-          <Button type="button" className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+          <Button type="submit"  disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
             <Save className="size-4" />
-            Salvar Alterações
+            {salvando ? "Salvando..." : "Salvar Alterações"}
           </Button>
         )}
       </form>
@@ -266,13 +344,15 @@ function SecuritySettings({ role }) {
   const [deletando, setDeletando] = useState(false)
   const [confirmCNPJ, setConfirmCNPJ] = useState("")
   const [confirmPasswordDelete, setConfirmPasswordDelete] = useState("")
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false)
   const showDeleteAccount = role === "admin"
+
+  const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
     if (senhasNaoBatem) {
-      Toaster("As senhas digitadas não estão iguais!")
+      toast("As senhas digitadas não estão iguais!")
       return
     }
 
@@ -292,17 +372,17 @@ function SecuritySettings({ role }) {
       })
 
       if (response.sucesso) {
-        Toaster("Senha alterada com sucesso!")
+        toast("Senha alterada com sucesso!")
         setCurrentPassword("")
         setNewPassword("")
         setConfirmPassword("")
       } else {
-        Toaster("Erro ao alterar senha. Verifique os requisitos.")
+       toast("Erro ao alterar senha. Verifique os requisitos.")
       }
 
     } catch (error) {
       console.error("Erro ao trocar senha:", error)
-      Toaster("Ocorreu um erro ao tentar alterar a senha.")
+      toast("Ocorreu um erro ao tentar alterar a senha.")
 
     } finally {
       setCarregando(false)
@@ -311,7 +391,7 @@ function SecuritySettings({ role }) {
 
   async function handleDeletarContar(e) {
     if (!confirmCNPJ || !confirmPasswordDelete) {
-    Toaster("Por favor, preencha o CNPJ e a senha para confirmar.");
+    toast("Por favor, preencha o CNPJ e a senha para confirmar.");
     return;
   }
   
@@ -336,7 +416,7 @@ function SecuritySettings({ role }) {
       });
 
       if (response.sucesso) {
-        Toaster.success("Conta e empresa excluídas com sucesso! Volte quando quiser, Prodsync está sempre pronto para te sincronizar!")
+        toast.success("Conta e empresa excluídas com sucesso! Volte quando quiser, Prodsync está sempre pronto para te sincronizar!")
 
         // Limpa o token e desloga o usuário após alguns segundos
         setTimeout(() => {
@@ -344,15 +424,25 @@ function SecuritySettings({ role }) {
           window.location.href = "/"
         }, 2000)
       } else {
-        Toaster.error("Não foi possível deletar a conta. Tente novamente.")
+        toast.error("Não foi possível deletar a conta. Tente novamente.")
       }
     } catch (error) {
       console.error("Erro ao deletar conta:", error)
-      Toaster.error("Erro interno ao tentar excluir a conta.")
+      toast.error("Erro interno ao tentar excluir a conta.")
     } finally {
       setDeletando(false)
     }
+  }
 
+  function aplicarMascaraCNPJ(valor) {
+    let v = valor.replace(/\D/g, "");
+
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+  
+    return v.substring(0, 18);
   }
 
   return (
@@ -362,7 +452,7 @@ function SecuritySettings({ role }) {
         description="Proteja sua conta com credenciais robustas."
       />
 
-      <form className="space-y-3" onSubmit={handleSubmit(e)}>
+      <form className="space-y-3" onSubmit={handleSubmit}>
         <div className="space-y-1">
           <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
             Senha Atual
@@ -412,49 +502,92 @@ function SecuritySettings({ role }) {
 
       {showDeleteAccount ? (
         <div className="border-t border-zinc-100 pt-4 dark:border-zinc-800">
-          <section className="rounded-lg border border-red-400 bg-red-50 px-4 py-3 dark:border-red-500/70 dark:bg-red-950/30">
+          <section className="rounded-lg border border-red-400 bg-red-50 px-4 py-4 dark:border-red-500/70 dark:bg-red-950/30">
             <div className="flex items-center gap-2 text-red-600 dark:text-red-300">
               <Trash2 className="size-4" />
-              <h3 className="text-sm font-bold">Deletar Conta</h3>
+              <h3 className="text-sm font-bold">Deletar Conta da Empresa</h3>
             </div>
             <p className="mt-2 max-w-lg text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              Excluir permanentemente sua conta e todos os dados da empresa. Esta ação é irreversível.
+              Excluir permanentemente sua conta de Administrador e todos os dados da empresa. Esta ação é irreversível.
             </p>
-            <div className="mt-4 grid max-w-md gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-                  CNPJ da Empresa
-                </label>
-                <SettingsInput
-                  id="deleteCnpj"
-                  placeholder="Apenas números"
-                  value={confirmCNPJ}
-                  onChange={(e) => setConfirmCNPJ(e.target.value.replace(/\D/g, ""))} 
-                />
+
+            {!mostrarConfirmacao ? (
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => setMostrarConfirmacao(true)} 
+                className="mt-4 h-8 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30"
+              >
+                Excluir Conta
+              </Button>
+            ) : (
+       
+              <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-xs font-bold text-red-600 dark:text-red-400">
+                  Para confirmar, preencha os dados abaixo:
+                </p>
+
+                <div className="mt-3 grid max-w-md gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">
+                      CNPJ da Empresa
+                    </label>
+                    <SettingsInput
+                      id="deleteCnpj"
+                      placeholder="00.000.000/0000-00"
+                      value={confirmCNPJ}
+                      className="placeholder:text-xs text-xs"
+                      onChange={(e) => {
+                        const valorComMascara = aplicarMascaraCNPJ(e.target.value);
+                        setConfirmCNPJ(valorComMascara);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">
+                      Senha de Administrador
+                    </label>
+                    <SettingsInput 
+                      id="deletePassword"
+                      type="password"
+                      placeholder="Digite sua senha"
+                      className="placeholder:text-xs text-xs"
+                      value={confirmPasswordDelete}
+                      onChange={(e) => setConfirmPasswordDelete(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-3">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeletarContar}
+                    size="sm"
+                    disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
+                    className="h-8 rounded-md bg-red-600 px-4 text-xs font-bold text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+                  >
+                    {deletando ? "Excluindo..." : "Confirmar Exclusão"}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setMostrarConfirmacao(false)
+                      setConfirmCNPJ("") 
+                      setConfirmPasswordDelete("") 
+                    }}
+                    size="sm"
+                    disabled={deletando}
+                    className="h-8 rounded-md px-4 text-xs font-bold"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-1">
-                <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-                  Sua Senha de Administrador
-                </label>
-                <SettingsInput
-                  id="deletePassword"
-                  type="password"
-                  placeholder="Digite sua senha"
-                  value={confirmPasswordDelete}
-                  onChange={(e) => setConfirmPasswordDelete(e.target.value)}
-                />
-              </div>
-            </div>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDeletarContar}
-              size="sm"
-              disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
-              className="mt-3 h-7 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30"
-            >
-              {deletando ? "Excluindo..." : "Excluir Conta"}
-            </Button>
+            )}
           </section>
         </div>
       ) : null}

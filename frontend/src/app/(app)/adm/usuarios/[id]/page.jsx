@@ -27,7 +27,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import { apiFetch } from "@/lib/api";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 
-import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+import { PageLayout, AsymmetricGrid, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
 import {
   DetailPageContainer,
   DetailBackLink,
@@ -37,6 +37,7 @@ import {
   DetailWidgetCard,
   SectionHighlight,
   DetailListingSection,
+  ListingTabs,
   DetailActions,
 } from "@/components/DetailComponents";
 
@@ -148,6 +149,7 @@ export default function UsuarioDetalhePage({ params }) {
   const [dadosApontamentoState, setDadosApontamentoState] = useState([]);
   const [todosApontamentos, setTodosApontamentos] = useState([]);
   const [buscaApontamento, setBuscaApontamento] = useState("");
+  const [activeListTab, setActiveListTab] = useState("eventos");
 
   const parseData = (dataStr) => {
     if (!dataStr) return new Date(0);
@@ -384,36 +386,42 @@ export default function UsuarioDetalhePage({ params }) {
 
         {usuario?.maquina && (
           <>
-            <DetailSectionTitle title="Responsável por:" />
-            <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
-              <UserProfileCard
-                imageSrc="/demo_maq.png"
-                imageAlt={usuario.maquina.nome || "Máquina"}
-                name={usuario.maquina.nome || "-"}
-                fieldsLeft={[
-                  { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
-                  { label: "Série", value: usuario.maquina.serie || "-" },
-                ]}
-                fieldsRight={[
-                  { label: "Status", value: usuario.maquina.status_atual || "-" },
-                ]}
-              />
-            </Link>
+            <DetailSectionTitle className="mt-12" title="Responsável por:" />
+            <AsymmetricGrid side="left" className="mt-2">
+              <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
+                <UserProfileCard
+                  imageSrc="/demo_maq.png"
+                  imageAlt={usuario.maquina.nome || "Máquina"}
+                  name={usuario.maquina.nome || "-"}
+                  fieldsLeft={[
+                    { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
+                    { label: "Série", value: usuario.maquina.serie || "-" },
+                  ]}
+                  fieldsRight={[
+                    { label: "Status", value: usuario.maquina.status_atual || "-" },
+                  ]}
+                />
+              </Link>
+
+              <SectionHighlight>
+                <OEEOperadorWidget operadorId={operadorId} />
+              </SectionHighlight>
+
+            </AsymmetricGrid>
           </>
         )}
 
         <DetailSectionTitle title="Produção" />
 
-        <SectionHighlight>
-          <OEEOperadorWidget operadorId={operadorId} />
-        </SectionHighlight>
+
 
         <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard>
-            <PecasPorDiaWidget operadorId={operadorId} />
-          </DetailWidgetCard>
+
           <DetailWidgetCard>
             <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <PecasPorDiaWidget operadorId={operadorId} />
           </DetailWidgetCard>
           <DetailWidgetCard centered>
             <MetaProducaoWidget operadorId={operadorId} />
@@ -429,128 +437,140 @@ export default function UsuarioDetalhePage({ params }) {
           </DetailWidgetCard>
         </DetailWidgetGrid>
 
-        <DetailListingSection
-          id="listagem_eventos"
-          title="Histórico de Eventos do Usuário"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
-                <Plus size={28} className="text-white cursor-pointer" />
-                Cadastrar
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroEvento onCadastroSucesso={carregarDados} />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaEvento}
-              onChange={(e) => setBuscaEvento(e.target.value)}
-              placeholder="Busque por id, tipo ou motivo..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosEventosExibidos.length}
-              label="eventos"
-              actions={
-                <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-                </>
-              }
-            />
-          }
-        >
-          {dadosEventosExibidos.length > 0 ? (
-            <TableListagens
-              data={dadosEventosExibidos}
-              columns={colunasEventos}
-              acoesDropdown={(evento) => (
-                <>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                        Ver Detalhes
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DetalhesEvento eventoId={evento.id} />
-                    </DialogContent>
-                  </Dialog>
-                  <SolicitarJustificativaMenuItem idEvento={evento.id}>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                      <BellRing className="mr-2 h-4 w-4" />
-                      Solicitar Justificativa
-                    </DropdownMenuItem>
-                  </SolicitarJustificativaMenuItem>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar Evento
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum evento encontrado"
-              message="Não há eventos vinculados a este usuário ou nenhum resultado para a busca."
-            />
-          )}
-        </DetailListingSection>
+        <ListingTabs
+          className="mt-8"
+          activeTab={activeListTab}
+          onChange={setActiveListTab}
+          tabs={[
+            { id: "eventos", label: "Histórico de Eventos" },
+            { id: "apontamentos", label: "Histórico de Apontamentos" },
+          ]}
+        />
 
-        <DetailListingSection
-          id="listagem_apontamentos"
-          title="Histórico de Apontamentos do Usuário"
-          search={
-            <SearchBar
-              value={buscaApontamento}
-              onChange={(e) => setBuscaApontamento(e.target.value)}
-              placeholder="Busque por OP ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosApontamentosFiltrados.length}
-              label="apontamentos"
-              actions={
-                <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
-                  <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
-                </>
-              }
-            />
-          }
-        >
-          {dadosApontamentosFiltrados.length > 0 ? (
-            <TableListagens
-              data={dadosApontamentosFiltrados}
-              columns={colunasApontamento}
-              acoesDropdown={(apontamento) => (
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
-                    <EyeIcon className="mr-2 h-4 w-4" />
-                    Ver OP relacionada
-                  </Link>
-                </DropdownMenuItem>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum apontamento encontrado"
-              message={`Não encontramos resultados para "${buscaApontamento}".`}
-            />
-          )}
-        </DetailListingSection>
+        {activeListTab === "eventos" ? (
+          <DetailListingSection
+            id="listagem_eventos"
+            title="Histórico de Eventos do Usuário"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-4 py-2 rounded-md text-white font-semibold text-2xl gap-2">
+                  <Plus size={28} className="text-white cursor-pointer" />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroEvento onCadastroSucesso={carregarDados} />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
+                value={buscaEvento}
+                onChange={(e) => setBuscaEvento(e.target.value)}
+                placeholder="Busque por id, tipo ou motivo..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={dadosEventosExibidos.length}
+                label="eventos"
+                actions={
+                  <>
+                    <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
+                    <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                  </>
+                }
+              />
+            }
+          >
+            {dadosEventosExibidos.length > 0 ? (
+              <TableListagens
+                data={dadosEventosExibidos}
+                columns={colunasEventos}
+                acoesDropdown={(evento) => (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                          Ver Detalhes
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DetalhesEvento eventoId={evento.id} />
+                      </DialogContent>
+                    </Dialog>
+                    <SolicitarJustificativaMenuItem idEvento={evento.id}>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <BellRing className="mr-2 h-4 w-4" />
+                        Solicitar Justificativa
+                      </DropdownMenuItem>
+                    </SolicitarJustificativaMenuItem>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar Evento
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum evento encontrado"
+                message="Não há eventos vinculados a este usuário ou nenhum resultado para a busca."
+              />
+            )}
+          </DetailListingSection>
+        ) : (
+          <DetailListingSection
+            id="listagem_apontamentos"
+            title="Histórico de Apontamentos Feitos pelo Usuário"
+            search={
+              <SearchBar
+                value={buscaApontamento}
+                onChange={(e) => setBuscaApontamento(e.target.value)}
+                placeholder="Busque por OP ou id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={dadosApontamentosFiltrados.length}
+                label="apontamentos"
+                actions={
+                  <>
+                    <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
+                    <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
+                  </>
+                }
+              />
+            }
+          >
+            {dadosApontamentosFiltrados.length > 0 ? (
+              <TableListagens
+                data={dadosApontamentosFiltrados}
+                columns={colunasApontamento}
+                acoesDropdown={(apontamento) => (
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
+                      <EyeIcon className="mr-2 h-4 w-4" />
+                      Ver OP relacionada
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum apontamento encontrado"
+                message={`Não encontramos resultados para "${buscaApontamento}".`}
+              />
+            )}
+          </DetailListingSection>
+        )}
       </DetailPageContainer>
     </PageLayout>
   );
