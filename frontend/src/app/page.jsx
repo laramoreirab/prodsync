@@ -21,7 +21,7 @@ export default function Home() {
     },
     {
       title: "Serviços",
-      href: "/",
+      href: "#servicos",
     },    
     {
       title: "FAQs",
@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <>
-    <HomeAuthRedirect />
+x    <HomeAuthRedirect />
     <Header navigationData={navigationData} />
       <AgencyHeroSection />
       <AboutAndStats01 />

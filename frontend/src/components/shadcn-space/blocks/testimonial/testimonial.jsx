@@ -19,9 +19,6 @@ export default function Testimonial01({
                         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -40 }}
                         transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}
                         className="flex flex-col gap-3">
-                        <Badge className="text-sm bg-secondary-foreground h-auto py-1 px-3 border-0 w-fit">
-                            Depoimentos
-                        </Badge>
                         <div className="flex flex-col md:flex-row gap-3">
                             <h2 className="sm:text-5xl text-xl leading-none font-medium tracking-tight">
                                 Histórias de Sucesso com
