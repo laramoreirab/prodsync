@@ -443,51 +443,64 @@ export function MachineProfileCard({
 }) {
   return (
     <FadeUpItem>
-      <div className={cn("flex flex-col gap-4 sm:gap-5", className)}>
-        {/* Cabeçalho: nome + ações */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="bg-white px-4 sm:px-5 pb-2 rounded-tl-3xl rounded-tr-3xl border border-t-gray-300 border-l-gray-300 border-r-gray-300 border-b-8 border-b-[#00357a] inline-block">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold uppercase text-[#212e4b] px-3 sm:px-4 py-2.5 sm:py-3">
+      <div 
+        className={cn(
+          "bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md",
+          className
+        )}
+      >
+        {/* Cabeçalho Unificado */}
+        <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
               {machineName}
             </h1>
+            {/* O slot de cabeçalho (ex: Badge de Status) agora fica elegante ao lado do título */}
+            {headerSlot && <div className="flex items-center">{headerSlot}</div>}
           </div>
+          
           {actions && (
-            <div className="flex items-center gap-2">{actions}</div>
+            <div className="flex items-center gap-2 self-end sm:self-auto raw-actions">
+              {actions}
+            </div>
           )}
         </div>
 
-        {/* Corpo: foto + dados */}
-        <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
-          {/* Foto */}
-          <div className="flex-shrink-0 bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+        {/* Corpo do Card */}
+        <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-6 items-start">
+          
+          {/* Container da Imagem Modernizado */}
+          <div className="w-full md:w-44 h-44 md:h-44 flex-shrink-0 bg-slate-50 rounded-xl border border-slate-100 overflow-hidden flex items-center justify-center relative group">
             <img
               src={imageSrc}
               alt={machineName}
-              className="rounded-xl w-[140px] h-[140px] object-cover"
-              onError={(e) => { e.currentTarget.src = "/demo_maq.png"; }}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                e.currentTarget.src = "/demo_maq.png";
+              }}
             />
           </div>
 
-          {/* Dados */}
-          <div className="flex flex-col sm:flex-row gap-8 flex-1">
+          {/* Área de Dados em Grid Responsivo */}
+          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mt-2 md:mt-0">
             {fieldsLeft.length > 0 && (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3.5">
                 {fieldsLeft.map((f, i) => (
-                  <DetailInfoField key={i} label={f.label} value={f.value} />
+                  <DetailInfoField key={`left-${i}`} label={f.label} value={f.value} />
                 ))}
               </div>
             )}
+            
             {fieldsRight.length > 0 && (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3.5">
                 {fieldsRight.map((f, i) => (
-                  <DetailInfoField key={i} label={f.label} value={f.value} />
+                  <DetailInfoField key={`right-${i}`} label={f.label} value={f.value} />
                 ))}
               </div>
             )}
           </div>
-        </div>
 
-        {headerSlot && <div>{headerSlot}</div>}
+        </div>
       </div>
     </FadeUpItem>
   );

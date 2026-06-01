@@ -67,10 +67,9 @@ export function AppSidebar({
         "--sidebar-ring": "#93c5fd",
       }}
       {...props}>
-      <SidebarHeader className="px-4 py-5 group-data-[collapsible=icon]:px-3">
-        <a href="#" className="inline-flex items-center group-data-[collapsible=icon]:justify-center">
-          <img src="/logo.png" alt="Logo ProdSync" className="h-9 w-auto max-w-[2.75rem] brightness-0 invert transition-all duration-300 group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:block group-hover/sidebar:max-w-none" />
-          <img src="/logo.svg" alt="Logo ProdSync" className="hidden h-16 w-16 brightness-0 invert transition-all duration-300 group-data-[state=collapsed]/sidebar:block group-data-[state=collapsed]/sidebar:group-hover/sidebar:hidden" />
+      <SidebarHeader className="px-3 py-5">
+        <a href="#" className="flex h-16 w-full items-center px-3 transition-[padding] duration-300 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-3">
+          <img src="/logo.svg" alt="Logo ProdSync" className="h-12 w-auto max-w-none brightness-0 invert transition-all duration-300 ease-in-out group-data-[state=collapsed]/sidebar:max-w-[2.75rem] group-data-[state=collapsed]/sidebar:group-hover/sidebar:max-w-none" />
         </a>
       </SidebarHeader>
 
@@ -83,7 +82,7 @@ export function AppSidebar({
           align="end"
           trigger={
             <div
-              className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg border border-white/20 bg-white px-2 text-left text-[#0f3d84] shadow-sm transition-all duration-300 hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
+              className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-md bg-transparent px-3 text-left text-sidebar-foreground/95 transition-all duration-300 hover:bg-white/12 group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-3"
             >
               <BellRing className="size-4 shrink-0" />
               <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificacoes</span>
@@ -94,7 +93,7 @@ export function AppSidebar({
           align="end"
           trigger={
             <div
-              className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg border border-white/20 bg-white px-2 text-left text-[#0f3d84] shadow-sm transition-all duration-300 hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
+              className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-md bg-transparent px-3 text-left text-sidebar-foreground/95 transition-all duration-300 hover:bg-white/12 group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-3"
             >
               <img src="/userdefault.svg" alt="Usuario" className="h-6 w-6 shrink-0 rounded-full" />
               <span className="truncate text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Minha conta</span>
