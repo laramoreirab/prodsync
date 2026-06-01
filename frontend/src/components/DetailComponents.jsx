@@ -354,96 +354,23 @@ export function ListingTabs({ tabs, activeTab, onChange, className }) {
  * @param {ReactNode} actions       — botões de editar/excluir
  * @param {string}    className
  */
-export function UserProfileCard({
+function EntityProfileCard({
+  name,
   imageSrc,
   imageAlt = "Foto do usuário",
-  name,
-  fieldsLeft = [],
-  fieldsRight = [],
-  actions,
-  className,
-}) {
-  return (
-    <FadeUpItem>
-      <div
-        className={cn(
-          "flex flex-col xl:flex-row justify-between items-start gap-6 bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6 lg:p-8",
-          className
-        )}
-      >
-        {/* Esquerda: foto + dados */}
-        <div className="flex flex-col sm:flex-row gap-5 flex-1 min-w-0">
-          {/* Foto */}
-          <div className="flex-shrink-0">
-            <img
-              src={imageSrc}
-              alt={imageAlt}
-              className="rounded-xl w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] object-cover"
-              onError={(e) => { e.currentTarget.src = "/jose.svg"; }}
-            />
-          </div>
-
-          {/* Dados */}
-          <div className="flex flex-col gap-3 min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-black leading-snug">{name}</h1>
-
-            <div className="flex flex-col sm:flex-row gap-6 sm:gap-10">
-              {/* Coluna esquerda */}
-              {fieldsLeft.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  {fieldsLeft.map((f, i) => (
-                    <DetailInfoField key={i} label={f.label} value={f.value} />
-                  ))}
-                </div>
-              )}
-
-              {/* Coluna direita */}
-              {fieldsRight.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  {fieldsRight.map((f, i) => (
-                    <DetailInfoField key={i} label={f.label} value={f.value} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Direita: ações */}
-        {actions && (
-          <div className="flex gap-2 flex-shrink-0 self-start">{actions}</div>
-        )}
-      </div>
-    </FadeUpItem>
-  );
-}
-
-// ─────────────────────────────────────────────
-// MACHINE PROFILE CARD
-// Card de perfil da máquina com imagem + dados
-// ─────────────────────────────────────────────
-
-/**
- * @param {string}    machineName   — nome/modelo
- * @param {string}    imageSrc      — caminho da imagem
- * @param {Array}     fieldsLeft    — [{label, value}]
- * @param {Array}     fieldsRight   — [{label, value}]
- * @param {ReactNode} actions       — editar/excluir
- * @param {ReactNode} headerSlot    — slot acima do conteúdo (ex: badge de status especial)
- * @param {string}    className
- */
-export function MachineProfileCard({
-  machineName,
-  imageSrc = "/demo_maq.png",
   fieldsLeft = [],
   fieldsRight = [],
   actions,
   headerSlot,
+  imageShape = "circle",
+  imageFallback = "/jose.svg",
   className,
 }) {
+  const isSquare = imageShape === "square";
+
   return (
     <FadeUpItem>
-      <div 
+      <div
         className={cn(
           "bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md",
           className
@@ -451,50 +378,54 @@ export function MachineProfileCard({
       >
         {/* Cabeçalho Unificado */}
         <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-              {machineName}
+          <div className="flex flex-wrap items-center gap-3 min-w-0">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl truncate">
+              {name}
             </h1>
-            {/* O slot de cabeçalho (ex: Badge de Status) agora fica elegante ao lado do título */}
-            {headerSlot && <div className="flex items-center">{headerSlot}</div>}
+            {headerSlot && <div className="flex items-center flex-shrink-0">{headerSlot}</div>}
           </div>
-          
+
           {actions && (
-            <div className="flex items-center gap-2 self-end sm:self-auto raw-actions">
+            <div className="flex items-center gap-2 self-end sm:self-auto raw-actions flex-shrink-0">
               {actions}
             </div>
           )}
         </div>
 
         {/* Corpo do Card */}
-        <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-6 items-start">
+        <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-6 items-center md:items-start">
           
-          {/* Container da Imagem Modernizado */}
-          <div className="w-full md:w-44 h-44 md:h-44 flex-shrink-0 bg-slate-50 rounded-xl border border-slate-100 overflow-hidden flex items-center justify-center relative group">
+          {/* Avatar do Usuário */}
+          <div
+            className={cn(
+              "w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 border-4 border-slate-50 shadow-inner overflow-hidden relative group bg-slate-100",
+              isSquare ? "rounded-xl" : "rounded-full"
+            )}
+          >
             <img
               src={imageSrc}
-              alt={machineName}
+              alt={imageAlt}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={(e) => {
-                e.currentTarget.src = "/demo_maq.png";
+                e.currentTarget.src = imageFallback;
               }}
             />
           </div>
 
-          {/* Área de Dados em Grid Responsivo */}
-          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mt-2 md:mt-0">
+          {/* Grid de Informações */}
+          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 md:mt-2">
             {fieldsLeft.length > 0 && (
               <div className="flex flex-col gap-3.5">
                 {fieldsLeft.map((f, i) => (
-                  <DetailInfoField key={`left-${i}`} label={f.label} value={f.value} />
+                  <DetailInfoField key={`user-left-${i}`} label={f.label} value={f.value} />
                 ))}
               </div>
             )}
-            
+
             {fieldsRight.length > 0 && (
               <div className="flex flex-col gap-3.5">
                 {fieldsRight.map((f, i) => (
-                  <DetailInfoField key={`right-${i}`} label={f.label} value={f.value} />
+                  <DetailInfoField key={`user-right-${i}`} label={f.label} value={f.value} />
                 ))}
               </div>
             )}
@@ -505,39 +436,6 @@ export function MachineProfileCard({
     </FadeUpItem>
   );
 }
-
-// ─────────────────────────────────────────────
-// STATUS BADGE
-// Badge de status reutilizável (sem import do shadcn)
-// ─────────────────────────────────────────────
-
-const STATUS_STYLES = {
-  Produzindo: "bg-green-500/15 text-green-700",
-  Setup: "bg-yellow-100 text-yellow-700",
-  Parada: "bg-red-100 text-red-700",
-  "Aguardando Início": "bg-gray-100 text-gray-600",
-  Concluída: "bg-blue-100 text-blue-700",
-};
-
-/**
- * @param {string}  status    — valor do status
- * @param {string}  className — classes extras
- */
-export function StatusBadge({ status, className }) {
-  const style = STATUS_STYLES[status] ?? "bg-gray-100 text-gray-600";
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center px-3 py-0.5 rounded-lg text-sm font-semibold",
-        style,
-        className
-      )}
-    >
-      {status}
-    </span>
-  );
-}
-
 // ─────────────────────────────────────────────
 // SECTION HIGHLIGHT
 // Card branco de ue (ex: OEE Principal)
@@ -547,6 +445,70 @@ export function StatusBadge({ status, className }) {
 /**
  * @param {string}  className
  */
+export function UserProfileCard({
+  imageAlt = "Foto do usuario",
+  imageFallback = "/jose.svg",
+  ...props
+}) {
+  return (
+    <EntityProfileCard
+      imageAlt={imageAlt}
+      imageFallback={imageFallback}
+      imageShape="circle"
+      {...props}
+    />
+  );
+}
+
+export function StatusBadge({ status, className }) {
+  const normalizedStatus = status || "-";
+  const statusClass = {
+    Produzindo: "bg-green-500/15 text-green-600 border-green-500/20",
+    Setup: "bg-amber-100 text-amber-900 border-amber-200",
+    Parada: "bg-red-100 text-red-700 border-red-200",
+  }[normalizedStatus] || "bg-slate-100 text-slate-700 border-slate-200";
+
+  return (
+    <span
+      className={cn(
+        "inline-flex w-fit items-center rounded-full border px-3 py-1 text-sm font-semibold",
+        statusClass,
+        className
+      )}
+    >
+      {normalizedStatus}
+    </span>
+  );
+}
+
+export function MachineProfileCard({
+  machineName,
+  imageSrc = "/demo_maq.png",
+  imageAlt = "Maquina",
+  imageFallback = "/demo_maq.png",
+  fieldsLeft = [],
+  fieldsRight = [],
+  status,
+  actions,
+  headerSlot,
+  className,
+}) {
+  return (
+    <EntityProfileCard
+      name={machineName}
+      imageSrc={imageSrc}
+      imageAlt={imageAlt}
+      imageFallback={imageFallback}
+      imageShape="square"
+      fieldsLeft={fieldsLeft}
+      fieldsRight={fieldsRight}
+      actions={actions}
+      headerSlot={headerSlot ?? (status ? <StatusBadge status={status} /> : null)}
+      className={className}
+    />
+  );
+}
+
 export function SectionHighlight({ children, className }) {
   return (
     <FadeUpItem>

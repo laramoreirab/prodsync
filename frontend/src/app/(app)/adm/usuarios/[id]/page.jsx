@@ -14,7 +14,6 @@ import { DataEvento } from "@/components/ui/dataEvento";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { EyeIcon, Pencil, Trash2, Plus, BellRing, Loader2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
@@ -32,6 +31,7 @@ import {
   DetailPageContainer,
   DetailBackLink,
   UserProfileCard,
+  MachineProfileCard,
   DetailSectionTitle,
   DetailWidgetGrid,
   DetailWidgetCard,
@@ -387,7 +387,7 @@ export default function UsuarioDetalhePage({ params }) {
         {usuario?.maquina && (
           <>
             <DetailSectionTitle className="mt-12" title="Responsável por:" />
-            <AsymmetricGrid side="left" className="mt-2">
+            <div className="mt-2">
               <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
                 <UserProfileCard
                   imageSrc="/demo_maq.png"
@@ -402,16 +402,15 @@ export default function UsuarioDetalhePage({ params }) {
                   ]}
                 />
               </Link>
-
-              <SectionHighlight>
-                <OEEOperadorWidget operadorId={operadorId} />
-              </SectionHighlight>
-
-            </AsymmetricGrid>
+              </div>
           </>
         )}
 
         <DetailSectionTitle title="Produção" />
+        <SectionHighlight>
+          <OEEOperadorWidget operadorId={operadorId} />
+        </SectionHighlight>
+
 
 
 

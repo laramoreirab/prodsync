@@ -20,7 +20,7 @@ export default function DashboardGeralPage() {
         title="Dashboard Geral da Empresa"
       />
       
-      <AsymmetricGrid className="mt-2">
+      <AsymmetricGrid className="mt-6">
         <WidgetCard>
           <ProducaoDiaWidget />
         </WidgetCard>
@@ -29,7 +29,7 @@ export default function DashboardGeralPage() {
         </WidgetCard>
       </AsymmetricGrid>
 
-      <ContentGrid cols={2} className="mt-2">
+      <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <ProducaoSetorWidget />
         </WidgetCard>
@@ -38,7 +38,7 @@ export default function DashboardGeralPage() {
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={2} className="mt-2">
+      <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <TendendiaRefugoWidget />       
         </WidgetCard>
@@ -47,7 +47,7 @@ export default function DashboardGeralPage() {
         </WidgetCard>
       </ContentGrid>
 
-      <KPIGrid cols={4} className="mt-2">
+      <KPIGrid cols={4} className="mt-4">
         <KPICardDecorated>
           <MediaParadasDiaWidget />
         </KPICardDecorated>
