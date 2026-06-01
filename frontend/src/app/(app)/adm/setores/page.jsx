@@ -16,7 +16,7 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Search, EyeIcon, Pencil, Trash2, Loader2, ChevronDown } from "lucide-react";
 import { PlusChevronToggleIcon } from "@/components/ui/PlusChevronToggleIcon";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
@@ -41,6 +41,7 @@ import {
   KPIGrid, ContentGrid, WidgetCard,
   SearchBar, FilterRow, EmptyState, LoadingState,
   PageSection,
+  AsymmetricGrid,
 } from "@/components/AnimatedComponents";
 
 const setoresFilter = [
@@ -160,77 +161,65 @@ export default function PageSetores() {
 
   return (
     <PageLayout>
-        <section className="graphs_cadastro">
-          {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
-          <div className="flex justify-between">
-            <div className="title_tela">
-              <h1 className="underline decoration-secondary-foreground underline-offset-9 decoration-5 text-4xl font-semibold">
-                Setores
-              </h1>
-            </div>
+      <PageHeader
+        title="Setores"
+        action={(
+          <>
+        {/* Título da tela e do botão que leva ao modal de cadastro do setor */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <PlusChevronToggleIcon className="mr-2" />
+              Criar
+              <ChevronDown className="ml-2 w-5 h-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-48">
+              <DropdownMenuItem
+                className="cursor-pointer text-base font-medium"
+                onClick={() => setCriarAberto("setor")}
+              >
+                Setor
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer text-base font-medium"
+                onClick={() => setCriarAberto("turno")}
+              >
+                Turno (todos os setores)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <DropdownMenu open={menuCriarAberto} onOpenChange={setMenuCriarAberto}>
-              <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center gap-2 text-white text-xl font-semibold cursor-pointer">
-                <PlusChevronToggleIcon open={menuCriarAberto} />
-                Criar
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-48">
-                <DropdownMenuItem
-                  className="cursor-pointer text-base font-medium"
-                  onClick={() => {
-                    setMenuCriarAberto(false);
-                    setCriarAberto("setor");
-                  }}
-                >
-                  Setor
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer text-base font-medium"
-                  onClick={() => {
-                    setMenuCriarAberto(false);
-                    setCriarAberto("turno");
-                  }}
-                >
-                  Turno Geral
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <Dialog open={criarAberto === "setor"} onOpenChange={(open) => !open && setCriarAberto(null)}>
+            <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
+              <FormCadastroSetor onCadastroSucesso={() => { refresh(); setCriarAberto(null); }} />
+            </DialogContent>
+          </Dialog>
 
-            <Dialog open={criarAberto === "setor"} onOpenChange={(open) => !open && setCriarAberto(null)}>
-              <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
-                <FormCadastroSetor onCadastroSucesso={() => { refresh(); setCriarAberto(null); }} />
-              </DialogContent>
-            </Dialog>
-
-            <Dialog open={criarAberto === "turno"} onOpenChange={(open) => !open && setCriarAberto(null)}>
-              <DialogContent>
-                <FormCadastroTurnoGeral onSuccess={() => { refresh(); setCriarAberto(null); }} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </section>
+          <Dialog open={criarAberto === "turno"} onOpenChange={(open) => !open && setCriarAberto(null)}>
+            <DialogContent>
+              <FormCadastroTurnoGeral onSuccess={() => { refresh(); setCriarAberto(null); }} />
+            </DialogContent>
+          </Dialog>
+          </>
+        )}
+      />
 
       {/* Gráficos */}
 
-      {/* SEÇÃO 1 */}
-      <KPIGrid cols={3} className="mt-4">
-
-        <WidgetCard>
-          <SetorTotalWidget />
-        </WidgetCard>
-
-        <WidgetCard>
-          <OperadoresMediaWidget />
-        </WidgetCard>
-
+      <AsymmetricGrid className="mt-6">
         <WidgetCard>
           <OEEPorSetorWidget />
         </WidgetCard>
+        <div className="flex flex-col justify-between gap-4 h-full">
+          <WidgetCard>
+            <SetorTotalWidget />
+          </WidgetCard>
 
-      </KPIGrid>
-
-
-      {/* SEÇÃO 2 */}
+          <WidgetCard>
+            <OperadoresMediaWidget />
+          </WidgetCard>
+        </div>
+      </AsymmetricGrid>
+      
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <RefugoPorSetorWidget />

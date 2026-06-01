@@ -11,3 +11,4 @@ export * from "./BarComLimite";
 export * from "./BarComValorETopo";
 export * from "./LineMultiplasSeries";
 export * from "./KPI";
+export * from "./KPIHorizontal";

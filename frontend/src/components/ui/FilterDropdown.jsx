@@ -124,9 +124,9 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-[#00357a] px-4 py-2 text-base font-semibold text-[#f8f8f8] shadow-sm transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]"
+        className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
       >
-        <FadersHorizontalIcon size={22} />
+        <FadersHorizontalIcon size={18} />
         Filtrar
       </button>
 
@@ -239,7 +239,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
 
           <button
             onClick={handleApplyClick}
-            className="mt-4 min-h-10 w-full rounded-md bg-[#00357a] py-2 font-semibold text-[#f8f8f8] transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]"
+            className="mt-4 h-10 w-full rounded-xl bg-primary py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
           >
             Aplicar Filtros
           </button>

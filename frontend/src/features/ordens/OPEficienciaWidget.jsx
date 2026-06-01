@@ -23,7 +23,7 @@ export function OPEficienciaWidget({ setorId = null }) {
         <GaugeSemicircular
           title="Eficiência"
           data={[{ value: data?.eficiencia, fill: "#00357a" }]}
-          size="lg"
+          size="xlg"
           config={eficienciaConfig}
         />
       </div>

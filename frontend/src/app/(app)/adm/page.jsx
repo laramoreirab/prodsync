@@ -11,25 +11,25 @@ import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, KPICardDecorated, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
 
 export default function DashboardGeralPage() {
   return (
-    <div className="pb-12">
-      <PageHeader title="Dashboard Geral da Empresa" />
-      <ContentGrid cols={1}>
-        <WidgetCard centered>
+    <PageLayout className="pb-12">
+      <PageHeader
+        title="Dashboard Geral da Empresa"
+      />
+      
+      <AsymmetricGrid className="mt-2">
+        <WidgetCard>
           <ProducaoDiaWidget />
         </WidgetCard>
-      </ContentGrid>
-
-      <ContentGrid cols={1} className="mt-6">
         <WidgetCard centered>
           <OEEWidget />
         </WidgetCard>
-      </ContentGrid>
+      </AsymmetricGrid>
 
-      <ContentGrid cols={2} className="mt-6">
+      <ContentGrid cols={2} className="mt-2">
         <WidgetCard>
           <ProducaoSetorWidget />
         </WidgetCard>
@@ -38,29 +38,29 @@ export default function DashboardGeralPage() {
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={2} className="mt-6">
+      <ContentGrid cols={2} className="mt-2">
         <WidgetCard>
-          <MotivosFrequentesWidget />
+          <TendendiaRefugoWidget />       
         </WidgetCard>
         <WidgetCard>
-          <TendendiaRefugoWidget />
+          <MotivosFrequentesWidget />    
         </WidgetCard>
       </ContentGrid>
 
-      <KPIGrid cols={4} className="mt-6 gap-6 lg:gap-8">
-        <WidgetCard>
+      <KPIGrid cols={4} className="mt-2">
+        <KPICardDecorated>
           <MediaParadasDiaWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <PecasPorMinutoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <MaquinaAtivaPorTurnoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <ProducaoPorTurnoLotesWidget />
-        </WidgetCard>
+        </KPICardDecorated>
       </KPIGrid>
-    </div>
+    </PageLayout>
   );
 }

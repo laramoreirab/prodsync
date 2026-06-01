@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { isValidElement, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -86,9 +86,11 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
 
   const naoLidas = notificacoes.filter((n) => !n.lida).length;
   const badgeContagem = contagem ?? naoLidas;
+  const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
+  const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className={cn("relative flex items-center justify-center", triggerIsFullWidth && "w-full")}>
       {badgeContagem > 0 && (
         <span className="pointer-events-none absolute -top-1 -right-1 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] font-bold text-white">
           {badgeContagem > 99 ? "99+" : badgeContagem}
@@ -99,7 +101,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="relative flex items-center justify-center outline-none"
+            className={cn("relative flex items-center justify-center outline-none", triggerIsFullWidth && "w-full")}
             aria-label="Abrir notificações"
             onClick={(e) => e.stopPropagation()}
           >
