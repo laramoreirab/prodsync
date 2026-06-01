@@ -434,7 +434,7 @@ export default function MaquinaDetalhePage({ params }) {
         <DetailSectionTitle title="Produção" />
 
         <AsymmetricGrid>
-          <DetailWidgetCard>
+          <DetailWidgetCard className="flex justify-center items-center">
             <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
           </DetailWidgetCard>
           <SectionHighlight>

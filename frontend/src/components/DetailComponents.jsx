@@ -313,9 +313,7 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
 }
 
 export function ListingTabs({ tabs, activeTab, onChange, className }) {
-  return (
-    <div className={cn("w-full", className)}>
-      <div className="flex flex-wrap items-center gap-1.5">
+  return (<>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -324,18 +322,23 @@ export function ListingTabs({ tabs, activeTab, onChange, className }) {
               type="button"
               onClick={() => onChange(tab.id)}
               className={cn(
-                "rounded-full px-3 py-1 text-xs sm:text-sm font-semibold leading-none transition-all duration-200 border",
+                // base — espelha TabsTrigger da referencia_1
+                "relative inline-flex h-full items-center justify-center gap-1.5 rounded-md border border-transparent px-3.5 py-0.5 text-md font-medium whitespace-nowrap transition-all",
+                "text-muted-foreground hover:text-foreground",
+                "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring",
+                "disabled:pointer-events-none disabled:opacity-50",
+                // ativo — espelha data-active do TabsTrigger
                 isActive
-                  ? "bg-[#00357a]/10 text-[#00357a] border-[#00357a]/25"
-                  : "bg-white text-slate-600 border-slate-300/80 hover:bg-slate-100 hover:text-slate-900"
+                  ? "bg-background text-foreground shadow-sm dark:border-input dark:bg-input/30 dark:text-slate-300"
+                  : "bg-transparent"
               )}
             >
               {tab.label}
             </button>
           );
         })}
-      </div>
-    </div>
+        </>
+
   );
 }
 

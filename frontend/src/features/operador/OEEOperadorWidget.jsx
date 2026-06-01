@@ -25,16 +25,16 @@ export function OEEOperadorWidget({ operadorId }) {
         <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
       </div>
 
-      {/* Container do Conteúdo */}
-      <div className="flex flex-col gap-6 w-full items-center flex-1 justify-center">
+      {/* Container do Conteúdo - Alterado para flex-row e centralizado verticalmente */}
+      <div className="flex flex-row gap-6 w-full items-center flex-1 justify-center">
 
-        {/* Gráfico Principal (OEE Geral do Operador) */}
+        {/* Gráfico Principal (OEE Geral do Operador) - Definido com w-1/2 (50%) */}
         {metricaOeeGeral && (
-          <div className="flex flex-col items-center justify-center w-full">
+          <div className="flex flex-col items-center justify-center w-1/2">
             <GaugeSemicircular
               title={metricaOeeGeral.label}
               data={[{ value: data[metricaOeeGeral.key], fill: metricaOeeGeral.color }]}
-              size="default"
+              size="xlg"
               config={{
                 value: { label: metricaOeeGeral.label, color: metricaOeeGeral.color },
               }}
@@ -42,8 +42,8 @@ export function OEEOperadorWidget({ operadorId }) {
           </div>
         )}
 
-        {/* Sub-indicadores Lineares (Disponibilidade, Performance, Qualidade) */}
-        <div className="w-full space-y-3.5 px-2">
+        {/* Sub-indicadores Lineares (Disponibilidade, Performance, Qualidade) - Definido com w-1/2 (50%) */}
+        <div className="w-1/2 space-y-3.5 px-2">
           {metricasSecundarias.map(({ key, label, color }) => {
             const rawValue = data[key];
             const value = Number(rawValue);
