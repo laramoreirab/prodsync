@@ -9,10 +9,13 @@ function Table({
   ...props
 }) {
   return (
-    <div data-slot="table-container" className="relative w-full overflow-x-auto">
+    <div
+      data-slot="table-container"
+      className="relative w-full overflow-x-auto rounded-xl border border-gray-200 bg-white"
+    >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-md", className)}
+        className={cn("w-full caption-bottom text-sm sm:text-base", className)}
         {...props} />
     </div>
   );
@@ -25,7 +28,7 @@ function TableHeader({
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b bg-muted/50", className)}
+      className={cn("[&_tr]:border-b bg-gray-50/90 sticky top-0 z-[1]", className)}
       {...props} />
   );
 }
@@ -37,7 +40,7 @@ function TableBody({
   return (
     <tbody
       data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0 bg-white", className)}
+      className={cn("[&_tr:last-child]:border-0 bg-white [&_tr:nth-child(even)]:bg-gray-50/35", className)}
       {...props} />
   );
 }
@@ -67,7 +70,7 @@ function TableRow({
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b border-gray-100 transition-colors hover:bg-[#f8fbff] has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
       {...props}>
@@ -84,7 +87,7 @@ function TableHead({
     <th
       data-slot="table-head"
       className={cn(
-        "h-10 p-3 py-3.5 text-left align-middle font-semibold whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
+        "h-11 p-3 sm:p-4 text-left align-middle font-semibold whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props} />
@@ -99,7 +102,7 @@ function TableCell({
     <td
       data-slot="table-cell"
       className={cn(
-        "py-2.5 px-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+        "py-2.5 sm:py-3 px-3 sm:px-4 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props} />

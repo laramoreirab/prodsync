@@ -1,5 +1,5 @@
 "use client"
-import { KPI } from "@/components/ui/charts/components";
+import { KPIHorizontal } from "@/components/ui/charts/components";
 import { useMaquinaAtivaPorTurno } from "./hooks/useMaquinaAtivaPorTurno.js";
 
 
@@ -12,7 +12,7 @@ export function MaquinaAtivaPorTurnoWidget(){
     if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
     
       return (
-        <KPI
+        <KPIHorizontal
           title={data?.titulo}
           value={data?.valor}
         />

@@ -1,5 +1,6 @@
 "use client";
 
+import { isValidElement } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -13,6 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
 import { clearAuthSession } from "@/lib/auth";
+import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api"
+
+import { cn } from "@/lib/utils";
 
 const PROFILE_ITEMS = [
   { label: "Meu Perfil", icon: User },
@@ -42,6 +47,8 @@ const ProfileDropdown = ({
     : pathname?.startsWith("/operador")
       ? "/operador/configuracoes"
       : "/adm/configuracoes";
+  const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
+  const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
   function handleLogout() {
     clearAuthSession();
@@ -49,9 +56,23 @@ const ProfileDropdown = ({
     router.refresh();
   }
 
+  const [nomeUsuario, setNomeUsuario] = useState("")
+  const [idUsuario, setIdUsuario] = useState("")
+  useEffect(()=>{
+    async function buscarDados() {
+      const resposta = await apiFetch('/api/auth/perfil')
+      console.log("dados para perfil:", resposta)
+      setIdUsuario(resposta.dados.usuarios?.[0]?.id_usuario || resposta.dados.id_usuario || "")
+      setNomeUsuario(resposta.dados.nome || resposta.dados.nome_representante || "")
+    }
+    buscarDados();
+  }, [])
+
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
-      <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuTrigger className={cn(triggerIsFullWidth && "flex w-full items-center justify-center")}>
+        {trigger}
+      </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align={align}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
@@ -62,10 +83,10 @@ const ProfileDropdown = ({
 
             <div className="flex flex-col">
               <span className="text-foreground text-lg font-semibold">
-                Nome Pessoa
+                {nomeUsuario}
               </span>
               <span className="text-muted-foreground text-sm">
-                emailpessoa@example.com
+                {idUsuario}
               </span>
             </div>
           </DropdownMenuLabel>
@@ -74,7 +95,7 @@ const ProfileDropdown = ({
 
           {PROFILE_ITEMS.map(({ label, icon: Icon }) => (
             <DropdownMenuItem key={label} className={itemClass}>
-              <Link href={settingsHref}>
+              <Link href={settingsHref} class="flex items-center gap-3">
               <Icon size={20} className="text-foreground" />
               <span>{label}</span>
               </Link>

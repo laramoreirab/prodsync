@@ -86,6 +86,10 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   }, [table.getPageCount(), table.getState().pagination.pageIndex]);
 
   const currentPage = table.getState().pagination.pageIndex + 1;
+  const pageSize = table.getState().pagination.pageSize;
+  const totalItems = data.length;
+  const rangeStart = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, totalItems);
   const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
@@ -249,13 +253,14 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         </Table>
       </div>
 
-      <div className='flex flex-col items-center gap-3 mt-2'>
-        <Pagination>
-          <PaginationContent>
+      <div className='mt-3 flex flex-col items-center gap-1.5'>
+        <Pagination className='w-auto'>
+          <PaginationContent className='rounded-full border border-slate-200 bg-white/95 px-1.5 py-1 shadow-sm'>
 
             <PaginationItem className="flex items-center">
               <Button
-                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8 cursor-pointer'
+                variant='outline'
+                className='h-7 w-7 rounded-full border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-35 cursor-pointer'
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
                 aria-label='Página anterior'>
@@ -281,8 +286,8 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                   <PaginationItem>
                     <Button
                       size='icon'
-                      variant={page === currentPage ? 'outline' : 'ghost'}
-                      className={`w-9 h-8 ${page === currentPage ? 'border-2 border-primary/20' : ''}`}
+                      variant='ghost'
+                      className={`h-7 min-w-7 rounded-full px-2 text-[11px] sm:text-xs cursor-pointer border ${page === currentPage ? 'border-primary/20 bg-primary/10 text-primary hover:bg-primary/15' : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50'}`}
                       onClick={() => table.setPageIndex(page - 1)}
                     >
                       {page}
@@ -294,7 +299,8 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
             <PaginationItem className="flex items-center">
               <Button
-                className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8 cursor-pointer'
+                variant='outline'
+                className='h-7 w-7 rounded-full border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-35 cursor-pointer'
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
                 aria-label='Vá para a próxima página'>
@@ -307,12 +313,11 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         </Pagination>
 
         <p
-          className='text-muted-foreground flex-1 text-2x1 whitespace-nowrap text-left mx-2 font-medium'
+          className='text-[11px] sm:text-xs text-slate-500 font-medium'
           aria-live='polite'>
-          Página <span className='text-foreground'>{table.getState().pagination.pageIndex + 1}</span> de{' '}
-          <span className='text-foreground'>{table.getPageCount()}</span>
+          Mostrando <span className='text-slate-700'>{rangeStart}</span>-<span className='text-slate-700'>{rangeEnd}</span> de{" "}
+          <span className='text-slate-700'>{totalItems}</span>
         </p>
-
       </div>
 
     </div>

@@ -12,7 +12,7 @@ import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget"
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
 import { usePerfil } from "@/hooks/usePerfil";
 
 
@@ -22,7 +22,7 @@ export default function DashboardGeralGestor() {
   if (loading) {
     return (
       <PageLayout>
-        <PageHeader title="Dashboard Geral do Setor" />
+        <PageHeader title="Dashboard Geral do Setor" subtitle="Acompanhando os indicadores do seu setor..." />
         <p className="text-sm text-muted-foreground">Carregando dados do setor...</p>
       </PageLayout>
     );
@@ -31,7 +31,7 @@ export default function DashboardGeralGestor() {
   if (!setorId) {
     return (
       <PageLayout>
-        <PageHeader title="Dashboard Geral do Setor" />
+        <PageHeader title="Dashboard Geral do Setor" subtitle="Acompanhando os indicadores do seu setor..." />
         <p className="text-sm text-destructive">Nenhum setor vinculado ao seu perfil.</p>
       </PageLayout>
     );
@@ -39,20 +39,22 @@ export default function DashboardGeralGestor() {
 
   return (
     <PageLayout>
-      <PageHeader title="Dashboard Geral do Setor" />
-      <ContentGrid cols={1}>
+      <PageHeader title="Dashboard Geral do Setor" subtitle="Visão completa da produtividade, eficiência e qualidade do setor." />
+      <SectionDivider title="Panorama do setor" className="mt-2" />
+      <ContentGrid cols={1} className="mt-2">
         <WidgetCard>
           <SetorProducaoDiariaWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={1}>
+      <ContentGrid cols={1} className="mt-6">
         <WidgetCard>
           <SetorOEEMedioWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={2}>
+      <SectionDivider title="Eficiência e equipe" className="mt-6" />
+      <ContentGrid cols={2} className="mt-2">
         <WidgetCard centered>
           <SetorOEEEvolucaoWidget setorId={setorId} />
         </WidgetCard>
@@ -61,7 +63,8 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={2}>
+      <SectionDivider title="Ativos de produção" className="mt-6" />
+      <ContentGrid cols={2} className="mt-2">
         <WidgetCard>
           <SetorProducaoMaquinaWidget setorId={setorId} />
         </WidgetCard>
@@ -70,7 +73,8 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <ContentGrid cols={2}>
+      <SectionDivider title="Perdas e qualidade" className="mt-6" />
+      <ContentGrid cols={2} className="mt-2">
         <WidgetCard>
           <SetorMotivosParadaWidget setorId={setorId} />
         </WidgetCard>
@@ -79,7 +83,8 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <KPIGrid cols={4}>
+      <SectionDivider title="Indicadores rápidos" className="mt-6" />
+      <KPIGrid cols={4} className="mt-2">
         <WidgetCard>
           <MediaParadasDiaWidget />
         </WidgetCard>

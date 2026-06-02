@@ -3,6 +3,223 @@ import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 import OEEModel from './OEEModel.js';
 
 class MaquinaModel {
+    static TEMPO_EXPIRACAO_PAREAMENTO_MS = 3 * 60 * 1000;
+    static _sessoesPareamentoPlaca = new Map();
+    static _placasAguardandoPareamento = new Map();
+
+    static gerarCodigoPareamento() {
+        // 6 dígitos, fácil de digitar em displays/serial
+        return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    static normalizarBoardUid(board_uid) {
+        return String(board_uid ?? '').trim();
+    }
+
+    static criarChaveEmpresa(id_empresa) {
+        return String(Number(id_empresa));
+    }
+
+    static registroExpirado(registro) {
+        return !registro?.expires_at || registro.expires_at.getTime() <= Date.now();
+    }
+
+    static async expirarSessoesSincronizacaoPlaca(id_empresa) {
+        const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
+
+        for (const [key, sessao] of this._sessoesPareamentoPlaca.entries()) {
+            if (key.startsWith(`${chaveEmpresa}:`) && this.registroExpirado(sessao)) {
+                this._sessoesPareamentoPlaca.delete(key);
+            }
+        }
+
+        const placa = this._placasAguardandoPareamento.get(chaveEmpresa);
+        if (this.registroExpirado(placa)) {
+            this._placasAguardandoPareamento.delete(chaveEmpresa);
+        }
+    }
+
+    static async buscarPareamentoDisponivel(id_empresa) {
+        await this.expirarSessoesSincronizacaoPlaca(id_empresa);
+        return this._placasAguardandoPareamento.get(this.criarChaveEmpresa(id_empresa)) ?? null;
+    }
+
+    static async buscarSessaoSincronizacaoPendente(id_empresa) {
+        await this.expirarSessoesSincronizacaoPlaca(id_empresa);
+
+        const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
+        const sessoes = Array.from(this._sessoesPareamentoPlaca.values())
+            .filter((sessao) => String(sessao.id_empresa) === chaveEmpresa)
+            .sort((a, b) => b.created_at - a.created_at);
+
+        return sessoes[0] ?? null;
+    }
+
+    static async concluirSincronizacaoPlaca(sessao, pareamento) {
+        const agora = new Date();
+        const boardUid = this.normalizarBoardUid(pareamento.board_uid);
+
+        if (!boardUid) {
+            throw new Error('Identificador da placa e obrigatorio');
+        }
+
+        const maquina = await prisma.$transaction(async (tx) => {
+            await tx.maquinas.updateMany({
+                where: {
+                    id_empresa: sessao.id_empresa,
+                    board_uid: boardUid,
+                    id_maquina: { not: sessao.id_maquina }
+                },
+                data: {
+                    board_uid: null,
+                    board_sincronizado_em: null
+                }
+            });
+
+            return tx.maquinas.update({
+                where: { id_maquina: sessao.id_maquina },
+                data: {
+                    board_uid: boardUid,
+                    board_sincronizado_em: agora,
+                    board_ultimo_contato_em: agora
+                }
+            });
+        });
+
+        const chaveEmpresa = this.criarChaveEmpresa(sessao.id_empresa);
+        this._sessoesPareamentoPlaca.delete(`${chaveEmpresa}:${sessao.id_maquina}`);
+        this._placasAguardandoPareamento.delete(chaveEmpresa);
+
+        return {
+            id_empresa: sessao.id_empresa,
+            id_maquina: sessao.id_maquina,
+            board_uid: boardUid,
+            status: 'Concluida',
+            paired: true,
+            pairing_code: sessao.pairing_code,
+            expires_at: sessao.expires_at.toISOString(),
+            completed_at: agora.toISOString(),
+            maquina
+        };
+    }
+
+    static async criarSessaoSincronizacaoPlaca({ id_empresa, id_maquina, id_usuario }) {
+        // Valida que a máquina existe e pertence à empresa (autorizações já passam pelos middlewares)
+        const maquina = await prisma.maquinas.findFirst({
+            where: { id_empresa: Number(id_empresa), id_maquina: Number(id_maquina), ativo: true },
+            select: { id_maquina: true }
+        });
+        if (!maquina) {
+            throw new Error('Máquina não encontrada');
+        }
+
+        await this.expirarSessoesSincronizacaoPlaca(id_empresa);
+
+        const pairing_code = this.gerarCodigoPareamento();
+        const expires_at = new Date(Date.now() + this.TEMPO_EXPIRACAO_PAREAMENTO_MS);
+
+        const sessao = {
+            id_empresa: Number(id_empresa),
+            id_maquina: Number(id_maquina),
+            id_usuario: Number(id_usuario),
+            pairing_code,
+            expires_at,
+            created_at: new Date()
+        };
+
+        const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
+        this._sessoesPareamentoPlaca.set(`${chaveEmpresa}:${Number(id_maquina)}`, sessao);
+
+        const pareamento = await this.buscarPareamentoDisponivel(id_empresa);
+        if (pareamento) {
+            return this.concluirSincronizacaoPlaca(sessao, pareamento);
+        }
+
+        return {
+            id_maquina: Number(id_maquina),
+            pairing_code,
+            status: 'Pendente',
+            board_uid: null,
+            expires_at: expires_at.toISOString(),
+            completed_at: null
+        };
+    }
+
+    static async registrarSolicitacaoPareamentoPlaca({ id_empresa, board_uid, mac = null, firmware_version = null, mqtt_topic = null }) {
+        const empresaId = Number(id_empresa);
+        const boardUid = this.normalizarBoardUid(board_uid);
+
+        if (!Number.isInteger(empresaId) || empresaId <= 0) {
+            throw new Error('Empresa invalida');
+        }
+
+        if (!boardUid) {
+            throw new Error('Identificador da placa e obrigatorio');
+        }
+
+        const empresa = await prisma.empresas.findUnique({
+            where: { id_empresa: empresaId },
+            select: { id_empresa: true }
+        });
+        if (!empresa) {
+            throw new Error('Empresa nao encontrada');
+        }
+
+        const expires_at = new Date(Date.now() + this.TEMPO_EXPIRACAO_PAREAMENTO_MS);
+        const agora = new Date();
+
+        const pareamento = {
+            id_empresa: empresaId,
+            board_uid: boardUid,
+            mac,
+            firmware_version,
+            mqtt_topic,
+            expires_at,
+            created_at: agora
+        };
+
+        this._placasAguardandoPareamento.set(this.criarChaveEmpresa(empresaId), pareamento);
+
+        const sessao = await this.buscarSessaoSincronizacaoPendente(empresaId);
+        if (sessao) {
+            return this.concluirSincronizacaoPlaca(sessao, pareamento);
+        }
+
+        return {
+            id_empresa: empresaId,
+            board_uid: boardUid,
+            status: 'AguardandoSessao',
+            paired: false,
+            expires_at: expires_at.toISOString()
+        };
+    }
+
+    static async buscarVinculoPlaca(board_uid) {
+        const boardUid = this.normalizarBoardUid(board_uid);
+        if (!boardUid) return null;
+
+        return prisma.maquinas.findFirst({
+            where: {
+                board_uid: boardUid,
+                ativo: true
+            },
+            select: {
+                id_empresa: true,
+                id_maquina: true,
+                board_uid: true
+            }
+        });
+    }
+
+    static async registrarContatoPlaca(board_uid) {
+        const boardUid = this.normalizarBoardUid(board_uid);
+        if (!boardUid) return;
+
+        await prisma.maquinas.updateMany({
+            where: { board_uid: boardUid },
+            data: { board_ultimo_contato_em: new Date() }
+        });
+    }
     static calcularDuracaoMinutos(inicio, fim) {
         if (!inicio || !fim) return 0;
 

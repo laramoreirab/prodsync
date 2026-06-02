@@ -8,8 +8,8 @@ import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { mascaraCPF } from '@/utils/mascaras';
 import { setorCrudService } from '@/services/setorCrudService';
-import { apiFetch } from '@/lib/apiFetch';
-import { deduplicarTurnosParaSelect } from '@/utils/deduplicarTurnosParaSelect';
+import { apiFetch } from '@/lib/api';
+import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 
 
 export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }) {

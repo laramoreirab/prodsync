@@ -42,6 +42,7 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
+  AsymmetricGrid,
 } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
@@ -52,6 +53,7 @@ import {
   DetailWidgetGrid,
   DetailWidgetCard,
   DetailListingSection,
+  ListingTabs,
   DetailActions,
 } from "@/components/DetailComponents";
 
@@ -117,6 +119,7 @@ export default function SetorEspecificoPage({ params }) {
   const [dadosExibidos, setDadosExibidos] = useState([]);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
   const [buscaUsuarios, setBuscaUsuarios] = useState("");
+  const [activeListTab, setActiveListTab] = useState("maquinas");
   const [maquinaParaExcluir, setMaquinaParaExcluir] = useState(null);
 
   const gestor = setor?.gestores?.[0]?.gestor;
@@ -351,11 +354,9 @@ export default function SetorEspecificoPage({ params }) {
   return (
     <PageLayout>
       <DetailPageContainer>
-
         {/* Voltar */}
         <DetailBackLink href="/adm/setores" label="Voltar para Setores" />
 
-        {/* Cabeçalho: nome do setor + ações de editar/excluir */}
         <PageHeader
           title={`Setor: ${setor?.nome_setor || id}`}
           action={
@@ -429,218 +430,222 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Gráficos ── */}
         <DetailSectionTitle title="Desempenho do Setor" />
 
-        {/* Linha 1: status de máquinas + OEE médio */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard colSpan="md:col-span-2">
-            <SetorMaquinaStatusWidget setorId={id} />
-          </DetailWidgetCard>
-          <DetailWidgetCard centered>
-            <SetorOEEMedioWidget setorId={id} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        {/* Linha 2: produção semanal + top operadores */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard colSpan="md:col-span-2">
-            <SetorProducaoSemanalWidget setorId={id} />
-          </DetailWidgetCard>
-          <DetailWidgetCard>
-            <SetorTopOperadoresWidget setorId={id} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        {/* Linha 3: motivos de parada + evolução OEE */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard>
-            <SetorMotivosParadaWidget setorId={id} />
-          </DetailWidgetCard>
+        <AsymmetricGrid>
           <DetailWidgetCard colSpan="md:col-span-2">
             <SetorOEEEvolucaoWidget setorId={id} />
           </DetailWidgetCard>
-        </DetailWidgetGrid>
+          <DetailWidgetCard centered>
+            <SetorOEEMedioWidget setorId={id} />
+            <SetorMaquinaStatusWidget setorId={id} />
+          </DetailWidgetCard>
+        </AsymmetricGrid>
 
-        {/* ── Listagem de Máquinas ── */}
-        <DetailListingSection
-          id="listagem_maquinas"
-          title=" Inventário de Máquinas do Setor"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
-                <Plus size={22} />
-                Cadastrar
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroMaquina onCadastroSucesso={refresh} />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaMaquinas}
-              onChange={(e) => setBuscaMaquinas(e.target.value)}
-              placeholder="Busque por nome ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={maquinasExibidas.length}
-              label="máquinas"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoMaquinas}
-                    onSortChange={handleSortMaquinas}
-                  />
-                  <FilterDropdown
-                    filtersConfig={maquinasFilter}
-                    onApply={aplicarFiltrosMaquinas}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          {maquinasExibidas.length > 0 ? (
-            <TableListagens
-              data={maquinasExibidas}
-              columns={colunaMaquinaSetor}
-              acoesDropdown={(maquina) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/maquinas/${maquina.id_maquina}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6 w-full">
+          <DetailWidgetCard>
+            <SetorProducaoSemanalWidget setorId={id} />
+          </DetailWidgetCard>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
+          <DetailWidgetCard>
+            <SetorTopOperadoresWidget setorId={id} />
+          </DetailWidgetCard>
 
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setMaquinaParaExcluir(maquina.id_maquina);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                    Excluir
-                  </DropdownMenuItem>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhuma máquina encontrada"
-              message={`Não encontramos resultados para "${buscaMaquinas}".`}
-            />
-          )}
-        </DetailListingSection>
+          <DetailWidgetCard>
+            <SetorMotivosParadaWidget setorId={id} />
+          </DetailWidgetCard>
+        </div>
 
-        {/* ── Listagem de Usuários ── */}
-        <DetailListingSection
-          id="listagem_usuarios"
-          title=" Listagem de Usuários do Setor"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
-                <Plus size={22} />
-                Cadastrar
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroUsuario onCadastroSucesso={refresh} />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaUsuarios}
-              onChange={(e) => setBuscaUsuarios(e.target.value)}
-              placeholder="Busque por nome ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={usuariosExibidos.length}
-              label="usuários"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoUsers}
-                    onSortChange={handleSortUsuarios}
-                  />
-                  <FilterDropdown
-                    filtersConfig={usuariosFilter}
-                    onApply={aplicarFiltrosUsers}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          {usuariosExibidos.length > 0 ? (
-            <TableListagens
-              data={usuariosExibidos}
-              columns={colunaUsuarioSetor}
-              acoesDropdown={(usuario) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link
-                      href={
-                        usuario.funcao === "Gestor"
-                          ? `/adm/usuarios/gestor/${usuario.id_usuario}`
-                          : `/adm/usuarios/${usuario.id_usuario}`
-                      }
+        <ListingTabs
+          className="mt-8"
+          activeTab={activeListTab}
+          onChange={setActiveListTab}
+          tabs={[
+            { id: "maquinas", label: "Inventário de Máquinas" },
+            { id: "usuarios", label: "Usuários do Setor" },
+          ]}
+        />
+
+        {activeListTab === "maquinas" ? (
+          <DetailListingSection
+            id="listagem_maquinas"
+            title="Inventário de Máquinas do Setor"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
+                  <Plus size={22} />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroMaquina onCadastroSucesso={refresh} />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
+                value={buscaMaquinas}
+                onChange={(e) => setBuscaMaquinas(e.target.value)}
+                placeholder="Busque por nome ou id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={maquinasExibidas.length}
+                label="máquinas"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoMaquinas}
+                      onSortChange={handleSortMaquinas}
+                    />
+                    <FilterDropdown
+                      filtersConfig={maquinasFilter}
+                      onApply={aplicarFiltrosMaquinas}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            {maquinasExibidas.length > 0 ? (
+              <TableListagens
+                data={maquinasExibidas}
+                columns={colunaMaquinaSetor}
+                acoesDropdown={(maquina) => (
+                  <>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`/adm/maquinas/${maquina.id_maquina}`}>
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setMaquinaParaExcluir(maquina.id_maquina);
+                      }}
+                      className="cursor-pointer"
                     >
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhuma máquina encontrada"
+                message={`Não encontramos resultados para "${buscaMaquinas}".`}
+              />
+            )}
+          </DetailListingSection>
+        ) : (
+          <DetailListingSection
+            id="listagem_usuarios"
+            title="Listagem de Usuários do Setor"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
+                  <Plus size={22} />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroUsuario onCadastroSucesso={refresh} />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
+                value={buscaUsuarios}
+                onChange={(e) => setBuscaUsuarios(e.target.value)}
+                placeholder="Busque por nome ou id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={usuariosExibidos.length}
+                label="usuários"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoUsers}
+                      onSortChange={handleSortUsuarios}
+                    />
+                    <FilterDropdown
+                      filtersConfig={usuariosFilter}
+                      onApply={aplicarFiltrosUsers}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            {usuariosExibidos.length > 0 ? (
+              <TableListagens
+                data={usuariosExibidos}
+                columns={colunaUsuarioSetor}
+                acoesDropdown={(usuario) => (
+                  <>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link
+                        href={
+                          usuario.funcao === "Gestor"
+                            ? `/adm/usuarios/gestor/${usuario.id_usuario}`
+                            : `/adm/usuarios/${usuario.id_usuario}`
+                        }
+                      >
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoUsuario usuarioId={usuario.id_usuario} onEdicaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoUsuario usuarioId={usuario.id_usuario} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormExclusaoUsuario usuarioId={usuario.id_usuario} onExclusaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum usuário encontrado"
-              message={`Não encontramos resultados para "${buscaUsuarios}".`}
-            />
-          )}
-        </DetailListingSection>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormExclusaoUsuario usuarioId={usuario.id_usuario} onExclusaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum usuário encontrado"
+                message={`Não encontramos resultados para "${buscaUsuarios}".`}
+              />
+            )}
+          </DetailListingSection>
+        )}
 
       </DetailPageContainer>
 

@@ -7,40 +7,53 @@ import { oeeMetricasConfig } from "./config/producaoChartConfig";
 export function OEEWidget() {
   const { data, loading, error } = useOEE();
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando OEE...</p>;
-  if (error) return <p className="text-sm text-destructive">Erro ao carregar OEE.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando OEE...</p>;
+  if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar OEE.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;
 
-  const metricasOrdenadas = [...oeeMetricasConfig].sort((a, b) => {
-    if (a.key === "oee") return 1;
-    if (b.key === "oee") return -1;
-    return 0;
-  });
+  const metricaOeeGeral = oeeMetricasConfig.find((m) => m.key === "oee");
+  const metricasSecundarias = oeeMetricasConfig.filter((m) => m.key !== "oee");
 
   return (
-    <div className="flex flex-col gap-6 w-full p-4">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">Resumo OEE geral da Fábrica</h2>
-        <p className="text-xs text-muted-foreground">Atualizando em tempo real</p>
+    <div className="flex flex-col gap-1 w-full p-4 h-full justify-between">
+      <div className="text-left w-full">
+        <h2 className="text-sm font-semibold tracking-tight text-foreground">
+          Resumo OEE geral da Fábrica
+        </h2>
+        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 items-end justify-items-center w-full max-w-4xl mx-auto">
-        {metricasOrdenadas.map(({ key, label, color }) => (
-          <div
-            key={key}
-            className="flex flex-col items-center justify-center w-full"
-          >
+      <div className="flex flex-col gap-1 w-full items-center">
+        
+        {metricaOeeGeral && (
+          <div className="flex flex-col items-center justify-center rounded-lg w-full ">
             <GaugeSemicircular
-              title={label}
-              data={[{ value: data[key], fill: color }]}
-              size={key === "oee" ? "lg" : "default"}
+              title={metricaOeeGeral.label}
+              data={[{ value: data[metricaOeeGeral.key], fill: metricaOeeGeral.color }]}
+              size="xlg"
               config={{
-                value: { label, color },
+                value: { label: metricaOeeGeral.label, color: metricaOeeGeral.color },
               }}
             />
           </div>
-        ))}
+        )}
+
+        <div className="-mt-8 grid grid-cols-3 gap-0.5 w-full items-start justify-items-center">
+          {metricasSecundarias.map(({ key, label, color }) => (
+            <div key={key} className="flex flex-col items-center justify-center w-full">
+              <GaugeSemicircular
+                title={label}
+                data={[{ value: data[key], fill: color }]}
+                size="sm"
+                config={{
+                  value: { label, color },
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
       </div>
     </div>
   );

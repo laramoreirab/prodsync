@@ -1,7 +1,7 @@
 "use client";
 
 import { useSetorTotalKPI } from "./hooks/useSetorKPI";
-import { KPI } from "@/components/ui/charts/components";
+import { KPIHorizontal } from "@/components/ui/charts/components";
 export function SetorTotalWidget() {
   const { data, loading, error } = useSetorTotalKPI();
 
@@ -11,7 +11,7 @@ export function SetorTotalWidget() {
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
   return (
-    <KPI 
+    <KPIHorizontal
       title={data?.titulo ?? "Número Total de Setores"} 
       value={data?.valor ?? "0"} 
     />
