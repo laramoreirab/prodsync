@@ -387,7 +387,7 @@ export default function SetorEspecificoPage({ params }) {
             <p>
               Gestor Responsável:{" "}
               {gestor ? (
-                <Link href={`/adm/usuarios/${gestor.id_usuario}`} className="hover:underline ml-1">
+                <Link href={`/usuarios/${gestor.id_usuario}`} className="hover:underline ml-1">
                   {gestor.nome}
                 </Link>
               ) : (
