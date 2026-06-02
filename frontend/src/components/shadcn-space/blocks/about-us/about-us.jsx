@@ -62,8 +62,8 @@ const AboutUs = ({
                 <div
                   key={index}
                   className={cn("flex items-center gap-3 px-6 py-2 rounded-full", item.color)}>
-                  <item.icon className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
-                  <span className={cn("text-4xl font-normal", instrumentSerif.className)}>
+                  <item.icon className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  <span className="text-2xl font-semibold" >
                     {item.title}
                   </span>
                 </div>

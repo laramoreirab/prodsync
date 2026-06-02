@@ -6,17 +6,17 @@ const aboutusData = [
     {
       icon: ChartNoAxesCombined,
       title: "Produtividade",
-      color: "bg-blue-500/10 text-blue-500"
+      color: "bg-[#e8eef7] text-[#00357a] border-[#00357a] "
     },
     {
       icon: Target,
       title: "Foco",
-      color: "bg-green-400/10 text-green-400" 
+      color: "bg-secondary text-white" 
     },
     {
       icon: Sparkles,
       title: "Inovação",
-      color: "bg-red-400/10 text-red-400" 
+      color: "bg-primary text-white" 
     }
 ];
 

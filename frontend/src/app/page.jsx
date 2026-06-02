@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <>
-x    <HomeAuthRedirect />
+    <HomeAuthRedirect />
     <Header navigationData={navigationData} />
       <AgencyHeroSection />
       <AboutAndStats01 />
