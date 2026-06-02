@@ -106,7 +106,7 @@ const Pricing = () => {
                     <div className="absolute -inset-0.5 rounded-2xl overflow-hidden">
                       {/* Animated conic-gradient border */}
                       <div
-                        className="absolute -inset-full blur-xs animate-spin [animation-duration:2s] bg-conic from-black via-primary to-foreground" />
+                        className="absolute -inset-full blur-xs animate-spin [animation-duration:2s] bg-conic from-[#00357a] via-[#343fbd] to-[#adc8ff]" />
                       {/* Inner mask */}
                       <div className="absolute inset-0.5 rounded-2xl bg-card" />
                     </div>
