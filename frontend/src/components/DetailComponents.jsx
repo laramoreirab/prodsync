@@ -323,7 +323,7 @@ export function ListingTabs({ tabs, activeTab, onChange, className }) {
               onClick={() => onChange(tab.id)}
               className={cn(
                 // base — espelha TabsTrigger da referencia_1
-                "relative inline-flex h-full items-center justify-center gap-1.5 rounded-md border border-transparent px-3.5 py-0.5 text-md font-medium whitespace-nowrap transition-all",
+                "relative inline-flex h-full items-center justify-center gap-1.5 rounded-md border border-transparent px-3.5 py-0.5 text-md font-medium whitespace-nowrap transition-all cursor-pointer",
                 "text-muted-foreground hover:text-foreground",
                 "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring",
                 "disabled:pointer-events-none disabled:opacity-50",

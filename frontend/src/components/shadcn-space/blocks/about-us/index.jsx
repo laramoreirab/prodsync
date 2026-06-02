@@ -1,6 +1,6 @@
 "use client";
 import AboutUs from "@/components/shadcn-space/blocks/about-us/about-us";
-import { Target, Sparkles, ChartNoAxesCombined } from "lucide-react";
+import { Aperture, Laptop, ChartNoAxesCombined } from "lucide-react";
 
 const aboutusData = [
     {
@@ -9,12 +9,12 @@ const aboutusData = [
       color: "bg-[#e8eef7] text-[#00357a] border-[#00357a] "
     },
     {
-      icon: Target,
+      icon: Aperture,
       title: "Foco",
       color: "bg-secondary text-white" 
     },
     {
-      icon: Sparkles,
+      icon: Laptop,
       title: "Inovação",
       color: "bg-primary text-white" 
     }

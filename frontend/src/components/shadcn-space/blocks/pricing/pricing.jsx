@@ -100,7 +100,7 @@ const Pricing = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   custom={index}
-                  className={cn("relative flex-1 flex flex-col w-full", isFeatured && "z-10 scale-102")}>
+                  className={cn("relative flex-1 flex flex-col w-full transition-all duration-300 ease-out hover:scale-103", isFeatured && "z-10 scale-102")}>
                   {/* GRADIENT BORDER */}
                   {isFeatured && (
                     <div className="absolute -inset-0.5 rounded-2xl overflow-hidden">

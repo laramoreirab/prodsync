@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
       lang="pt-br"
       suppressHydrationWarning
       // h-full + overflow-hidden evita que o próprio <html> gere barra de rolagem
-      className={`${montserrat.variable} ${virtualFont.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${virtualFont.variable} min-h-screen antialiased`}
     >
       <head>
         <Script id="theme-initializer" strategy="beforeInteractive">

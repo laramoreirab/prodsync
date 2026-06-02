@@ -25,7 +25,7 @@ export default function Home() {
     },    
     {
       title: "FAQs",
-      href: "/",
+      href: "#faqs",
     }
   ];
 
