@@ -181,7 +181,7 @@ export default function Maquinas() {
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando máquinas...</p>
+          <p className="text-lg text-gray-600 font-medium">Sincronizando máquinas...</p>
         </div>
       </main>
     );
@@ -240,7 +240,7 @@ export default function Maquinas() {
 
       <FilterRow
         count={dadosExibidos.length}
-        label="maquinas"
+        label="máquinas"
         actions={
           <>
             <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />

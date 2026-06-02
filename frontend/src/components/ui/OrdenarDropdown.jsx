@@ -8,7 +8,7 @@ const OrdenarDropdown = ({ options = [], label, onSortChange }) => {
             <select
                 defaultValue=""
                 onChange={(e) => onSortChange(e.target.value)}
-                className="cursor-pointer rounded-md border border-[#c3c7c8] bg-[#f8f8f8] px-2 py-2.5 text-sm text-[#23304c] outline-none transition-all focus:border-[#00357a] focus:ring-2 focus:ring-[#7d95c6]/30 dark:bg-[#f8f8f8] dark:text-[#23304c]"
+                className="cursor-pointer rounded-md border shadow-sm bg-white px-3 py-2.5 text-sm font-semibold text-[#23304c] outline-none  dark:bg-[#f8f8f8] dark:text-[#23304c]"
             >
                 <option value="" disabled>
                     Selecione...

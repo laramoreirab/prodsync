@@ -461,13 +461,13 @@ export function SearchBar({
   return (
     <FadeUpItem
       className={cn(
-        "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 focus-within:border-[#00357a]/40 focus-within:ring-2 focus-within:ring-[#00357a]/15",
+        "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
         className,
       )}
     >
       <input
         type="search"
-        className="p-2.5 w-full outline-none bg-transparent font-medium text-sm rounded-lg placeholder:text-gray-400"
+        className="p-2.5 w-full outline-none bg-transparent font-medium text-md rounded-lg placeholder:text-gray-400"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
