@@ -59,8 +59,7 @@ export function OEEOperadorWidget({ operadorId }) {
                 </div>
 
                 {/* Barra de Progresso Customizada */}
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div
+<div className="w-full h-2 bg-slate-100 dark:bg-zinc-700 rounded-full overflow-hidden">                  <div
                     className="h-full rounded-full transition-all duration-500 ease-out"
                     style={{
                       width: `${normalizedValue}%`,

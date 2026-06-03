@@ -11,7 +11,7 @@ function Table({
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto rounded-xl border border-gray-200 bg-white"
+      className="relative w-full overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-[#1d2d49] dark:bg-[#07101f]"
     >
       <table
         data-slot="table"
@@ -28,7 +28,7 @@ function TableHeader({
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b bg-gray-50/90 sticky top-0 z-[1]", className)}
+      className={cn("[&_tr]:border-b bg-gray-50/90 sticky top-0 z-[1] dark:bg-[#101b31]", className)}
       {...props} />
   );
 }
@@ -40,7 +40,7 @@ function TableBody({
   return (
     <tbody
       data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0 bg-white [&_tr:nth-child(even)]:bg-gray-50/35", className)}
+      className={cn("[&_tr:last-child]:border-0 bg-white [&_tr:nth-child(even)]:bg-gray-50/35 dark:bg-[#07101f] dark:[&_tr:nth-child(even)]:bg-[#0f1a2d]", className)}
       {...props} />
   );
 }
@@ -70,7 +70,7 @@ function TableRow({
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-gray-100 transition-colors hover:bg-[#f8fbff] has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b border-gray-100 transition-colors hover:bg-[#f8fbff] has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted dark:border-[#1d2d49] dark:hover:bg-[#17253f] dark:has-aria-expanded:bg-[#17253f] dark:data-[state=selected]:bg-[#17345f]",
         className
       )}
       {...props}>

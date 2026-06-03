@@ -55,10 +55,10 @@ export function ProducaoTotalWidget({ setorId }) {
         
         {/* Bloco do Título */}
         <div className="min-w-0"> 
-          <p className="text-sm font-semibold text-black truncate">
+          <p className="text-sm font-semibold text-[#17233b] truncate dark:text-[#f4f8ff]">
             Produção total das máquinas
           </p>
-          <p className="text-xs text-gray-400 font-semibold mt-1">
+          <p className="text-xs text-gray-400 font-semibold mt-1 dark:text-[#aebbd1]">
             *Atualizado em tempo real
           </p>
         </div>
@@ -71,8 +71,8 @@ export function ProducaoTotalWidget({ setorId }) {
               onClick={() => setDiasSelecionados(dias)}
               className={`h-8 px-3 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
                 diasSelecionados === dias
-                  ? "bg-[var(--secondary-foreground)] text-white shadow-sm"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-[#315aa8] text-white shadow-sm hover:bg-[#3868c2] dark:bg-[#2f63c7] dark:text-[#f4f8ff] dark:shadow-[0_8px_22px_rgba(47,99,199,0.28)] dark:hover:bg-[#3b73dc]"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border dark:border-[#243754] dark:bg-[#101b31] dark:text-[#aebbd1] dark:hover:border-[#365b94] dark:hover:bg-[#17253f] dark:hover:text-[#f4f8ff]"
               }`}
             >
               {label}
