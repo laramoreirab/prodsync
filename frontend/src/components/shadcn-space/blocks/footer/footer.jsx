@@ -1,133 +1,109 @@
-// import Logo from "@/assets/logo/logo";
 import { Separator } from "@/components/ui/separator";
+import { Mail, MapPin, Phone } from "lucide-react";
 
-const footerSections = [
+const navLinks = [
+  { title: "Home", href: "/" },
+  { title: "Sobre nós", href: "#sobre-nos" },
+  { title: "Serviços", href: "#servicos" },
+  { title: "FAQs", href: "#faqs" },
+  { title: "Cadastro", href: "/cadastro" },
+];
+
+const contactItems = [
   {
-    title: "Índice",
-    links: [
-      {
-        title: "Home",
-        href: "/",
-      },
-      {
-        title: "Sobre nós",
-        href: "#about-us",
-      },
-      {
-        title: "Serviços",
-        href: "#servicos",
-      },
-      {
-        title: "FAQs",
-        href: "#faqs",
-      },
-      {
-        title: "Cadastro",
-        href: "/cadastro",
-      }
-    ],
+    icon: MapPin,
+    label: "Rua Boa Vista, 825",
+    href: null,
   },
   {
-    title: "",
-    links: [
-      {
-        title: "",
-        href: "#",
-      },
-      {
-        title: "",
-        href: "#",
-      },
-      {
-        title: "",
-        href: "#",
-      },
-    ],
+    icon: Mail,
+    label: "prodsync@gmail.com",
+    href: "mailto:prodsync@gmail.com",
+  },
+  {
+    icon: Phone,
+    label: "4002-8922",
+    href: "tel:+55400028922",
   },
 ];
 
 const Footer = () => {
   return (
-    <footer className="py-8">
-      <Separator orientation="horizontal" />
-      <div className="xl:px-16 lg:px-8 px-4 mx-auto">
-        <div className="flex flex-col gap-2 sm:gap-8">
-          <div
-            className="pt-8 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-12 gap-x-6 gap-y-2 px-2 xl:px-0">
-            <div className="col-span-full lg:col-span-4">
-              <div
-                className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-100 ease-in-out fill-mode-both">
-                {/* Logo */}
-                <a className="" href="#">
-                  <img src="/logo.png" alt="Logo - ProdSync" className="h-10" />
-                </a>
-
-                <p className="text-base font-normal text-muted-foreground">
-                  Sua fábrica sincronizada em tempo real e sob controle.
-                </p>
-              </div>
-            </div>
-
-            <div className="col-span-1 lg:block hidden"></div>
-
-            {footerSections.map(({ title, links }, index) => (
-              <div key={index} className="col-span-2">
-                <div
-                  className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-100 ease-in-out fill-mode-both">
-                  <p className="text-base font-medium text-foreground">
-                    {title}
-                  </p>
-                  <ul className="flex flex-col gap-3">
-                    {links.map(({ title, href }) => (
-                      <li key={title}>
-                        <a
-                          href={href}
-                          className="text-base font-normal text-muted-foreground hover:text-foreground">
-                          {title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-
-            <div className="col-span-3">
-              <div
-                className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-100 ease-in-out fill-mode-both">
-                <p className="text-base font-medium text-foreground">
-                  Informações para contato
-                </p>
-                <ul className="flex flex-col gap-3">
-                  <li>
-                    <p className="text-base font-normal text-muted-foreground">
-                      Rua Boa Vista, 825
-                    </p>
-                  </li>
-                  <li>
-                    <a
-                      href="mailto:contact@example.com"
-                      className="text-base font-normal text-muted-foreground hover:text-foreground">
-                      prodsync@gmail.com
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="tel:+01051923556"
-                      className="text-base font-normal text-muted-foreground hover:text-foreground">
-                      4002-8922
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+    <footer className="border-t border-[#23304c]/10 bg-[#fafbfd]">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-16 lg:py-14">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-5">
+            <a href="/" className="inline-block">
+              <img
+                src="/logo.png"
+                alt="ProdSync"
+                className="h-9 w-auto sm:h-10"
+              />
+            </a>
+            <p className="mt-4 max-w-sm text-base leading-relaxed text-muted-foreground">
+              Sua fábrica sincronizada em tempo real e sob controle.
+            </p>
           </div>
-          <Separator orientation="horizontal" />
-          <p
-            className="text-sm font-normal text-muted-foreground text-center animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-100 ease-in-out fill-mode-both">
-            ©2026 ProdSync. Todos os direitos reservados.
-          </p>
+
+          <div className="lg:col-span-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#23304c]/70">
+              Navegação
+            </p>
+            <nav className="mt-4 flex flex-col gap-2.5">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-muted-foreground transition-colors hover:text-[#23304c]"
+                >
+                  {link.title}
+                </a>
+              ))}
+            </nav>
+          </div>
+
+          <div className="lg:col-span-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#23304c]/70">
+              Contato
+            </p>
+            <ul className="mt-4 flex flex-col gap-3">
+              {contactItems.map((item) => {
+                const Icon = item.icon;
+                const content = (
+                  <>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#23304c]/6 text-[#23304c]">
+                      <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+                    </span>
+                    <span className="text-sm leading-snug">{item.label}</span>
+                  </>
+                );
+
+                return (
+                  <li key={item.label}>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="group flex items-center gap-3 text-muted-foreground transition-colors hover:text-[#23304c]"
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        {content}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
+
+        <Separator className="my-8 bg-[#23304c]/10" />
+
+        <p className="text-center text-xs text-muted-foreground sm:text-sm">
+          © 2026 ProdSync. Todos os direitos reservados.
+        </p>
       </div>
     </footer>
   );
