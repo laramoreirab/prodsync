@@ -12,6 +12,7 @@ import ordemProducaoRotas from './ordemProducaoRotas.js'
 import apontamentoRotas from './apontamentoRotas.js'
 import notificacaoRotas from './notificacaoRotas.js'
 import placaRotas from './placaRotas.js'
+import aiRotas from './aiRotas.js'
 
 const router = Router()
 
@@ -29,6 +30,7 @@ router.use('/ordens-producao', ordemProducaoRotas)
 router.use('/apontamentos', apontamentoRotas)
 router.use('/notificacoes', notificacaoRotas)
 router.use('/placas', placaRotas)
+router.use('/ai', aiRotas)
 
 
 export default router
