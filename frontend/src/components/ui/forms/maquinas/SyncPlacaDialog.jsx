@@ -26,6 +26,44 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
   const emProgresso = statusSync && statusSync !== "Concluida";
 
   useEffect(() => {
+    if (!emProgresso) return undefined;
+
+    let ativo = true;
+
+    async function consultarStatus() {
+      try {
+        const resp = await maquinaSyncService.obterStatusSincronizacaoPlaca(maquinaId);
+        if (!ativo) return;
+
+        if (resp?.status === "Concluida") {
+          setCodigo(resp?.pairing_code ?? null);
+          setExpiraEm(resp?.expires_at ?? null);
+          setPlacaUid(resp?.board_uid ?? null);
+          setStatusSync(resp?.status ?? null);
+          return;
+        }
+
+        if (resp?.status === "SemSessao") {
+          setCodigo(null);
+          setExpiraEm(null);
+          setPlacaUid(null);
+          setStatusSync(null);
+        }
+      } catch {
+        // Mantem a janela aguardando; erros temporarios de rede nao devem cancelar o pareamento.
+      }
+    }
+
+    consultarStatus();
+    const intervalId = window.setInterval(consultarStatus, 2000);
+
+    return () => {
+      ativo = false;
+      window.clearInterval(intervalId);
+    };
+  }, [emProgresso, maquinaId]);
+
+  useEffect(() => {
     if (statusSync === "Concluida" && placaUid) {
       toast.success("Placa conectada com sucesso!", {
         description: `UID: ${placaUid}`,
@@ -125,4 +163,3 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
     </Dialog>
   );
 }
-

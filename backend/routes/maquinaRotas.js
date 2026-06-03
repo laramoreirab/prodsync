@@ -43,6 +43,7 @@ router.get('/eficienciaMaquina/:id_operador', autorizarUsuarioParam('id_operador
 
 // Pareamento / Sincronização de placa (ESP32)
 router.post('/:id/sincronizar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.iniciarSincronizacaoPlaca);
+router.get('/:id/sincronizacao-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.obterStatusSincronizacaoPlaca);
 router.post('/:id/parar-sincronizacao', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.pararSincronizacaoPlaca);
 
 router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);

@@ -5,6 +5,26 @@ import MaquinaModel from '../models/MaquinaModel.js';
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
 const TOPICOS = ['phietro/fabrica/+/status', 'phietro/fabrica/pareamento'];
 
+function topicoControlePlaca(board_uid) {
+  return `phietro/fabrica/${board_uid}/controle`;
+}
+
+function publicarControlePlaca(board_uid, payload) {
+  if (!board_uid) return;
+
+  const topico = topicoControlePlaca(board_uid);
+  const mensagem = JSON.stringify(payload);
+
+  clienteMQTT.publish(topico, mensagem, (err) => {
+    if (err) {
+      console.error(`[MQTT CONTROLE] Falha ao publicar em ${topico}:`, err);
+      return;
+    }
+
+    console.log(`[MQTT CONTROLE] Publicado em ${topico}: ${mensagem}`);
+  });
+}
+
 function normalizarStatus(status) {
   const valor = String(status ?? '').trim().toUpperCase();
   if (valor === 'PRODUZINDO') return 'Produzindo';
@@ -30,6 +50,24 @@ async function processarPareamento(dados, topic) {
     console.log(`[MQTT PAREAMENTO] Placa ${resultado.board_uid} aguardando sincronizacao pelo site.`);
   }
 }
+
+MaquinaModel.eventosPlaca.on('pareamentoConcluido', (resultado) => {
+  publicarControlePlaca(resultado.board_uid, {
+    tipo: 'PAREAMENTO_CONCLUIDO',
+    id_empresa: resultado.id_empresa,
+    id_maquina: resultado.id_maquina,
+    board_uid: resultado.board_uid
+  });
+});
+
+MaquinaModel.eventosPlaca.on('pareamentoCancelado', (resultado) => {
+  publicarControlePlaca(resultado.board_uid, {
+    tipo: 'PARAR_PAREAMENTO',
+    id_empresa: resultado.id_empresa,
+    id_maquina: resultado.id_maquina,
+    board_uid: resultado.board_uid
+  });
+});
 
 clienteMQTT.on('connect', () => {
   console.log('SUCESSO: O Backend conectou ao Broker HiveMQ!');
