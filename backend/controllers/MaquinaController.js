@@ -657,5 +657,32 @@ class MaquinaController {
         }
     }
 
+    // POST /maquinas/:id/parar-sincronizacao - Cancela sessão de pareamento da placa
+    static async pararSincronizacaoPlaca(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            await MaquinaModel.cancelarSessaoSincronizacaoPlaca({
+                id_empresa,
+                id_maquina
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Sincronização cancelada com sucesso.'
+            });
+        } catch (error) {
+            console.error('Erro ao parar sincronização da placa:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível cancelar a sincronização da placa'
+            });
+        }
+    }
+
 }
 export default MaquinaController;

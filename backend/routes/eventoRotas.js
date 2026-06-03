@@ -12,6 +12,7 @@ router.use(authMiddleware);
 router.get('/', aplicarEscopoGestor, paginacaoMiddleware, EventoController.listarTodos);
 router.get('/pendente', aplicarEscopoGestor, EventoController.obterEventoPendente);
 router.get('/motivos-parada', MotivoParadaController.listarMotivosEmpresa);
+router.post('/motivos-parada', MotivoParadaController.criarMotivoParada);
 router.get('/justificadas', aplicarEscopoGestor, paginacaoMiddleware, EventoController.listarJustificadas);
 router.get('/nao-justificadas', aplicarEscopoGestor, paginacaoMiddleware, EventoController.listarNaoJustificadas);
 router.post('/sistema', validarBodySetorGestor('setor_afetado'), autorizarMaquinasBody('maquinas'), EventoController.registrarEventoSistema);
