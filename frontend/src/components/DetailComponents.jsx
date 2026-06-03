@@ -495,6 +495,11 @@ export function MachineProfileCard({
   headerSlot,
   className,
 }) {
+  const enrichedFieldsRight = [
+    ...fieldsRight,
+    ...(status ? [{ label: "Status", value: <StatusBadge status={status} /> }] : []),
+  ];
+
   return (
     <EntityProfileCard
       name={machineName}
@@ -503,9 +508,9 @@ export function MachineProfileCard({
       imageFallback={imageFallback}
       imageShape="square"
       fieldsLeft={fieldsLeft}
-      fieldsRight={fieldsRight}
+      fieldsRight={enrichedFieldsRight}
       actions={actions}
-      headerSlot={headerSlot ?? (status ? <StatusBadge status={status} /> : null)}
+      headerSlot={headerSlot ?? null}
       className={className}
     />
   );

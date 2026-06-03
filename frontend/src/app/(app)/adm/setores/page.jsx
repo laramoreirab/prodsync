@@ -41,7 +41,7 @@ import {
   KPIGrid, ContentGrid, WidgetCard,
   SearchBar, FilterRow, EmptyState, LoadingState,
   PageSection,
-  AsymmetricGrid, WidgetCard2,
+  AsymmetricGrid, WidgetCard2, KPICardDecorated,
 } from "@/components/AnimatedComponents";
 
 const setoresFilter = [
@@ -210,13 +210,13 @@ export default function PageSetores() {
           <OEEPorSetorWidget />
         </WidgetCard>
         <div className="flex flex-col gap-4 h-full">
-          <WidgetCard className="flex-1" centered>
+          <KPICardDecorated className="flex-1" centered>
             <SetorTotalWidget />
-          </WidgetCard>
+          </KPICardDecorated>
 
-          <WidgetCard className="flex-1" centered>
+          <KPICardDecorated className="flex-1" centered>
             <OperadoresMediaWidget />
-          </WidgetCard>
+          </KPICardDecorated>
         </div>
       </AsymmetricGrid>
 

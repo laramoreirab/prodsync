@@ -255,7 +255,7 @@ export function SectionDivider({ title, action, className }) {
       )}
     >
       <div className="flex items-center gap-5 flex-1 min-w-0">
-        <h2 className="text-3xl mb-6 sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap text-[#17233b] dark:text-[#f4f8ff]">
+        <h2 className="text-3xl sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap text-[#17233b] dark:text-[#f4f8ff]">
           {title}
         </h2>
         <hr className="hidden sm:block flex-1 h-0.75 rounded-full bg-[#315aa8]/50 dark:bg-[#243754]" />
