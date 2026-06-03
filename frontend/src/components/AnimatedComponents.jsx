@@ -128,13 +128,25 @@ export function PageLayout({
   center = false,
 }) {
   return (
-    <main className={cn("relative min-h-screen flex flex-col", className)}>
+    <main className={cn("relative min-h-screen flex flex-col bg-transparent dark:bg-zinc-950", className)}>
+      {/* Light mode: SVG aparece normalmente */}
       <div
-        className="fixed inset-0 -z-10 bg-no-repeat"
+        className="fixed inset-0 -z-10 bg-no-repeat dark:hidden"
         style={{
           backgroundImage: bg ?? "url('/bg_app.svg')",
           backgroundPosition: "right 0 top -6rem",
           backgroundSize: "75% auto",
+        }}
+      />
+
+      {/* Dark mode: SVG com a cor do fundo (invisível) */}
+      <div
+        className="fixed inset-0 -z-10 bg-no-repeat hidden dark:block"
+        style={{
+          backgroundImage: bg ?? "url('/bg_app.svg')",
+          backgroundPosition: "right 0 top -6rem",
+          backgroundSize: "75% auto",
+          filter: "brightness(0) invert(0) opacity(0.07)",
         }}
       />
 
@@ -192,13 +204,13 @@ export function PageHeader({
       <div className="flex flex-col gap-1 min-w-0 flex-1">
         {/* Criamos um wrapper 'w-fit' para que a linha tenha exatamente o tamanho do texto */}
         <div className="relative w-fit pb-2">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-black">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#17233b] dark:text-[#f4f8ff]">
             {title}
           </h1>
           
           {underline && (
             <motion.div
-              className="absolute bottom-0 left-0 h-[5px] w-full bg-secondary-foreground rounded-full"
+              className="absolute bottom-0 left-0 h-[5px] w-full rounded-full bg-[#315aa8] dark:bg-[#6f9bff]"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               style={{ originX: 0 }} // Faz a animação começar estritamente da esquerda para a direita
@@ -243,10 +255,10 @@ export function SectionDivider({ title, action, className }) {
       )}
     >
       <div className="flex items-center gap-5 flex-1 min-w-0">
-        <h2 className="text-3xl mb-6 sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap">
+        <h2 className="text-3xl sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap text-[#17233b] dark:text-[#f4f8ff]">
           {title}
         </h2>
-        <hr className="hidden sm:block bg-black flex-1 h-0.75 rounded-full" />
+        <hr className="hidden sm:block flex-1 h-0.75 rounded-full bg-[#315aa8]/50 dark:bg-[#243754]" />
       </div>
 
       {action && <div className="shrink-0 w-full sm:w-auto">{action}</div>}
@@ -437,7 +449,7 @@ export function WidgetCard({ children, className, colSpan, centered }) {
   return (
     <FadeUpItem
       className={cn(
-        "group bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90",
+        "group bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90 dark:bg-[#0b1324] dark:border-[#1d2d49] dark:shadow-[0_18px_50px_rgba(0,0,0,0.28)] dark:hover:border-[#2f4770]",
         centered && "flex flex-col items-center justify-center",
         colSpan,
         className,
@@ -452,7 +464,7 @@ export function WidgetCard2({ children, className, colSpan, centered }) {
   return (
     <FadeUpItem
       className={cn(
-        "group flex flex-col bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90",
+        "group flex flex-col bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90 dark:bg-[#0b1324] dark:border-[#1d2d49] dark:shadow-[0_18px_50px_rgba(0,0,0,0.28)] dark:hover:border-[#2f4770]",
         
         centered && "items-center justify-center",
         colSpan,
@@ -484,13 +496,13 @@ export function SearchBar({
   return (
     <FadeUpItem
       className={cn(
-        "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
+        "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 dark:border-[#243754] dark:bg-[#07101f] dark:shadow-[0_12px_34px_rgba(0,0,0,0.24)]",
         className,
       )}
     >
       <input
         type="search"
-        className="p-2.5 w-full outline-none bg-transparent font-medium text-md rounded-lg placeholder:text-gray-400"
+        className="p-2.5 w-full outline-none bg-transparent font-medium text-md rounded-lg text-[#17233b] placeholder:text-gray-400 dark:text-[#f4f8ff] dark:placeholder:text-[#71809b]"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -529,7 +541,7 @@ export function FilterRow({ count, label = "resultados", actions, className }) {
         className,
       )}
     >
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-[#aebbd1]">
         {count} {label} encontrado{count !== 1 ? "s" : ""}
       </p>
 
@@ -563,14 +575,14 @@ export function EmptyState({
   return (
     <FadeUpItem
       className={cn(
-        "flex flex-col items-center justify-center p-8 sm:p-12 text-gray-500 w-full",
+        "flex flex-col items-center justify-center p-8 sm:p-12 text-gray-500 w-full dark:text-[#aebbd1]",
         className,
       )}
     >
-      <Icon className="w-12 h-12 mb-4 text-gray-300" />
+      <Icon className="w-12 h-12 mb-4 text-gray-300 dark:text-[#3a5278]" />
       <h2 className="text-xl font-semibold">{title}</h2>
       {message && (
-        <p className="text-sm text-gray-400 mt-1 text-center">{message}</p>
+        <p className="text-sm text-gray-400 mt-1 text-center dark:text-[#71809b]">{message}</p>
       )}
     </FadeUpItem>
   );
@@ -597,8 +609,8 @@ export function LoadingState({ message = "Carregando...", className }) {
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center gap-4"
       >
-        <Loader2 className="w-12 h-12 animate-spin text-[#00357a]" />
-        <p className="text-lg text-gray-600 font-medium">{message}</p>
+        <Loader2 className="w-12 h-12 animate-spin text-[#00357a] dark:text-[#6f9bff]" />
+        <p className="text-lg text-gray-600 font-medium dark:text-[#aebbd1]">{message}</p>
       </motion.div>
     </div>
   );
@@ -641,7 +653,7 @@ export function KPICardDecorated({ children, className, colSpan }) {
   return (
     <FadeUpItem
       className={cn(
-        "bg-white/95 border border-gray-200/80 border-l-4 border-l-[#00357a] rounded-2xl p-4 sm:p-5 shadow-sm min-h-23 flex items-center justify-between transition-all duration-300 hover:shadow-md",
+        "bg-white/95 border border-gray-200/80 border-l-4 border-l-[#00357a] rounded-2xl p-4 sm:p-5 shadow-sm min-h-23 flex items-center justify-between transition-all duration-300 hover:shadow-md dark:bg-[#0b1324] dark:border-[#1d2d49] dark:border-l-[#6f9bff]",
         colSpan,
         className,
       )}

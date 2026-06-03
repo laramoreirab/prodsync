@@ -18,7 +18,10 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
       const currentValues = prev[filterId] || [];
 
       if (currentValues.includes(option)) {
-        return { ...prev, [filterId]: currentValues.filter((item) => item !== option) };
+        return {
+          ...prev,
+          [filterId]: currentValues.filter((item) => item !== option),
+        };
       }
 
       return { ...prev, [filterId]: [...currentValues, option] };
@@ -124,62 +127,97 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-[#00357a] px-4 py-2 text-md font-semibold text-[#f8f8f8] shadow-sm transition-colors hover:bg-[#002866] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]"
+        className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md bg-[#00357a] px-4 py-2 text-md font-semibold text-[#f8f8f8] shadow-sm transition-colors hover:bg-[#002866] dark:bg-stale-700 dark:text-white dark:hover:bg-slate-800"
       >
         <FadersHorizontalIcon size={22} />
         Filtrar
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 w-80 bg-gray-100 shadow-2xl rounded-lg p-4 border border-gray-200 z-50">
+        <div className="absolute right-0 top-12 w-80 bg-gray-100 dark:bg-slate-900 shadow-2xl rounded-lg p-4 border border-gray-200 dark:border-zinc-700 z-50">
+          {" "}
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
             {filtersConfig.map((filter) => (
-              <div key={filter.id} className="rounded-md border bg-white shadow-sm">
+              <div
+                key={filter.id}
+                className="rounded-md border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm"
+              >
+                {" "}
                 <div
-                  className="flex cursor-pointer items-center justify-between rounded-md p-3 transition-colors hover:bg-[#f8f8f8]"
+                  className="flex cursor-pointer items-center justify-between rounded-md p-3 transition-colors hover:bg-[#f8f8f8] dark:hover:bg-zinc-700"
                   onClick={() => toggleSection(filter.id)}
                 >
-                  <span className="font-semibold text-[#23304c]">{filter.label}</span>
+                  <span className="font-semibold text-[#23304c] dark:text-slate-200">
+                    {filter.label}
+                  </span>
                   {openSections[filter.id] ? (
-                    <Minus size={18} className="text-[#636f87]" />
+                    <Minus
+                      size={18}
+                      className="text-[#636f87] dark:text-zinc-400"
+                    />
                   ) : (
-                    <Plus size={18} className="text-[#636f87]" />
+                    <Plus
+                      size={18}
+                      className="text-[#636f87] dark:text-zinc-400"
+                    />
                   )}
                 </div>
-
                 {openSections[filter.id] && (
                   <div className="px-3 pb-3 flex flex-col gap-3">
-
                     {/*caso 1: checkbox */}
-                    {filter.type === "checkbox" && filter.options.map((opt) => (
-                      <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={(filterValues[filter.id] || []).includes(opt)}
-                          onChange={() => handleCheckbox(filter.id, opt)}
-                          className="w-4 h-4 rounded accent-blue-900 border-gray-300 text-secondary-foreground cursor-pointer"
-                        />
-                        <span className="text-sm text-gray-700">{opt}</span>
-                      </label>
-                    ))}
+                    {filter.type === "checkbox" &&
+                      filter.options.map((opt) => (
+                        <label
+                          key={opt}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={(filterValues[filter.id] || []).includes(
+                              opt,
+                            )}
+                            onChange={() => handleCheckbox(filter.id, opt)}
+                            className="w-4 h-4 rounded accent-blue-900 border-gray-300 text-secondary-foreground cursor-pointer"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-zinc-300">
+                            {opt}
+                          </span>{" "}
+                        </label>
+                      ))}
 
                     {filter.type === "date-range" && (
                       <>
                         <div className="flex flex-col gap-1">
-                          <label className="text-sm font-semibold text-[#636f87]">Desde</label>
+                          <label className="text-sm font-semibold text-[#636f87] dark:text-zinc-400">
+                            Desde
+                          </label>
                           <input
                             type="datetime-local"
                             value={filterValues[filter.id]?.start || ""}
-                            onChange={(event) => handleInputChange(filter.id, "start", event.target.value)}
+                            onChange={(event) =>
+                              handleInputChange(
+                                filter.id,
+                                "start",
+                                event.target.value,
+                              )
+                            }
                             className="rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <label className="text-sm font-semibold text-[#636f87]">Até</label>
+                          <label className="text-sm font-semibold text-[#636f87] dark:text-zinc-400">
+                            Até
+                          </label>
                           <input
                             type="datetime-local"
                             value={filterValues[filter.id]?.end || ""}
-                            onChange={(event) => handleInputChange(filter.id, "end", event.target.value)}
+                            onChange={(event) =>
+                              handleInputChange(
+                                filter.id,
+                                "end",
+                                event.target.value,
+                              )
+                            }
                             className="rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
@@ -189,20 +227,36 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
                     {filter.type === "number-range" && (
                       <div className="flex gap-2">
                         <div className="flex w-full flex-col gap-1">
-                          <label className="text-sm font-semibold text-[#636f87]">Mínimo</label>
+                          <label className="text-sm font-semibold text-[#636f87] dark:text-zinc-400">
+                            Mínimo
+                          </label>
                           <input
                             type="number"
                             value={filterValues[filter.id]?.min || ""}
-                            onChange={(event) => handleInputChange(filter.id, "min", event.target.value)}
+                            onChange={(event) =>
+                              handleInputChange(
+                                filter.id,
+                                "min",
+                                event.target.value,
+                              )
+                            }
                             className="w-full rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
                         <div className="flex w-full flex-col gap-1">
-                          <label className="text-sm font-semibold text-[#636f87]">Máximo</label>
+                          <label className="text-sm font-semibold text-[#636f87] dark:text-zinc-400">
+                            Máximo
+                          </label>
                           <input
                             type="number"
                             value={filterValues[filter.id]?.max || ""}
-                            onChange={(event) => handleInputChange(filter.id, "max", event.target.value)}
+                            onChange={(event) =>
+                              handleInputChange(
+                                filter.id,
+                                "max",
+                                event.target.value,
+                              )
+                            }
                             className="w-full rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                           />
                         </div>
@@ -211,11 +265,19 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
 
                     {filter.type === "time-max" && (
                       <div className="flex flex-col gap-1">
-                        <label className="text-sm font-semibold text-[#636f87]">Até</label>
+                        <label className="text-sm font-semibold text-[#636f87] dark:text-zinc-400">
+                          Até
+                        </label>
                         <input
                           type="time"
                           value={filterValues[filter.id]?.max || ""}
-                          onChange={(event) => handleInputChange(filter.id, "max", event.target.value)}
+                          onChange={(event) =>
+                            handleInputChange(
+                              filter.id,
+                              "max",
+                              event.target.value,
+                            )
+                          }
                           className="rounded border border-[#c3c7c8] p-1 text-sm text-[#23304c] outline-none focus:border-[#00357a]"
                         />
                       </div>
@@ -225,22 +287,24 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
               </div>
             ))}
           </div>
-
           {activeTags.length > 0 && (
             <div className="flex flex-wrap gap-2 pt-3">
               {activeTags.map((tag) => (
-                <span key={tag.key} className="flex items-center gap-1 rounded-md bg-[#e2e2e2] px-2 py-1 text-sm font-semibold text-[#23304c]">
+                <span className="flex items-center gap-1 rounded-md bg-[#e2e2e2] dark:bg-zinc-700 px-2 py-1 text-sm font-semibold text-[#23304c] dark:text-slate-200">
                   {tag.label}
-                  <X size={12} className="cursor-pointer hover:text-red-600" onClick={tag.onRemove} />
+                  <X
+                    size={12}
+                    className="cursor-pointer hover:text-red-600"
+                    onClick={tag.onRemove}
+                  />
                 </span>
               ))}
             </div>
           )}
-
           <button
             onClick={handleApplyClick}
-            className="mt-4 min-h-10 w-full rounded-md bg-[#00357a] py-2 font-semibold text-[#f8f8f8] transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6] dark:bg-[#a9b9dc] dark:text-[#0b1020] dark:hover:bg-[#c1cbe2]"
-          >
+            className="mt-4 min-h-10 w-full rounded-md bg-[#00357a] py-2 font-semibold text-[#f8f8f8] transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6]  dark:bg-stale-700 dark:text-white dark:hover:bg-slate-800"
+      >
             Aplicar Filtros
           </button>
         </div>

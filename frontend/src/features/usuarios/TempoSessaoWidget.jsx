@@ -22,8 +22,8 @@ export function TempoSessaoWidget({ setorId }) {
 
   return (
     <div>
-      <p className="text-sm font-semibold text-black">Tempo médio de sessão por perfil</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1 mb-6">*Atualizado em tempo real</p>
+      <p className="text-sm font-semibold text-black dark:text-f8fafc">Tempo médio de sessão por perfil</p>
+      <p className="text-xs text-gray-400 dark:text-slate-500 font-semibold mt-1 mb-6">*Atualizado em tempo real</p>
 
       <div className="flex flex-col gap-5">
         {perfisData.map(({ perfil, minutos, label }) => {
@@ -31,21 +31,18 @@ export function TempoSessaoWidget({ setorId }) {
 
           return (
             <div key={perfil} className="flex items-center gap-4">
-              {/* Nome do Perfil (Adm, Gestor, Operador) */}
-              <span className="w-24 text-sm font-semibold text-gray-700 flex-shrink-0">
+              <span className="w-24 text-sm font-semibold text-gray-700 dark:text-slate-300 flex-shrink-0">
                 {perfil}
               </span>
 
-              {/* Barra de Progresso */}
-              <div className="flex-1 bg-gray-100 border border-gray-100 rounded-full h-9 overflow-hidden">
+              <div className="flex-1 bg-gray-100 dark:bg-[var(--chart-track)] border border-gray-100 dark:border-[var(--border)] rounded-full h-9 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-[var(--primary)] transition-all duration-500"
                   style={{ width: `${pct}%` }}
                 />
               </div>
 
-              {/* Label formatado vindo do Back (ex: "03:45 h") */}
-              <span className="w-20 text-sm font-bold text-gray-800 text-right flex-shrink-0">
+              <span className="w-20 text-sm font-bold text-gray-800 dark:text-slate-100 text-right flex-shrink-0">
                 {label}
               </span>
             </div>

@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, ArrowDown, Flame, Loader2, MoveHorizontal, Pencil, Plus, EyeIcon, Trash2, Search } from 'lucide-react';
+import { Loader2, Pencil, Plus, EyeIcon, Trash2, Search } from 'lucide-react';
 import TableListagens from "@/components/table";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
@@ -28,6 +28,10 @@ import FormExclusaoOp from "@/components/ui/forms/ops/formExclusaoOp";
 import { OPProgressoCell } from "@/features/ordens/OPProgressoCell";
 import FormCadastroOp from "@/components/ui/forms/ops/formCadastroOp";
 import FormEdicaoOp from "@/components/ui/forms/ops/formEdicaoOp";
+import {
+  getOrdemStatusBadgeClass,
+  getPrioridadeBadgeConfig,
+} from "@/lib/opDisplay";
 
 import {
   PageLayout,
@@ -41,7 +45,8 @@ import {
   EmptyState,
   LoadingState,
   FadeUpItem,
-  AsymmetricGrid
+  AsymmetricGrid, 
+  KPICardDecorated,
 } from "@/components/AnimatedComponents";
 
 
@@ -87,35 +92,12 @@ const colunasOrdemProd = [
     label: "Prioridade",
     className: "w-45",
     icone: (valor) => {
-      const config = {
-        "Média": {
-          variant: "outline",
-          className: "border border-[var(--azul-cobalto)]",
-          icon: <MoveHorizontal className="text-azul-cobalto" />
-        },
-        "Alta": {
-          variant: "secondary",
-          className: "border border-[var(--amarelo)] bg-transparent",
-          icon: <AlertTriangle className="text-amarelo" />
-        },
-        "Crítica": {
-          variant: "destructive",
-          className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
-          icon: <Flame className="text-vermelho-vivido" />
-        },
-        "Baixa": {
-          variant: "destructive",
-          className: "border border-gray-400 text-sm bg-transparent text-black",
-          icon: <ArrowDown className="text-gray-400" />
-        }
-      };
-
-
-      const item = config[valor] || { icon: null };
+      const item = getPrioridadeBadgeConfig(valor) || {};
+      const Icon = item.icon;
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
-          {item.icon}
-          {valor}
+        <Badge variant="outline" className={`whitespace-nowrap ${item.className || ""} text-sm font-medium p-2.5`}>
+          {Icon ? <Icon className={`mr-1 h-4 w-4 ${item.iconClassName || ""}`} /> : null}
+          {item.label || valor}
         </Badge>
       );
     }
@@ -132,32 +114,9 @@ const colunasOrdemProd = [
     label: 'Status',
     className: "text-center",
     icone: (valor) => {
-      const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm font-semibold border-none dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
-        },
-        "Setup": {
-          variant: "secondary",
-          className: "!border-amber-300 !bg-amber-100 !text-amber-900 text-sm font-semibold border-none dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm font-semibold border-none dark:!border-red-300/35 dark:!bg-red-500/20 :!text-red-100"
-        },
-        "Concluída": {
-          variant: "outline",
-          className: "!border-blue-300 !bg-blue-100 !text-blue-600 text-sm font-semibold border-none dark:!border-blue-300/45 dark:!bg-blue-300/20 :!text-blue-100"
-        },
-        "Aguardando Início": {
-          variant: "outline",
-          className: "!bg-[var(--status-neutral-bg)] !text-[var(--status-neutral-text)] !border-slate-500/30 text-sm font-semibold border-none dark:!border-slate-300/45 dark:!bg-slate-300/20 dark:!text-slate-100"
-        }
-      };
-      const item = config[valor] || { icon: null };
+      const className = getOrdemStatusBadgeClass(valor);
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
-          {item.icon}
+        <Badge variant="outline" className={`whitespace-nowrap ${className} text-sm font-medium p-2.5`}>
           {valor}
         </Badge>
       );
@@ -324,21 +283,21 @@ export default function OrdensDeProducao() {
 
       <KPIGrid cols={4} className="mt-4">
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPAtivasKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPAtrasadasKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPPecasBoasKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPRefugoKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
 
       </KPIGrid>

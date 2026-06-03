@@ -45,8 +45,8 @@ export function BarStackedHorizontal({ data, config, title, xKey = "setor" }) {
           />
           <ChartTooltip content={<ChartTooltipContent />} />
           <ChartLegend content={<ChartLegendContent />} />
-          <Bar dataKey="produzidas" stackId="stack1" fill={config.produzidas?.color || "var(--chart-primary)"} radius={[0, 0, 0, 0]} />
-          <Bar dataKey="defeito" stackId="stack1" fill={config.defeito?.color || "var(--chart-accent)"} radius={[0, 4, 4, 0]} />
+          <Bar dataKey="produzidas" stackId="stack1" fill={config.produzidas?.color || "var(--chart1)"} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="defeito" stackId="stack1" fill={config.defeito?.color || "var(--chart2)"} radius={[0, 4, 4, 0]} />
         </BarChart>
       </ChartContainer>
     </div>

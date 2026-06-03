@@ -44,8 +44,7 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       data-variant={variant}
-      className={cn(tabsListVariants({ variant }),"bg-[var(--cinza-claro)] py-5", className)}
-      {...props} />
+className={cn(tabsListVariants({ variant }), "bg-[var(--cinza-claro)] dark:bg-slate-900/60 py-5", className)}      {...props} />
   );
 }
 
