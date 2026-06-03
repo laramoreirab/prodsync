@@ -51,7 +51,18 @@ export default function DashboardGeralGestor() {
 
   return (
     <PageLayout>
-      <PageHeader title="Dashboard Geral do Setor" subtitle="Visão completa da produtividade, eficiência e qualidade do setor." />
+      <PageHeader
+        title="Dashboard Geral do Setor"
+        subtitle="Visão completa da produtividade, eficiência e qualidade do setor."
+        action={
+          <a href="/gestor/relatorios">
+            <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <ArrowUpFromLine size={20} className="mr-2" />
+              Exportar PDF
+            </button>
+          </a>
+        }
+      />
       <SectionDivider title="Panorama do setor" className="mt-2" />
       <ContentGrid cols={1} className="mt-2">
         <WidgetCard>

@@ -22,6 +22,7 @@ router.put('/:id', autorizarEventoParam('id'), validarBodySetorGestor('setor_afe
 router.get('/tempo_parado_produzindo', aplicarEscopoGestor, EventoController.tempoParadoTempoProduzindoEvento);
 router.get('/top_motivos_tempo', aplicarEscopoGestor, EventoController.obterTopMotivosTempo);
 router.get('/top3-motivos-parada', aplicarEscopoGestor, EventoController.top3MotivosParada);
+router.get('/relatorio', aplicarEscopoGestor, EventoController.listarParaRelatorio);
 router.get('/:id', autorizarEventoParam('id'), EventoController.buscarPorId);
 
 export default router;

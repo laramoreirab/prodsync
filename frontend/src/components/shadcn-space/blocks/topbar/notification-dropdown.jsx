@@ -159,9 +159,17 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
                           <Icon size={20} className={cn("size-5", config.textColor)} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-popover-foreground">
-                            {notificacao.titulo}
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-medium text-popover-foreground">
+                              {notificacao.titulo}
+                            </p>
+                            {(notificacao.solicitado_pelo_adm ||
+                              notificacao.tipo === "Solicitar_Justificativa") && (
+                              <Badge className="h-5 bg-[#23304c] px-2 text-[10px] font-semibold uppercase tracking-wide hover:bg-[#23304c]">
+                                Solicitado pelo adm
+                              </Badge>
+                            )}
+                          </div>
                           <p className="truncate text-sm text-muted-foreground">
                             {notificacao.mensagem}
                           </p>

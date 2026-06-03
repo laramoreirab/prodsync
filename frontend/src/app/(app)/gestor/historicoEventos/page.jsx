@@ -165,12 +165,7 @@ export default function HistoricoEventosGestor() {
           <DetalhesEvento eventoId={row.id} />
         </DialogContent>
       </Dialog>
-      <SolicitarJustificativaMenuItem idEvento={row.id}>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-          <BellRing className="mr-2 h-4 w-4" />
-          Solicitar Justificativa
-        </DropdownMenuItem>
-      </SolicitarJustificativaMenuItem>
+      <SolicitarJustificativaMenuItem idEvento={row.id} />
       <Dialog>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
