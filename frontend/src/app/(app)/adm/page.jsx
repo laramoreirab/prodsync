@@ -10,6 +10,7 @@ import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget"
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
+import { ArrowUpFromLine } from "lucide-react";
 
 import { PageLayout, KPICardDecorated, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
 
@@ -18,6 +19,15 @@ export default function DashboardGeralPage() {
     <PageLayout className="pb-12">
       <PageHeader
         title="Dashboard Geral da Empresa"
+
+        action={
+          <a href="/adm/relatorios">
+            <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <ArrowUpFromLine size={20} className="mr-2" />
+              Exportar PDF
+            </button>
+          </a>
+        }
       />
       
       <AsymmetricGrid className="mt-2">
