@@ -21,6 +21,7 @@ model Empresas {
   escalas_trabalho   EscalaTrabalho[]
   historico_eventos  Historico_Eventos[]
   maquinas           Maquinas[]
+  solicitacoes_pareamento SolicitacoesPareamento[]
   motivos_parada     Motivos_Parada[]
   notificacoes       Notificacoes[]
   ordens_producao    OrdemProducao[]
@@ -87,6 +88,8 @@ model Maquinas {
   board_uid               String?             @db.VarChar(100)
   board_sincronizado_em   DateTime?
   board_ultimo_contato_em DateTime?
+  pairing_code            String?             @db.VarChar(10)
+  pairing_expires_at      DateTime?
   apontamentos            Apontamento[]
   escala_trabalho         EscalaTrabalho[]
   historico_eventos       Historico_Eventos[]
@@ -252,6 +255,21 @@ model Logs {
   @@index([rota])
   @@index([status_code])
   @@index([criado_em])
+}
+
+model SolicitacoesPareamento {
+  id_solicitacao   Int       @id @default(autoincrement())
+  id_empresa       Int
+  board_uid        String    @db.VarChar(100)
+  mac              String?   @db.VarChar(50)
+  firmware_version String?   @db.VarChar(50)
+  mqtt_topic       String?   @db.VarChar(255)
+  criado_em        DateTime  @default(now())
+  expira_em        DateTime
+  empresa          Empresas  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+
+  @@index([id_empresa])
+  @@index([board_uid])
 }
 
 enum TipoUsuario {

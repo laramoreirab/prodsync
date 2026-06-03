@@ -1,6 +1,7 @@
 import MaquinaModel from '../models/MaquinaModel.js';
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 import Papa from 'papaparse'
+import clienteMQTT from '../config/mqtt.js';
 
 class MaquinaController {
     static obterIdMaquina(req, res) {
@@ -53,9 +54,19 @@ class MaquinaController {
                 id_usuario
             });
 
+            if (sessao.status === 'Concluida') {
+                clienteMQTT.publish(`phietro/fabrica/${sessao.board_uid}/controle`, JSON.stringify({
+                    tipo: 'PARAR_PAREAMENTO',
+                    maquina_id: sessao.id_maquina,
+                    sucesso: true
+                }));
+            }
+
             return res.status(200).json({
                 sucesso: true,
-                mensagem: 'Sessão de sincronização iniciada.',
+                mensagem: sessao.status === 'Concluida' 
+                    ? 'Placa sincronizada com sucesso.' 
+                    : 'Sessão de sincronização iniciada.',
                 dados: sessao
             });
         } catch (error) {
@@ -63,7 +74,31 @@ class MaquinaController {
             return res.status(500).json({
                 sucesso: false,
                 erro: 'Erro interno do servidor',
-                mensagem: 'Não foi possível iniciar a sincronização da placa'
+                mensagem: error.message || 'Não foi possível iniciar a sincronização da placa'
+            });
+        }
+    }
+
+    // POST /maquinas/:id/parar-sincronizacao - Para sessão de pareamento
+    static async pararSincronizacaoPlaca(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            await MaquinaModel.pararSincronizacaoPlaca(id_maquina, id_empresa);
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Sincronização cancelada com sucesso.'
+            });
+        } catch (error) {
+            console.error('Erro ao parar sincronização da placa:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível cancelar a sincronização'
             });
         }
     }
