@@ -377,6 +377,38 @@ class UsuarioModel {
         }
     }
 
+    static async atualizarEmpresa(id_empresa, dadosEmpresa){
+        try {
+            const resposta = await prisma.empresas.update({
+                where:{
+                    id_empresa: Number(id_empresa)
+                },
+                data:{
+                    ...dadosEmpresa
+                }
+            })
+
+            return resposta
+            
+        } catch (error) {
+            console.error('Erro atualizar dados da empresa', error);
+            throw error;
+        }
+    }
+
+    static async cadastrarLote(dados){
+        try {
+            const resultado = await prisma.usuario.createMany({
+                data: dadosParaSalvar,
+                skipDuplicates: true, // Impede que a query quebre caso um CPF já exista
+            });
+            return resultado.count
+        } catch (error) {
+            console.error('Erro cadastrar lote csv de usuários no banco de dados', error);
+            throw error;
+        }
+    }
+
     // -------------------------------------------------Dashboards-------------------------------------------------
 
     static filtroSetorUsuario(setorId) {
