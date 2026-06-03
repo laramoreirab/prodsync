@@ -1,6 +1,5 @@
 import EventoModel from '../models/EventoModel.js';
 import MaquinaModel from '../models/MaquinaModel.js';
-import clienteMQTT from '../config/mqtt.js';
 
 class PlacaController {
     static normalizarStatus(status) {
@@ -24,14 +23,6 @@ class PlacaController {
                 firmware_version,
                 mqtt_topic
             });
-
-            if (resultado.status === 'Concluida') {
-                clienteMQTT.publish(`phietro/fabrica/${resultado.board_uid}/controle`, JSON.stringify({
-                    tipo: 'PARAR_PAREAMENTO',
-                    maquina_id: resultado.id_maquina,
-                    sucesso: true
-                }));
-            }
 
             return res.status(200).json({
                 sucesso: true,

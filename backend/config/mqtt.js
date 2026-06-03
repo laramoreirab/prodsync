@@ -26,12 +26,6 @@ async function processarPareamento(dados, topic) {
 
   if (resultado.status === 'Concluida') {
     console.log(`[MQTT PAREAMENTO] Placa ${resultado.board_uid} sincronizada com maquina ${resultado.id_maquina}.`);
-    // Notificar a placa que o pareamento foi concluído
-    clienteMQTT.publish(`phietro/fabrica/${resultado.board_uid}/controle`, JSON.stringify({
-      tipo: 'PARAR_PAREAMENTO',
-      maquina_id: resultado.id_maquina,
-      sucesso: true
-    }));
   } else {
     console.log(`[MQTT PAREAMENTO] Placa ${resultado.board_uid} aguardando sincronizacao pelo site.`);
   }
