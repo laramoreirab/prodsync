@@ -154,12 +154,12 @@ const formatarDataHora = (valor) => {
 const prioridadeBadge = (prioridade) => {
   const valor = prioridade || "";
   const config = {
-    Média: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
-    Media: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
-    Alta: { className: "border border-[var(--amarelo)] bg-transparent", icon: <AlertTriangle className="text-amarelo" /> },
-    Crítica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },
-    Critica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },
-    Baixa: { className: "border border-gray-400 text-sm bg-transparent text-black", icon: <ArrowDown className="text-gray-400" /> },
+    Média: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
+    Media: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
+    Alta: { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700", icon: <AlertTriangle className="text-amber-600" /> },
+    Crítica: { className: "border border-rose-500/30 bg-rose-500/10 text-rose-700", icon: <Flame className="text-rose-600" /> },
+    Critica: { className: "border border-rose-500/30 bg-rose-500/10 text-rose-700", icon: <Flame className="text-rose-600" /> },
+    Baixa: { className: "border border-slate-400/30 bg-slate-100 text-slate-700", icon: <ArrowDown className="text-slate-400" /> },
   };
   const item = config[valor] || { icon: null, className: "" };
   const label = valor === "Critica" ? "Crítica" : valor === "Media" ? "Média" : valor;
@@ -173,11 +173,12 @@ const prioridadeBadge = (prioridade) => {
 
 const statusBadge = (status) => {
   const config = {
-    Produzindo: "bg-green-500/15 text-green-600",
-    Parada: "bg-red-500/15 text-red-600",
-    Setup: "bg-amber-500/15 text-amber-800",
-    Concluída: "bg-gray-500/15 text-gray-700",
-    Finalizada: "bg-gray-500/15 text-gray-700",
+    Produzindo: "bg-emerald-500/15 text-emerald-700",
+    Parada: "bg-rose-500/15 text-rose-700",
+    Setup: "bg-amber-500/15 text-amber-900",
+    Concluída: "bg-sky-500/15 text-sky-700",
+    Finalizada: "bg-sky-500/15 text-sky-700",
+    "Aguardando Início": "bg-slate-500/15 text-slate-700",
   };
   const label =
     status === "Em_Andamento" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";

@@ -43,10 +43,10 @@ import {
 } from "@/components/DetailComponents";
 
 const prioridadeIcone = {
-  Crítica: { icon: Flame, className: "border border-vermelho-vivido bg-transparent text-black" },
-  Alta: { className: "border border-amber-400 bg-transparent text-black" },
-  Média: { className: "border border-azul-cobalto bg-transparent text-black" },
-  Baixa: { className: "border border-gray-400 bg-transparent text-black" },
+  Crítica: { icon: Flame, className: "border border-rose-500/30 bg-rose-500/10 text-rose-700" },
+  Alta: { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700" },
+  Média: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700" },
+  Baixa: { className: "border border-slate-400/30 bg-slate-100 text-slate-700" },
 };
 
 function formatarDataHora(valor) {
@@ -276,11 +276,11 @@ export default function OPDetalheGestor({ params }) {
   const setorNome = op.maquina?.setor?.nome_setor || op.setor || "-";
 
   const statusBadge = {
-    Produzindo: "bg-green-500/15 text-green-600",
-    Parada: "bg-red-100 text-red-700",
-    Setup: "bg-amber-100 text-amber-900",
-    Concluída: "bg-blue-500/10 text-blue-600",
-    "Aguardando Início": "bg-gray-100 text-gray-600",
+    Produzindo: "bg-emerald-500/15 text-emerald-700",
+    Parada: "bg-rose-500/15 text-rose-700",
+    Setup: "bg-amber-500/15 text-amber-900",
+    Concluída: "bg-sky-500/15 text-sky-700",
+    "Aguardando Início": "bg-slate-500/15 text-slate-700",
   };
 
   return (
