@@ -3,6 +3,8 @@ import MaquinaModel from '../models/MaquinaModel.js';
 
 class PlacaController {
     static normalizarStatus(status) {
+        return EventoModel.normalizarStatusMaquina(status) ?? status;
+
         const valor = String(status ?? '').trim().toUpperCase();
         if (valor === 'PRODUZINDO') return 'Produzindo';
         if (valor === 'SETUP' || valor === 'SETUP/AJUSTE') return 'Setup';
