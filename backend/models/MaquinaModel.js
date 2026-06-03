@@ -7,6 +7,7 @@ class MaquinaModel {
     static TEMPO_EXPIRACAO_PAREAMENTO_MS = 3 * 60 * 1000;
     static _sessoesPareamentoPlaca = new Map();
     static _placasAguardandoPareamento = new Map();
+    static _placasAguardandoPareamentoPorUid = new Map();
     static eventosPlaca = new EventEmitter();
 
     static gerarCodigoPareamento() {
@@ -20,6 +21,17 @@ class MaquinaModel {
 
     static criarChaveEmpresa(id_empresa) {
         return String(Number(id_empresa));
+    }
+
+    static removerPareamentoPendentePorUid(boardUid) {
+        if (!boardUid) return;
+
+        this._placasAguardandoPareamentoPorUid.delete(boardUid);
+        for (const [chaveEmpresa, pareamento] of this._placasAguardandoPareamento.entries()) {
+            if (pareamento?.board_uid === boardUid) {
+                this._placasAguardandoPareamento.delete(chaveEmpresa);
+            }
+        }
     }
 
     static registroExpirado(registro) {
@@ -38,12 +50,33 @@ class MaquinaModel {
         const placa = this._placasAguardandoPareamento.get(chaveEmpresa);
         if (this.registroExpirado(placa)) {
             this._placasAguardandoPareamento.delete(chaveEmpresa);
+            if (placa?.board_uid) {
+                this._placasAguardandoPareamentoPorUid.delete(placa.board_uid);
+            }
+        }
+
+        for (const [boardUid, pareamento] of this._placasAguardandoPareamentoPorUid.entries()) {
+            if (this.registroExpirado(pareamento)) {
+                this._placasAguardandoPareamentoPorUid.delete(boardUid);
+            }
         }
     }
 
     static async buscarPareamentoDisponivel(id_empresa) {
         await this.expirarSessoesSincronizacaoPlaca(id_empresa);
-        return this._placasAguardandoPareamento.get(this.criarChaveEmpresa(id_empresa)) ?? null;
+        const pareamentoEmpresa = this._placasAguardandoPareamento.get(this.criarChaveEmpresa(id_empresa));
+        if (pareamentoEmpresa) return pareamentoEmpresa;
+
+        return this.buscarPareamentoGlobalDisponivel();
+    }
+
+    static buscarPareamentoGlobalDisponivel() {
+        const pareamentos = Array.from(this._placasAguardandoPareamentoPorUid.values())
+            .filter((pareamento) => !this.registroExpirado(pareamento))
+            .sort((a, b) => b.created_at - a.created_at);
+
+        if (pareamentos.length === 1) return pareamentos[0];
+        return null;
     }
 
     static async buscarSessaoSincronizacaoPendente(id_empresa) {
@@ -57,6 +90,21 @@ class MaquinaModel {
         return sessoes[0] ?? null;
     }
 
+    static async buscarSessaoSincronizacaoPendenteGlobal() {
+        for (const [key, sessao] of this._sessoesPareamentoPlaca.entries()) {
+            if (this.registroExpirado(sessao)) {
+                this._sessoesPareamentoPlaca.delete(key);
+            }
+        }
+
+        const sessoes = Array.from(this._sessoesPareamentoPlaca.values())
+            .filter((sessao) => !this.registroExpirado(sessao))
+            .sort((a, b) => b.created_at - a.created_at);
+
+        if (sessoes.length === 1) return sessoes[0];
+        return null;
+    }
+
     static async concluirSincronizacaoPlaca(sessao, pareamento) {
         const agora = new Date();
         const boardUid = this.normalizarBoardUid(pareamento.board_uid);
@@ -68,7 +116,6 @@ class MaquinaModel {
         const maquina = await prisma.$transaction(async (tx) => {
             await tx.maquinas.updateMany({
                 where: {
-                    id_empresa: sessao.id_empresa,
                     board_uid: boardUid,
                     id_maquina: { not: sessao.id_maquina }
                 },
@@ -90,7 +137,7 @@ class MaquinaModel {
 
         const chaveEmpresa = this.criarChaveEmpresa(sessao.id_empresa);
         this._sessoesPareamentoPlaca.delete(`${chaveEmpresa}:${sessao.id_maquina}`);
-        this._placasAguardandoPareamento.delete(chaveEmpresa);
+        this.removerPareamentoPendentePorUid(boardUid);
 
         const resultado = {
             id_empresa: sessao.id_empresa,
@@ -135,9 +182,11 @@ class MaquinaModel {
 
         const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
         this._sessoesPareamentoPlaca.set(`${chaveEmpresa}:${Number(id_maquina)}`, sessao);
+        console.log(`[PAREAMENTO SITE] Sessao criada para empresa ${sessao.id_empresa}, maquina ${sessao.id_maquina}, codigo ${pairing_code}.`);
 
         const pareamento = await this.buscarPareamentoDisponivel(id_empresa);
         if (pareamento) {
+            console.log(`[PAREAMENTO SITE] Placa ${pareamento.board_uid} encontrada aguardando. Concluindo sincronizacao.`);
             return this.concluirSincronizacaoPlaca(sessao, pareamento);
         }
 
@@ -185,8 +234,16 @@ class MaquinaModel {
         };
 
         this._placasAguardandoPareamento.set(this.criarChaveEmpresa(empresaId), pareamento);
+        this._placasAguardandoPareamentoPorUid.set(boardUid, pareamento);
+        console.log(`[PAREAMENTO PLACA] Pedido da placa ${boardUid} para empresa ${empresaId}.`);
 
-        const sessao = await this.buscarSessaoSincronizacaoPendente(empresaId);
+        let sessao = await this.buscarSessaoSincronizacaoPendente(empresaId);
+        if (!sessao) {
+            sessao = await this.buscarSessaoSincronizacaoPendenteGlobal();
+            if (sessao) {
+                console.log(`[PAREAMENTO PLACA] Usando sessao pendente unica da empresa ${sessao.id_empresa}, maquina ${sessao.id_maquina}.`);
+            }
+        }
         if (sessao) {
             return this.concluirSincronizacaoPlaca(sessao, pareamento);
         }
@@ -1593,11 +1650,14 @@ static async producaoMaquinasSetor(id_setor, id_empresa) {
 
     const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
     const chaveSessiono = `${chaveEmpresa}:${Number(id_maquina)}`;
-    const placaAguardando = this._placasAguardandoPareamento.get(chaveEmpresa) ?? null;
+    const placaAguardando = this._placasAguardandoPareamento.get(chaveEmpresa) ?? this.buscarPareamentoGlobalDisponivel();
     
     // Remove a sessão de pareamento
     this._sessoesPareamentoPlaca.delete(chaveSessiono);
     this._placasAguardandoPareamento.delete(chaveEmpresa);
+    if (placaAguardando?.board_uid) {
+      this.removerPareamentoPendentePorUid(placaAguardando.board_uid);
+    }
 
     if (placaAguardando?.board_uid) {
       this.eventosPlaca.emit('pareamentoCancelado', {
