@@ -30,22 +30,22 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
               className="stroke-background"
               
               // ATIVA AS "SETAS"/LINHAS:
-              labelLine={{ stroke: "#94a3b8", strokeWidth: 1 }}
-              label={({ name, cx, x, y, textAnchor }) => {
-                const color = config[name]?.color || "currentColor";
-                return (
-                  <text
-                    cx={cx}
-                    x={x}
-                    y={y}
-                    textAnchor={textAnchor}
-                    className="text-xs font-medium dynamic-label"
-                    fill={color}
-                  >
-                    {config[name]?.label || name}
-                  </text>
-                );
-              }}
+              // labelLine={{ stroke: "#94a3b8", strokeWidth: 1 }}
+              // label={({ name, cx, x, y, textAnchor }) => {
+              //   const color = config[name]?.color || "currentColor";
+              //   return (
+              //     <text
+              //       cx={cx}
+              //       x={x}
+              //       y={y}
+              //       textAnchor={textAnchor}
+              //       className="text-xs font-medium dynamic-label"
+              //       fill={color}
+              //     >
+              //       {config[name]?.label || name}
+              //     </text>
+              //   );
+              // }}
             >
               {data.map((entry, index) => (
                 <Cell 

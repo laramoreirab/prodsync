@@ -43,6 +43,7 @@ import {
   FilterRow,
   EmptyState,
   AsymmetricGrid,
+  KPIGrid,
 } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
@@ -382,35 +383,64 @@ export default function SetorEspecificoPage({ params }) {
           }
         />
 
-        <FadeUpItem className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm text-xl font-medium text-gray-900">
-          <div className="flex flex-col gap-2">
-            <p>
-              Gestor Responsável:{" "}
-              {gestor ? (
-                <Link href={`/adm/usuarios/${gestor.id_usuario}`} className="hover:underline ml-1">
-                  {gestor.nome}
-                </Link>
-              ) : (
-                <span className="ml-1">-</span>
-              )}
-            </p>
+        <FadeUpItem className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm text-gray-900">
+          <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
 
-            <div className="flex">
-              <p>Turnos:</p>
-              <ul className="list-disc list-inside ml-4">
-                {turnosAgrupados.length > 0 ? (
-                  turnosAgrupados.map((t) => (
-                    <li key={`${t.nome_turno}-${t.hora_inicio}-${t.hora_fim}`}>
-                      {t.nome_turno} ({t.dias.join(", ")}): {formatarHorario(t.hora_inicio)} - {formatarHorario(t.hora_fim)}
-                    </li>
-                  ))
+            {/* Bloco da Esquerda: Informações Principais e Localização */}
+            <div className="flex flex-col gap-4 flex-1 w-full">
+              <div>
+                <span className="text-xs font-semibold text-black uppercase tracking-wider block mb-1">
+                  Gestor Responsável
+                </span>
+                {gestor ? (
+                  <span className="text-lg font-semibold text-black">
+                    {gestor.nome}
+                  </span>
                 ) : (
-                  <li className="text-gray-500 italic">Nenhum turno cadastrado para este setor</li>
+                  <span className="text-base text-black italic">Não associado</span>
                 )}
-              </ul>
+              </div>
+
+              <div className="border-t border-slate-100 pt-3">
+                <span className="text-xs font-semibold text-black uppercase tracking-wider block mb-1">
+                  Localização
+                </span>
+                <p className="text-base font-medium text-slate-700">
+                  {setor?.localizacao || <span className="text-slate-400 italic">Não informada</span>}
+                </p>
+              </div>
             </div>
 
-            <p>Localização: {setor?.localizacao || "-"}</p>
+            {/* Bloco da Direita: Turnos (Inspirado no layout de campos agrupados) */}
+            <div className="flex flex-col gap-2 flex-1 w-full border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6">
+              <span className="text-xs font-semibold text-black uppercase tracking-wider block mb-2">
+                Turnos de Trabalho
+              </span>
+
+              <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1">
+                {turnosAgrupados.length > 0 ? (
+                  turnosAgrupados.map((t) => (
+                    <div
+                      key={`${t.nome_turno}-${t.hora_inicio}-${t.hora_fim}`}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 bg-slate-50 border border-slate-100 rounded-lg text-sm"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-slate-800">{t.nome_turno}</span>
+                        <span className="text-xs text-slate-500">{t.dias.join(", ")}</span>
+                      </div>
+                      <div className="text-xs font-mono bg-white border border-slate-200 px-2.5 py-1 rounded-md text-slate-600 shadow-sm self-start sm:self-center">
+                        {formatarHorario(t.hora_inicio)} — {formatarHorario(t.hora_fim)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-slate-400 italic p-3 bg-slate-50 border border-dashed border-slate-200 rounded-lg text-center">
+                    Nenhum turno cadastrado para este setor
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
         </FadeUpItem>
 
@@ -436,11 +466,20 @@ export default function SetorEspecificoPage({ params }) {
           </DetailWidgetCard>
           <DetailWidgetCard centered>
             <SetorOEEMedioWidget setorId={id} />
-            <SetorMaquinaStatusWidget setorId={id} />
+
           </DetailWidgetCard>
         </AsymmetricGrid>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6 w-full">
+        <KPIGrid cols={2} className="mt-6">
+
+          <DetailWidgetCard>
+            <SetorMotivosParadaWidget setorId={id} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <SetorMaquinaStatusWidget setorId={id} />
+          </DetailWidgetCard>
+        </KPIGrid>
+                <KPIGrid cols={2} className="mt-6">
           <DetailWidgetCard>
             <SetorProducaoSemanalWidget setorId={id} />
           </DetailWidgetCard>
@@ -449,10 +488,7 @@ export default function SetorEspecificoPage({ params }) {
             <SetorTopOperadoresWidget setorId={id} />
           </DetailWidgetCard>
 
-          <DetailWidgetCard>
-            <SetorMotivosParadaWidget setorId={id} />
-          </DetailWidgetCard>
-        </div>
+        </KPIGrid>
 
         <ListingTabs
           className="mt-8"

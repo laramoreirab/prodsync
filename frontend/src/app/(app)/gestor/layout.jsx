@@ -14,7 +14,7 @@ export default function AdminLayout({ children }) {
         <div className="relative z-10 flex h-full w-full">
           <AppSidebar />
           <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden p-4 sm:p-6 lg:p-8">
-            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto scrollbar-hide">{children}</div>
           </main>
         </div>
       </div>

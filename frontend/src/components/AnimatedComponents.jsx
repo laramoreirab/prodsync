@@ -190,17 +190,25 @@ export function PageHeader({
       )}
     >
       <div className="flex flex-col gap-1 min-w-0 flex-1">
-        <h1
-          className={cn(
-            "text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-black",
-            underline &&
-              "underline decoration-secondary-foreground underline-offset-9 decoration-[5px]",
+        {/* Criamos um wrapper 'w-fit' para que a linha tenha exatamente o tamanho do texto */}
+        <div className="relative w-fit pb-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-black">
+            {title}
+          </h1>
+          
+          {underline && (
+            <motion.div
+              className="absolute bottom-0 left-0 h-[5px] w-full bg-secondary-foreground rounded-full"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              style={{ originX: 0 }} // Faz a animação começar estritamente da esquerda para a direita
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }} // Ajuste o delay se quiser sincronizar com o fadeUp
+            />
           )}
-        >
-          {title}
-        </h1>
+        </div>
+
         {subtitle && (
-          <p className="text-base text-muted-foreground font-medium">
+          <p className="text-base text-muted-foreground font-medium mt-1">
             {subtitle}
           </p>
         )}
@@ -212,7 +220,6 @@ export function PageHeader({
     </motion.div>
   );
 }
-
 // ─────────────────────────────────────────────
 // SECTION DIVIDER
 // Linha horizontal com título — padrão das páginas
@@ -302,6 +309,7 @@ export function FadeUpItem({
 }) {
   const usedVariant = VARIANTS[variant] ?? VARIANTS.fadeUp;
   const shouldReduceMotion = useReducedMotion();
+  
 
   return (
     <motion.div
@@ -431,6 +439,22 @@ export function WidgetCard({ children, className, colSpan, centered }) {
       className={cn(
         "group bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90",
         centered && "flex flex-col items-center justify-center",
+        colSpan,
+        className,
+      )}
+    >
+      {children}
+    </FadeUpItem>
+  );
+}
+
+export function WidgetCard2({ children, className, colSpan, centered }) {
+  return (
+    <FadeUpItem
+      className={cn(
+        "group flex flex-col bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90",
+        
+        centered && "items-center justify-center",
         colSpan,
         className,
       )}
