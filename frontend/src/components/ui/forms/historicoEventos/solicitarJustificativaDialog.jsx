@@ -1,36 +1,53 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, BellRing } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { notificacaoService } from "@/services/notificacaoService";
 import ModalSucessNotificacao from "./modalSucessNotificacao";
 
-export function SolicitarJustificativaMenuItem({ idEvento, children, onSucesso }) {
+export function SolicitarJustificativaMenuItem({ idEvento, onSucesso }) {
   const [aberto, setAberto] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState(false);
 
-  const enviar = async () => {
-    if (!idEvento) {
-      toast.error("Evento inválido para solicitar justificativa.");
-      return;
+  useEffect(() => {
+    if (!aberto || sucesso || enviando) return;
+
+    let cancelado = false;
+
+    async function enviar() {
+      if (!idEvento) {
+        toast.error("Evento inválido para solicitar justificativa.");
+        setAberto(false);
+        return;
+      }
+
+      setEnviando(true);
+      try {
+        await notificacaoService.solicitarJustificativa(idEvento);
+        if (!cancelado) {
+          setSucesso(true);
+          onSucesso?.();
+        }
+      } catch (error) {
+        if (!cancelado) {
+          toast.error(error.message || "Erro ao solicitar justificativa.");
+          setAberto(false);
+        }
+      } finally {
+        if (!cancelado) setEnviando(false);
+      }
     }
 
-    setEnviando(true);
-    try {
-      await notificacaoService.solicitarJustificativa(idEvento);
-      setSucesso(true);
-      onSucesso?.();
-    } catch (error) {
-      toast.error(error.message || "Erro ao solicitar justificativa.");
-      setAberto(false);
-    } finally {
-      setEnviando(false);
-    }
-  };
+    enviar();
+
+    return () => {
+      cancelado = true;
+    };
+  }, [aberto, sucesso, enviando, idEvento, onSucesso]);
 
   const handleOpenChange = (open) => {
     setAberto(open);
@@ -38,34 +55,34 @@ export function SolicitarJustificativaMenuItem({ idEvento, children, onSucesso }
       setSucesso(false);
       setEnviando(false);
     }
-    if (open && !sucesso) {
-      enviar();
-    }
   };
 
   return (
-    <Dialog open={aberto} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        {children ?? (
-          <DropdownMenuItem
-            onSelect={(e) => e.preventDefault()}
-            className="cursor-pointer"
-          >
-            Solicitar Justificativa
-          </DropdownMenuItem>
-        )}
-      </DialogTrigger>
-      <DialogContent>
-        {enviando && !sucesso ? (
-          <div className="flex flex-col items-center justify-center gap-3 p-12">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-lg font-medium">Enviando notificação ao operador...</p>
-          </div>
-        ) : sucesso ? (
-          <ModalSucessNotificacao />
-        ) : null}
-      </DialogContent>
-    </Dialog>
+    <>
+      <DropdownMenuItem
+        onSelect={(e) => {
+          e.preventDefault();
+          setAberto(true);
+        }}
+        className="cursor-pointer"
+      >
+        <BellRing className="mr-2 h-4 w-4" />
+        Solicitar Justificativa
+      </DropdownMenuItem>
+
+      <Dialog open={aberto} onOpenChange={handleOpenChange}>
+        <DialogContent>
+          {enviando && !sucesso ? (
+            <div className="flex flex-col items-center justify-center gap-3 p-12">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              <p className="text-lg font-medium">Enviando notificação ao operador...</p>
+            </div>
+          ) : sucesso ? (
+            <ModalSucessNotificacao />
+          ) : null}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -80,6 +97,7 @@ export function SolicitarJustificativaConteudo({ idsEventos, onSucesso }) {
       const ids = (idsEventos ?? []).filter(Boolean);
       if (ids.length === 0) {
         toast.error("Selecione ao menos um evento.");
+        setEnviando(false);
         return;
       }
 

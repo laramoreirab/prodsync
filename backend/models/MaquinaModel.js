@@ -874,6 +874,19 @@ class MaquinaModel {
         return Array.from(secoes.values()).filter(secao => secao.maquinas.length > 0);
     }
 
+        static async cadastrarLote(dados){
+            try {
+                const resultado = await prisma.maquinas.createMany({
+                    data: dados,
+                    skipDuplicates: true, 
+                });
+                return resultado.count
+            } catch (error) {
+                console.error('Erro cadastrar lote csv de máquinas no banco de dados', error);
+                throw error;
+            }
+        }
+
     // -------------------------------------dashboard--------------------------------------------------
     static async taxaCumprimentoMetaPorSetor(id_empresa, setorId = null) {
         try {

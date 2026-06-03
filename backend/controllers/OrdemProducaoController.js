@@ -346,6 +346,53 @@ class OrdemProducaoController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
         }
     }
+
+    static async cadastroLote(req, res) {
+        try {
+            function converterDataHora(dataBR, horaStr) {
+                if (!dataBR) return null;
+                const [dia, mes, ano] = dataBR.split('/');
+                const [horas, minutos] = horaStr ? horaStr.split(':') : ['00', '00'];
+                return new Date(ano, Number(mes) - 1, dia, horas, minutos);
+            }
+            if (!req.file) {
+                return res.status(400).json({ sucesso: false, erro: 'Arquivo CSV não encontrado.' });
+            }
+
+            const fileText = req.file.buffer.toString('utf-8');
+
+            const parsedData = Papa.parse(fileText, {
+                header: true,
+                skipEmptyLines: true,
+            });
+
+            const ordensCsv = parsedData.data;
+
+            const dadosParaSalvar = ordensCsv.map((linha) => ({
+                id_empresa: Number(linha.id_empresa),
+                codigo_lote: linha.codigo_lote,
+                prioridade: linha.prioridade,
+                id_setor: Number(linha.id_setor),
+                id_maquina: Number(linha.id_maquina),
+                qtd_planejada: Number(linha.quantidade),
+                produto: linha.produto,
+                data_inicio: converterDataHora(linha.data_inicio, linha.hora_inicio),
+                data_fim: converterDataHora(linha.data_fim, linha.hora_fim),
+                observacao_op: linha.observacao_op ?? '',
+                status_op: linha.status_op
+            }));
+
+            const resultado = await OrdemProducaoModel.cadastrarLote(dadosParaSalvar)
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: `${resultado} Ordens de Produção criadas com sucesso!`
+            });
+        } catch (error) {
+            console.error('Erro ao cadastrar lote de ordens de produção:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno ao processar o arquivo CSV' });
+        }
+    }
 }
 
 export default OrdemProducaoController
