@@ -28,13 +28,14 @@ export default function LeftCards() {
         />
 
         {/* Player Lottie */}
-        <div className="relative z-20 w-full h-full flex items-center justify-center">
+        {/* <div className="relative z-20 w-full h-full">
           <iframe
             src="/animations/prodsync.html"
-            className="border-0 w-full max-w-[580px] h-[380px]"
+            className="w-full h-full border-0"
           />
-        </div>
-        {/* <div className="relative z-20 w-full h-full flex items-center justify-center">
+        </div> */}
+
+        <div className="relative z-20 w-full h-full flex items-center justify-center">
             <Player
               autoplay
               loop={false}
@@ -46,7 +47,7 @@ export default function LeftCards() {
               }}
               keepLastFrame
             />
-        </div> */}
+        </div>
 
         {/* Gradiente */}
         <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
