@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { RefreshCw } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -36,7 +36,7 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
         if (!ativo) return;
 
         if (resp?.status === "Concluida") {
-          setCodigo(resp?.pairing_code ?? null);
+          setCodigo((atual) => resp?.pairing_code ?? atual);
           setExpiraEm(resp?.expires_at ?? null);
           setPlacaUid(resp?.board_uid ?? null);
           setStatusSync(resp?.status ?? null);
@@ -125,7 +125,7 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       <DialogContent>
         <div className="flex flex-col gap-4">
           <div className="text-xl font-semibold text-blue-900">
-            {emProgresso ? "Sincronização em progresso" : "Sincronizar placa"}
+            {statusSync === "Concluida" ? "Placa conectada" : emProgresso ? "Sincronização em progresso" : "Sincronizar placa"}
           </div>
 
           <div className="text-sm text-gray-700">
@@ -146,7 +146,15 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
             >
               {loading ? "Iniciando..." : parando ? "Parando..." : emProgresso ? "Parar sincronização" : "Iniciar sincronização"}
             </Button>
-            {codigo ? (
+            {statusSync === "Concluida" && placaUid ? (
+              <div className="flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-900">
+                <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+                <div className="flex flex-col">
+                  <div className="text-sm font-semibold">Placa conectada com sucesso</div>
+                  <div className="text-xs text-emerald-800">UID: {placaUid}</div>
+                </div>
+              </div>
+            ) : codigo ? (
               <div className="flex flex-col">
                 <div className="text-sm text-gray-600">
                   {statusSync === "Concluida" ? "✓ Placa sincronizada" : "Aguardando placa"}

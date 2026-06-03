@@ -15,7 +15,7 @@ function publicarControlePlaca(board_uid, payload) {
   const topico = topicoControlePlaca(board_uid);
   const mensagem = JSON.stringify(payload);
 
-  clienteMQTT.publish(topico, mensagem, (err) => {
+  clienteMQTT.publish(topico, mensagem, { qos: 1 }, (err) => {
     if (err) {
       console.error(`[MQTT CONTROLE] Falha ao publicar em ${topico}:`, err);
       return;
