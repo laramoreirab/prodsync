@@ -67,7 +67,7 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
                         type="text"
                         value={descricao}
                         onChange={(e) => setDescricao(e.target.value)}
-                        className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white focus:ring-2 focus:ring-blue-500"
+                        className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
                     />
                 </div>
 

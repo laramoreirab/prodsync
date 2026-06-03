@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EyeIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard } from "@/components/AnimatedComponents";
-import SearchBar from "@/components/ui/searchBar";
 import { FilterRow } from "@/components/AnimatedComponents";
 import { EmptyState } from "@/components/AnimatedComponents";
+import { SearchBar } from "@/components/AnimatedComponents";
 
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
@@ -78,7 +78,7 @@ function normalizarMaquina(maquina) {
 export default function MaquinasGestor() {
   const { setorId, setorNome } = usePerfil();
   const { maquinas, loading, refresh, excluirMaquina } = useMaquinas();
-  
+
   // Estados declarativos apenas para os critérios
   const [busca, setBusca] = useState("");
   const [maquinaParaExcluir, setMaquinaParaExcluir] = useState(null);
@@ -99,15 +99,15 @@ export default function MaquinasGestor() {
     // Aplica a busca por texto
     if (busca) {
       const termo = busca.toLowerCase();
-      resultado = resultado.filter((maquina) => 
-        maquina.nome?.toLowerCase().includes(termo) || 
+      resultado = resultado.filter((maquina) =>
+        maquina.nome?.toLowerCase().includes(termo) ||
         String(maquina.id_maquina).includes(termo)
       );
     }
 
     // Aplica o filtro de status
     if (filtrosAtivos.status?.length > 0) {
-      resultado = resultado.filter((maquina) => 
+      resultado = resultado.filter((maquina) =>
         filtrosAtivos.status.includes(maquina.status)
       );
     }
@@ -144,16 +144,16 @@ export default function MaquinasGestor() {
           </DialogTrigger>
 
           <DialogContent>
-             <FormCadastroMaquina onCadastroSucesso={refresh} />
+            <FormCadastroMaquina onCadastroSucesso={refresh} />
           </DialogContent>
         </Dialog>
       } />
-      
+
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
         <WidgetCard><MaquinaStatusDonutWidget setorId={setorId} /></WidgetCard>
-        <WidgetCard><MaquinasPorSetorWidget setorId={setorId}/></WidgetCard>
-        <WidgetCard><TempoMedioParadaWidget setorId={setorId}/></WidgetCard>
+        <WidgetCard><MaquinasPorSetorWidget setorId={setorId} /></WidgetCard>
+        <WidgetCard><TempoMedioParadaWidget setorId={setorId} /></WidgetCard>
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
@@ -170,7 +170,6 @@ export default function MaquinasGestor() {
       {/* LISTAGEM MAQUINAS */}
       <SectionDivider title="Inventário de Máquinas" className="mt-8" />
 
-      {/* Busca */}
       <SearchBar
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
@@ -182,15 +181,15 @@ export default function MaquinasGestor() {
         label="máquinas"
         actions={
           <>
-            <OrdenarDropdown 
-              label="Ordenar por" 
-              options={opcoesOrdenacao} 
-              onSortChange={setOrdenacao} 
+            <OrdenarDropdown
+              label="Ordenar por"
+              options={opcoesOrdenacao}
+              onSortChange={setOrdenacao}
             />
             {/* CORREÇÃO DO ERRO AQUI: Passando maquinasFilter no lugar da função */}
-            <FilterDropdown 
-              filtersConfig={maquinasFilter} 
-              onApply={setFiltrosAtivos} 
+            <FilterDropdown
+              filtersConfig={maquinasFilter}
+              onApply={setFiltrosAtivos}
             />
           </>
         }
@@ -200,7 +199,7 @@ export default function MaquinasGestor() {
       <FadeUpItem className="mt-4">
         {dadosExibidos.length > 0 ? (
           <TableListagens
-            data={dadosExibidos} 
+            data={dadosExibidos}
             columns={colunasMaquinas}
             acoesDropdown={(maquina) => (
               <>

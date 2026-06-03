@@ -596,7 +596,7 @@ export function EmptyState({
 /**
  * @param {string} message — texto abaixo do spinner
  */
-export function LoadingState({ message = "Carregando...", className }) {
+export function LoadingState({ message = "Sincroninzando...", className }) {
   return (
     <div
       className={cn(

@@ -28,12 +28,12 @@ const data = {
       icon: <PieChartIcon />,
     },
     {
-      title: "Maquinas",
+      title: "Máquinas",
       url: "/adm/maquinas",
       icon: <Wrench />,
     },
     {
-      title: "Usuarios",
+      title: "Usuários",
       url: "/adm/usuarios",
       icon: <Users />,
     },
@@ -43,12 +43,12 @@ const data = {
       icon: <Folders />,
     },
     {
-      title: "Historico de Eventos",
+      title: "Histórico de Eventos",
       url: "/adm/historicoEventos",
       icon: <Calendar />,
     },
     {
-      title: "Ordem de Producao",
+      title: "Ordem de Produção",
       url: "/adm/ordensDeProducao",
       icon: <ListBulletsIcon />,
     },
@@ -98,7 +98,7 @@ export function AppSidebar({
               className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg px-2 text-left text-[#ffffff] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
             >
               <BellRing className="size-4 shrink-0" />
-              <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificacoes</span>
+              <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificações</span>
             </div>
           }
         />

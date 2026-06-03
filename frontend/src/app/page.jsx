@@ -6,9 +6,9 @@ import Header from "@/components/ui/headerHome";
 import Footer from "@/components/shadcn-space/blocks/footer/footer";
 import Faq from "@/components/shadcn-space/blocks/faq/faq";
 import HomeAuthRedirect from "@/components/auth/HomeAuthRedirect";
+import { HomeMeshBackground } from "@/components/landing/HomeMeshBackground";
 
 export default function Home() {
-
   const navigationData = [
     {
       title: "Home",
@@ -22,18 +22,25 @@ export default function Home() {
     {
       title: "Serviços",
       href: "#servicos",
-    },    
+    },
     {
       title: "FAQs",
       href: "#faqs",
-    }
+    },
   ];
 
   return (
     <>
-    <HomeAuthRedirect />
-    <Header navigationData={navigationData} />
-      <AgencyHeroSection />
+      <HomeAuthRedirect />
+
+      <div className="home-plexus-region relative min-h-[100svh] bg-white">
+        <HomeMeshBackground />
+        <div className="relative z-10">
+          <Header navigationData={navigationData} />
+          <AgencyHeroSection />
+        </div>
+      </div>
+
       <AboutAndStats01 />
       <Pricing />
       <Testimonial01 />
