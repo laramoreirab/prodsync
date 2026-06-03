@@ -1,6 +1,6 @@
 export const qtdUsuariosPerfilConfig = {
   gestores: { label: "Gestores:", color: "var(--chart1)" },
-  operadores: { label: "Operadores:", color: "var(--chart2)" },
+  operadores: { label: "Operadores:", color: "#212e4b" },
 };
 
 export const qtdUsuariosSetorConfig = {
@@ -8,11 +8,11 @@ export const qtdUsuariosSetorConfig = {
 };
 
 export const topOperadoresConfig = {
-  media: { label: "Peças Produzidas:", color: "var(--chart4)" },
+  media: { label: "Peças Produzidas:", color: "var(--chart-primary)" },
 };
 
 export const tempoSessaoConfig = {
-  horas: { label: "Tempo (h):", color: "var(--chart4)" },
+  horas: { label: "Tempo (h):", color: "var(--chart-primary)" },
 };
 
 export const rotatividadeConfig = {
@@ -25,19 +25,19 @@ export const cumprimentoMetaConfig = {
 };
 
 export const producaoMediaConfig = {
-  media: { label: "Peças/dia:", color: "var(--chart3)" },
+  media: { label: "Peças/dia:", color: "var(--chart-primary)" },
 };
 
 export const turnosOperadoresConfig = {
-  Manhã: { label: "Manhã", color: "var(--chart1)" },
-  Tarde: { label: "Tarde", color: "var(--chart2)" },
-  Noite: { label: "Noite", color: "var(--chart4)" },
+  Manhã: { label: "Manhã", color: "var(--chart-primary)" },
+  Tarde: { label: "Tarde", color: "var(--chart-secondary)" },
+  Noite: { label: "Noite", color: "var(--chart-accent)" },
 };
 
 export const taxaRefugoUsuarioConfig = {
-  taxa: { label: "Taxa de Refugo:", color: "var(--chart4)" },
+  taxa: { label: "Taxa de Refugo:", color: "var(--chart-vivid)" },
 };
 
 export const producaoMediaUsuarioConfig = {
-  media: { label: "Peças por operador:", color: "var(--chart2)" },
+  media: { label: "Peças por operador:", color: "var(--chart-primary)" },
 };

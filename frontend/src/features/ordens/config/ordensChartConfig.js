@@ -8,30 +8,30 @@ export const opTopRefugoConfig = {
 export const opCargaSetorConfig = {
   carga: {
     label: "OPs:",
-    color: "var(--chart2)",
+    color: "var(--chart1)",
   },
 };
 
 export const opStatusConfig = {
   "Em Produção": {
     label: "Em Produção",
-    color: "#22c55e",
+    color: "var(--chart1)",
   },
   "Pausadas (Setup)": {
     label: "Pausadas (Setup)",
-    color: "#f59e0b",
+    color: "var(--chart4)",
   },
   "Pausadas": {
     label: "Pausadas",
-    color: "#e11d48",
+    color: "var(--chart2)",
   },
   "Aguardando Início": {
     label: "Aguardando Início",
-    color: "#64748b",
+    color: "var(--chart3)",
   },
   "Concluída": {
     label: "Concluída",
-    color: "#0284c7",
+    color: "var(--chart1)",
   },
 };
 
