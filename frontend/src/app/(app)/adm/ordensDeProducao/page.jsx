@@ -45,7 +45,8 @@ import {
   EmptyState,
   LoadingState,
   FadeUpItem,
-  AsymmetricGrid
+  AsymmetricGrid, 
+  KPICardDecorated,
 } from "@/components/AnimatedComponents";
 
 
@@ -313,21 +314,21 @@ export default function OrdensDeProducao() {
 
       <KPIGrid cols={4} className="mt-4">
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPAtivasKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPAtrasadasKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPPecasBoasKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
-        <WidgetCard>
+        <KPICardDecorated>
           <OPRefugoKPIWidget />
-        </WidgetCard>
+        </KPICardDecorated>
 
 
       </KPIGrid>

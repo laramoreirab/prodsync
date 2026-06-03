@@ -401,7 +401,7 @@ export default function UsuarioDetalhePage({ params }) {
                   { label: "Série", value: usuario.maquina.serie || "-" },
                 ]}
                 fieldsRight={[
-                  { label: "Status", value: usuario.maquina.status_atual || "-" },
+                  // { label: "Status", value: usuario.maquina.status_atual || "-" },
                 ]}
                 status={usuario.maquina.status_atual}
                 className="h-full"

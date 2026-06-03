@@ -86,10 +86,6 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   }, [table.getPageCount(), table.getState().pagination.pageIndex]);
 
   const currentPage = table.getState().pagination.pageIndex + 1;
-  const pageSize = table.getState().pagination.pageSize;
-  const totalItems = data.length;
-  const rangeStart = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const rangeEnd = Math.min(currentPage * pageSize, totalItems);
   const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
@@ -315,8 +311,8 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         <p
           className='text-[11px] sm:text-xs text-slate-500 font-medium dark:text-[#aebbd1]'
           aria-live='polite'>
-          Mostrando <span className='text-slate-700 dark:text-[#f4f8ff]'>{rangeStart}</span>-<span className='text-slate-700 dark:text-[#f4f8ff]'>{rangeEnd}</span> de{" "}
-          <span className='text-slate-700 dark:text-[#f4f8ff]'>{totalItems}</span>
+          Página <span className='text-slate-700 dark:text-[#f4f8ff]'>{currentPage}</span> de{" "}
+          <span className='text-slate-700 dark:text-[#f4f8ff]'>{table.getPageCount()}</span>
         </p>
       </div>
 
