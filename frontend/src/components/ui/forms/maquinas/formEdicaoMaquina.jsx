@@ -220,55 +220,55 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
 
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4 mt-6">
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Nome</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Nome</label>
                         <input
                             id="nome"
                             type="text"
                             value={nome}
                             onChange={(e) => setNome(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none"
+                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
                         />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">ID</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">ID</label>
                         <input
                             disabled
                             id="idMaquina"
                             type="number"
                             value={maquinaId}
-                            className="bg-gray-100 cursor-not-allowed border rounded-md p-2.5 outline-none"
+                            className="bg-gray-100 cursor-not-allowed border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
                         />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Número de Série</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Número de Série</label>
                         <input
                             id="serie"
                             type="text"
                             value={serie}
                             onChange={(e) => setSerie(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none"
+                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
                         />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Data de Aquisição</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Data de Aquisição</label>
                         <input
                             disabled
                             id="dataAquisicao"
                             type="date"
                             value={maquinaCompleta?.data_aquisicao ? maquinaCompleta.data_aquisicao.split('T')[0] : ''}
-                            className="border rounded-md p-2.5 outline-none bg-gray-100 cursor-not-allowed opacity-70"
+                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-gray-100 cursor-not-allowed opacity-70"
                         />
                     </div>
 
                     {/* campos pendentes pro backend adicionar */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Setor</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Setor</label>
                         <select
                                 id="id_setor"
-                                className="border rounded-md p-2.5 outline-none bg-white"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
                                 value={idSetor}
                                 onChange={(e) => {setIdSetor(e.target.value);  setOperador('');}}
                             >
@@ -286,35 +286,35 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Tipo de Máquina</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Tipo de Máquina</label>
                         <input
                             id="categoria"
                             type="text"
                             value={categoria}
                             onChange={(e) => setCategoria(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none bg-white"
+                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
                         >
                         </input>
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Capacidade Normal</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Capacidade Normal</label>
                         <input
                             id="capacidade"
                             type="text"
                             value={capacidade}
                             onChange={(e) => setCapacidade(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none"
+                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
                         />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-md text-cinza-escuro">Status de Máquina</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Status de Máquina</label>
                         <select
                             id="status"
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
-                            className="border rounded-md p-2.5 outline-none bg-white"
+                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
                         >
                             <option value="">Selecione...</option>
                             <option value="Produzindo">Produzindo</option>
@@ -327,7 +327,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                         <label className="text-md text-cinza-escuro">Operador</label>
                         <select
                                 id="operador"
-                                className="border rounded-md p-2.5 outline-none bg-white"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
                                 value={operador}
                                 onChange={(e) => setOperador(e.target.value)}
                                  disabled={!idSetor}

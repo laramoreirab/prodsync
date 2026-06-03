@@ -206,7 +206,7 @@ export function PageHeader({
         )}
       </div>
 
-      <div className="flex items-center gap-3 flex-shrink-0 pt-1 w-full sm:w-auto">
+      <div className="flex items-center gap-3 shrink-0 pt-1 w-full sm:w-auto">
         {action}
       </div>
     </motion.div>
@@ -239,10 +239,10 @@ export function SectionDivider({ title, action, className }) {
         <h2 className="text-3xl mb-6 sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap">
           {title}
         </h2>
-        <hr className="hidden sm:block bg-black flex-1 h-[3px] rounded-full" />
+        <hr className="hidden sm:block bg-black flex-1 h-0.75 rounded-full" />
       </div>
 
-      {action && <div className="flex-shrink-0 w-full sm:w-auto">{action}</div>}
+      {action && <div className="shrink-0 w-full sm:w-auto">{action}</div>}
     </motion.div>
   );
 }
@@ -302,6 +302,7 @@ export function FadeUpItem({
 }) {
   const usedVariant = VARIANTS[variant] ?? VARIANTS.fadeUp;
   const shouldReduceMotion = useReducedMotion();
+  
 
   return (
     <motion.div
@@ -460,13 +461,13 @@ export function SearchBar({
   return (
     <FadeUpItem
       className={cn(
-        "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 focus-within:border-[#00357a]/40 focus-within:ring-2 focus-within:ring-[#00357a]/15",
+        "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
         className,
       )}
     >
       <input
         type="search"
-        className="p-2.5 w-full outline-none bg-transparent font-medium text-sm rounded-lg placeholder:text-gray-400"
+        className="p-2.5 w-full outline-none bg-transparent font-medium text-md rounded-lg placeholder:text-gray-400"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -617,7 +618,7 @@ export function KPICardDecorated({ children, className, colSpan }) {
   return (
     <FadeUpItem
       className={cn(
-        "bg-white/95 border border-gray-200/80 border-l-4 border-l-[#00357a] rounded-2xl p-4 sm:p-5 shadow-sm min-h-[92px] flex items-center justify-between transition-all duration-300 hover:shadow-md",
+        "bg-white/95 border border-gray-200/80 border-l-4 border-l-[#00357a] rounded-2xl p-4 sm:p-5 shadow-sm min-h-23 flex items-center justify-between transition-all duration-300 hover:shadow-md",
         colSpan,
         className,
       )}

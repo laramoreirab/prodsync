@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 import Link from "next/link";
 import { ChevronDown, Loader2 } from "lucide-react";
+import { AnimatedTitle, FadeUpItem } from "@/components/AnimatedComponents";
 
 export default function GestorDetalhePage({ params }) {
   const { id } = use(params);
@@ -52,7 +53,7 @@ export default function GestorDetalhePage({ params }) {
           <p className="text-xl font-semibold text-gray-800">Voltar para Usuários</p>
         </Link>
 
-        <section className="flex flex-col gap-2">
+        <FadeUpItem className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold text-black">{gestor?.nome || `Gestor #${gestorId}`}</h1>
           <div className="flex flex-wrap gap-8 text-lg text-black">
             <p><span className="font-semibold">ID:</span> {gestor?.id_usuario || gestorId}</p>
@@ -64,9 +65,11 @@ export default function GestorDetalhePage({ params }) {
               Ver setor gerenciado
             </Link>
           )}
-        </section>
+        </FadeUpItem>
 
-        <h1 className="font-bold text-3xl mt-4">Indicadores do setor</h1>
+        <AnimatedTitle className="font-bold text-3xl mt-4">
+          Indicadores do setor
+        </AnimatedTitle>
 
         <section className="bg-white border-2 rounded-2xl p-4 shadow-sm">
           <OEEOperadorWidget operadorId={gestorId} />
