@@ -398,8 +398,8 @@ class UsuarioModel {
 
     static async cadastrarLote(dados){
         try {
-            const resultado = await prisma.usuario.createMany({
-                data: dadosParaSalvar,
+            const resultado = await prisma.usuarios.createMany({
+                data: dados,
                 skipDuplicates: true, // Impede que a query quebre caso um CPF já exista
             });
             return resultado.count

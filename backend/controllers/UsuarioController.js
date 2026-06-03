@@ -641,12 +641,15 @@ static async atualizarUsuario(req, res) {
             const usuariosCsv = parsedData.data;
 
             const dadosParaSalvar = usuariosCsv.map((linha) => ({
+                id_empresa: Number(linha.id_empresa),
                 nome: linha.nome,
                 cpf: String(linha.cpf).replace(/\D/g, ""),
                 email: linha.email,
-                id_setor: Number(linha.id_setor),
+                tipo: linha.tipo,
+                senha: '',
+                id_setor: linha.id_setor ? Number(linha.id_setor) : null,
                 funcao: linha.funcao,
-                id_turno: Number(linha.id_turno),
+                id_turno: linha.id_turno ? Number(linha.id_turno) : null,
                 id_maquina: linha.id_maquina ? Number(linha.id_maquina) : null,
             }));
 
