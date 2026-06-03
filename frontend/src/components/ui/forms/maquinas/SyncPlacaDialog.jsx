@@ -10,6 +10,7 @@ import { maquinaSyncService } from "@/services/maquinaSyncService";
 
 export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
   const [loading, setLoading] = useState(false);
+  const [parando, setParando] = useState(false);
   const [codigo, setCodigo] = useState(null);
   const [expiraEm, setExpiraEm] = useState(null);
   const [placaUid, setPlacaUid] = useState(null);
@@ -22,6 +23,8 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
     return dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   }, [expiraEm]);
 
+  const emProgresso = statusSync && statusSync !== "Concluida";
+
   async function iniciar() {
     try {
       setLoading(true);
@@ -32,11 +35,27 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       setStatusSync(resp?.status ?? null);
       toast.success(resp?.status === "Concluida"
         ? "Placa sincronizada com sucesso."
-        : "Sessao de sincronizacao iniciada.");
+        : "Sessao de sincronizacao iniciada. Pressione o botão Setup da placa por 3 segundos.");
     } catch (e) {
       toast.error(e?.message || "Nao foi possivel iniciar a sincronizacao.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function parar() {
+    try {
+      setParando(true);
+      await maquinaSyncService.pararSincronizacaoPlaca(maquinaId);
+      setCodigo(null);
+      setExpiraEm(null);
+      setPlacaUid(null);
+      setStatusSync(null);
+      toast.success("Sincronização cancelada.");
+    } catch (e) {
+      toast.error(e?.message || "Nao foi possivel cancelar a sincronizacao.");
+    } finally {
+      setParando(false);
     }
   }
 
@@ -49,6 +68,7 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
           setPlacaUid(null);
           setStatusSync(null);
           setLoading(false);
+          setParando(false);
         }
       }}
     >
@@ -57,29 +77,36 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       </DialogTrigger>
       <DialogContent>
         <div className="flex flex-col gap-4">
-          <div className="text-xl font-semibold text-blue-900">Sincronizar placa</div>
+          <div className="text-xl font-semibold text-blue-900">
+            {emProgresso ? "Sincronização em progresso" : "Sincronizar placa"}
+          </div>
 
           <div className="text-sm text-gray-700">
             <div className="font-semibold mb-2">Como fazer</div>
             <ol className="list-decimal pl-5 space-y-1">
               <li>Pressione o botao <span className="font-semibold">Setup</span> da placa por 3 segundos.</li>
-              <li>Clique em <span className="font-semibold">Iniciar sincronizacao</span> nesta maquina.</li>
+              <li>Clique em <span className="font-semibold">Iniciar sincronização</span> nesta maquina.</li>
               <li>As duas etapas podem ser feitas em qualquer ordem dentro de poucos minutos.</li>
             </ol>
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="default" disabled={loading} onClick={iniciar}>
-              {loading ? "Iniciando..." : "Iniciar sincronizacao"}
+            <Button 
+              variant={emProgresso ? "destructive" : "default"}
+              disabled={loading || parando} 
+              onClick={emProgresso ? parar : iniciar}
+              className="gap-2"
+            >
+              {loading ? "Iniciando..." : parando ? "Parando..." : emProgresso ? "Parar sincronização" : "Iniciar sincronização"}
             </Button>
             {codigo ? (
               <div className="flex flex-col">
                 <div className="text-sm text-gray-600">
-                  {statusSync === "Concluida" ? "Placa sincronizada" : "Sessao aguardando placa"}
+                  {statusSync === "Concluida" ? "✓ Placa sincronizada" : "Aguardando placa"}
                 </div>
                 <div className="text-2xl font-bold tracking-widest text-blue-900">{placaUid ?? codigo}</div>
                 {expiraLabel ? (
-                  <div className="text-xs text-gray-500">Expira as {expiraLabel}</div>
+                  <div className="text-xs text-gray-500">Expira às {expiraLabel}</div>
                 ) : null}
               </div>
             ) : null}
@@ -89,3 +116,4 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
     </Dialog>
   );
 }
+

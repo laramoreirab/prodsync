@@ -44,6 +44,7 @@ import {
 import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEvento";
 import FormCadastroEvento from "@/components/ui/forms/historicoEventos/formCadastroEvento";
 import FormEdicaoEvento from "@/components/ui/forms/historicoEventos/formEdicaoEvento";
+import FormCriarMotivo from "@/components/ui/forms/historicoEventos/formCriarMotivo";
 import { SolicitarJustificativaMenuItem, SolicitarJustificativaConteudo } from "@/components/ui/forms/historicoEventos/solicitarJustificativaDialog";
 
 import {
@@ -123,6 +124,7 @@ export default function HistoricoEventos() {
   const [dados, setDados] = useState([]);
   const [busca, setBusca] = useState("");
   const [selecionados, setSelecionados] = useState([]);
+  const [isModalCriarMotivoAberto, setIsModalCriarMotivoAberto] = useState(false);
 
   useEffect(() => {
     setDados(eventos);
@@ -218,19 +220,34 @@ export default function HistoricoEventos() {
   return (
     <PageLayout>
 
-      {/* Título + botão */}
+      {/* Título + botões */}
       <PageHeader
         title="Histórico de Eventos"
         action={
-          <Dialog>
-            <DialogTrigger className="bg-secondary-foreground py-1.5 px-5 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-              <Plus className="mr-2" />
-              Registrar Evento
-            </DialogTrigger>
-            <DialogContent>
-              <FormCadastroEvento onCadastroSucesso={refresh} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <Dialog>
+              <DialogTrigger className="bg-secondary-foreground py-1.5 px-5 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer hover:bg-opacity-90 transition-all">
+                <Plus className="mr-2" />
+                Registrar Evento
+              </DialogTrigger>
+              <DialogContent>
+                <FormCadastroEvento onCadastroSucesso={refresh} />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isModalCriarMotivoAberto} onOpenChange={setIsModalCriarMotivoAberto}>
+              <DialogTrigger className="bg-secondary-foreground py-1.5 px-5 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer hover:bg-opacity-90 transition-all">
+                <Plus className="mr-2" />
+                Criar Motivo
+              </DialogTrigger>
+              <DialogContent>
+                <FormCriarMotivo onCriadoSucesso={() => {
+                  refresh();
+                  setIsModalCriarMotivoAberto(false);
+                }} />
+              </DialogContent>
+            </Dialog>
+          </div>
         }
       />
 

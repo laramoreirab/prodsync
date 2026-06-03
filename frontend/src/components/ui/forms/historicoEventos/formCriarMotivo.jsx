@@ -3,8 +3,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-
-const ID_EMPRESA = 1; //vai precisar mudar, nn sei como vamos receber o id
+import { apiFetch } from "@/lib/api";
 
 export default function FormCriarMotivo({ onCriadoSucesso }) {
     const [descricao, setDescricao] = useState("");
@@ -23,15 +22,10 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(`/api/motivos-parada/${ID_EMPRESA}`, { //vai precisar colocar o endpoint real
+            await apiFetch(`/api/eventos/motivos-parada`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ descricao: descricao.trim(), tipo }),
             });
-
-            if (!response.ok){
-                throw new Error("Erro ao criar motivo");
-            } 
 
             toast.success("Motivo criado com sucesso!");
             setDescricao("");
@@ -42,7 +36,7 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
             }
             
         } catch (error) {
-            toast.error("Erro ao conectar com o servidor.");
+            toast.error(error.message || "Erro ao conectar com o servidor.");
         } finally {
             setIsSubmitting(false);
         }
