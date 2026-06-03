@@ -1,11 +1,13 @@
 import prisma from '../config/prisma.js';
 import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 import OEEModel from './OEEModel.js';
+import { EventEmitter } from 'events';
 
 class MaquinaModel {
     static TEMPO_EXPIRACAO_PAREAMENTO_MS = 3 * 60 * 1000;
     static _sessoesPareamentoPlaca = new Map();
     static _placasAguardandoPareamento = new Map();
+    static eventosPlaca = new EventEmitter();
 
     static gerarCodigoPareamento() {
         // 6 dígitos, fácil de digitar em displays/serial
@@ -90,7 +92,7 @@ class MaquinaModel {
         this._sessoesPareamentoPlaca.delete(`${chaveEmpresa}:${sessao.id_maquina}`);
         this._placasAguardandoPareamento.delete(chaveEmpresa);
 
-        return {
+        const resultado = {
             id_empresa: sessao.id_empresa,
             id_maquina: sessao.id_maquina,
             board_uid: boardUid,
@@ -101,6 +103,10 @@ class MaquinaModel {
             completed_at: agora.toISOString(),
             maquina
         };
+
+        this.eventosPlaca.emit('pareamentoConcluido', resultado);
+
+        return resultado;
     }
 
     static async criarSessaoSincronizacaoPlaca({ id_empresa, id_maquina, id_usuario }) {
@@ -191,6 +197,59 @@ class MaquinaModel {
             status: 'AguardandoSessao',
             paired: false,
             expires_at: expires_at.toISOString()
+        };
+    }
+
+    static async obterStatusSincronizacaoPlaca({ id_empresa, id_maquina }) {
+        const empresaId = Number(id_empresa);
+        const maquinaId = Number(id_maquina);
+
+        const maquina = await prisma.maquinas.findFirst({
+            where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
+            select: {
+                id_maquina: true,
+                board_uid: true,
+                board_sincronizado_em: true
+            }
+        });
+        if (!maquina) {
+            throw new Error('Máquina não encontrada');
+        }
+
+        await this.expirarSessoesSincronizacaoPlaca(empresaId);
+
+        const chaveEmpresa = this.criarChaveEmpresa(empresaId);
+        const sessao = this._sessoesPareamentoPlaca.get(`${chaveEmpresa}:${maquinaId}`);
+        if (sessao) {
+            return {
+                id_maquina: maquinaId,
+                pairing_code: sessao.pairing_code,
+                board_uid: null,
+                status: 'Pendente',
+                paired: false,
+                completed_at: null,
+                expires_at: sessao.expires_at.toISOString()
+            };
+        }
+
+        if (maquina.board_uid) {
+            return {
+                id_maquina: maquinaId,
+                board_uid: maquina.board_uid,
+                status: 'Concluida',
+                paired: true,
+                completed_at: maquina.board_sincronizado_em?.toISOString?.() ?? null,
+                expires_at: null
+            };
+        }
+
+        return {
+            id_maquina: maquinaId,
+            board_uid: null,
+            status: 'SemSessao',
+            paired: false,
+            completed_at: null,
+            expires_at: null
         };
     }
 
@@ -1534,12 +1593,24 @@ static async producaoMaquinasSetor(id_setor, id_empresa) {
 
     const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
     const chaveSessiono = `${chaveEmpresa}:${Number(id_maquina)}`;
+    const placaAguardando = this._placasAguardandoPareamento.get(chaveEmpresa) ?? null;
     
     // Remove a sessão de pareamento
     this._sessoesPareamentoPlaca.delete(chaveSessiono);
     this._placasAguardandoPareamento.delete(chaveEmpresa);
 
-    return { mensagem: 'Sincronização cancelada com sucesso' };
+    if (placaAguardando?.board_uid) {
+      this.eventosPlaca.emit('pareamentoCancelado', {
+        id_empresa: Number(id_empresa),
+        id_maquina: Number(id_maquina),
+        board_uid: placaAguardando.board_uid
+      });
+    }
+
+    return {
+      mensagem: 'Sincronização cancelada com sucesso',
+      board_uid: placaAguardando?.board_uid ?? null
+    };
   }
 
 }

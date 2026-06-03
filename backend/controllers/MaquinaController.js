@@ -68,6 +68,33 @@ class MaquinaController {
         }
     }
 
+    // GET /maquinas/:id/sincronizacao-placa - Consulta sessão de pareamento da placa
+    static async obterStatusSincronizacaoPlaca(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            const status = await MaquinaModel.obterStatusSincronizacaoPlaca({
+                id_empresa,
+                id_maquina
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: status
+            });
+        } catch (error) {
+            console.error('Erro ao consultar sincronização da placa:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível consultar a sincronização da placa'
+            });
+        }
+    }
+
     // GET /maquinas/:id - Buscar máquina por ID
     static async buscarMaquinaPorId(req, res) {
         try {
