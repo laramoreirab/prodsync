@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useMemo, useState } from "react"
 import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main"
 import {
   Sidebar,
@@ -17,6 +18,8 @@ import {
   Wrench,
 } from "lucide-react"
 import { ListBulletsIcon } from "@phosphor-icons/react"
+import { apiFetch } from "@/lib/api"
+import { getUserFromToken } from "@/lib/auth"
 
 const data = {
   navMain: [
@@ -51,6 +54,46 @@ const data = {
 export function AppSidebar({
   ...props
 }) {
+  const [maquinaUrl, setMaquinaUrl] = useState("/operador/maquinas")
+
+  useEffect(() => {
+    let ativo = true
+
+    async function carregarMaquinaOperador() {
+      const usuario = getUserFromToken()
+      const idOperador = usuario?.id_usuario
+
+      if (!idOperador) return
+
+      try {
+        const resposta = await apiFetch(`/api/maquinas/obter-maquina-operador/${idOperador}`)
+        const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina
+
+        if (ativo && idMaquina) {
+          setMaquinaUrl(`/operador/maquinas/${idMaquina}`)
+        }
+      } catch (error) {
+        console.error("Erro ao carregar maquina do operador:", error)
+      }
+    }
+
+    carregarMaquinaOperador()
+
+    return () => {
+      ativo = false
+    }
+  }, [])
+
+  const navMain = useMemo(
+    () =>
+      data.navMain.map((item) =>
+        item.title === "Maquinas"
+          ? { ...item, url: maquinaUrl }
+          : item
+      ),
+    [maquinaUrl]
+  )
+
   return (
     <Sidebar
       collapsible="icon"
@@ -75,7 +118,7 @@ export function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent className="px-1 py-2">
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
       </SidebarContent>
 
       <SidebarFooter className="p-3 pt-2 group-data-[collapsible=icon]:px-3">

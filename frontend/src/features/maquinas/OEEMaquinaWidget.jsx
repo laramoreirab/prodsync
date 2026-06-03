@@ -36,7 +36,7 @@ export function OEEMaquinaWidget({ maquinaId }) {
             <GaugeSemicircular
               title={metricaOeeGeral.label}
               data={[{ value: data[metricaOeeGeral.key], fill: metricaOeeGeral.color }]}
-              size="xlg"
+              size="lg"
               config={{
                 value: { label: metricaOeeGeral.label, color: metricaOeeGeral.color },
               }}

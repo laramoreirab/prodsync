@@ -1,6 +1,5 @@
 "use client";
 
-import { isValidElement } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -47,8 +46,6 @@ const ProfileDropdown = ({
     : pathname?.startsWith("/operador")
       ? "/operador/configuracoes"
       : "/adm/configuracoes";
-  const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
-  const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
   function handleLogout() {
     clearAuthSession();
@@ -70,9 +67,7 @@ const ProfileDropdown = ({
 
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
-      <DropdownMenuTrigger className={cn(triggerIsFullWidth && "flex w-full items-center justify-center")}>
-        {trigger}
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align={align}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
