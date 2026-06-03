@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
@@ -25,6 +25,15 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
 
   const emProgresso = statusSync && statusSync !== "Concluida";
 
+  useEffect(() => {
+    if (statusSync === "Concluida" && placaUid) {
+      toast.success("Placa conectada com sucesso!", {
+        description: `UID: ${placaUid}`,
+        duration: 5000
+      });
+    }
+  }, [statusSync, placaUid]);
+
   async function iniciar() {
     try {
       setLoading(true);
@@ -33,11 +42,11 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       setExpiraEm(resp?.expires_at ?? null);
       setPlacaUid(resp?.board_uid ?? null);
       setStatusSync(resp?.status ?? null);
-      toast.success(resp?.status === "Concluida"
-        ? "Placa sincronizada com sucesso."
-        : "Sessao de sincronizacao iniciada. Pressione o botão Setup da placa por 3 segundos.");
+      if (resp?.status !== "Concluida") {
+        toast.success("Sessão de sincronização iniciada. Pressione o botão Setup da placa por 3 segundos.");
+      }
     } catch (e) {
-      toast.error(e?.message || "Nao foi possivel iniciar a sincronizacao.");
+      toast.error(e?.message || "Não foi possível iniciar a sincronização.");
     } finally {
       setLoading(false);
     }
