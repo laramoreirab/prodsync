@@ -234,7 +234,7 @@ function Sidebar({
           <div
             data-sidebar="sidebar"
             data-slot="sidebar-inner"
-            className="flex max-h-[calc(100svh-7rem)] w-full flex-col overflow-hidden rounded-[1.25rem] border border-sidebar-border/80 bg-sidebar shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
+            className="flex max-h-[calc(100svh-5rem)] w-full flex-col overflow-hidden rounded-[1.25rem] border border-sidebar-border/80 bg-sidebar shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
             {children}
           </div>
         </div>
