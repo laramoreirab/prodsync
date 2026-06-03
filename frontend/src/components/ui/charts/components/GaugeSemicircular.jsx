@@ -1,12 +1,22 @@
 "use client";
 
+const DARK_GAUGE_COLORS = {
+  "#00357a": "#60a5fa",
+  "#004aad": "#38bdf8",
+  "#23304c": "#60a5fa",
+  "#7d95c6": "#38bdf8",
+}
+
 export function GaugeSemicircular({ data, config, title, size = "default" }) {
   if (!data?.length) return null;
 
   const dataKey = Object.keys(config)[0];
   const value = Number(data[0]?.value);
   const normalizedValue = Number.isFinite(value) ? Math.max(0, Math.min(100, Math.round(value))) : 0;
-  const strokeColor = data[0]?.fill || config[dataKey]?.color || "#00357a";
+  const rawStrokeColor = data[0]?.fill || config[dataKey]?.color || "#00357a";
+  const strokeColor = rawStrokeColor?.startsWith?.("#")
+    ? `light-dark(${rawStrokeColor}, ${DARK_GAUGE_COLORS[rawStrokeColor.toLowerCase()] ?? rawStrokeColor})`
+    : rawStrokeColor;
 
   const sizes = {
     sm: {
@@ -72,7 +82,7 @@ xlg: {
         <path
           d={arcPath}
           fill="none"
-          stroke="#7D95C6"
+          stroke="var(--chart-track)"
           strokeWidth={s.strokeWidth}
           strokeLinecap="round"
           pathLength="100"
@@ -89,10 +99,10 @@ xlg: {
       </svg>
 
       <div className={`flex flex-col items-center w-full text-center ${s.labelOffset}`}>
-        <span className={`${s.valueText} font-bold tracking-tight text-black leading-none`}>
+        <span className={`${s.valueText} font-bold tracking-tight text-black leading-none dark:text-[#f4f8ff]`}>
           {normalizedValue}%
         </span>
-        <span className={`${s.labelText} uppercase tracking-wider text-black font-semibold mt-1`}>
+        <span className={`${s.labelText} uppercase tracking-wider text-black font-semibold mt-1 dark:text-[#d7e2f4]`}>
           {config[dataKey]?.label || "Gauge"}
         </span>
       </div>
