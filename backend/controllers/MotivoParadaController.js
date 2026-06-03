@@ -5,13 +5,13 @@ class MotivoParadaController {
     // Criar um novo motivo de parada
     static async criarMotivoParada(req, res) {
         try {
-            const { id_empresa } = req.params;
+            const id_empresa = req.params.id_empresa ?? req.user.id_empresa;
             const dados = req.body;
             const motivoParada = await MotivoParadaModel.criarMotivoParada(dados, id_empresa);
-            res.status(201).json(motivoParada);
+            res.status(201).json({ sucesso: true, dados: motivoParada });
         } catch (error) {
             console.error('Erro ao criar motivo de parada:', error);
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ sucesso: false, erro: error.message });
         }
     }
 

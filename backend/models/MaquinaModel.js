@@ -1522,6 +1522,26 @@ static async producaoMaquinasSetor(id_setor, id_empresa) {
     }))
   }
 
+  static async cancelarSessaoSincronizacaoPlaca({ id_empresa, id_maquina }) {
+    // Valida que a máquina existe e pertence à empresa
+    const maquina = await prisma.maquinas.findFirst({
+      where: { id_empresa: Number(id_empresa), id_maquina: Number(id_maquina), ativo: true },
+      select: { id_maquina: true }
+    });
+    if (!maquina) {
+      throw new Error('Máquina não encontrada');
+    }
+
+    const chaveEmpresa = this.criarChaveEmpresa(id_empresa);
+    const chaveSessiono = `${chaveEmpresa}:${Number(id_maquina)}`;
+    
+    // Remove a sessão de pareamento
+    this._sessoesPareamentoPlaca.delete(chaveSessiono);
+    this._placasAguardandoPareamento.delete(chaveEmpresa);
+
+    return { mensagem: 'Sincronização cancelada com sucesso' };
+  }
+
 }
 
 export default MaquinaModel;
