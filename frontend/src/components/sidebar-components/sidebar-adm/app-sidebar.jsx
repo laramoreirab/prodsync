@@ -81,7 +81,7 @@ export function AppSidebar({
       {...props}>
       <SidebarHeader className="px-4 py-5 group-data-[collapsible=icon]:px-3">
         <a href="#" className="relative inline-flex h-16 items-center group-data-[collapsible=icon]:justify-center">
-          <img src="/logo.png" alt="Logo ProdSync" className="h-12 w-auto max-w-[2.75rem] brightness-0 invert opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:scale-95 group-data-[state=collapsed]/sidebar:group-hover/sidebar:opacity-100 group-data-[state=collapsed]/sidebar:group-hover/sidebar:scale-100 group-hover/sidebar:max-w-none" />
+          <img src="/logo.svg" alt="Logo ProdSync" className="h-12 w-auto max-w-11 brightness-0 invert opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:scale-95 group-data-[state=collapsed]/sidebar:group-hover/sidebar:opacity-100 group-data-[state=collapsed]/sidebar:group-hover/sidebar:scale-100 group-hover/sidebar:max-w-none" />
           <img src="/logo.svg" alt="Logo ProdSync" className="absolute h-16 w-16 brightness-0 invert opacity-0 scale-95 transition-all duration-300 ease-in-out group-data-[state=collapsed]/sidebar:opacity-100 group-data-[state=collapsed]/sidebar:scale-100 group-data-[state=collapsed]/sidebar:group-hover/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:scale-95" />
         </a>
       </SidebarHeader>
