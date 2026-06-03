@@ -186,7 +186,7 @@ class DashboardModel {
 
             // 2. Busca as descrições dos motivos encontrados
             const idsMotivos = motivosAgrupados.map(m => m.id_motivo_parada);
-            const motivosInfo = await prisma.motivos_parada.findMany({
+            const motivosInfo = await prisma.motivos_Parada.findMany({
                 where: {
                     id_empresa,
                     id_motivo: { in: idsMotivos }
