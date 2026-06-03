@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { EyeIcon, Loader2, Pencil, Plus, Search } from "lucide-react";
+import { EyeIcon, Pencil, Plus, Search } from "lucide-react";
 
 import { ParadasComparadasWidget } from "@/features/eventos/ParadasComparadasWidget";
 import { TopMotivosTempoWidget } from "@/features/eventos/TopMotivosTempoWidget";
@@ -181,11 +181,7 @@ export default function HistoricoEventosGestor() {
   );
 
   if (loading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="animate-spin text-blue-900 w-12 h-12" />
-      </main>
-    );
+    return <LoadingState message="Carregando eventos..." />;
   }
 
   return (

@@ -32,6 +32,7 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
+  LoadingState,
 } from "@/components/AnimatedComponents";
 import {
   DetailPageContainer,
@@ -248,11 +249,7 @@ export default function OPDetalheGestor({ params }) {
   );
 
   if (loading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-900" />
-      </main>
-    );
+    return <LoadingState message="Carregando ordem de produção..." />;
   }
 
   if (error || !op) {

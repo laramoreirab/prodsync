@@ -11,13 +11,13 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import FormCriarApontamento from "@/components/ui/forms/maquinas/criarApontamento";
-import { Plus, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, ChevronDown } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
 import { Badge } from "@/components/ui/badge";
-import { FadeUpItem } from "@/components/AnimatedComponents";
+import { FadeUpItem, LoadingState } from "@/components/AnimatedComponents";
 
 const statusConfig = {
   Produzindo: "bg-green-500/15 text-green-600",
@@ -40,11 +40,7 @@ export default function MaquinaDetalhePage({ params }) {
   }, [maquinaId]);
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-900" />
-      </main>
-    );
+    return <LoadingState message="Carregando máquina..." />;
   }
 
   const nome = maquina?.nome || `Máquina #${id}`;
