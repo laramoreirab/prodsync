@@ -28,10 +28,10 @@ export default function LeftCards() {
         />
 
         {/* Player Lottie */}
-        <div className="relative z-20 w-full h-full">
+        <div className="relative z-20 w-full h-full flex items-center justify-center">
           <iframe
             src="/animations/prodsync.html"
-            className="w-full h-full border-0"
+            className="border-0 w-full max-w-[580px] h-[380px]"
           />
         </div>
         {/* <div className="relative z-20 w-full h-full flex items-center justify-center">
