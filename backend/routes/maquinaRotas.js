@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import MaquinaController from '../controllers/MaquinaController.js';
-import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js';
+import { authMiddleware, adminMiddleware, gestorOuAdminMiddleware } from '../middlewares/authMiddleware.js';
 import { aplicarEscopoGestor, autorizarMaquinaParam, autorizarSetorParam, autorizarUsuarioParam } from '../middlewares/setorAccessMiddleware.js';
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js';
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
+import multer from 'multer';
 
 const router = Router();
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authMiddleware);
 
@@ -22,6 +25,8 @@ router.get('/dashboard/pecasProduzidas7dias/:id_setor', autorizarSetorParam('id_
 router.get('/statusMaquinas/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.statusMaquinas)
 router.get('/producaoMaquinas/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.producaoMaquinas)
 
+router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), MaquinaController.cadastroLote);
+
 router.get('/status/:status', aplicarEscopoGestor, MaquinaController.listarMaquinasPorStatus);
 router.get('/setor/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.listarMaquinasPorSetor);
 router.get('/obter-maquina-operador/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.obterMaquinaOperador)
@@ -35,6 +40,9 @@ router.get('/:id/velocidade', autorizarMaquinaParam('id'), MaquinaController.obt
 router.get('/:id/historico-eventos', autorizarMaquinaParam('id'), MaquinaController.obterHistoricoEventosTabela);
 
 router.get('/eficienciaMaquina/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.eficienciaMaquina)
+
+// Pareamento / Sincronização de placa (ESP32)
+router.post('/:id/sincronizar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.iniciarSincronizacaoPlaca);
 
 router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);
 router.put('/:id', adminMiddleware, uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);

@@ -3,9 +3,12 @@ import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.j
 import UsuarioController from '../controllers/UsuarioController.js'
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js'
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js'
+import multer from 'multer';
 import { aplicarEscopoGestor, autorizarSetorParam, autorizarUsuarioParam, validarBodySetorGestor } from '../middlewares/setorAccessMiddleware.js'
 
 const router = Router()
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Rotas de Dashboard do Operador
 router.get('/', authMiddleware, aplicarEscopoGestor, UsuarioController.listarUsuarios)
@@ -21,6 +24,7 @@ router.get('/turnos', authMiddleware, aplicarEscopoGestor, UsuarioController.tur
 router.get('/taxa_refugo', authMiddleware, aplicarEscopoGestor, UsuarioController.taxaRefugo)
 router.get('/producao_media_por_usuario', authMiddleware, aplicarEscopoGestor, UsuarioController.producaoMediaPorUsuario)
 router.post('/criar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.criarUsuario)
+router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), UsuarioController.cadastroLote);
 router.get('/operadores/:id_setor', authMiddleware, autorizarSetorParam('id_setor'), UsuarioController.listarOperadoresporSetor)
 router.get('/:id', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.buscarPorId)
 router.delete('/:id/deletar', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.deletarUsuario)
@@ -36,6 +40,7 @@ router.get('/:id/meta', authMiddleware, autorizarUsuarioParam('id'), UsuarioCont
 router.get('/:id/tempo_parado_tempo_produzindo_operador', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.tempoParadoTempoProduzindoUsuario);
 router.get('/:id/oee_maquinas', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquina);
 router.get('/:id/maquina_oee_detalhe', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquinaDetalhes);
-router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa)
+router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa);
+router.patch('/atualizarEmpresa', authMiddleware, adminMiddleware, UsuarioController.atualizarEmpresa);
 
 export default router

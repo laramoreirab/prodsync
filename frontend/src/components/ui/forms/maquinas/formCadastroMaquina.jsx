@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Upload, File } from "lucide-react";
+import { Plus, Upload, File, Info } from "lucide-react";
 import {
+    Dialog,
+    DialogTrigger,
     DialogContent,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -12,8 +14,11 @@ import { apiFetch } from '@/lib/api';
 
 
 export default function FormCadastroMaquina({ onCadastroSucesso }) {
+    const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
     const [arquivo, setArquivo] = useState(null);
+    const [arquivoLote, setArquivoLote] = useState(null);
     const fileInputRef = useRef(null);
+    const fileInputLoteRef = useRef(null);
 
     //estados para os campos do form
     const [nome, setNome] = useState('');
@@ -133,6 +138,54 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         }
     };
 
+    const handleLoteChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.name.endsWith('.csv')) {
+            setArquivoLote({
+                raw: file,
+                nome: file.name
+            });
+        } else {
+            toast.error("Selecione um arquivo CSV válido.");
+            if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleSubmitLote = async (e) => {
+        e.preventDefault();
+        if (!arquivoLote) return toast.error("Selecione um arquivo CSV!");
+
+        const payloadLote = new FormData();
+        payloadLote.append("file", arquivoLote.raw);
+
+        try {
+            const resposta = await apiFetch('/api/maquinas/cadastro-lote', {
+                method: "POST",
+                body: payloadLote
+            })
+            if (resposta && resposta.sucesso !== false) {
+                toast.success("Usuários importados com sucesso!");
+            }
+            setArquivoLote(null);
+            if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
+
+            setIsLoteModalOpen(false);
+
+            if (onCadastroSucesso) onCadastroSucesso();
+            else {
+                toast.error(response.mensagem || "Erro ao processar o arquivo CSV.");
+            }
+        } catch (error) {
+            console.error("Erro no upload em lote:", error);
+            toast.error("Erro interno ao enviar o arquivo para o servidor.");
+        }
+    };
+
     return (
         <>
             <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
@@ -143,6 +196,66 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                     </div>
                 </div>
                 <Separator className="m-2 bg-[#a6a6a6]" />
+
+                <div className="flex justify-end">
+                    <Dialog open={isLoteModalOpen} onOpenChange={setIsLoteModalOpen}>
+                        <DialogTrigger className="bg-secondary-foreground px-4 py-2 rounded-md flex items-center text-white text-xl font-semibold">
+                            <Plus className="mr-2" />
+                            Criar em Lote
+                        </DialogTrigger>
+
+                        <DialogContent>
+                            <div className="flex items-center">
+                                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
+                                    <Plus className="mr-2 text-3xl text-white" />
+                                    <DialogTitle className="text-3xl text-white">Criar Máquinas em Lote</DialogTitle>
+                                </div>
+                            </div>
+                            <Separator className="m-2 bg-[#a6a6a6]" />
+
+                            <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
+                                <input
+                                    type="file"
+                                    ref={fileInputLoteRef}
+                                    onChange={handleLoteChange}
+                                    accept=".csv"
+                                    className="hidden"
+                                />
+
+                                {/* div do upload clicavel */}
+                                <div
+                                    onClick={() => fileInputLoteRef.current?.click()}
+                                    className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
+                                >
+                                    {!arquivoLote ? (
+                                        <div className="flex flex-col items-center text-gray-500">
+                                            <Upload className="w-12 h-12 mb-2 text-gray-400" />
+                                            <span className="text-md font-medium">Clique aqui para fazer upload do arquivo CSV.</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center w-full">
+                                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
+                                                <File className="w-4 h-4 mr-2 shrink-0" />
+                                                <span className="text-sm truncate">{arquivoLote.nome}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center">
+                                    <Info className="text-[#7c7c81] mr-2" />
+                                    <p className="text-[#7c7c81]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas.</p>
+                                </div>
+
+                                <div className="flex justify-center mt-4">
+                                    <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                                        Criar em Lote
+                                    </button>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
 
                 <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                     <input
@@ -180,38 +293,38 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
 
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Nome</label>
+                            <label className=" block text-lg text-gray-700 font-medium dark:text-slate-300">Nome</label>
                             <input
                                 id="nome"
                                 type="text"
                                 placeholder=""
-                                className="border rounded-md p-2.5 outline-none"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
                                 value={nome}
                                 onChange={(e) => setNome(e.target.value)}
                             />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Número de Série</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Número de Série</label>
                             <input
                                 id="serie"
                                 type="text"
-                                className="border rounded-md p-2.5 outline-none"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
                                 value={serie}
                                 onChange={(e) => setSerie(e.target.value)}
                             />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Setor</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Setor</label>
                             <select
                                 id="id_setor"
-                                className="border rounded-md p-2.5 outline-none bg-white text-gray-400"
+                                className="border shadow-md  border-gray-200 rounded-md p-3 outline-none text-gray-400 text-md font-medium"
                                 value={idSetor}
-                                onChange={(e) => {setIdSetor(e.target.value);  setOperador('');}}
+                                onChange={(e) => { setIdSetor(e.target.value); setOperador(''); }}
                             >
                                 <option value="">Selecione...</option>
-                                 {setores.map((setor) => (
+                                {setores.map((setor) => (
 
                                     <option
                                         key={setor.id_setor}
@@ -225,12 +338,12 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Tipo de Máquina</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Tipo de Máquina</label>
                             <input
                                 id="categoria"
                                 type="text"
                                 placeholder=""
-                                className="border rounded-md p-2.5 outline-none"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
                                 value={categoria}
                                 onChange={(e) => setCategoria(e.target.value)}
                             >
@@ -239,32 +352,32 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
 
                         {/* campos pendentes pro backend adicionar */}
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Capacidade Normal</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Capacidade Normal</label>
                             <input
                                 id="capacidade"
                                 type="text"
-                                className="border rounded-md p-2.5 outline-none"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
                                 value={capacidade}
                                 onChange={(e) => setCapacidade(e.target.value)}
                             />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Data de Aquisição</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Data de Aquisição</label>
                             <input
                                 id="dataAquisicao"
                                 type="date"
-                                className="border rounded-md p-2.5 outline-none"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
                                 value={dataAquisicao}
                                 onChange={(e) => setDataAquisicao(e.target.value)}
                             />
                         </div>
 
                         <div className="flex flex-col gap-1 col-span-2">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Status de Máquina</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Status de Máquina</label>
                             <select
                                 id="status"
-                                className="border rounded-md p-2.5 outline-none bg-white text-gray-400"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
                             >
@@ -275,13 +388,13 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex flex-col gap-1 col-span-2">
-                            <label className="text-md text-cinza-escuro dark:text-slate-300">Operador</label>
+                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Operador</label>
                             <select
                                 id="operador"
-                                className="border rounded-md p-2.5 outline-none bg-white text-gray-400"
+                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
                                 value={operador}
                                 onChange={(e) => setOperador(e.target.value)}
-                                 disabled={!idSetor}
+                                disabled={!idSetor}
                             >
                                 <option value="">Selecione...</option>
                                 {operadores.map((operador) => (

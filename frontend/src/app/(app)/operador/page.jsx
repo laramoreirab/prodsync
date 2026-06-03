@@ -8,10 +8,7 @@ import { QualidadeWidget }                 from "@/features/operador/QualidadeWi
 import { VelocimetroWidget }               from "@/features/operador/VelocimetroWidget";
 import { OEEMaquinaWidget }                from "@/features/operador/OEEMaquinaWidget";
 import { getUserFromToken } from "@/lib/auth";
-
-import { Plus, Search, EyeIcon, Pencil, Trash2, Loader2 } from "lucide-react";
-
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, WidgetCard, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
 
 
 
@@ -28,10 +25,13 @@ export default function DashboardGeralOperador() {
 
  return (
   <PageLayout>
-    <PageHeader title="Dashboard Geral" />
+    <PageHeader
+      title="Dashboard Geral"
+      subtitle="Acompanhe seu desempenho operacional em tempo real."
+    />
 
-    {/* SEÇÃO 1: OEE | Produtividade | Eficiência */}
-    <ContentGrid cols={3}>
+    <SectionDivider title="Performance principal" className="mt-2" />
+    <ContentGrid cols={3} className="mt-2">
       <WidgetCard>
         <OEEMaquinaWidget operadorId={operadorId} />
       </WidgetCard>
@@ -43,8 +43,8 @@ export default function DashboardGeralOperador() {
       </WidgetCard>
     </ContentGrid>
 
-    {/* SEÇÃO 2: Produção por Hora | Qualidade | Velocímetro */}
-    <ContentGrid cols={3}>
+    <SectionDivider title="Qualidade e ritmo de produção" className="mt-6" />
+    <ContentGrid cols={3} className="mt-2">
       <WidgetCard>
         <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
       </WidgetCard>

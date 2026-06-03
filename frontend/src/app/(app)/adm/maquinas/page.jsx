@@ -35,6 +35,7 @@ import {
   KPIGrid, ContentGrid, WidgetCard,
   SearchBar, FilterRow, EmptyState, LoadingState,
   PageSection,
+  AsymmetricGrid,
 } from "@/components/AnimatedComponents";
 
 
@@ -99,9 +100,9 @@ export default function Maquinas() {
   const maquinasFilter = maquinasFilterBase.map((filter) =>
     filter.id === "setor"
       ? {
-          ...filter,
-          options: [...new Set(maquinas.map(obterNomeSetor).filter(Boolean))],
-        }
+        ...filter,
+        options: [...new Set(maquinas.map(obterNomeSetor).filter(Boolean))],
+      }
       : filter
   );
 
@@ -180,7 +181,7 @@ export default function Maquinas() {
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando máquinas...</p>
+          <p className="text-lg text-gray-600 font-medium">Sincronizando máquinas...</p>
         </div>
       </main>
     );
@@ -201,24 +202,15 @@ export default function Maquinas() {
 
 
       {/* Gráficos */}
-      {/* SEÇÃO 1: Charts */}
-      <KPIGrid cols={3} className="mt-4">
-
+      <AsymmetricGrid className="mt-6">
+        <WidgetCard>
+          <ProducaoTotalWidget />
+        </WidgetCard>
         <WidgetCard>
           <MaquinaStatusDonutWidget />
         </WidgetCard>
+      </AsymmetricGrid>
 
-        <WidgetCard>
-          <MaquinasPorSetorWidget />
-        </WidgetCard>
-
-        <WidgetCard>
-          <TempoMedioParadaWidget />
-        </WidgetCard>
-
-      </KPIGrid>
-
-      {/* SEÇÃO 2: Graphs */}
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <ProducaoDefeitosWidget />
@@ -228,13 +220,14 @@ export default function Maquinas() {
         </WidgetCard>
       </ContentGrid>
 
-      {/* SEÇÃO 3:Graphs*/}
-
-      <FadeUpItem className="mt-8">
-        <div className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
-          <ProducaoTotalWidget />
-        </div>
-      </FadeUpItem>
+      <KPIGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <TempoMedioParadaWidget />
+        </WidgetCard>
+        <WidgetCard>
+          <MaquinasPorSetorWidget />
+        </WidgetCard>
+      </KPIGrid>
 
       {/* LISTAGEM MAQUINAS */}
       <SectionDivider title="Inventário de Máquinas" className="mt-8" />
@@ -247,7 +240,7 @@ export default function Maquinas() {
 
       <FilterRow
         count={dadosExibidos.length}
-        label="maquinas"
+        label="máquinas"
         actions={
           <>
             <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
@@ -260,47 +253,49 @@ export default function Maquinas() {
         {dadosExibidos.length > 0 ? (
           <div className="w-full overflow-x-auto">
 
-            <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
 
-                <TableListagens
-                  /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-                  data={dadosExibidos} columns={colunasMaquinas}
-                  acoesDropdown={(maquina) => (
-                    <>
+              <TableListagens
+                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
+                data={dadosExibidos} columns={colunasMaquinas}
+                acoesDropdown={(maquina) => (
+                  <>
 
-                      <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link href={`maquinas/${maquina.id_maquina}`}>
-                          <EyeIcon className="mr-2 h-4 w-4" />
-                          Ver Detalhes
-                        </Link>
-                      </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`maquinas/${maquina.id_maquina}`}>
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
 
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                            <Pencil className="mr-2 h-4 w-4 text-primary" />
-                            Editar
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
-                        </DialogContent>
-                      </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
 
-                      <DropdownMenuItem
-                        onSelect={(e) => {
-                          e.preventDefault();
-                          setMaquinaParaExcluir(maquina.id_maquina);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormExclusaoMaquina
+                          maquinaId={maquina.id_maquina}
+                          onExcluir={excluirMaquina}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </>
                 )}
-              /> 
-            </div>
+              />
           </div>
         ) : (
           <EmptyState

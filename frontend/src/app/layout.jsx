@@ -1,5 +1,6 @@
 import { Montserrat } from "next/font/google";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -20,22 +21,23 @@ export default function RootLayout({ children }) {
     <html
       lang="pt-br"
       suppressHydrationWarning
-      className={`${montserrat.variable} ${virtualFont.variable} h-full antialiased`}
+      // h-full + overflow-hidden evita que o próprio <html> gere barra de rolagem
+      className={`${montserrat.variable} ${virtualFont.variable} min-h-screen antialiased`}
     >
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-try {
-  var isAppRoute = /^\\/(adm|gestor|operador)(\\/|$)/.test(window.location.pathname);
-  var isDark = window.localStorage.getItem("prodsync-theme") === "dark";
-  document.documentElement.classList.toggle("dark", isAppRoute && isDark);
-} catch (_) {}
-            `,
-          }}
-        />
+        <Script id="theme-initializer" strategy="beforeInteractive">
+          {`
+            try {
+              var isAppRoute = /^\\/(adm|gestor|operador)(\\/|$)/.test(window.location.pathname);
+              var isDark = window.localStorage.getItem("prodsync-theme") === "dark";
+              document.documentElement.classList.toggle("dark", isAppRoute && isDark);
+            } catch (_) {}
+          `}
+        </Script>
       </head>
-      <body className="min-h-full flex flex-col">
+
+      {/* h-full + overflow-hidden: o body ocupa exatamente a viewport e não rola */}
+      <body className="h-full flex flex-col">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" />
       </body>

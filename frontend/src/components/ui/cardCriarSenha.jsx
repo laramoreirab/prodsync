@@ -12,15 +12,12 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import InputSenha from "./inputSenha";
 import { useState } from "react";
-import { CheckCircle2, Info, Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, Info, Eye, EyeOff, Key } from "lucide-react";
 import { apiFetch } from "@/lib/api"
 import { setAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
 
 export default function CriarSenha() {
-
-    /* const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); */
 
     // Controle de Etapas
     const [step, setStep] = useState(1)
@@ -109,7 +106,7 @@ export default function CriarSenha() {
     return (
         <section
             className="lg:h-[calc(100vh-80px)] flex items-center justify-center relative">
-            {step === 2 && (
+            {step === 1 && (
 
                 <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
 
@@ -126,11 +123,6 @@ export default function CriarSenha() {
                                 </CardDescription>
                             </div>
                         </CardHeader>
-
-
-
-
-
 
                         <CardContent className="p-0">
                             <form onSubmit={(e) => handleContinuar(e)} className="space-y-6" noValidate>
@@ -155,7 +147,7 @@ export default function CriarSenha() {
                                         </Field>
 
                                         <Field className="flex text-center text-3x1">
-                                            <a className="w-full font-semibold hover:bg-transparent">
+                                            <a className="w-full font-semibold hover:bg-transparent" href="/">
                                                 Voltar para Login
                                             </a>
                                         </Field>
@@ -178,7 +170,7 @@ export default function CriarSenha() {
 
 
 
-            {step === 1 && (
+            {step === 2 && (
 
                 <div className="py-10 md:py-20 max-w-lg px-4 sm:px-0 mx-auto w-full">
                     <Card className="px-6 py-8 sm:p-12 relative gap-6">

@@ -81,6 +81,12 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
     paginationItemsToDisplay: 5
   })
 
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const pageSize = table.getState().pagination.pageSize;
+  const totalItems = data.length;
+  const rangeStart = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, totalItems);
+
   return (
     <div className='w-full px-8 mb-5'>
       <div className='overflow-hidden rounded-md border bg-white/50 backdrop-blur-sm'>
@@ -175,57 +181,63 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
         </Table>
       </div>
 
-      <div className='flex items-center gap-3 max-sm:flex-col mt-2 justify-center text-center'>
+      <div className='mt-3 flex flex-col items-center gap-1.5'>
+        <Pagination className='w-auto'>
+          <PaginationContent className='rounded-full border border-slate-200 bg-white/95 px-1.5 py-1 shadow-sm'>
+            <PaginationItem className="flex items-center">
+              <Button
+                variant='outline'
+                className='h-7 w-7 rounded-full border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-35'
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                aria-label='Página anterior'>
+                <ChevronLeftIcon aria-hidden='true' strokeWidth={3} className='w-4 h-4' />
+              </Button>
+            </PaginationItem>
 
-        <div className='grow items-center'>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem className="flex items-center">
+            {showLeftEllipsis && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+
+            {pages.map((page) => (
+              <PaginationItem key={page}>
                 <Button
-                  className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                  aria-label='Página anterior'>
-                  <ChevronLeftIcon aria-hidden='true'
-                    strokeWidth={3}
-                    className='!w-7 !h-7' />
+                  size='icon'
+                  variant='ghost'
+                  className={`h-7 min-w-7 rounded-full px-2 text-[11px] sm:text-xs border ${page === currentPage ? 'border-primary/20 bg-primary/10 text-primary hover:bg-primary/15' : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50'}`}
+                  onClick={() => table.setPageIndex(page - 1)}
+                >
+                  {page}
                 </Button>
               </PaginationItem>
+            ))}
 
-              {showLeftEllipsis && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-
-              <p
-                className='text-muted-foreground flex-1 text-2x1 whitespace-nowrap text-left mx-2 font-medium'
-                aria-live='polite'>
-                Página <span className='text-foreground'>{table.getState().pagination.pageIndex + 1}</span> de{' '}
-                <span className='text-foreground'>{table.getPageCount()}</span>
-              </p>
-
-              {showRightEllipsis && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-
-              <PaginationItem className="flex items-center">
-                <Button
-                  className='disabled:pointer-events-none disabled:opacity-100 bg-primary border-none text-white w-9 h-8'
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                  aria-label='Vá para a próxima página'>
-                  <ChevronRightIcon aria-hidden='true'
-                    strokeWidth={3}
-                    className='!w-7 !h-7' />
-                </Button>
+            {showRightEllipsis && (
+              <PaginationItem>
+                <PaginationEllipsis />
               </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+            )}
 
+            <PaginationItem className="flex items-center">
+              <Button
+                variant='outline'
+                className='h-7 w-7 rounded-full border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-35'
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                aria-label='Vá para a próxima página'>
+                <ChevronRightIcon aria-hidden='true' strokeWidth={3} className='w-4 h-4' />
+              </Button>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
+        <p className='text-[11px] sm:text-xs text-slate-500 font-medium'>
+          Mostrando <span className='text-slate-700'>{rangeStart}</span>-<span className='text-slate-700'>{rangeEnd}</span> de{" "}
+          <span className='text-slate-700'>{totalItems}</span>
+        </p>
+        
         {/* <div className='flex flex-1 justify-end'>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -247,8 +259,6 @@ const TableListagens = ({ data, columns, viewLink, dialogs }) => {
             </SelectContent>
           </Select>
         </div> */}
-
-
       </div>
 
     </div>

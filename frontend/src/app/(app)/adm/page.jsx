@@ -10,24 +10,34 @@ import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget"
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
+import { ArrowUpFromLine } from "lucide-react";
 
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, KPICardDecorated, AsymmetricGrid, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
 
 export default function DashboardGeralPage() {
   return (
-    <div className="pb-12">
-      <PageHeader title="Dashboard Geral da Empresa" />
-      <ContentGrid cols={1}>
-        <WidgetCard centered>
+    <PageLayout className="pb-12">
+      <PageHeader
+        title="Dashboard Geral da Empresa"
+
+        action={
+          <a href="/adm/relatorios" title="Personalizar e exportar relatório em PDF">
+            <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <ArrowUpFromLine size={20} className="mr-2" />
+              Exportar PDF
+            </button>
+          </a>
+        }
+      />
+      
+      <AsymmetricGrid className="mt-6">
+        <WidgetCard>
           <ProducaoDiaWidget />
         </WidgetCard>
-      </ContentGrid>
-
-      <ContentGrid cols={1} className="mt-6">
         <WidgetCard centered>
           <OEEWidget />
         </WidgetCard>
-      </ContentGrid>
+      </AsymmetricGrid>
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
@@ -40,27 +50,27 @@ export default function DashboardGeralPage() {
 
       <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
-          <MotivosFrequentesWidget />
+          <TendendiaRefugoWidget />       
         </WidgetCard>
         <WidgetCard>
-          <TendendiaRefugoWidget />
+          <MotivosFrequentesWidget />    
         </WidgetCard>
       </ContentGrid>
 
-      <KPIGrid cols={4} className="mt-6 gap-6 lg:gap-8">
-        <WidgetCard>
+      <KPIGrid cols={4} className="mt-4">
+        <KPICardDecorated>
           <MediaParadasDiaWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <PecasPorMinutoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <MaquinaAtivaPorTurnoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <ProducaoPorTurnoLotesWidget />
-        </WidgetCard>
+        </KPICardDecorated>
       </KPIGrid>
-    </div>
+    </PageLayout>
   );
 }

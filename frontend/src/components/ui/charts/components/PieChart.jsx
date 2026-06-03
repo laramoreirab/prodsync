@@ -12,7 +12,7 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
       {title && <h3 className="text-sm font-medium mb-3 self-start">{title}</h3>}
       
       {/* Relative wrapper holding both the chart and the absolute center text */}
-      <div className="relative flex items-center justify-center h-[180px] w-[580px]">
+      <div className="relative flex items-center justify-center h-[180px] w-[320px]">
         <ChartContainer config={config} className="h-full w-full">
           <RechartsPieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
@@ -22,7 +22,7 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={55} // Donut
+              innerRadius={55} 
               outerRadius={80}
               startAngle={90}
               endAngle={-270}
@@ -30,22 +30,22 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
               className="stroke-background"
               
               // ATIVA AS "SETAS"/LINHAS:
-              labelLine={{ stroke: "#94a3b8", strokeWidth: 1 }}
-              label={({ name, cx, x, y, textAnchor }) => {
-                const color = config[name]?.color || "currentColor";
-                return (
-                  <text
-                    cx={cx}
-                    x={x}
-                    y={y}
-                    textAnchor={textAnchor}
-                    className="text-xs font-medium dynamic-label"
-                    fill={color}
-                  >
-                    {config[name]?.label || name}
-                  </text>
-                );
-              }}
+              // labelLine={{ stroke: "#94a3b8", strokeWidth: 1 }}
+              // label={({ name, cx, x, y, textAnchor }) => {
+              //   const color = config[name]?.color || "currentColor";
+              //   return (
+              //     <text
+              //       cx={cx}
+              //       x={x}
+              //       y={y}
+              //       textAnchor={textAnchor}
+              //       className="text-xs font-medium dynamic-label"
+              //       fill={color}
+              //     >
+              //       {config[name]?.label || name}
+              //     </text>
+              //   );
+              // }}
             >
               {data.map((entry, index) => (
                 <Cell 

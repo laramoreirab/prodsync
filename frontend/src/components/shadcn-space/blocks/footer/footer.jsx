@@ -7,27 +7,23 @@ const footerSections = [
     links: [
       {
         title: "Home",
-        href: "#",
+        href: "/",
       },
       {
         title: "Sobre nós",
-        href: "#",
+        href: "#about-us",
       },
       {
         title: "Serviços",
-        href: "#",
+        href: "#servicos",
       },
       {
         title: "FAQs",
-        href: "#",
+        href: "#faqs",
       },
       {
         title: "Cadastro",
-        href: "#",
-      },
-      {
-        title: "Login",
-        href: "#",
+        href: "/cadastro",
       }
     ],
   },
@@ -52,12 +48,12 @@ const footerSections = [
 
 const Footer = () => {
   return (
-    <footer className="py-10">
+    <footer className="py-8">
       <Separator orientation="horizontal" />
       <div className="xl:px-16 lg:px-8 px-4 mx-auto">
-        <div className="flex flex-col gap-6 sm:gap-12">
+        <div className="flex flex-col gap-2 sm:gap-8">
           <div
-            className="py-12 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-12 gap-x-8 gap-y-10 px-6 xl:px-0">
+            className="pt-8 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-12 gap-x-6 gap-y-2 px-2 xl:px-0">
             <div className="col-span-full lg:col-span-4">
               <div
                 className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-100 ease-in-out fill-mode-both">

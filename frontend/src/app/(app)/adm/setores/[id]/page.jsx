@@ -42,6 +42,8 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
+  AsymmetricGrid,
+  KPIGrid,
 } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
@@ -52,6 +54,7 @@ import {
   DetailWidgetGrid,
   DetailWidgetCard,
   DetailListingSection,
+  ListingTabs,
   DetailActions,
 } from "@/components/DetailComponents";
 
@@ -117,6 +120,7 @@ export default function SetorEspecificoPage({ params }) {
   const [dadosExibidos, setDadosExibidos] = useState([]);
   const [buscaMaquinas, setBuscaMaquinas] = useState("");
   const [buscaUsuarios, setBuscaUsuarios] = useState("");
+  const [activeListTab, setActiveListTab] = useState("maquinas");
   const [maquinaParaExcluir, setMaquinaParaExcluir] = useState(null);
 
   const gestor = setor?.gestores?.[0]?.gestor;
@@ -351,17 +355,15 @@ export default function SetorEspecificoPage({ params }) {
   return (
     <PageLayout>
       <DetailPageContainer>
-
         {/* Voltar */}
         <DetailBackLink href="/adm/setores" label="Voltar para Setores" />
 
-        {/* Cabeçalho: nome do setor + ações de editar/excluir */}
         <PageHeader
           title={`Setor: ${setor?.nome_setor || id}`}
           action={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
+                <DialogTrigger className="text-(--pencil) cursor-pointer">
                   <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -370,7 +372,7 @@ export default function SetorEspecificoPage({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
+                <DialogTrigger className="text-(--trash) cursor-pointer">
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -381,35 +383,64 @@ export default function SetorEspecificoPage({ params }) {
           }
         />
 
-        <FadeUpItem className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm text-xl font-medium text-gray-900">
-          <div className="flex flex-col gap-2">
-            <p>
-              Gestor Responsável:{" "}
-              {gestor ? (
-                <Link href={`/adm/usuarios/${gestor.id_usuario}`} className="hover:underline ml-1">
-                  {gestor.nome}
-                </Link>
-              ) : (
-                <span className="ml-1">-</span>
-              )}
-            </p>
+        <FadeUpItem className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm text-gray-900">
+          <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
 
-            <div className="flex">
-              <p>Turnos:</p>
-              <ul className="list-disc list-inside ml-4">
-                {turnosAgrupados.length > 0 ? (
-                  turnosAgrupados.map((t) => (
-                    <li key={`${t.nome_turno}-${t.hora_inicio}-${t.hora_fim}`}>
-                      {t.nome_turno} ({t.dias.join(", ")}): {formatarHorario(t.hora_inicio)} - {formatarHorario(t.hora_fim)}
-                    </li>
-                  ))
+            {/* Bloco da Esquerda: Informações Principais e Localização */}
+            <div className="flex flex-col gap-4 flex-1 w-full">
+              <div>
+                <span className="text-xs font-semibold text-black uppercase tracking-wider block mb-1">
+                  Gestor Responsável
+                </span>
+                {gestor ? (
+                  <span className="text-lg font-semibold text-black">
+                    {gestor.nome}
+                  </span>
                 ) : (
-                  <li className="text-gray-500 italic">Nenhum turno cadastrado para este setor</li>
+                  <span className="text-base text-black italic">Não associado</span>
                 )}
-              </ul>
+              </div>
+
+              <div className="border-t border-slate-100 pt-3">
+                <span className="text-xs font-semibold text-black uppercase tracking-wider block mb-1">
+                  Localização
+                </span>
+                <p className="text-base font-medium text-slate-700">
+                  {setor?.localizacao || <span className="text-slate-400 italic">Não informada</span>}
+                </p>
+              </div>
             </div>
 
-            <p>Localização: {setor?.localizacao || "-"}</p>
+            {/* Bloco da Direita: Turnos (Inspirado no layout de campos agrupados) */}
+            <div className="flex flex-col gap-2 flex-1 w-full border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6">
+              <span className="text-xs font-semibold text-black uppercase tracking-wider block mb-2">
+                Turnos de Trabalho
+              </span>
+
+              <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1">
+                {turnosAgrupados.length > 0 ? (
+                  turnosAgrupados.map((t) => (
+                    <div
+                      key={`${t.nome_turno}-${t.hora_inicio}-${t.hora_fim}`}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 bg-slate-50 border border-slate-100 rounded-lg text-sm"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-slate-800">{t.nome_turno}</span>
+                        <span className="text-xs text-slate-500">{t.dias.join(", ")}</span>
+                      </div>
+                      <div className="text-xs font-mono bg-white border border-slate-200 px-2.5 py-1 rounded-md text-slate-600 shadow-sm self-start sm:self-center">
+                        {formatarHorario(t.hora_inicio)} — {formatarHorario(t.hora_fim)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-slate-400 italic p-3 bg-slate-50 border border-dashed border-slate-200 rounded-lg text-center">
+                    Nenhum turno cadastrado para este setor
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
         </FadeUpItem>
 
@@ -429,218 +460,228 @@ export default function SetorEspecificoPage({ params }) {
         {/* ── Gráficos ── */}
         <DetailSectionTitle title="Desempenho do Setor" />
 
-        {/* Linha 1: status de máquinas + OEE médio */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard colSpan="md:col-span-2">
-            <SetorMaquinaStatusWidget setorId={id} />
-          </DetailWidgetCard>
-          <DetailWidgetCard centered>
-            <SetorOEEMedioWidget setorId={id} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        {/* Linha 2: produção semanal + top operadores */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard colSpan="md:col-span-2">
-            <SetorProducaoSemanalWidget setorId={id} />
-          </DetailWidgetCard>
-          <DetailWidgetCard>
-            <SetorTopOperadoresWidget setorId={id} />
-          </DetailWidgetCard>
-        </DetailWidgetGrid>
-
-        {/* Linha 3: motivos de parada + evolução OEE */}
-        <DetailWidgetGrid cols={3}>
-          <DetailWidgetCard>
-            <SetorMotivosParadaWidget setorId={id} />
-          </DetailWidgetCard>
+        <AsymmetricGrid>
           <DetailWidgetCard colSpan="md:col-span-2">
             <SetorOEEEvolucaoWidget setorId={id} />
           </DetailWidgetCard>
-        </DetailWidgetGrid>
+          <DetailWidgetCard centered>
+            <SetorOEEMedioWidget setorId={id} />
 
-        {/* ── Listagem de Máquinas ── */}
-        <DetailListingSection
-          id="listagem_maquinas"
-          title=" Inventário de Máquinas do Setor"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
-                <Plus size={22} />
-                Cadastrar
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroMaquina onCadastroSucesso={refresh} />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaMaquinas}
-              onChange={(e) => setBuscaMaquinas(e.target.value)}
-              placeholder="Busque por nome ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={maquinasExibidas.length}
-              label="máquinas"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoMaquinas}
-                    onSortChange={handleSortMaquinas}
-                  />
-                  <FilterDropdown
-                    filtersConfig={maquinasFilter}
-                    onApply={aplicarFiltrosMaquinas}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          {maquinasExibidas.length > 0 ? (
-            <TableListagens
-              data={maquinasExibidas}
-              columns={colunaMaquinaSetor}
-              acoesDropdown={(maquina) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/maquinas/${maquina.id_maquina}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
+          </DetailWidgetCard>
+        </AsymmetricGrid>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
+        <KPIGrid cols={2} className="mt-6">
 
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setMaquinaParaExcluir(maquina.id_maquina);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                    Excluir
-                  </DropdownMenuItem>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhuma máquina encontrada"
-              message={`Não encontramos resultados para "${buscaMaquinas}".`}
-            />
-          )}
-        </DetailListingSection>
+          <DetailWidgetCard>
+            <SetorMotivosParadaWidget setorId={id} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <SetorMaquinaStatusWidget setorId={id} />
+          </DetailWidgetCard>
+        </KPIGrid>
+                <KPIGrid cols={2} className="mt-6">
+          <DetailWidgetCard>
+            <SetorProducaoSemanalWidget setorId={id} />
+          </DetailWidgetCard>
 
-        {/* ── Listagem de Usuários ── */}
-        <DetailListingSection
-          id="listagem_usuarios"
-          title=" Listagem de Usuários do Setor"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
-                <Plus size={22} />
-                Cadastrar
-              </DialogTrigger>
-              <DialogContent>
-                <FormCadastroUsuario onCadastroSucesso={refresh} />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaUsuarios}
-              onChange={(e) => setBuscaUsuarios(e.target.value)}
-              placeholder="Busque por nome ou id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={usuariosExibidos.length}
-              label="usuários"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoUsers}
-                    onSortChange={handleSortUsuarios}
-                  />
-                  <FilterDropdown
-                    filtersConfig={usuariosFilter}
-                    onApply={aplicarFiltrosUsers}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          {usuariosExibidos.length > 0 ? (
-            <TableListagens
-              data={usuariosExibidos}
-              columns={colunaUsuarioSetor}
-              acoesDropdown={(usuario) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link
-                      href={
-                        usuario.funcao === "Gestor"
-                          ? `/adm/usuarios/gestor/${usuario.id_usuario}`
-                          : `/adm/usuarios/${usuario.id_usuario}`
-                      }
+          <DetailWidgetCard>
+            <SetorTopOperadoresWidget setorId={id} />
+          </DetailWidgetCard>
+
+        </KPIGrid>
+
+        <ListingTabs
+          className="mt-8"
+          activeTab={activeListTab}
+          onChange={setActiveListTab}
+          tabs={[
+            { id: "maquinas", label: "Inventário de Máquinas" },
+            { id: "usuarios", label: "Usuários do Setor" },
+          ]}
+        />
+
+        {activeListTab === "maquinas" ? (
+          <DetailListingSection
+            id="listagem_maquinas"
+            title="Inventário de Máquinas do Setor"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
+                  <Plus size={22} />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroMaquina onCadastroSucesso={refresh} />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
+                value={buscaMaquinas}
+                onChange={(e) => setBuscaMaquinas(e.target.value)}
+                placeholder="Busque por nome ou id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={maquinasExibidas.length}
+                label="máquinas"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoMaquinas}
+                      onSortChange={handleSortMaquinas}
+                    />
+                    <FilterDropdown
+                      filtersConfig={maquinasFilter}
+                      onApply={aplicarFiltrosMaquinas}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            {maquinasExibidas.length > 0 ? (
+              <TableListagens
+                data={maquinasExibidas}
+                columns={colunaMaquinaSetor}
+                acoesDropdown={(maquina) => (
+                  <>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`/adm/maquinas/${maquina.id_maquina}`}>
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setMaquinaParaExcluir(maquina.id_maquina);
+                      }}
+                      className="cursor-pointer"
                     >
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhuma máquina encontrada"
+                message={`Não encontramos resultados para "${buscaMaquinas}".`}
+              />
+            )}
+          </DetailListingSection>
+        ) : (
+          <DetailListingSection
+            id="listagem_usuarios"
+            title="Listagem de Usuários do Setor"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-secondary-foreground flex items-center px-4 py-2 rounded-md text-white font-semibold text-xl gap-2">
+                  <Plus size={22} />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroUsuario onCadastroSucesso={refresh} />
+                </DialogContent>
+              </Dialog>
+            }
+            search={
+              <SearchBar
+                value={buscaUsuarios}
+                onChange={(e) => setBuscaUsuarios(e.target.value)}
+                placeholder="Busque por nome ou id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={usuariosExibidos.length}
+                label="usuários"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoUsers}
+                      onSortChange={handleSortUsuarios}
+                    />
+                    <FilterDropdown
+                      filtersConfig={usuariosFilter}
+                      onApply={aplicarFiltrosUsers}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            {usuariosExibidos.length > 0 ? (
+              <TableListagens
+                data={usuariosExibidos}
+                columns={colunaUsuarioSetor}
+                acoesDropdown={(usuario) => (
+                  <>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link
+                        href={
+                          usuario.funcao === "Gestor"
+                            ? `/adm/usuarios/gestor/${usuario.id_usuario}`
+                            : `/adm/usuarios/${usuario.id_usuario}`
+                        }
+                      >
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver Detalhes
+                      </Link>
+                    </DropdownMenuItem>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoUsuario usuarioId={usuario.id_usuario} onEdicaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Pencil className="mr-2 h-4 w-4 text-primary" />
+                          Editar
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormEdicaoUsuario usuarioId={usuario.id_usuario} onEdicaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormExclusaoUsuario usuarioId={usuario.id_usuario} onExclusaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum usuário encontrado"
-              message={`Não encontramos resultados para "${buscaUsuarios}".`}
-            />
-          )}
-        </DetailListingSection>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FormExclusaoUsuario usuarioId={usuario.id_usuario} onExclusaoSucesso={refresh} />
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum usuário encontrado"
+                message={`Não encontramos resultados para "${buscaUsuarios}".`}
+              />
+            )}
+          </DetailListingSection>
+        )}
 
       </DetailPageContainer>
 

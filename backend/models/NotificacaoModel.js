@@ -95,6 +95,7 @@ class NotificacaoModel {
             criado_em: notificacao.criado_em,
             maquina: notificacao.maquina?.nome ?? null,
             status_evento: notificacao.evento?.status_atual ?? null,
+            solicitado_pelo_adm: notificacao.tipo === 'Solicitar_Justificativa',
         };
     }
 
@@ -125,12 +126,12 @@ class NotificacaoModel {
     static async obterOperadorMaquina(id_empresa, id_maquina) {
         const maquina = await prisma.maquinas.findFirst({
             where: { id_empresa, id_maquina: Number(id_maquina) },
-            select: { id_operador: true },
+            select: { id_operador: true, id_setor: true },
         });
 
         if (maquina?.id_operador) return maquina.id_operador;
 
-        const escala = await prisma.escalaTrabalho.findFirst({
+        const escalaMaquina = await prisma.escalaTrabalho.findFirst({
             where: {
                 id_empresa,
                 id_maquina: Number(id_maquina),
@@ -138,7 +139,22 @@ class NotificacaoModel {
             select: { id_operador: true },
         });
 
-        return escala?.id_operador ?? null;
+        if (escalaMaquina?.id_operador) return escalaMaquina.id_operador;
+
+        if (maquina?.id_setor) {
+            const escalaSetor = await prisma.escalaTrabalho.findFirst({
+                where: {
+                    id_empresa,
+                    id_setor: maquina.id_setor,
+                    id_maquina: { not: null },
+                },
+                select: { id_operador: true },
+            });
+
+            if (escalaSetor?.id_operador) return escalaSetor.id_operador;
+        }
+
+        return null;
     }
 
     static async obterGestoresSetor(id_empresa, id_setor) {
@@ -240,7 +256,8 @@ class NotificacaoModel {
                 select: { id_setor: true },
             });
             const setoresIds = setores.map((s) => s.id_setor);
-            if (!setoresIds.includes(evento.setor_afetado)) {
+            const setorEvento = evento.setor_afetado ?? evento.maquina?.id_setor;
+            if (!setoresIds.includes(setorEvento)) {
                 throw new Error('Gestor sem permissão para este setor');
             }
         }
@@ -248,6 +265,27 @@ class NotificacaoModel {
         const idOperador = await this.obterOperadorMaquina(id_empresa, evento.id_maquina);
         if (!idOperador) {
             throw new Error('Nenhum operador vinculado à máquina deste evento');
+        }
+
+        const existente = await prisma.notificacoes.findFirst({
+            where: {
+                id_empresa,
+                id_destinatario: Number(idOperador),
+                id_evento: evento.id_evento,
+                tipo: 'Solicitar_Justificativa',
+                lida: false,
+            },
+        });
+
+        if (existente) {
+            const completa = await prisma.notificacoes.findUnique({
+                where: { id_notificacao: existente.id_notificacao },
+                include: {
+                    maquina: { select: { nome: true } },
+                    evento: { select: { status_atual: true } },
+                },
+            });
+            return this.formatar(completa);
         }
 
         const nomeMaquina = evento.maquina?.nome ?? `Máquina ${evento.id_maquina}`;

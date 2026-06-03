@@ -1,5 +1,5 @@
 "use client";
-import { KPI } from "@/components/ui/charts/components";
+import { KPIHorizontal } from "@/components/ui/charts/components";
 import { useOPPecasBoas } from "./hooks/useOPPecasBoas";
 
 export function OPPecasBoasKPIWidget({ setorId = null }) {
@@ -11,5 +11,5 @@ export function OPPecasBoasKPIWidget({ setorId = null }) {
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
 
-  return <KPI title={data?.titulo} value={data?.valor} />;
+  return <KPIHorizontal title={data?.titulo} value={data?.valor} />;
 }

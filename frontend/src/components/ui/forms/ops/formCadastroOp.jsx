@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
+    Dialog,
+    DialogContent,
+    DialogTrigger,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, ChevronDown, Calendar, Clock } from "lucide-react";
+import { Plus, ChevronDown, Calendar, Clock, Upload, File, Info } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { opCrudService } from '@/services/opCrudService';
@@ -10,6 +13,9 @@ import { useSetores } from '@/hooks/useSetores';
 import { useMaquinas } from '@/hooks/useMaquinas';
 
 export default function FormCadastroOp({ onCadastroSucesso }) {
+    const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
+    const [arquivoLote, setArquivoLote] = useState(null);
+    const fileInputLoteRef = useRef(null);
 
     // estados dos campos do form
     const [prioridade, setPrioridade] = useState('Crítica');     // backend: prioridade
@@ -17,8 +23,8 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
     const [idSetor, setIdSetor] = useState('');                  // número — backend: id_setor
     const [idMaquina, setIdMaquina] = useState('');              // número — backend: id_maquina
     const [qtdPlanejada, setQtdPlanejada] = useState('');        // backend: qtd_planejada
-    const [produto, setProduto] = useState('');  
-    
+    const [produto, setProduto] = useState('');
+
     // backend: produto
     const [inicioData, setInicioData] = useState('');            // backend: data_inicio
     const [inicioHora, setInicioHora] = useState('');
@@ -76,6 +82,54 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
         }
     };
 
+    const handleLoteChange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.name.endsWith('.csv')) {
+            setArquivoLote({
+                raw: file,
+                nome: file.name
+            });
+        } else {
+            toast.error("Selecione um arquivo CSV válido.");
+            if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
+        }
+    };
+
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleSubmitLote = async (e) => {
+        e.preventDefault();
+               if (!arquivoLote) return toast.error("Selecione um arquivo CSV!");
+       
+               const payloadLote = new FormData();
+               payloadLote.append("file", arquivoLote.raw);
+       
+               try {
+                   const resposta = await apiFetch('/api/ordens/cadastro-lote', {
+                       method: "POST",
+                       body: payloadLote
+                   })
+                   if (resposta && resposta.sucesso !== false) {
+                       toast.success("Usuários importados com sucesso!");
+                   }
+                   setArquivoLote(null);
+                   if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
+       
+                   setIsLoteModalOpen(false);
+       
+                   if (onCadastroSucesso) onCadastroSucesso();
+                   else {
+                       toast.error(response.mensagem || "Erro ao processar o arquivo CSV.");
+                   }
+               } catch (error) {
+                   console.error("Erro no upload em lote:", error);
+                   toast.error("Erro interno ao enviar o arquivo para o servidor.");
+               }
+    };
     return (
         <>
             <div className="flex items-center">
@@ -89,6 +143,65 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
+            <div className="flex justify-end">
+                <Dialog open={isLoteModalOpen} onOpenChange={setIsLoteModalOpen}>
+                    <DialogTrigger className="bg-secondary-foreground px-4 py-2 rounded-md flex items-center text-white text-xl font-semibold">
+                        <Plus className="mr-2" />
+                        Criar em Lote
+                    </DialogTrigger>
+
+                    <DialogContent>
+                        <div className="flex items-center">
+                            <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
+                                <Plus className="mr-2 text-3xl text-white" />
+                                <DialogTitle className="text-3xl text-white">Criar OPs em Lote</DialogTitle>
+                            </div>
+                        </div>
+                        <Separator className="m-2 bg-[#a6a6a6]" />
+
+                        <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
+                            <input
+                                type="file"
+                                ref={fileInputLoteRef}
+                                onChange={handleLoteChange}
+                                accept=".csv"
+                                className="hidden"
+                            />
+
+                            {/* div do upload clicavel */}
+                            <div
+                                onClick={() => fileInputLoteRef.current?.click()}
+                                className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                                {!arquivoLote ? (
+                                    <div className="flex flex-col items-center text-gray-500">
+                                        <Upload className="w-12 h-12 mb-2 text-gray-400" />
+                                        <span className="text-md font-medium">Clique aqui para fazer upload do arquivo CSV.</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center w-full">
+                                        <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
+                                            <File className="w-4 h-4 mr-2 shrink-0" />
+                                            <span className="text-sm truncate">{arquivoLote.nome}</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center">
+                                <Info className="text-[#7c7c81] mr-2" />
+                                <p className="text-[#7c7c81]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas.</p>
+                            </div>
+
+                            <div className="flex justify-center mt-4">
+                                <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                                    Criar em Lote
+                                </button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            </div>
 
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6 font-sans">
 

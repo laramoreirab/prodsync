@@ -313,11 +313,11 @@ class EventoModel {
                 throw new Error('Maquina nao encontrada ou inativa');
             }
 
-            const atualizarMaquina = await prisma.maquinas.update({
-                where:{ id_empresa, id_maquina },
+            const atualizarMaquina = await prisma.maquinas.updateMany({
+                where:{ id_empresa, id_maquina, ativo: true },
                 data:{ status_atual: capitalizar(status_maquina) }
             })
-            if(!atualizarMaquina){
+            if(atualizarMaquina.count === 0){
                 throw new Error('Erro ao atualizar status da máquina'); 
             }
 
@@ -944,6 +944,51 @@ class EventoModel {
             console.error('Erro ao obter top motivos por tempo:', error);
             throw error;
         }
+    }
+
+    static async listarParaRelatorio(id_empresa, dias = 7, setorId = null) {
+        const diasValidos = [7, 15, 30].includes(Number(dias)) ? Number(dias) : 7;
+        const inicio = this.inicioDoDia(new Date());
+        inicio.setDate(inicio.getDate() - diasValidos);
+
+        const eventos = await prisma.historico_Eventos.findMany({
+            where: {
+                id_empresa: Number(id_empresa),
+                inicio: { gte: inicio },
+                ...(setorId ? { setor_afetado: Number(setorId) } : {}),
+            },
+            include: {
+                maquina: { select: { nome: true, serie: true } },
+                motivo_parada: { select: { descricao: true } },
+            },
+            orderBy: { inicio: 'desc' },
+            take: 500,
+        });
+
+        return eventos.map((evento) => {
+            const duracaoMinutos = evento.duracao ?? (
+                evento.inicio
+                    ? this.calcularDuracao(evento.inicio, evento.termino ?? new Date())
+                    : null
+            );
+            const horas = duracaoMinutos != null ? Math.floor(duracaoMinutos / 60) : 0;
+            const mins = duracaoMinutos != null ? duracaoMinutos % 60 : 0;
+
+            return {
+                id: evento.id_evento,
+                id_evento: evento.id_evento,
+                maquina: evento.maquina?.nome ?? evento.maquina?.serie ?? '—',
+                tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
+                inicio: evento.inicio ? new Date(evento.inicio).toISOString() : null,
+                fim: evento.termino ? new Date(evento.termino).toISOString() : null,
+                duracao: duracaoMinutos != null
+                    ? `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+                    : '—',
+                motivo: evento.motivo_parada?.descricao ?? 'Aguardando justificativa',
+                observacao: evento.observacao || '—',
+                justificada: Boolean(evento.id_motivo_parada),
+            };
+        });
     }
 }
 

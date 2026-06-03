@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-export function KPI({ title, value, type = "number" }) {
+export function KPI({ title, value, type = "number", className = "", titleClass = "" }) {
   const [displayValue, setDisplayValue] = useState(0);
   const prevValueRef = useRef(0);
   const animationRef = useRef(null);
@@ -49,16 +49,16 @@ export function KPI({ title, value, type = "number" }) {
   };
 
   return (
-    <div className="w-full h-full flex flex-col select-none p-1">
+    <div className={`w-full h-full flex flex-col select-none p-1 ${className}`}>
       
-      <div className="flex flex-col items-start flex-shrink-0">
-        <p className="text-sm font-semibold text-black leading-snug">{title}</p>
+      <div className="flex flex-col items-center shrink-0">
+        <p className={`text-sm font-semibold leading-snug ${titleClass}`}>{title}</p>
       </div>
 
       {/* 
        - `min-h-[64px]`: Garante uma distância mínima aceitável caso o card esteja na altura padrão (default).
       */}
-      <div className="flex flex-1 items-center justify-center min-h-[64px] mt-2">
+      <div className="flex flex-1 items-center justify-center min-h-16 mt-2">
         <h2 className="text-5xl font-bold text-black tracking-tight leading-none md:text-6xl tabular-nums">
           {formatValue(displayValue)}
         </h2>

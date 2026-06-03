@@ -54,7 +54,7 @@ const colunasOrdemProd = [
     className: "w-45",
     icone: (valor) => {
       const config = {
-        "Media": { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
+        "Media": { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
         "MÃ©dia": { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
         Alta: { className: "border border-[var(--amarelo)] bg-transparent", icon: <AlertTriangle className="text-amarelo" /> },
         Critica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },

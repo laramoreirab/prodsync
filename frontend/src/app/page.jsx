@@ -17,15 +17,15 @@ export default function Home() {
     },
     {
       title: "Sobre nós",
-      href: "/",
+      href: "#sobre-nos",
     },
     {
       title: "Serviços",
-      href: "/",
+      href: "#servicos",
     },    
     {
       title: "FAQs",
-      href: "/",
+      href: "#faqs",
     }
   ];
 

@@ -34,8 +34,7 @@ function HeroSection() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, ease: "easeInOut" }}
                   className=" font-medium leading-[0.32]">
-                  <span className="block whitespace-nowrap text-[clamp(5.5rem,14vw,8rem)] text-primary sm:text-[8rem] md:text-[8rem] lg:text-[10rem] xl:text-[12rem] leading-[0.8]" style={{ fontFamily: "var(--font-virtual)"}}>
-                    Produtividade
+<span className="block whitespace-nowrap text-[clamp(5.5rem,14vw,8rem)] text-primary sm:text-[8rem] md:text-[8rem] lg:text-[10rem] xl:text-[12rem] leading-[0.8]" style={{ fontFamily: "var(--font-virtual)"}}>                    Produtividade
                   </span>
                   <span className="block lg:text-7xl md:text-5xl text-4xl font-semibold">sem pausa.</span>
                 </motion.h1>

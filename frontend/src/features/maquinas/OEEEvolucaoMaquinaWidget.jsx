@@ -1,23 +1,27 @@
 "use client";
+
 import { AreaChartBase } from "@/components/ui/charts/components/AreaChart";
 import { useOEEEvolucaoMaquina } from "./hooks/useOEEEvolucaoMaquina";
 import { oeeEvolucaoConfig } from "./config/maquinaDetalheConfig";
- 
+
 export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
   const { data, loading, error } = useOEEEvolucaoMaquina(maquinaId);
- 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
-  if (error)   return <p className="text-sm text-destructive">Erro ao carregar evolução.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando evolução...</p>;
+  if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar evolução.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
+  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;
 
- 
   return (
-    <div>
-      <p className="text-sm font-semibold text-black">Evolução do OEE há 7 dias</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
-      <div className="mt-2">
+    <div className="flex flex-col gap-1 w-full p-4 h-full justify-between">
+      <div className="text-left w-full">
+        <h2 className="text-sm font-semibold tracking-tight text-foreground">
+          Evolução do OEE nos últimos 7 dias
+        </h2>
+        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
+      </div>
+
+      <div className="mt-4 w-full h-full min-h-[160px]">
         <AreaChartBase
           data={data}
           xKey="dia"
@@ -28,4 +32,3 @@ export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
     </div>
   );
 }
- 

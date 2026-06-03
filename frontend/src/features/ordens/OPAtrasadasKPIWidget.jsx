@@ -1,5 +1,5 @@
 "use client";
-import { KPI } from "@/components/ui/charts/components";
+import { KPIHorizontal } from "@/components/ui/charts/components";
 import { useOPAtrasadas } from "./hooks/useOPAtrasadas";
 
 export function OPAtrasadasKPIWidget({ setorId = null }) {
@@ -12,5 +12,5 @@ export function OPAtrasadasKPIWidget({ setorId = null }) {
 
 
 
-  return <KPI title={data?.titulo} value={data?.valor} />;
+  return <KPIHorizontal title={data?.titulo} value={data?.valor} />;
 }

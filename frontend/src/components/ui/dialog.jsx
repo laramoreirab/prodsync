@@ -1,33 +1,22 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Dialog as DialogPrimitive } from "radix-ui"
+import * as React from "react";
+import { Dialog as DialogPrimitive } from "radix-ui";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { XIcon } from "lucide-react"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { XIcon } from "lucide-react";
+import { motion } from "motion/react";
 
-function Dialog({
-  ...props
-}) {
+function Dialog({ ...props }) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
-function DialogTrigger({
-  ...props
-}) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
-}
-
-function DialogPortal({
-  ...props
-}) {
+function DialogPortal({ ...props }) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
-function DialogClose({
-  ...props
-}) {
+function DialogClose({ ...props }) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
@@ -36,7 +25,7 @@ function DialogOverlay({ className, ...props }) {
     <DialogPrimitive.Overlay
       className={cn(
         "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm",
-        className
+        className,
       )}
       {...props}
     />
@@ -76,15 +65,13 @@ function DialogContent({
   );
 }
 
-function DialogHeader({
-  className,
-  ...props
-}) {
+function DialogHeader({ className, ...props }) {
   return (
     <div
       data-slot="dialog-header"
       className={cn("flex flex-col gap-2", className)}
-      {...props} />
+      {...props}
+    />
   );
 }
 
@@ -99,9 +86,10 @@ function DialogFooter({
       data-slot="dialog-footer"
       className={cn(
         "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
-        className
+        className,
       )}
-      {...props}>
+      {...props}
+    >
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
@@ -112,33 +100,78 @@ function DialogFooter({
   );
 }
 
-function DialogTitle({
-  className,
-  ...props
-}) {
+function DialogTitle({ className, ...props }) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("font-heading text-base leading-none font-medium", className)}
-      {...props} />
+      className={cn(
+        "font-heading text-base leading-none font-medium",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function DialogDescription({
-  className,
-  ...props
-}) {
+function DialogDescription({ className, ...props }) {
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
         "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
-        className
+        className,
       )}
-      {...props} />
+      {...props}
+    />
   );
 }
 
+
+function DialogTrigger({
+  className,
+  children,
+  asChild = false,
+  ...props
+}) {
+  const hoverState = {
+    scale: 1.03,
+    filter: "brightness(1.05)"
+  };
+
+  const tapState = {
+    scale: 0.98,
+    filter: "brightness(0.96)"
+  };
+
+  if (asChild) {
+    const MotionSlot = motion.create(DialogPrimitive.Trigger);
+
+    return (
+      <MotionSlot
+        data-slot="dialog-trigger"
+        asChild
+        {...props}
+        whileHover={hoverState}
+        whileTap={tapState}
+        transition={{ type: "spring", stiffness: 400, damping: 18 }}      >
+        {children}
+      </MotionSlot>
+    );
+  }
+
+  return (
+    <DialogPrimitive.Trigger data-slot="dialog-trigger" asChild {...props}>
+      <motion.button
+        type="button"
+        className={cn("cursor-pointer", className)}
+        whileHover={hoverState}
+        whileTap={tapState}
+        transition={{ type: "spring", stiffness: 400, damping: 18 }}      >
+        {children}
+      </motion.button>
+    </DialogPrimitive.Trigger>
+  );
+}
 export {
   Dialog,
   DialogClose,
@@ -150,4 +183,4 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-}
+};

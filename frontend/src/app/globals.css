@@ -61,7 +61,7 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: #23304c;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: #00357a;
   --secondary-foreground: #00357a;
   --muted: oklch(0.97 0 0);
   --muted-foreground: #9b9d9d;
@@ -161,7 +161,119 @@
 }
 
 input{
-  outline: none;
+  outline: none !important;
+}
+
+select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  outline: none !important;
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  color: #23304c !important;
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 500;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  width: 100%;
+  cursor: pointer;
+  /* chevron down personalziado  */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2323304c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 16px !important;
+}
+
+select option {
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  padding: 10px !important;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+
+select:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-slot="select-trigger"] {
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  font-family: var(--font-montserrat), sans-serif;
+  color: #23304c !important;
+}
+
+[data-slot="select-content"] {
+  border: none !important;
+  border-radius: 12px !important; /* Mais arredondado como na foto */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  background-color: white !important;
+  margin-top: 8px !important;
+  overflow: hidden !important;
+  padding: 4px !important;
+}
+
+[data-slot="select-item"] {
+  border-radius: 6px !important;
+  margin: 2px 0 !important;
+  padding: 8px 12px !important;
+  color: #23304c !important;
+  font-family: var(--font-montserrat), sans-serif;
+  cursor: pointer !important;
+  outline: none !important;
+}
+
+[data-slot="select-item"]:focus,
+[data-slot="select-item"][data-highlighted],
+[data-slot="select-item"][data-state="checked"] {
+  background-color: #f1f5f9 !important;
+  color: #23304c !important;
+}
+
+[data-slot="select-item-indicator"] {
+  display: none !important;
+}
+
+[data-radix-select-trigger] {
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.5rem !important; 
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; 
+}
+
+[data-radix-select-content] {
+  background-color: #ffffff !important;
+  border-radius: 0.75rem !important; 
+  padding: 0.25rem !important;
+  border: none !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-radix-select-item] {
+  color: #23304c !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+
+[data-radix-select-item][data-highlighted],
+[data-radix-select-item]:focus {
+  background-color: #eef4ff !important; 
+  color: #23304c !important;
+  outline: none !important;
 }
 
 .dark body {
@@ -227,6 +339,70 @@ input{
 .dark [data-app-shell] select option {
   background-color: #f8f8f8;
   color: #23304c;
+}
+
+.dark [data-app-shell] select,
+.dark select {
+  color-scheme: light;
+}
+
+.dark [data-app-shell] select option,
+.dark select option {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  -webkit-text-fill-color: #23304c !important;
+}
+
+.dark [data-app-shell] select option:hover,
+.dark [data-app-shell] select option:focus,
+.dark [data-app-shell] select option:checked,
+.dark [data-app-shell] select option:active,
+.dark select option:hover,
+.dark select option:focus,
+.dark select option:checked,
+.dark select option:active {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  box-shadow: 0 0 0 9999px #ffffff inset !important;
+  -webkit-text-fill-color: #23304c !important;
+}
+
+.dark [data-app-shell] select option:disabled,
+.dark select option:disabled {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  box-shadow: 0 0 0 9999px #ffffff inset !important;
+  -webkit-text-fill-color: #23304c !important;
+}
+
+.dark [data-app-shell] select:focus option:checked,
+.dark [data-app-shell] select:active option:checked,
+.dark select:focus option:checked,
+.dark select:active option:checked {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  box-shadow: 0 0 0 9999px #ffffff inset !important;
+  -webkit-text-fill-color: #23304c !important;
+}
+
+.dark [data-slot="select-content"] {
+  background-color: #ffffff !important;
+  color: #23304c !important;
+  border-color: #7d95c6 !important;
+}
+
+.dark [data-slot="select-item"] {
+  color: #23304c !important;
+}
+
+.dark [data-slot="select-item"]:focus,
+.dark [data-slot="select-item"][data-highlighted] {
+  background-color: #edf4ff !important;
+  color: #23304c !important;
 }
 
 .dark [data-app-shell] .contrast-control {
@@ -360,3 +536,118 @@ input.input-no-spinner {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Relatórios: impressão / exportar PDF (Salvar como PDF no diálogo) ─── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  [data-app-shell] > img,
+  [data-app-shell] [data-slot="sidebar"],
+  [data-print-hide],
+  .relatorio-pagina > .fixed,
+  .relatorio-pagina .fixed.inset-0 {
+    display: none !important;
+  }
+
+  [data-app-shell] {
+    background: #fff !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  [data-app-shell] main {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  [data-app-shell] main > div {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .relatorio-pagina {
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
+  .relatorio-pagina .fixed {
+    display: none !important;
+  }
+
+  .relatorio-documento {
+    border: none !important;
+    background: #fff !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .relatorio-marca {
+    border-bottom-color: rgba(0, 53, 122, 0.15) !important;
+    break-after: avoid;
+  }
+
+  .relatorio-marca img {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .relatorio-secao {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .relatorio-widget-card,
+  .relatorio-capa {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .relatorio-tabela thead tr {
+    box-shadow: none !important;
+    break-inside: avoid;
+    background-color: #23304c !important;
+    color: #fff !important;
+  }
+
+  .recharts-surface,
+  .recharts-wrapper,
+  svg {
+    overflow: visible !important;
+  }
+
+  .recharts-cartesian-grid line,
+  .recharts-polar-grid-angle line,
+  .recharts-polar-grid-concentric path {
+    stroke: rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .recharts-cartesian-axis-tick text,
+  .recharts-text {
+    fill: #23304c !important;
+    font-size: 10px !important;
+  }
+}
+

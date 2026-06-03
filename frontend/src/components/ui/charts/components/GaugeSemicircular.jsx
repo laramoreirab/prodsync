@@ -9,22 +9,45 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
   const strokeColor = data[0]?.fill || config[dataKey]?.color || "#00357a";
 
   const sizes = {
+    sm: {
+      container: "h-[85px] w-[95px]",
+      svgSize: 60,
+      strokeWidth: 6,
+      valueText: "text-sm font-semibold",
+      labelText: "text-[10px]",
+      labelOffset: "-mt-4",
+    },md: { 
+      container: "h-[105px] w-[120px]",
+      svgSize: 100,
+      strokeWidth: 8,
+      valueText: "text-xl font-bold",
+      labelText: "text-[11px]",
+      labelOffset: "-mt-6",
+    },
     default: {
-      container: "h-[180px] w-[180px]",
-      svgSize: 180,
-      strokeWidth: 20,
-      valueText: "text-3xl",
-      labelText: "text-sm",
-      labelOffset: "-mt-2",
+      container: "h-[120px] w-[130px]",
+      svgSize: 100,
+      strokeWidth: 10,
+      valueText: "text-xl font-bold",
+      labelText: "text-xs",
+      labelOffset: "-mt-7",
     },
     lg: {
-      container: "h-[240px] w-[240px]",
-      svgSize: 240,
-      strokeWidth: 26,
-      valueText: "text-5xl",
+      container: "h-[150px] w-[160px]",
+      svgSize: 130,
+      strokeWidth: 12,
+      valueText: "text-3xl font-bold",
       labelText: "text-sm",
-      labelOffset: "-mt-4",
+      labelOffset: "-mt-9",
     },
+xlg: {
+    container: "h-[190px] w-[200px]",
+    svgSize: 190,
+    strokeWidth: 18,
+    valueText: "text-5xl font-extrabold",
+    labelText: "text-base",
+    labelOffset: "-mt-12",
+  },
   };
 
   const s = sizes[size] ?? sizes.default;
@@ -65,11 +88,11 @@ export function GaugeSemicircular({ data, config, title, size = "default" }) {
         />
       </svg>
 
-      <div className={`flex flex-col items-center ${s.labelOffset}`}>
-        <span className={`${s.valueText} font-bold leading-none`}>
+      <div className={`flex flex-col items-center w-full text-center ${s.labelOffset}`}>
+        <span className={`${s.valueText} font-bold tracking-tight text-black leading-none`}>
           {normalizedValue}%
         </span>
-        <span className={`${s.labelText} uppercase tracking-wider text-muted-foreground font-medium mt-1`}>
+        <span className={`${s.labelText} uppercase tracking-wider text-black font-semibold mt-1`}>
           {config[dataKey]?.label || "Gauge"}
         </span>
       </div>
