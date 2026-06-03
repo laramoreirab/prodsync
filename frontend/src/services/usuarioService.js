@@ -100,12 +100,8 @@ export const turnosOperadoresService = {
     if (USE_MOCK) {
       return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
     }
-    try {
-      const data = await apiFetch("/api/usuarios/turnos");
-      return UsuariosPorTurnoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
-    } catch {
-      return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
-    }
+    const data = await apiFetch("/api/usuarios/turnos");
+    return UsuariosPorTurnoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
 
@@ -116,14 +112,13 @@ export const producaoMediaUsuarioSetorService = {
         filterBySetorId(mockProducaoMediaUsuarioSetor, setorId)
       );
     }
-    try {
-      const data = await apiFetch("/api/usuarios/producao_media_por_usuario");
-      return ProducaoMediaUsuarioArraySchema.parse(filterBySetorId(data.dados || [], setorId));
-    } catch {
-      return ProducaoMediaUsuarioArraySchema.parse(
-        filterBySetorId(mockProducaoMediaUsuarioSetor, setorId)
-      );
-    }
+    const data = await apiFetch("/api/usuarios/producao_media_por_usuario");
+    const normalized = (data.dados || []).map((item) => ({
+      usuario: item.usuario ?? item.nome ?? "Sem nome",
+      media: item.media ?? item.qtd ?? 0,
+      setorId: item.setorId ?? (setorId ? Number(setorId) : undefined),
+    }));
+    return ProducaoMediaUsuarioArraySchema.parse(filterBySetorId(normalized, setorId));
   },
 };
 
@@ -132,11 +127,7 @@ export const usuarioTaxaRefugoService = {
     if (USE_MOCK) {
       return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
     }
-    try {
-      const data = await apiFetch("/api/usuarios/taxa_refugo");
-      return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
-    } catch {
-      return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
-    }
+    const data = await apiFetch("/api/usuarios/taxa_refugo");
+    return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };

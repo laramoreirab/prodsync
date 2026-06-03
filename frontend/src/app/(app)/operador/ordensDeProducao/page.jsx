@@ -67,23 +67,23 @@ export default function OrdensDeProducao() {
         const config = {
           "Média": {
             variant: "outline",
-            className: "border border-[var(--azul-cobalto)]",
-            icon: <MoveHorizontal className="text-azul-cobalto" />
+            className: "border border-sky-500/30 bg-sky-500/10 text-sky-700",
+            icon: <MoveHorizontal className="text-sky-600" />
           },
           "Alta": {
             variant: "secondary",
-            className: "border border-[var(--amarelo)] bg-transparent",
-            icon: <AlertTriangle className="text-amarelo" />
+            className: "border border-amber-500/30 bg-amber-500/10 text-amber-700",
+            icon: <AlertTriangle className="text-amber-600" />
           },
           "Crítica": {
             variant: "destructive",
-            className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
-            icon: <Flame className="text-vermelho-vivido" />
+            className: "border border-rose-500/30 bg-rose-500/10 text-rose-700",
+            icon: <Flame className="text-rose-600" />
           },
           "Baixa": {
             variant: "destructive",
-            className: "border border-gray-400 text-sm bg-transparent text-black",
-            icon: <ArrowDown className="text-gray-400" />
+            className: "border border-slate-400/30 bg-slate-100 text-slate-700",
+            icon: <ArrowDown className="text-slate-400" />
           }
         };
 
@@ -105,23 +105,23 @@ export default function OrdensDeProducao() {
         const config = {
           "Produzindo": {
             variant: "outline",
-            className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+            className: "bg-emerald-500/15 text-emerald-700 text-sm font-semibold border-none"
           },
           "Setup": {
             variant: "secondary",
-            className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm "
+            className: "bg-amber-500/15 text-amber-900 font-semibold text-sm "
           },
           "Parada": {
             variant: "destructive",
-            className: "bg-vermelho-vivido/10 text-vermelho-vivido font-semibold text-sm border-none"
+            className: "bg-rose-500/15 text-rose-700 font-semibold text-sm border-none"
           },
           "Concluída": {
             variant: "outline",
-            className: "bg-blue-500/10 text-blue-600 text-sm font-semibold border-none"
+            className: "bg-sky-500/15 text-sky-700 text-sm font-semibold border-none"
           },
           "Aguardando Início": {
             variant: "outline",
-            className: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)] text-sm font-semibold border-none"
+            className: "bg-slate-500/15 text-slate-700 text-sm font-semibold border-none"
           }
         };
 

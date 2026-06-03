@@ -382,10 +382,10 @@ export const mockOPCargaSetor = [
 ];
 
 export const mockOPStatus = [
-  { name: "emProducao",       value: 35 },
-  { name: "pausadasSetup",    value: 25 },
-  { name: "atrasadas",        value: 13 },
-  { name: "aguardandoInicio", value: 27 },
+  { name: "Em Produção", value: 35 },
+  { name: "Pausadas (Setup)", value: 25 },
+  { name: "Pausadas", value: 13 },
+  { name: "Aguardando Início", value: 27 },
 ];
 
 export const mockOPConcluidasDia = [
