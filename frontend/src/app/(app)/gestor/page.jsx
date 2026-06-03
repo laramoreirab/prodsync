@@ -14,6 +14,7 @@ import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorT
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
 import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
 import { usePerfil } from "@/hooks/usePerfil";
+import { ArrowUpFromLine } from "lucide-react";
 
 
 export default function DashboardGeralGestor() {
@@ -31,8 +32,19 @@ export default function DashboardGeralGestor() {
   if (!setorId) {
     return (
       <PageLayout>
-        <PageHeader title="Dashboard Geral do Setor" subtitle="Acompanhando os indicadores do seu setor..." />
+        <PageHeader
+          title="Dashboard Geral do Setor" subtitle="Acompanhando os indicadores do seu setor..."
+          action={
+            <a href="/gestor/relatorios">
+              <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+                <ArrowUpFromLine size={20} className="mr-2" />
+                Exportar PDF
+              </button>
+            </a>
+          }
+        />
         <p className="text-sm text-destructive">Nenhum setor vinculado ao seu perfil.</p>
+
       </PageLayout>
     );
   }

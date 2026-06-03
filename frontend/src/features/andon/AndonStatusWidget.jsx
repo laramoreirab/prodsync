@@ -7,17 +7,20 @@ const cards = [
   {
     key: "emProducao",
     label: "Em Produção",
-    accent: "#369948",
+    bg: "bg-green-50",
+    accent: "text-[#369948]",
   },
   {
     key: "emSetup",
     label: "Em Setup",
-    accent: "#ffac1e",
+    bg: "bg-yellow-50",
+    accent: "text-[#ffac1e]",
   },
   {
     key: "emParada",
     label: "Em Parada",
-    accent: "var(--trash)",
+    bg: "bg-red-50",
+    accent: "text-[#b30000]",
   },
 ];
 
@@ -32,23 +35,19 @@ export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) 
 
   return (
     <div className="space-y-4 w-full h-full flex flex-col">
-      <p className="text-md font-semibold text-slate-950 flex-shrink-0">{heading}</p>
+      <p className="text-md font-semibold text-slate-950 shrink-0">{heading}</p>
 
       <div className="grid gap-4 grid-cols-3 w-full flex-1">
-        {cards.map(({ key, label, accent }) => (
+        {cards.map(({ key, label, bg, accent }) => (
           <div
             key={key}
-            className="flex w-full h-full flex-col rounded-xl border p-4 shadow-sm"
-            style={{
-              borderColor: accent,
-              color: accent,
-              backgroundColor: `color-mix(in srgb, ${accent} 8%, transparent)`,
-            }}
+            className={`flex w-full h-full flex-col rounded-xl p-4 ${bg}`}
           >
             <KPI
               title={label}
               value={Number(data[key]) || 0}
               type="number"
+              titleClass={accent}
             />
           </div>
         ))}
