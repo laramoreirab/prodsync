@@ -14,7 +14,6 @@ import { DataEvento } from "@/components/ui/dataEvento";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { EyeIcon, Pencil, Trash2, Plus, BellRing, Loader2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormEdicaoUsuario from "@/components/ui/forms/usuarios/formEdicaoUsuario";
 import FormExclusaoUsuario from "@/components/ui/forms/usuarios/formExclusaoUsuario";
@@ -32,6 +31,7 @@ import {
   DetailPageContainer,
   DetailBackLink,
   UserProfileCard,
+  MachineProfileCard,
   DetailSectionTitle,
   DetailWidgetGrid,
   DetailWidgetCard,
@@ -345,77 +345,85 @@ export default function UsuarioDetalhePage({ params }) {
       <DetailPageContainer>
         <DetailBackLink href="/adm/usuarios" label="Voltar para Usuários" />
 
-        <UserProfileCard
-          imageSrc={
-            usuario?.imagem_perfil
-              ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
-              : "/userdefault.svg"
-          }
-          name={usuario?.nome || "-"}
-          fieldsLeft={[
-            { label: "ID", value: String(usuario?.id_usuario || operadorId) },
-            { label: "Email", value: usuario?.email || "-" },
-            { label: "CPF", value: usuario?.cpf || "-" },
-          ]}
-          fieldsRight={[
-            { label: "Setor", value: usuario?.setor?.nome_setor || "-" },
-            { label: "Função", value: usuario?.tipo || usuario?.funcao || "-" },
-            { label: "Turno", value: usuario?.turno?.nome_turno || "-" },
-          ]}
-          actions={
-            <DetailActions>
-              <Dialog>
-                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
-                  <Pencil size={32} />
-                </DialogTrigger>
-                <DialogContent>
-                  <FormEdicaoUsuario usuarioId={operadorId} onEdicaoSucesso={carregarDados} />
-                </DialogContent>
-              </Dialog>
-              <Dialog>
-                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
-                  <Trash2 size={32} />
-                </DialogTrigger>
-                <DialogContent>
-                  <FormExclusaoUsuario usuarioId={operadorId} />
-                </DialogContent>
-              </Dialog>
-            </DetailActions>
-          }
-        />
 
-        {usuario?.maquina && (
-          <>
-            <DetailSectionTitle className="mt-12" title="Responsável por:" />
-            <AsymmetricGrid side="left" className="mt-2">
-              <Link href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}>
-                <UserProfileCard
-                  imageSrc="/demo_maq.png"
-                  imageAlt={usuario.maquina.nome || "Máquina"}
-                  name={usuario.maquina.nome || "-"}
-                  fieldsLeft={[
-                    { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
-                    { label: "Série", value: usuario.maquina.serie || "-" },
-                  ]}
-                  fieldsRight={[
-                    { label: "Status", value: usuario.maquina.status_atual || "-" },
-                  ]}
-                />
-              </Link>
+        <div className={`grid gap-4 sm:gap-6 grid-cols-1 ${usuario?.maquina ? "lg:grid-cols-2" : ""}`}>
+          {/* Card do Usuário */}
+          <UserProfileCard
+            imageSrc={
+              usuario?.imagem_perfil
+                ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
+                : "/userdefault.svg"
+            }
+            name={usuario?.nome || "-"}
+            fieldsLeft={[
+              { label: "ID", value: String(usuario?.id_usuario || operadorId) },
+              { label: "Email", value: usuario?.email || "-" },
+              { label: "CPF", value: usuario?.cpf || "-" },
+            ]}
+            fieldsRight={[
+              { label: "Setor", value: usuario?.setor?.nome_setor || "-" },
+              { label: "Função", value: usuario?.tipo || usuario?.funcao || "-" },
+              { label: "Turno", value: usuario?.turno?.nome_turno || "-" },
+            ]}
+            actions={
+              <DetailActions>
+                <Dialog>
+                  <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
+                    <Pencil size={32} />
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormEdicaoUsuario usuarioId={operadorId} onEdicaoSucesso={carregarDados} />
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger className="text-[var(--trash)] cursor-pointer">
+                    <Trash2 size={32} />
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormExclusaoUsuario usuarioId={operadorId} />
+                  </DialogContent>
+                </Dialog>
+              </DetailActions>
+            }
+          />
 
-              <SectionHighlight>
-                <OEEOperadorWidget operadorId={operadorId} />
-              </SectionHighlight>
-
-            </AsymmetricGrid>
-          </>
-        )}
-
+          {/* Card da Máquina (se houver) */}
+          {usuario?.maquina && (
+            <Link
+              href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}
+              className="block h-full"
+            >
+              <MachineProfileCard
+                machineName={usuario.maquina.nome ? `Responsável por: ${usuario.maquina.nome}` : "-"} imageSrc="/demo_maq.png"
+                imageAlt={usuario.maquina.nome || "Máquina"}
+                fieldsLeft={[
+                  { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
+                  { label: "Série", value: usuario.maquina.serie || "-" },
+                ]}
+                fieldsRight={[
+                  { label: "Status", value: usuario.maquina.status_atual || "-" },
+                ]}
+                status={usuario.maquina.status_atual}
+                className="h-full"
+              />
+            </Link>
+          )}
+        </div>
         <DetailSectionTitle title="Produção" />
+        <AsymmetricGrid>
+          <DetailWidgetCard>    
+            <OEEOperadorWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard centered>
+            <MetaProducaoWidget operadorId={operadorId} />
+          </DetailWidgetCard>
+
+        </AsymmetricGrid>
 
 
 
-        <DetailWidgetGrid cols={3}>
+
+        <DetailWidgetGrid cols={2}>
 
           <DetailWidgetCard>
             <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
@@ -423,9 +431,7 @@ export default function UsuarioDetalhePage({ params }) {
           <DetailWidgetCard>
             <PecasPorDiaWidget operadorId={operadorId} />
           </DetailWidgetCard>
-          <DetailWidgetCard centered>
-            <MetaProducaoWidget operadorId={operadorId} />
-          </DetailWidgetCard>
+
         </DetailWidgetGrid>
 
         <DetailWidgetGrid cols={2}>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, KeyRound } from "lucide-react";
 import SuccessCard from "@/components/ui/modalCadastro";
 import { setAuthToken } from "@/lib/auth";
 
@@ -98,33 +98,33 @@ export default function LoginForm() {
                         </div>
 
                         <div className="grid gap-3">
-    <div className="flex items-center">
-        <Label className="font-medium text-[#545454]">Senha</Label>
-    </div>
-    
-    {/* Container relativo para prender o botão absoluto */}
-    <div className="relative flex items-center">
-        <Input
-            className="h-9 pr-10 w-full" // pr-10 garante que o texto não fique por baixo do botão
-            type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-        />
-        <button
-            type="button"
-            className="absolute right-0 top-0 bottom-0 flex w-10 items-center justify-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => setShowPassword((current) => !current)}
-            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-        >
-            {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-            ) : (
-                <Eye className="h-4 w-4" />
-            )}
-        </button>
-    </div>
-</div>
+                            <div className="flex items-center">
+                                <Label className="font-medium text-[#545454]">Senha</Label>
+                            </div>
+
+                            {/* Container relativo para prender o botão absoluto */}
+                            <div className="relative flex items-center">
+                                <Input
+                                    className="h-9 pr-10 w-full" // pr-10 garante que o texto não fique por baixo do botão
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="••••••••"
+                                    value={senha}
+                                    onChange={(e) => setSenha(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-0 top-0 bottom-0 flex w-10 items-center justify-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground"
+                                    onClick={() => setShowPassword((current) => !current)}
+                                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                        <Eye className="h-4 w-4" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mt-2">
                             <label className="flex items-center gap-2 cursor-pointer group">
                                 <input
@@ -168,12 +168,12 @@ export default function LoginForm() {
                     </a>
                 </p>
 
-                <a href="/primeiro-acesso">
-                    <p className="text-sm text-center font-semibold text-foreground cursor-pointer hover:underline">
-
-                        É seu primeiro acesso?
-                    </p>
-                </a>
+                <div className="flex justify-center items-center text-center font-semibold text-foreground">
+                    <a href="/primeiro-acesso" className="flex items-center gap-2 text-sm hover:underline cursor-pointer">
+                        <KeyRound width={20} />
+                        <span>É seu primeiro acesso?</span>
+                    </a>
+                </div>
             </div>
 
 

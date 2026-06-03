@@ -258,7 +258,7 @@ function Sidebar({
           "relative shrink-0 bg-transparent transition-[width] duration-500 ease-in-out",
           "group-data-[side=right]/sidebar:rotate-180",
           isIconMode
-            ? "w-(--sidebar-width) group-data-[state=collapsed]/sidebar:w-(--sidebar-width-icon)"
+            ? "w-(--sidebar-width) group-data-[state=collapsed]/sidebar:w-(--sidebar-width-icon) group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-(--sidebar-width)"
             : "w-(--sidebar-width) group-data-[collapsible=offcanvas]/sidebar:w-0"
         )} />
 

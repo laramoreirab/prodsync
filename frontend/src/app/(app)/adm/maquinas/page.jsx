@@ -253,7 +253,6 @@ export default function Maquinas() {
         {dadosExibidos.length > 0 ? (
           <div className="w-full overflow-x-auto">
 
-            <div className="flex flex-col flex-1 items-center w-full mt-4 px-8">
 
               <TableListagens
                 /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
@@ -297,7 +296,6 @@ export default function Maquinas() {
                   </>
                 )}
               />
-            </div>
           </div>
         ) : (
           <EmptyState

@@ -66,12 +66,15 @@ const Header = ({
       viewport={{ once: true }}
       transition={{ duration: 0.7, ease: "easeInOut" }}
       className={cn(
-        "inset-x-0 z-50 flex items-center justify-center sticky top-0 h-20",
+        "w-full z-50 flex items-center justify-center sticky top-0 h-20 transition-all duration-500",
+        sticky 
+      ? "bg-white border-b border-border/40 shadow-2xl shadow-primary/5" 
+      : "bg-transparent border-b border-transparent",
         className
       )}>
       <div
         className={cn(
-          "w-full px-4 flex items-center h-fit justify-between gap-3.5 lg:gap-6 transition-all duration-500 bg-transparent",
+          "w-full px-4 flex items-center h-full justify-between gap-3.5 lg:gap-6 transition-all duration-500",
           sticky
             ? "py-2.5 bg-white m-0 border border-border/40 shadow-2xl shadow-primary/5 h-20"
             : "border-transparent h-20 bg-transparent"

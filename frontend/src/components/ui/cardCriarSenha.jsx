@@ -12,15 +12,12 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import InputSenha from "./inputSenha";
 import { useState } from "react";
-import { CheckCircle2, Info, Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, Info, Eye, EyeOff, Key } from "lucide-react";
 import { apiFetch } from "@/lib/api"
 import { setAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
 
 export default function CriarSenha() {
-
-    /* const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); */
 
     // Controle de Etapas
     const [step, setStep] = useState(1)
@@ -127,11 +124,6 @@ export default function CriarSenha() {
                             </div>
                         </CardHeader>
 
-
-
-
-
-
                         <CardContent className="p-0">
                             <form onSubmit={(e) => handleContinuar(e)} className="space-y-6" noValidate>
                                 <FieldGroup className="gap-2">
@@ -155,7 +147,7 @@ export default function CriarSenha() {
                                         </Field>
 
                                         <Field className="flex text-center text-3x1">
-                                            <a className="w-full font-semibold hover:bg-transparent">
+                                            <a className="w-full font-semibold hover:bg-transparent" href="/">
                                                 Voltar para Login
                                             </a>
                                         </Field>
