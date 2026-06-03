@@ -100,14 +100,13 @@ const Pricing = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   custom={index}
-                  className={cn("relative flex-1 flex flex-col w-full", isFeatured && "z-10 scale-102")}>
+                  className={cn("relative flex-1 flex flex-col w-full transition-all duration-300 ease-out hover:scale-103", isFeatured && "z-10 scale-102")}>
                   {/* GRADIENT BORDER */}
                   {isFeatured && (
                     <div className="absolute -inset-0.5 rounded-2xl overflow-hidden">
                       {/* Animated conic-gradient border */}
                       <div
-                        className="absolute -inset-full blur-xs animate-spin [animation-duration:2s] bg-conic from-blue-500 via-red-500 to-teal-400" />
-
+                        className="absolute -inset-full blur-xs animate-spin [animation-duration:2s] bg-conic from-[#00357a] via-[#343fbd] to-[#adc8ff]" />
                       {/* Inner mask */}
                       <div className="absolute inset-0.5 rounded-2xl bg-card" />
                     </div>

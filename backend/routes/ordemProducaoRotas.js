@@ -1,10 +1,13 @@
 import { Router } from 'express';
 import OrdemProducaoController from '../controllers/OrdemProducaoController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js';
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js';
 import { aplicarEscopoGestor, autorizarOrdemParam, validarBodySetorGestor } from '../middlewares/setorAccessMiddleware.js';
+import multer from 'multer';
 
 const router = Router();
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authMiddleware);
 
@@ -21,6 +24,8 @@ router.get('/dashboard/top-refugo', aplicarEscopoGestor, OrdemProducaoController
 router.get('/dashboard/carga-setor', aplicarEscopoGestor, OrdemProducaoController.cargaPorSetor);
 router.get('/dashboard/status', aplicarEscopoGestor, OrdemProducaoController.statusOPs);
 router.get('/dashboard/concluidas-dia', aplicarEscopoGestor, OrdemProducaoController.opsConcluidasPorDia);
+
+router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), OrdemProducaoController.cadastroLote);
 
 router.get('/', aplicarEscopoGestor, paginacaoMiddleware, OrdemProducaoController.listarTodos);
 router.post('/', validarBodySetorGestor('id_setor'), OrdemProducaoController.criar);

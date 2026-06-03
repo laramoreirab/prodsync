@@ -490,6 +490,27 @@ class EventoController {
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
         }
     }
+
+    static async listarParaRelatorio(req, res) {
+        try {
+            const dias = Number(req.query.dias) || 7;
+            const setorId = req.query.setorId ?? req.setorId ?? null;
+            const dados = await EventoModel.listarParaRelatorio(
+                req.user.id_empresa,
+                dias,
+                setorId
+            );
+
+            return res.status(200).json({ sucesso: true, dados });
+        } catch (error) {
+            console.error('Erro ao listar eventos para relatório:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível listar os eventos para o relatório',
+            });
+        }
+    }
 }
 
 export default EventoController;

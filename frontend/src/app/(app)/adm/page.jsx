@@ -21,7 +21,7 @@ export default function DashboardGeralPage() {
         title="Dashboard Geral da Empresa"
 
         action={
-          <a href="/adm/relatorios">
+          <a href="/adm/relatorios" title="Personalizar e exportar relatório em PDF">
             <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
               <ArrowUpFromLine size={20} className="mr-2" />
               Exportar PDF

@@ -163,7 +163,27 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         const payloadLote = new FormData();
         payloadLote.append("file", arquivoLote.raw);
 
-        //integrar endpoint de cadastro em lote quando o backend disponibilizar
+        try {
+            const resposta = await apiFetch('/api/maquinas/cadastro-lote', {
+                method: "POST",
+                body: payloadLote
+            })
+            if (resposta && resposta.sucesso !== false) {
+                toast.success("Usuários importados com sucesso!");
+            }
+            setArquivoLote(null);
+            if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
+
+            setIsLoteModalOpen(false);
+
+            if (onCadastroSucesso) onCadastroSucesso();
+            else {
+                toast.error(response.mensagem || "Erro ao processar o arquivo CSV.");
+            }
+        } catch (error) {
+            console.error("Erro no upload em lote:", error);
+            toast.error("Erro interno ao enviar o arquivo para o servidor.");
+        }
     };
 
     return (

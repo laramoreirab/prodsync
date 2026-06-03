@@ -60,11 +60,6 @@ export default function Faq() {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:py-24 py-8 flex flex-col gap-16">
         <div
           className="flex flex-col gap-4 items-center animate-in fade-in slide-in-from-top-10 duration-1000 delay-100 ease-in-out fill-mode-both">
-          <Badge
-            variant="outline"
-            className="text-sm h-auto py-1 px-3 border-0 outline outline-border bg-secondary-foreground text-white font-medium font-sans">
-            FAQs
-          </Badge>
           <h2 className="text-4xl sm:text-5xl font-bold text-center text-primary">
             Tem dúvidas? Nós estamos prontos para respondê-las!
           </h2>

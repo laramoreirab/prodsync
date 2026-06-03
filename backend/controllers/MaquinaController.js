@@ -1,5 +1,6 @@
 import MaquinaModel from '../models/MaquinaModel.js';
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
+import Papa from 'papaparse'
 
 class MaquinaController {
     static obterIdMaquina(req, res) {
@@ -133,7 +134,7 @@ class MaquinaController {
             const imagem = req.file ? `/uploads/imagens/${req.file.filename}` : null;
 
             const maquina = await MaquinaModel.criarMaquina(
-                id_empresa, id_setor, categoria, nome.trim(), serie?.trim(), 
+                id_empresa, id_setor, categoria, nome.trim(), serie?.trim(),
                 capacidade?.trim(), (status_atual || status)?.trim(), data_aquisicao, id_operador, imagem
             );
 
@@ -330,7 +331,7 @@ class MaquinaController {
         }
     }
 
-    static async obterMaquinaOperador(req, res){
+    static async obterMaquinaOperador(req, res) {
         try {
             const id_operador = req.params.id_operador
             const id_empresa = req.user.id_empresa
@@ -343,6 +344,52 @@ class MaquinaController {
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível obter máquina pelo ID do operador'
             });
+        }
+    }
+
+    static async cadastroLote(req, res) {
+        try {
+            function converterData(dataBR) {
+                if (!dataBR) return null;
+                const [dia, mes, ano] = dataBR.split('/');
+                return new Date(ano, Number(mes) - 1, dia);
+            }
+
+            if (!req.file) {
+                return res.status(400).json({ sucesso: false, erro: 'Arquivo CSV não encontrado.' });
+            }
+
+            const fileText = req.file.buffer.toString('utf-8');
+
+            const parsedData = Papa.parse(fileText, {
+                header: true,
+                skipEmptyLines: true,
+            });
+
+            const maquinasCsv = parsedData.data;
+
+            const dadosParaSalvar = maquinasCsv.map((linha) => ({
+                id_empresa: Number(linha.id_empresa),
+                nome: linha.nome,
+                serie: linha.serie,
+                id_setor: linha.id_setor ? Number(linha.id_setor) : null,
+                ativo: linha.ativo === 'true' || linha.ativo === '1' || linha.ativo === true,
+                capacidade: linha.capacidade,
+                data_aquisicao: converterData(linha.data_aquisicao),
+                status_atual: linha.status_atual,
+                id_operador: linha.id_operador ? Number(linha.id_operador) : null,
+                categoria: linha.categoria
+            }));
+
+            const resultado = await MaquinaModel.cadastrarLote(dadosParaSalvar)
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: `${resultado} máquinas criadas com sucesso!`
+            });
+        } catch (error) {
+            console.error('Erro ao cadastrar lote de máquinas:', error);
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno ao processar o arquivo CSV' });
         }
     }
 
@@ -544,7 +591,7 @@ class MaquinaController {
         }
     }
 
-    static async eficienciaMaquina(req, res){
+    static async eficienciaMaquina(req, res) {
         try {
             const id_empresa = req.user.id_empresa
             const id_operador = req.params.id_operador
@@ -566,49 +613,49 @@ class MaquinaController {
     // ---------------------------------------------------Tela de Gestor -----------------------------------------------
 
     static async pecasProduzidas7Dias(req, res) {
-    try {
-        const id_empresa = req.user.id_empresa
-        const id_setor = Number(req.params.id_setor)
-      const dados = await MaquinaModel.pecasProduzidas7Dias(
-        id_setor,
-        id_empresa
-      )
-      return res.status(200).json({ sucesso: true, dados })
-    } catch (error) {
-      console.error('Erro no gráfico Peças Produzidas no últimos 7 Dias:', error)
-      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_setor = Number(req.params.id_setor)
+            const dados = await MaquinaModel.pecasProduzidas7Dias(
+                id_setor,
+                id_empresa
+            )
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro no gráfico Peças Produzidas no últimos 7 Dias:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
     }
-  }
 
-static async statusMaquinas(req, res) {
-    try {
-        const id_empresa = req.user.id_empresa
-        const id_setor = req.params.id_setor
-         const dados = await MaquinaModel.statusMaquinasSetor(
-        id_setor,
-        id_empresa
-      )
-      return res.status(200).json({ sucesso: true, dados })
-    } catch (error) {
-      console.error('Erro statusMaquinas:', error)
-      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    static async statusMaquinas(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_setor = req.params.id_setor
+            const dados = await MaquinaModel.statusMaquinasSetor(
+                id_setor,
+                id_empresa
+            )
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro statusMaquinas:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
     }
-  }
 
-   static async producaoMaquinas(req, res) {
-    try {
-        const id_empresa = req.user.id_empresa
-        const id_setor = Number(req.params.id_setor)
-      const dados = await MaquinaModel.producaoMaquinasSetor(
-        id_setor,
-        id_empresa
-      )
-      return res.status(200).json({ sucesso: true, dados })
-    } catch (error) {
-      console.error('Erro producaoMaquinas:', error)
-      return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+    static async producaoMaquinas(req, res) {
+        try {
+            const id_empresa = req.user.id_empresa
+            const id_setor = Number(req.params.id_setor)
+            const dados = await MaquinaModel.producaoMaquinasSetor(
+                id_setor,
+                id_empresa
+            )
+            return res.status(200).json({ sucesso: true, dados })
+        } catch (error) {
+            console.error('Erro producaoMaquinas:', error)
+            return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
     }
-  }
 
 }
 export default MaquinaController;

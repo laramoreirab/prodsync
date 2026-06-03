@@ -61,7 +61,7 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: #23304c;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: #00357a;
   --secondary-foreground: #00357a;
   --muted: oklch(0.97 0 0);
   --muted-foreground: #9b9d9d;
@@ -544,5 +544,110 @@ input.input-no-spinner {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ─── Relatórios: impressão / exportar PDF (Salvar como PDF no diálogo) ─── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  [data-app-shell] > img,
+  [data-app-shell] [data-slot="sidebar"],
+  [data-print-hide],
+  .relatorio-pagina > .fixed,
+  .relatorio-pagina .fixed.inset-0 {
+    display: none !important;
+  }
+
+  [data-app-shell] {
+    background: #fff !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  [data-app-shell] main {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  [data-app-shell] main > div {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .relatorio-pagina {
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
+  .relatorio-pagina .fixed {
+    display: none !important;
+  }
+
+  .relatorio-documento {
+    border: none !important;
+    background: #fff !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .relatorio-marca {
+    border-bottom-color: rgba(0, 53, 122, 0.15) !important;
+    break-after: avoid;
+  }
+
+  .relatorio-marca img {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .relatorio-secao {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .relatorio-widget-card,
+  .relatorio-capa {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .relatorio-tabela thead tr {
+    box-shadow: none !important;
+    break-inside: avoid;
+    background-color: #23304c !important;
+    color: #fff !important;
+  }
+
+  .recharts-surface,
+  .recharts-wrapper,
+  svg {
+    overflow: visible !important;
+  }
+
+  .recharts-cartesian-grid line,
+  .recharts-polar-grid-angle line,
+  .recharts-polar-grid-concentric path {
+    stroke: rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .recharts-cartesian-axis-tick text,
+  .recharts-text {
+    fill: #23304c !important;
+    font-size: 10px !important;
+  }
 }
 

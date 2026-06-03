@@ -330,6 +330,19 @@ class OrdemProducaoModel {
         }
     }
 
+        static async cadastrarLote(dados){
+            try {
+                const resultado = await prisma.ordemProducao.createMany({
+                    data: dados,
+                    skipDuplicates: true, // Impede que a query quebre caso um CPF já exista
+                });
+                return resultado.count
+            } catch (error) {
+                console.error('Erro cadastrar lote csv de Ordens de Produção no banco de dados', error);
+                throw error;
+            }
+        }
+
     // ------------------------------------------Dashboard pag especifica OP -----------------------------------------------------------
 
     static async progressoOP(id_empresa, id_ordem) {

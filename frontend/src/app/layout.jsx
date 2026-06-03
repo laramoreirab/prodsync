@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
       lang="pt-br"
       suppressHydrationWarning
       // h-full + overflow-hidden evita que o próprio <html> gere barra de rolagem
-      className={`${montserrat.variable} ${virtualFont.variable} h-full overflow-hidden antialiased`}
+      className={`${montserrat.variable} ${virtualFont.variable} min-h-screen antialiased`}
     >
       <head>
         <Script id="theme-initializer" strategy="beforeInteractive">
@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
       </head>
 
       {/* h-full + overflow-hidden: o body ocupa exatamente a viewport e não rola */}
-      <body className="h-full overflow-hidden flex flex-col">
+      <body className="h-full flex flex-col">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" />
       </body>
