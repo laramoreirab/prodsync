@@ -203,8 +203,8 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         carregarMaquinas();
     }, [formData.id_setor]);
 
-    const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
-    const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
+   const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
+    const inputStyle = "w-full border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none";
 
     if (carregando) {
         return (
