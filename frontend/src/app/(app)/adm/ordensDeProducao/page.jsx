@@ -138,11 +138,11 @@ const colunasOrdemProd = [
           className: "!border-green-500/30 !bg-green-100 !text-green-800 text-sm font-semibold border-none dark:!border-green-300/35 dark:!bg-green-300/20 dark:!text-green-100"
         },
         "Setup": {
-          variant: "secondary",
+          variant: "setup",
           className: "!border-amber-300 !bg-amber-100 !text-amber-900 text-sm font-semibold border-none dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
         },
         "Parada": {
-          variant: "destructive",
+          variant: "parada",
           className: "!border-red-500/30 !bg-red-100 !text-red-800 text-sm font-semibold border-none dark:!border-red-300/35 dark:!bg-red-500/20 :!text-red-100"
         },
         "Concluída": {
@@ -156,7 +156,7 @@ const colunasOrdemProd = [
       };
       const item = config[valor] || { icon: null };
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+        <Badge variant={item.variant} className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
           {item.icon}
           {valor}
         </Badge>

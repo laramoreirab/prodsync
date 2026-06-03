@@ -8,7 +8,7 @@ export default function AppLayout({ children }) {
       <AppThemeSync />
       <div className="flex min-h-screen w-full flex-col relative">
         {children}
-        <ChatAI />
+        {/* <ChatAI /> */}
       </div>
     </SidebarProvider>
   )
