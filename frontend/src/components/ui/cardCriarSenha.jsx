@@ -19,9 +19,6 @@ import { toast } from "sonner";
 
 export default function CriarSenha() {
 
-    /* const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); */
-
     // Controle de Etapas
     const [step, setStep] = useState(1)
 

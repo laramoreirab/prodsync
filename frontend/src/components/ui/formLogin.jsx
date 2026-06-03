@@ -168,19 +168,9 @@ export default function LoginForm() {
                     </a>
                 </p>
 
-                <div className="flex justify-center text-center md:py-4 relative">
-                    <div className="flex items-center justify-center gap-2">
-                      <div
-                        className="hidden md:block h-0.5 w-34 bg-cinza-escuro/20" />
-                      <p className="relative z-10 bg-white px-4 font-medium text-cinza opacity-35 tracking-tight"> OU</p>
-                      <div
-                        className="hidden md:block h-0.5 w-34 bg-cinza-escuro/20" />
-                    </div>
-                  </div>
-
                 <div className="flex justify-center items-center text-center font-semibold text-foreground">
                     <a href="/primeiro-acesso" className="flex items-center gap-2 text-sm hover:underline cursor-pointer">
-                        <KeyRound width={15} />
+                        <KeyRound width={20} />
                         <span>É seu primeiro acesso?</span>
                     </a>
                 </div>
