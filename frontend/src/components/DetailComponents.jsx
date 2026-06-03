@@ -357,7 +357,7 @@ export function ListingTabs({ tabs, activeTab, onChange, className }) {
  * @param {ReactNode} actions       — botões de editar/excluir
  * @param {string}    className
  */
-function EntityProfileCard({
+export function EntityProfileCard({
   name,
   imageSrc,
   imageAlt = "Foto do usuário",
@@ -375,14 +375,14 @@ function EntityProfileCard({
     <FadeUpItem>
       <div
         className={cn(
-          "bg-white border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md",
+          "bg-white dark:bg-[#0b1329] border border-slate-200/80 dark:border-[#1e294b] rounded-2xl shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md",
           className
         )}
       >
         {/* Cabeçalho Unificado */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-[#1e294b] bg-slate-50/50 dark:bg-[#0f172a]/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 min-w-0">
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl truncate">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-[#f8fafc] sm:text-2xl truncate">
               {name}
             </h1>
             {headerSlot && <div className="flex items-center flex-shrink-0">{headerSlot}</div>}
@@ -401,7 +401,7 @@ function EntityProfileCard({
           {/* Avatar do Usuário */}
           <div
             className={cn(
-              "w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 border-4 border-slate-50 shadow-inner overflow-hidden relative group bg-slate-100",
+              "w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 border-4 border-slate-50 dark:border-[#1e294b] shadow-inner overflow-hidden relative group bg-slate-100 dark:bg-[#0f172a]",
               isSquare ? "rounded-xl" : "rounded-full"
             )}
           >
@@ -462,14 +462,13 @@ export function UserProfileCard({
     />
   );
 }
-
 export function StatusBadge({ status, className }) {
   const normalizedStatus = status || "-";
   const statusClass = {
-    Produzindo: "bg-green-500/15 text-green-600 border-green-500/20",
-    Setup: "bg-amber-100 text-amber-900 border-amber-200",
-    Parada: "bg-red-100 text-red-700 border-red-200",
-  }[normalizedStatus] || "bg-slate-100 text-slate-700 border-slate-200";
+    Produzindo: "bg-green-500/15 text-green-600 border-green-500/20 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/30",
+    Setup: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30",
+    Parada: "bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30",
+  }[normalizedStatus] || "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20";
 
   return (
     <span

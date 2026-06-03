@@ -60,7 +60,7 @@ export function OEEWidget() {
                 </div>
                 
                 {/* Trilho da Barra de Progresso */}
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-slate-100 dark:bg-zinc-700 rounded-full overflow-hidden">
                   <div 
                     className="h-full rounded-full transition-all duration-500 ease-out"
                     style={{ 

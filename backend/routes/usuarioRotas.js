@@ -24,6 +24,7 @@ router.get('/turnos', authMiddleware, aplicarEscopoGestor, UsuarioController.tur
 router.get('/taxa_refugo', authMiddleware, aplicarEscopoGestor, UsuarioController.taxaRefugo)
 router.get('/producao_media_por_usuario', authMiddleware, aplicarEscopoGestor, UsuarioController.producaoMediaPorUsuario)
 router.post('/criar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.criarUsuario)
+router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), UsuarioController.cadastroLote);
 router.get('/operadores/:id_setor', authMiddleware, autorizarSetorParam('id_setor'), UsuarioController.listarOperadoresporSetor)
 router.get('/:id', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.buscarPorId)
 router.delete('/:id/deletar', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.deletarUsuario)
@@ -41,6 +42,5 @@ router.get('/:id/oee_maquinas', authMiddleware, autorizarUsuarioParam('id'), Usu
 router.get('/:id/maquina_oee_detalhe', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getOEEMaquinaDetalhes);
 router.post('/deletarEmpresa', authMiddleware, adminMiddleware, UsuarioController.deletarEmpresa);
 router.patch('/atualizarEmpresa', authMiddleware, adminMiddleware, UsuarioController.atualizarEmpresa);
-router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), UsuarioController.cadastroLote);
 
 export default router

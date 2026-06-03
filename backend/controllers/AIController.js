@@ -1,134 +1,91 @@
 import { AzureOpenAI } from "openai";
-import prisma from "../config/prisma.js";
 
 class AIController {
     static async chat(req, res) {
         try {
             const { mensagem, historico = [] } = req.body;
-            const { nome = "Usuário", id_empresa } = req.user || {};
-            const idEmpresaNum = parseInt(id_empresa);
+            //pegando dados do usuário autenticado pelo middleware de auth para personalizar a resposta da IA
+            const { nome, id_empresa } = req.user; 
 
-            const client = new AzureOpenAI({
-                endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-                apiKey: process.env.AZURE_OPENAI_KEY,
-                deployment: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
-                apiVersion: process.env.AZURE_OPENAI_API_VERSION,
-            });
+            const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+            const apiKey = process.env.AZURE_OPENAI_KEY;
+            const deployment = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
+            const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
 
-            const tools = [
-                {
-                    type: "function",
-                    function: {
-                        name: "get_detailed_dashboard_data",
-                        description: "Busca dados analíticos para explicar os gráficos: OEE médio, evolução de produção, motivos de parada frequentes e status de máquinas por setor.",
-                        parameters: { type: "object", properties: {} },
-                    },
-                }
-            ];
-
-            const systemPrompt = `
-                Você é o Sy, o Assistente Analítico do ProdSync.
-                Sua especialidade é interpretar gráficos e dados industriais.
-
-                DIRETRIZES:
-                1. Quando o usuário perguntar sobre gráficos, resumos ou "como estamos", chame 'get_detailed_dashboard_data'.
-                2. Use os dados retornados para explicar tendências: "Nossa produção subiu 10% ontem", "O setor X está com o maior índice de refugo", etc.
-                3. Compare os dados: Se o OEE estiver baixo, identifique se o problema é Disponibilidade (paradas) ou Qualidade (refugo).
-                4. Sempre use Markdown para tabelas e destaque os pontos críticos em negrito.
-                5. Empresa do Usuário: ${idEmpresaNum}.
-            `;
-
-            let messages = [
-                { role: "system", content: systemPrompt },
-                ...historico.slice(-5), // Mantém apenas as últimas 5 para contexto
-                { role: "user", content: mensagem }
-            ];
-
-            const response = await client.chat.completions.create({
-                messages,
-                tools,
-                tool_choice: "auto",
-            });
-
-            let responseMessage = response.choices[0].message;
-
-            if (responseMessage.tool_calls) {
-                console.log("[AI] Analisando dados para os gráficos...");
-                messages.push(responseMessage);
-
-                for (const toolCall of responseMessage.tool_calls) {
-                    if (toolCall.function.name === "get_detailed_dashboard_data") {
-                        const hoje = new Date();
-                        const seteDiasAtras = new Date();
-                        seteDiasAtras.setDate(hoje.getDate() - 7);
-
-                        // BUSCA ANALÍTICA PARA OS GRÁFICOS
-                        const [statusMaquinas, producao7Dias, topParadas, resumoSetores] = await Promise.all([
-                            // 1. Status Geral (Gráfico de Rosca/Donut)
-                            prisma.maquinas.groupBy({
-                                by: ['status_atual'],
-                                where: { id_empresa: idEmpresaNum },
-                                _count: { id_maquina: true }
-                            }),
-                            // 2. Produção da última semana (Gráfico de Área/Barras)
-                            prisma.apontamento.groupBy({
-                                by: ['data_hora_inicio'],
-                                where: { id_empresa: idEmpresaNum, data_hora_inicio: { gte: seteDiasAtras } },
-                                _sum: { qtd_boa: true, qtd_refugo: true }
-                            }),
-                            // 3. Principais Motivos de Parada (Gráfico de Barras)
-                            prisma.historico_Eventos.findMany({
-                                where: { id_empresa: idEmpresaNum, motivo_parada: { isNot: null } },
-                                take: 5,
-                                orderBy: { duracao: 'desc' },
-                                include: { motivo_parada: true, maquina: true }
-                            }),
-                            // 4. Setores e sua saúde
-                            prisma.setores.findMany({
-                                where: { id_empresa: idEmpresaNum },
-                                include: {
-                                    maquinas: { select: { status_atual: true } },
-                                    _count: { select: { maquinas: true } }
-                                }
-                            })
-                        ]);
-
-                        const analyticsResponse = {
-                            resumo_maquinas: statusMaquinas,
-                            tendencia_producao: producao7Dias,
-                            maiores_gargalos: topParadas.map(p => ({
-                                maquina: p.maquina.nome,
-                                motivo: p.motivo_parada.descricao,
-                                duracao_minutos: p.duracao
-                            })),
-                            saude_setores: resumoSetores.map(s => ({
-                                nome: s.nome_setor,
-                                total_maquinas: s._count.maquinas,
-                                maquinas_paradas: s.maquinas.filter(m => m.status_atual === 'Parada').length
-                            }))
-                        };
-
-                        messages.push({
-                            tool_call_id: toolCall.id,
-                            role: "tool",
-                            name: "get_detailed_dashboard_data",
-                            content: JSON.stringify(analyticsResponse),
-                        });
-                    }
-                }
-
-                const secondResponse = await client.chat.completions.create({ messages });
-                return res.status(200).json({
-                    sucesso: true,
-                    resposta: secondResponse.choices[0].message.content
+            if (!endpoint || !apiKey || !deployment) {
+                return res.status(500).json({
+                    sucesso: false,
+                    erro: "Configuração da IA ausente",
+                    mensagem: "As variáveis de ambiente da Azure OpenAI não foram configuradas corretamente."
                 });
             }
 
-            return res.status(200).json({ sucesso: true, resposta: responseMessage.content });
+            const client = new AzureOpenAI({
+                endpoint,
+                apiKey,
+                deployment,
+                apiVersion,
+            });
+
+            const systemPrompt = `
+                Você é o Assistente Especialista do ProdSync, um sistema avançado de Gestão de Chão de Fábrica (MES).
+                Seu objetivo é ser o braço direito de gestores e operadores, transformando dados complexos em insights acionáveis.
+
+                CONTEXTO DO USUÁRIO:
+                - Nome do Usuário: ${nome}
+                - ID da Empresa: ${id_empresa}
+
+                SUAS CAPACIDADES E RESPONSABILIDADES:
+                1. Análise de OEE (Overall Equipment Effectiveness): Você entende que OEE é o produto de Disponibilidade, Performance e Qualidade.
+                2. Gestão de Paradas: Você analisa motivos de downtime (programados e não programados) e identifica gargalos.
+                3. Resumo de Dashboards: Ao receber dados brutos de produção, você deve criar resumos executivos focados em:
+                   - O que está indo bem (metas batidas).
+                   - O que é crítico (máquinas paradas há muito tempo, excesso de refugo).
+                   - Sugestões de melhoria (ex: "A máquina X está com setup muito longo, considerar treinamento").
+                4. Suporte Operacional: Auxiliar operadores em dúvidas sobre ordens de produção e status de máquinas.
+
+                CONHECIMENTO DO DOMÍNIO PRODSYNC:
+                - Status de Máquina: Produzindo, Parada, Setup.
+                - Prioridades de OP: Alta, Média, Baixa, Crítica.
+                - Tipos de Eventos: Paradas programadas e não programadas, Setup.
+
+                ESTRUTURA DE DADOS (Conhecimento do Banco):
+                Você tem ciência de que o sistema possui as seguintes entidades:
+                - Maquinas (conectadas a setores e operadores).
+                - Ordens de Produção (lotes, produtos, quantidades planejadas).
+                - Apontamentos (registros de peças boas e refugo/sucata).
+                - Histórico de Eventos (log detalhado de cada mudança de status).
+
+                DIRETRIZES DE RESPOSTA:
+                - Use Markdown para formatar as respostas (negrito, tabelas e listas).
+                - Se o usuário perguntar "Como está o dia hoje?", e você não tiver os dados, peça para ele fornecer o resumo do dashboard ou os dados específicos.
+                - Seja técnico, mas direto. Use termos como "Gargalo", "Lead Time", "Downtime" e "Setup".
+                - Segurança: Nunca sugira ações que comprometam a segurança física dos operadores.
+                - SEMPRE mantenha o foco na eficiência industrial da empresa ID ${id_empresa}.
+            `;
+
+            const response = await client.chat.completions.create({
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    ...historico,
+                    { role: "user", content: mensagem }
+                ],
+                max_tokens: 800,
+                temperature: 0.7,
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                resposta: response.choices[0].message.content
+            });
 
         } catch (error) {
-            console.error("[AI ERROR]", error);
-            return res.status(500).json({ sucesso: false, erro: "Erro ao gerar análise", detalhes: error.message });
+            console.error("Erro no AIController:", error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: "Erro ao processar solicitação com a IA",
+                mensagem: error.message
+            });
         }
     }
 }

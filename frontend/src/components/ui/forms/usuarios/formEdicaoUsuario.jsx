@@ -206,14 +206,14 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
     const inputStyle = "w-full border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none";
 
-    /* if (carregando) {
+    if (carregando) {
         return (
             <div className="flex flex-col items-center justify-center p-20 min-h-100">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-900 mb-4" />
                 <p className="text-lg text-gray-600 font-medium">Buscando dados...</p>
             </div>
         );
-    } */
+    }
 
     return (
         <>

@@ -25,7 +25,7 @@ export const tempoMedioParadaConfig = {
 
 // Produção vs Defeito por setor (BarStackedHorizontal)
 export const producaoDefeitosConfig = {
-  produzidas: { label: "Produzidas:",  color: "var(--chart1" },
+  produzidas: { label: "Produzidas:",  color: "var(--chart1)" },
   defeito:    { label: "Com Defeito:", color: "var(--chart2)" },
 };
 

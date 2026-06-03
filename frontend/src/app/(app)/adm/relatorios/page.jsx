@@ -1,14 +1,9 @@
-import { PageLayout, PageHeader } from "@/components/AnimatedComponents";
+"use client";
 
+import { RelatorioView } from "@/features/relatorios/RelatorioView";
 
-export default function RelatoriosPage() {
-    return (
-        <>
-            <PageLayout className="pb-12">
-                <PageHeader
-                    title="Relatórios"
-                />
-            </PageLayout>
-        </>
-    );
+export default function RelatoriosAdmPage() {
+  return (
+    <RelatorioView variant="adm" dashboardHref="/adm" />
+  );
 }

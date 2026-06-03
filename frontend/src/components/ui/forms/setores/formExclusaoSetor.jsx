@@ -36,9 +36,9 @@ export default function FormExclusaoSetor({ setorId, setorIds = [], onExclusaoSu
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-red-900 flex items-center px-4 py-2 rounded-md">
-                    <Trash2 className="mr-2 text-4xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-vermelho-vivido flex text-center justify-center px-4 py-2 rounded-md">
+                    <Trash2 strokeWidth={2.5} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">
                         Excluir Setor
                     </DialogTitle>
                 </div>

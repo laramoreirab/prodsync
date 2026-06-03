@@ -10,6 +10,17 @@ import {
   OPProgressoSchema,
   OPOEEDetalheSchema,
 } from "@features/ordens/schemas/ordenSchema";
+import {
+  mockOPAtivasKPI,
+  mockOPAtrasadasKPI,
+  mockOPPecasBoas,
+  mockOPRefugoKPI,
+  mockOPEficiencia,
+  mockOPTopRefugo,
+  mockOPCargaSetor,
+  mockOPStatus,
+  mockOPConcluidasDia,
+} from "./mockData";
 
 const USE_MOCK = false;
 
@@ -26,10 +37,10 @@ export const opAtivasService = {
       const response = await apiFetch(withSetorId("/api/ordens/kpi/ativas", setorId));
       return OPKPISchema.parse({
         titulo: "OPs Ativas",
-        valor: response.resultado
+        valor: response.resultado,
       });
     } catch (error) {
-      console.error('Erro ao buscar OPs ativas:', error);
+      console.error("Erro ao buscar OPs ativas:", error);
     }
   },
 };
@@ -41,10 +52,10 @@ export const opAtrasadasService = {
       const response = await apiFetch(withSetorId("/api/ordens/kpi/atrasadas", setorId));
       return OPKPISchema.parse({
         titulo: "OPs Atrasadas",
-        valor: response.resultado
+        valor: response.resultado,
       });
     } catch (error) {
-      console.error('Erro ao buscar OPs atrasadas:', error);
+      console.error("Erro ao buscar OPs atrasadas:", error);
     }
   },
 };
@@ -56,10 +67,10 @@ export const opPecasBoasService = {
       const response = await apiFetch(withSetorId("/api/ordens/kpi/pecas-boas", setorId));
       return OPKPISchema.parse({
         titulo: "Peças Boas",
-        valor: response.resultado._sum.qtd_boa || 0
+        valor: response.resultado._sum.qtd_boa || 0,
       });
     } catch (error) {
-      console.error('Erro ao buscar peças boas:', error);
+      console.error("Erro ao buscar peças boas:", error);
     }
   },
 };
@@ -71,10 +82,10 @@ export const opRefugoKPIService = {
       const response = await apiFetch(withSetorId("/api/ordens/kpi/refugo", setorId));
       return OPKPISchema.parse({
         titulo: "Refugo Total",
-        valor: response.resultado._sum.qtd_refugo || 0
+        valor: response.resultado._sum.qtd_refugo || 0,
       });
     } catch (error) {
-      console.error('Erro ao buscar refugo:', error);
+      console.error("Erro ao buscar refugo:", error);
     }
   },
 };
@@ -86,7 +97,7 @@ export const opEficienciaService = {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/eficiencia", setorId));
       return OPEficienciaSchema.parse(response.dados);
     } catch (error) {
-      console.error('Erro ao buscar eficiência:', error);
+      console.error("Erro ao buscar eficiência:", error);
     }
   },
 };
@@ -96,13 +107,13 @@ export const opTopRefugoService = {
     if (USE_MOCK) return OPRefugoArraySchema.parse(mockOPTopRefugo);
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/top-refugo", setorId));
-      const dados = response.dados.map(item => ({
+      const dados = (response.dados || []).map((item) => ({
         op: item.label,
-        refugo: item.qtd_refugo
+        refugo: item.qtd_refugo,
       }));
       return OPRefugoArraySchema.parse(dados);
     } catch (error) {
-      console.error('Erro ao buscar top refugo:', error);
+      console.error("Erro ao buscar top refugo:", error);
     }
   },
 };
@@ -112,13 +123,13 @@ export const opCargaSetorService = {
     if (USE_MOCK) return OPCargaSetorArraySchema.parse(mockOPCargaSetor);
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/carga-setor", setorId));
-      const dados = response.dados.map(item => ({
+      const dados = (response.dados || []).map((item) => ({
         setor: item.setor,
-        carga: item.qtd_ops
+        carga: item.qtd_ops,
       }));
       return OPCargaSetorArraySchema.parse(dados);
     } catch (error) {
-      console.error('Erro ao buscar carga por setor:', error);
+      console.error("Erro ao buscar carga por setor:", error);
     }
   },
 };
@@ -128,13 +139,13 @@ export const opStatusService = {
     if (USE_MOCK) return OPStatusArraySchema.parse(mockOPStatus);
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/status", setorId));
-      const dados = response.dados.map(item => ({
+      const dados = (response.dados || []).map((item) => ({
         name: item.status,
-        value: item.quantidade
+        value: item.quantidade,
       }));
       return OPStatusArraySchema.parse(dados);
     } catch (error) {
-      console.error('Erro ao buscar status das OPs:', error);
+      console.error("Erro ao buscar status das OPs:", error);
     }
   },
 };
@@ -144,17 +155,17 @@ export const opConcluidasDiaService = {
     if (USE_MOCK) return OPConcluidasDiaArraySchema.parse(mockOPConcluidasDia);
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/concluidas-dia", setorId));
-      const dados = response.dados.map(item => ({
+      const dados = (response.dados || []).map((item) => ({
         dia: item.dia,
-        total: item.ops_concluidas
+        total: item.ops_concluidas,
       }));
       return OPConcluidasDiaArraySchema.parse(dados);
     } catch (error) {
-      console.error('Erro ao buscar OPs concluídas por dia:', error);
+      console.error("Erro ao buscar OPs concluídas por dia:", error);
     }
   },
 };
- 
+
 const extrairProgressoOP = (dados) => {
   const itens = Array.isArray(dados) ? dados : [];
   const produzido = itens.find((i) => i.nome === "Produzidos") ?? itens[0];

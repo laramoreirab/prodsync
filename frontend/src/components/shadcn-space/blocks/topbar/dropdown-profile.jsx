@@ -16,7 +16,6 @@ import { clearAuthSession } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api"
 
-import { cn } from "@/lib/utils";
 
 const PROFILE_ITEMS = [
   { label: "Meu Perfil", icon: User },

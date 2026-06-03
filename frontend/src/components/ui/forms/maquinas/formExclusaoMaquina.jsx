@@ -42,9 +42,9 @@ export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSu
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-red-900 flex items-center px-4 py-2 rounded-md">
-                    <Trash2 className="mr-2 text-4xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-vermelho-vivido flex text-center justify-center px-4 py-2 rounded-md">
+                    <Trash2 strokeWidth={2.5} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">
                         Excluir Máquina
                     </DialogTitle>
                 </div>
@@ -64,10 +64,10 @@ export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSu
                         As informações serão excluídas <b>PERMANENTEMENTE</b> <br /> e não poderão ser restauradas após excluí-las!
                     </p>
                 </div>
-                
+
                 <div className="flex justify-end gap-2">
                     <DialogClose asChild>
-                        <button 
+                        <button
                             type="button"
                             disabled={carregando}
                             className='border py-3 px-4 rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
@@ -75,7 +75,7 @@ export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSu
                             Cancelar
                         </button>
                     </DialogClose>
-                    <button 
+                    <button
                         type="submit"
                         disabled={carregando || excluido}
                         className='py-3 px-5 bg-[var(--trash)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
