@@ -118,7 +118,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
         carregarSetores();
     }, []);
-      // A função que vai rodar quando o usuário digitar:
+    // A função que vai rodar quando o usuário digitar:
     const handleCpfChange = (e) => {
         const valorMascarado = mascaraCPF(e.target.value);
 
@@ -203,7 +203,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         carregarMaquinas();
     }, [formData.id_setor]);
 
-   const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
+    const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
     const inputStyle = "w-full border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none";
 
     if (carregando) {
@@ -218,9 +218,9 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Pencil className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Pencil strokeWidth={2.8} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">
                         Editar Usuário
                     </DialogTitle>
                 </div>
@@ -317,7 +317,6 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -335,7 +334,6 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             <option value="Operador">Operador</option>
                             <option value="Gestor">Gestor</option>
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                     <div className="relative">
                         <label htmlFor="id_turno" className={labelStyle}>Turno</label>
@@ -358,7 +356,6 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -386,12 +383,11 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg">
                         Editar
                     </button>
                 </div>

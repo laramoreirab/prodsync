@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import { CheckCircle2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { maquinaSyncService } from "@/services/maquinaSyncService";
 
@@ -122,14 +122,22 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       <DialogTrigger className="text-[var(--pencil)] cursor-pointer" aria-label="Sincronizar placa">
         <RefreshCw size={iconSize} />
       </DialogTrigger>
+
+
       <DialogContent>
-        <div className="flex flex-col gap-4">
-          <div className="text-xl font-semibold text-blue-900">
-            {statusSync === "Concluida" ? "Placa conectada" : emProgresso ? "Sincronização em progresso" : "Sincronizar placa"}
+        <div className="flex flex-col gap-4 px-8 pb-8 pt-4">
+
+          <div className="title_modal flex items-center">
+            <div className="text-secondary flex items-center py-2 rounded-md">
+              <RefreshCw strokeWidth={2.8} className="mr-2" size={30} />
+              <DialogTitle className="font-semibold text-3xl">
+                {emProgresso ? "Sincronização em progresso" : "Sincronizar placa"}
+              </DialogTitle>
+            </div>
           </div>
 
-          <div className="text-sm text-gray-700">
-            <div className="font-semibold mb-2">Como fazer</div>
+          <div className="text-xl text-gray-700">
+            <div className="font-semibold mb-2 text-2xl">Como fazer</div>
             <ol className="list-decimal pl-5 space-y-1">
               <li>Pressione o botao <span className="font-semibold">Setup</span> da placa por 3 segundos.</li>
               <li>Clique em <span className="font-semibold">Iniciar sincronização</span> nesta maquina.</li>
@@ -138,11 +146,11 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button 
+            <button
               variant={emProgresso ? "destructive" : "default"}
-              disabled={loading || parando} 
+              disabled={loading || parando}
               onClick={emProgresso ? parar : iniciar}
-              className="gap-2"
+              className="bg-[#002866] text-xl text-white font-semibold py-2 px-6 rounded-lg cursor-pointer"
             >
               {loading ? "Iniciando..." : parando ? "Parando..." : emProgresso ? "Parar sincronização" : "Iniciar sincronização"}
             </Button>

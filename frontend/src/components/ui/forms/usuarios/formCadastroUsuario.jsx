@@ -5,7 +5,7 @@ import {
     DialogContent,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Info, File, Upload, ChevronDown } from "lucide-react";
+import { Plus, Users, Info, File, Upload, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
 import { usuariosCrudService } from '@/services/usuariosCrudService';
@@ -199,28 +199,28 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Users strokeWidth={2.8} className="mr-4" size={30} />
+                    <DialogTitle className="font-semibold text-3xl">
                         Criar Usuário
                     </DialogTitle>
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
 
-            <form onSubmit={handleSubmitIndividual} className="px-8 pb-8 pt-4 flex flex-col gap-6">
+            <form onSubmit={handleSubmitIndividual} className="px-8 py-4 flex flex-col gap-6">
                 <div className="flex justify-end">
                     <Dialog open={isLoteModalOpen} onOpenChange={setIsLoteModalOpen}>
                         <DialogTrigger className="bg-secondary-foreground px-4 py-2 rounded-md flex items-center text-white text-xl font-semibold">
-                            <Plus className="mr-2" />
+                            <Plus strokeWidth={2.5} className="mr-2 text-xl" />
                             Criar em Lote
                         </DialogTrigger>
 
                         <DialogContent>
                             <div className="flex items-center">
-                                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                                    <Plus className="mr-2 text-3xl text-white" />
-                                    <DialogTitle className="text-3xl text-white">Criar Usuários em Lote</DialogTitle>
+                                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                                    <Users strokeWidth={2.8} className="mr-4" size={30} />
+                                    <DialogTitle className="text-3xl font-semibold">Criar Usuários em Lote</DialogTitle>
                                 </div>
                             </div>
                             <Separator className="m-2 bg-[#a6a6a6]" />
@@ -260,7 +260,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                 </div>
 
                                 <div className="flex justify-center mt-4">
-                                    <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                                    <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg">
                                         Criar em Lote
                                     </button>
                                 </div>
@@ -358,7 +358,6 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -376,7 +375,6 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             <option value="Operador">Operador</option>
                             <option value="Gestor">Gestor</option>
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                     <div className="relative">
                         <label htmlFor="id_turno" className={labelStyle}>Turno</label>
@@ -400,7 +398,6 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -428,12 +425,11 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg cursor-pointer">
                         Criar
                     </button>
                 </div>

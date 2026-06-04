@@ -190,30 +190,33 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
         <>
             <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg">
                 <div className="flex items-center">
-                    <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                        <Plus className="mr-2 text-3xl text-white" />
-                        <DialogTitle className="text-3xl text-white">Cadastrar Máquina</DialogTitle>
+                    <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                        <Plus strokeWidth={2} size={30} className="mr-2" />
+                        <DialogTitle className="text-3xl font-semibold">
+                            Cadastrar Máquina
+                        </DialogTitle>
                     </div>
                 </div>
                 <Separator className="m-2 bg-[#a6a6a6]" />
 
-                <div className="flex justify-end">
-                    <Dialog open={isLoteModalOpen} onOpenChange={setIsLoteModalOpen}>
-                        <DialogTrigger className="bg-secondary-foreground px-4 py-2 rounded-md flex items-center text-white text-xl font-semibold">
-                            <Plus className="mr-2" />
-                            Criar em Lote
-                        </DialogTrigger>
+                <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
+                    <div className="flex justify-end">
+                        <Dialog open={isLoteModalOpen} onOpenChange={setIsLoteModalOpen}>
+                            <DialogTrigger className="bg-secondary-foreground px-4 py-2 rounded-md flex items-center text-white text-xl font-semibold">
+                                <Plus strokeWidth={2.5} className="mr-2 text-xl" />
+                                Criar em Lote
+                            </DialogTrigger>
 
-                        <DialogContent>
-                            <div className="flex items-center">
-                                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                                    <Plus className="mr-2 text-3xl text-white" />
-                                    <DialogTitle className="text-3xl text-white">Criar Máquinas em Lote</DialogTitle>
+                            <DialogContent>
+                                <div className="flex items-center">
+                                    <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                                        <Plus className="mr-2 text-3xl text-white" />
+                                        <DialogTitle className="text-3xl text-white">Criar Máquinas em Lote</DialogTitle>
+                                    </div>
                                 </div>
-                            </div>
-                            <Separator className="m-2 bg-[#a6a6a6]" />
+                                <Separator className="m-2 bg-[#a6a6a6]" />
 
-                            <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
+
                                 <input
                                     type="file"
                                     ref={fileInputLoteRef}
@@ -252,171 +255,174 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                                         Criar em Lote
                                     </button>
                                 </div>
+
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+
+
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
+                            className="hidden"
+                        />
+                        {/* div do upload clicavel */}
+                        <div
+                            onClick={handleUploadClick}
+                            className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
+                        >
+                            {!arquivo ? (
+                                <div className="flex flex-col items-center text-gray-500">
+                                    <Upload className="w-12 h-12 mb-2 text-gray-400" />
+                                    <span className="text-md font-medium">Clique aqui para fazer upload da imagem.</span>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center w-full">
+                                    {/*pré-visualização da Imagem */}
+                                    <img
+                                        src={arquivo.preview}
+                                        alt="Preview"
+                                        className="w-32 h-32 object-cover rounded-lg mb-2 border"
+                                    />
+                                    <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
+                                        <File className="w-4 h-4 mr-2 shrink-0" />
+                                        <span className="text-sm truncate">{arquivo.nome}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="flex flex-col gap-1">
+                                <label className=" block text-lg text-gray-700 font-medium dark:text-slate-300">Nome</label>
+                                <input
+                                    id="nome"
+                                    type="text"
+                                    placeholder=""
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
+                                    value={nome}
+                                    onChange={(e) => setNome(e.target.value)}
+                                />
                             </div>
-                        </DialogContent>
-                    </Dialog>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Número de Série</label>
+                                <input
+                                    id="serie"
+                                    type="text"
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
+                                    value={serie}
+                                    onChange={(e) => setSerie(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Setor</label>
+                                <select
+                                    id="id_setor"
+                                    className="border shadow-md  border-gray-200 rounded-md p-3 outline-none text-gray-400 text-md font-medium"
+                                    value={idSetor}
+                                    onChange={(e) => { setIdSetor(e.target.value); setOperador(''); }}
+                                >
+                                    <option value="">Selecione...</option>
+                                    {setores.map((setor) => (
+
+                                        <option
+                                            key={setor.id_setor}
+                                            value={setor.id_setor}
+                                        >
+                                            {setor.nome_setor}
+                                        </option>
+
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Tipo de Máquina</label>
+                                <input
+                                    id="categoria"
+                                    type="text"
+                                    placeholder=""
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
+                                    value={categoria}
+                                    onChange={(e) => setCategoria(e.target.value)}
+                                >
+                                </input>
+                            </div>
+
+                            {/* campos pendentes pro backend adicionar */}
+                            <div className="flex flex-col gap-1">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Capacidade Normal</label>
+                                <input
+                                    id="capacidade"
+                                    type="text"
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
+                                    value={capacidade}
+                                    onChange={(e) => setCapacidade(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Data de Aquisição</label>
+                                <input
+                                    id="dataAquisicao"
+                                    type="date"
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
+                                    value={dataAquisicao}
+                                    onChange={(e) => setDataAquisicao(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-1 col-span-2">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Status de Máquina</label>
+                                <select
+                                    id="status"
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                >
+                                    <option value="">Selecione...</option>
+                                    <option value="Parada">Parada</option>
+                                    <option value="Setup">Setup</option>
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-1 col-span-2">
+                                <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Operador</label>
+                                <select
+                                    id="operador"
+                                    className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
+                                    value={operador}
+                                    onChange={(e) => setOperador(e.target.value)}
+                                    disabled={!idSetor}
+                                >
+                                    <option value="">Selecione...</option>
+                                    {operadores.map((operador) => (
+
+                                        <option
+                                            key={operador.id_operador}
+                                            value={operador.id_operador}
+                                        >
+                                            {operador.nome}
+                                        </option>
+
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center mt-4">
+                            <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg ">
+                                Cadastrar
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
-                        className="hidden"
-                    />
-                    {/* div do upload clicavel */}
-                    <div
-                        onClick={handleUploadClick}
-                        className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
-                    >
-                        {!arquivo ? (
-                            <div className="flex flex-col items-center text-gray-500">
-                                <Upload className="w-12 h-12 mb-2 text-gray-400" />
-                                <span className="text-md font-medium">Clique aqui para fazer upload da imagem.</span>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center w-full">
-                                {/*pré-visualização da Imagem */}
-                                <img
-                                    src={arquivo.preview}
-                                    alt="Preview"
-                                    className="w-32 h-32 object-cover rounded-lg mb-2 border"
-                                />
-                                <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
-                                    <File className="w-4 h-4 mr-2 shrink-0" />
-                                    <span className="text-sm truncate">{arquivo.nome}</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                        <div className="flex flex-col gap-1">
-                            <label className=" block text-lg text-gray-700 font-medium dark:text-slate-300">Nome</label>
-                            <input
-                                id="nome"
-                                type="text"
-                                placeholder=""
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
-                                value={nome}
-                                onChange={(e) => setNome(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Número de Série</label>
-                            <input
-                                id="serie"
-                                type="text"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
-                                value={serie}
-                                onChange={(e) => setSerie(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Setor</label>
-                            <select
-                                id="id_setor"
-                                className="border shadow-md  border-gray-200 rounded-md p-3 outline-none text-gray-400 text-md font-medium"
-                                value={idSetor}
-                                onChange={(e) => { setIdSetor(e.target.value); setOperador(''); }}
-                            >
-                                <option value="">Selecione...</option>
-                                {setores.map((setor) => (
-
-                                    <option
-                                        key={setor.id_setor}
-                                        value={setor.id_setor}
-                                    >
-                                        {setor.nome_setor}
-                                    </option>
-
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Tipo de Máquina</label>
-                            <input
-                                id="categoria"
-                                type="text"
-                                placeholder=""
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
-                                value={categoria}
-                                onChange={(e) => setCategoria(e.target.value)}
-                            >
-                            </input>
-                        </div>
-
-                        {/* campos pendentes pro backend adicionar */}
-                        <div className="flex flex-col gap-1">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Capacidade Normal</label>
-                            <input
-                                id="capacidade"
-                                type="text"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
-                                value={capacidade}
-                                onChange={(e) => setCapacidade(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Data de Aquisição</label>
-                            <input
-                                id="dataAquisicao"
-                                type="date"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none"
-                                value={dataAquisicao}
-                                onChange={(e) => setDataAquisicao(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1 col-span-2">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Status de Máquina</label>
-                            <select
-                                id="status"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                            >
-                                <option value="">Selecione...</option>
-                                <option value="Parada">Parada</option>
-                                <option value="Setup">Setup</option>
-                            </select>
-                        </div>
-
-                        <div className="flex flex-col gap-1 col-span-2">
-                            <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Operador</label>
-                            <select
-                                id="operador"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none"
-                                value={operador}
-                                onChange={(e) => setOperador(e.target.value)}
-                                disabled={!idSetor}
-                            >
-                                <option value="">Selecione...</option>
-                                {operadores.map((operador) => (
-
-                                    <option
-                                        key={operador.id_operador}
-                                        value={operador.id_operador}
-                                    >
-                                        {operador.nome}
-                                    </option>
-
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-center mt-4">
-                        <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg ">
-                            Cadastrar
-                        </button>
-                    </div>
-                </form>
             </DialogContent>
         </>
     )

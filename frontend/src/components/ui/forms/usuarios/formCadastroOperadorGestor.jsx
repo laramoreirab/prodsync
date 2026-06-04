@@ -132,9 +132,9 @@ export default function FormCadastroOperadorGestor({ onCadastroSucesso }) {
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Plus className="mr-2 text-3xl" />
+                    <DialogTitle className="text-3xl">
                         Criar Operador
                     </DialogTitle>
                 </div>
