@@ -1287,7 +1287,7 @@ class MaquinaModel {
                 : 0;
 
             return {
-                titulo: 'Pecas por Minuto',
+                titulo: 'Peças por Minuto',
                 valor: String(pecasPorMinuto)
                 // pecas_por_minuto: pecasPorMinuto,
                 // total_pecas: totais.pecas,
