@@ -711,5 +711,33 @@ class MaquinaController {
         }
     }
 
+    // POST /maquinas/:id/desconectar-placa - Remove o vinculo da placa com a maquina
+    static async desconectarPlacaMaquina(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            const dados = await MaquinaModel.desconectarPlacaMaquina({
+                id_empresa,
+                id_maquina
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Placa desconectada com sucesso.',
+                dados
+            });
+        } catch (error) {
+            console.error('Erro ao desconectar placa da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel desconectar a placa da maquina'
+            });
+        }
+    }
+
 }
 export default MaquinaController;

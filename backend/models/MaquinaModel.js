@@ -1673,6 +1673,53 @@ static async producaoMaquinasSetor(id_setor, id_empresa) {
     };
   }
 
+  static async desconectarPlacaMaquina({ id_empresa, id_maquina }) {
+    const empresaId = Number(id_empresa);
+    const maquinaId = Number(id_maquina);
+
+    const maquina = await prisma.maquinas.findFirst({
+      where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
+      select: { id_maquina: true, board_uid: true }
+    });
+
+    if (!maquina) {
+      throw new Error('Maquina nao encontrada');
+    }
+
+    if (!maquina.board_uid) {
+      return {
+        mensagem: 'Maquina nao possui placa sincronizada',
+        board_uid: null
+      };
+    }
+
+    const boardUid = maquina.board_uid;
+    const chaveEmpresa = this.criarChaveEmpresa(empresaId);
+
+    await prisma.maquinas.updateMany({
+      where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
+      data: {
+        board_uid: null,
+        board_sincronizado_em: null,
+        board_ultimo_contato_em: null
+      }
+    });
+
+    this._sessoesPareamentoPlaca.delete(`${chaveEmpresa}:${maquinaId}`);
+    this.removerPareamentoPendentePorUid(boardUid);
+
+    this.eventosPlaca.emit('pareamentoCancelado', {
+      id_empresa: empresaId,
+      id_maquina: maquinaId,
+      board_uid: boardUid
+    });
+
+    return {
+      mensagem: 'Placa desconectada com sucesso',
+      board_uid: boardUid
+    };
+  }
+
 }
 
 export default MaquinaModel;
