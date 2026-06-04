@@ -45,6 +45,7 @@ router.get('/eficienciaMaquina/:id_operador', autorizarUsuarioParam('id_operador
 router.post('/:id/sincronizar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.iniciarSincronizacaoPlaca);
 router.get('/:id/sincronizacao-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.obterStatusSincronizacaoPlaca);
 router.post('/:id/parar-sincronizacao', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.pararSincronizacaoPlaca);
+router.post('/:id/desconectar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.desconectarPlacaMaquina);
 
 router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);
 router.put('/:id', adminMiddleware, uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
