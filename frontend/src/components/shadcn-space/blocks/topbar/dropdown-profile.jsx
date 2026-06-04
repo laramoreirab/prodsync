@@ -33,6 +33,16 @@ const LOGOUT_ITEM = {
 
 const itemClass = "px-4 py-2.5 text-base cursor-pointer gap-3";
 
+const resolverImagemPerfil = (imagem) => {
+  if (!imagem) return "/userdefault.svg";
+  if (imagem.startsWith("http")) return imagem;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+  return `${apiUrl}/uploads/imagens/${imagem}`;
+};
+
 const ProfileDropdown = ({
   trigger,
   defaultOpen,
@@ -54,24 +64,34 @@ const ProfileDropdown = ({
 
   const [nomeUsuario, setNomeUsuario] = useState("")
   const [idUsuario, setIdUsuario] = useState("")
+  const [avatarSrc, setAvatarSrc] = useState("/userdefault.svg")
   useEffect(()=>{
     async function buscarDados() {
-      const resposta = await apiFetch('/api/auth/perfil')
-      console.log("dados para perfil:", resposta)
-      setIdUsuario(resposta.dados.usuarios?.[0]?.id_usuario || resposta.dados.id_usuario || "")
-      setNomeUsuario(resposta.dados.nome || resposta.dados.nome_representante || "")
+      try {
+        const resposta = await apiFetch('/api/auth/perfil')
+        const dados = resposta?.dados || {};
+        const usuarioAdm = dados.usuarios?.[0];
+
+        setIdUsuario(usuarioAdm?.id_usuario || dados.id_usuario || "")
+        setNomeUsuario(dados.nome || dados.nome_representante || "")
+        setAvatarSrc(resolverImagemPerfil(dados.imagem_perfil || usuarioAdm?.imagem_perfil))
+      } catch (error) {
+        console.error("Erro ao buscar dados do perfil:", error)
+      }
     }
     buscarDados();
   }, [])
 
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
-      <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
+        {typeof trigger === "function" ? trigger({ avatarSrc, nomeUsuario }) : trigger}
+      </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align={align}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
             <div className="relative">
-              <img src="/userdefault.svg" className="w-10" alt="" />
+              <img src={avatarSrc} className="h-10 w-10 rounded-full object-cover" alt={nomeUsuario || "Usuario"} />
               <span className="ring-card absolute right-0 bottom-0 size-2 rounded-full bg-green-600 ring-2" />
             </div>
 
@@ -89,7 +109,7 @@ const ProfileDropdown = ({
 
           {PROFILE_ITEMS.map(({ label, icon: Icon }) => (
             <DropdownMenuItem key={label} className={itemClass}>
-              <Link href={settingsHref} class="flex items-center gap-3">
+              <Link href={settingsHref} className="flex items-center gap-3">
               <Icon size={20} className="text-foreground" />
               <span>{label}</span>
               </Link>

@@ -253,7 +253,8 @@ class UsuarioModel {
                                 id_usuario: Number(id_usuario) 
                             },
                             select: {
-                                id_usuario: true
+                                id_usuario: true,
+                                imagem_perfil: true
                             }
 
                         }
