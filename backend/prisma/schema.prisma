@@ -31,21 +31,22 @@ model Empresas {
 }
 
 model Usuarios {
-  id_usuario        Int              @id
-  id_empresa        Int
-  nome              String           @db.VarChar(255)
-  tipo              TipoUsuario
-  cpf               String           @unique @db.VarChar(14)
-  email             String           @unique @db.VarChar(255)
-  senha             String           @db.VarChar(255)
-  imagem_perfil     String?          @db.VarChar(255)
-  apontamentos      Apontamento[]
-  escalas           EscalaTrabalho[]
-  logs              Logs[]
-  maquinas_operadas Maquinas[]
-  notificacoes      Notificacoes[]
-  setores_geridos   Setor_Gestor[]
-  empresa           Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  id_usuario              Int              @id
+  id_empresa              Int
+  nome                    String           @db.VarChar(255)
+  tipo                    TipoUsuario
+  cpf                     String           @unique @db.VarChar(14)
+  email                   String           @unique @db.VarChar(255)
+  senha                   String           @db.VarChar(255)
+  imagem_perfil           String?
+  imagem_perfil_public_id String?          @db.VarChar(255)
+  apontamentos            Apontamento[]
+  escalas                 EscalaTrabalho[]
+  logs                    Logs[]
+  maquinas_operadas       Maquinas[]
+  notificacoes            Notificacoes[]
+  setores_geridos         Setor_Gestor[]
+  empresa                 Empresas         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
 }
 
 model Setores {

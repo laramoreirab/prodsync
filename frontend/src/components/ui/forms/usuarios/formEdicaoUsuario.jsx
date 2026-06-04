@@ -29,6 +29,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [setores, setSetores] = useState([]);
     const [listaTurnos, setListaTurnos] = useState([])
     const [listaMaquinas, setListaMaquinas] = useState([])
+    const [carregandoTurnos, setCarregandoTurnos] = useState(false)
 
     // Estados para gerenciar os dados do formulário
     const [carregando, setCarregando] = useState(true);
@@ -68,7 +69,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
             }
 
             // Se a função virar Gestor, remove máquina para não enviar valor antigo
-            if (id === "funcao" && value !== "Operador") {
+            if (id === "id_turno" || (id === "funcao" && value !== "Operador")) {
                 novoEstado.id_maquina = "";
             }
 
@@ -168,6 +169,10 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
             toast.success("Usuário atualizado com sucesso!");
             if (onEdicaoSucesso) onEdicaoSucesso();
         } catch (error) {
+            if (error.message) {
+                toast.error(error.message);
+                return;
+            }
             console.error("Erro ao atualizar usuário:", error);
             toast.error("Erro ao atualizar os dados.");
         }
@@ -180,12 +185,15 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                 return;
             }
             try {
+                setCarregandoTurnos(true);
                 const options = { method: "GET" }
                 const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
                 setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
             } catch (error) {
                 console.log(error)
                 toast.error("Erro ao carregar turnos.");
+            } finally {
+                setCarregandoTurnos(false);
             }
 
         }
@@ -196,14 +204,14 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     useEffect(() => {
         async function carregarMaquinas() {
             const idSetor = formData.id_setor;
-            if (!idSetor) {
+            if (!idSetor || !formData.id_turno || formData.funcao !== "Operador") {
                 setListaMaquinas([]);
                 return;
             }
             try {
                 const options = { method: "GET" }
-                const dados = await apiFetch(`/api/maquinas/setor/${idSetor}`, options)
-                setListaMaquinas(dados.dados);
+                const dados = await apiFetch(`/api/maquinas/setor/${idSetor}/disponiveis?id_turno=${formData.id_turno}&id_operador=${usuarioId}`, options)
+                setListaMaquinas(dados.dados || []);
             } catch (error) {
                 console.log(error)
                 toast.error("Erro ao carregar máquinas.");
@@ -211,7 +219,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
         }
         carregarMaquinas();
-    }, [formData.id_setor]);
+    }, [formData.id_setor, formData.id_turno, formData.funcao, usuarioId]);
 
     const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
     const inputStyle = "w-full border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none";
@@ -314,8 +322,11 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             value={formData.id_setor}
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disabled={setores.length === 0}
                             required>
-                            <option value="">Selecione...</option>
+                            <option value="">
+                                {setores.length === 0 ? "Nenhum setor criado" : "Selecione..."}
+                            </option>
                             {setores.map((setor) => (
 
                                 <option
@@ -352,9 +363,17 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             value={formData.id_turno}
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            disabled={!formData.id_setor}
+                            disabled={!formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
                             required>
-                            <option value="">Selecione...</option>
+                            <option value="">
+                                {!formData.id_setor
+                                    ? "Selecione um setor primeiro"
+                                    : carregandoTurnos
+                                        ? "Carregando turnos..."
+                                    : listaTurnos.length === 0
+                                        ? "Nenhum turno criado"
+                                        : "Selecione..."}
+                            </option>
                             {listaTurnos.map((turno) => (
 
                                 <option
@@ -378,10 +397,12 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             value={formData.id_maquina}
                             onChange={handleInputChange}
                             className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            disabled={!formData.id_setor}
+                            disabled={!formData.id_setor || !formData.id_turno}
                             required
                         >
-                            <option value="">Selecione...</option>
+                            <option value="">
+                                {formData.id_turno ? "Selecione..." : "Selecione um turno primeiro"}
+                            </option>
                             {listaMaquinas.map((maquina) => (
 
                                 <option

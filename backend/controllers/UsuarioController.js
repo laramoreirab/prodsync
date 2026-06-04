@@ -144,7 +144,36 @@ class UsuarioController {
         }
     }
 
-    //POST api/usuarios/criar - Criar novo usuário (apenas dmin)
+    //POST api/usuarios/criar - Criar novo usuário (apenas admin)
+    static async buscarConflitoMaquinaTurno(id_empresa, id_turno, id_maquina, id_operadorIgnorado = null) {
+        return await prisma.escalaTrabalho.findFirst({
+            where: {
+                id_empresa: Number(id_empresa),
+                id_turno: Number(id_turno),
+                id_maquina: Number(id_maquina),
+                ...(id_operadorIgnorado ? { id_operador: { not: Number(id_operadorIgnorado) } } : {})
+            },
+            include: {
+                operador: {
+                    select: {
+                        id_usuario: true,
+                        nome: true
+                    }
+                },
+                turno: {
+                    select: {
+                        nome_turno: true
+                    }
+                },
+                maquina: {
+                    select: {
+                        nome: true
+                    }
+                }
+            }
+        });
+    }
+
     static async criarUsuario(req, res) {
         try {
             const id_empresa = req.user.id_empresa;
@@ -239,6 +268,22 @@ class UsuarioController {
                     mensagem: 'O turno é obrigatório!'
                 })
             };
+
+            if (funcao === 'Operador') {
+                const conflito = await UsuarioController.buscarConflitoMaquinaTurno(
+                    id_empresa,
+                    id_turno,
+                    id_maquina
+                );
+
+                if (conflito) {
+                    return res.status(409).json({
+                        sucesso: false,
+                        erro: 'Maquina indisponivel no turno',
+                        mensagem: `A maquina ${conflito.maquina?.nome ?? id_maquina} ja esta sendo gerenciada por ${conflito.operador?.nome ?? 'outro operador'} no turno ${conflito.turno?.nome_turno ?? id_turno}.`
+                    });
+                }
+            }
 
             //preparar dados do usuario para tabela usuarios
             const idUsuarioNovo = gerarIdUsuario(funcao);
@@ -350,6 +395,33 @@ static async atualizarUsuario(req, res) {
         const funcaoNormalizada = funcao !== undefined
             ? (String(funcao).trim().toLowerCase() === 'gestor' ? 'Gestor' : 'Operador')
             : undefined;
+
+        const tipoFinal = funcaoNormalizada ?? usuarioExistente.tipo;
+        if (tipoFinal === 'Operador') {
+            const turnoFinal = id_turno !== undefined && id_turno !== ''
+                ? id_turno
+                : usuarioExistente.id_turno;
+            const maquinaFinal = id_maquina !== undefined && id_maquina !== ''
+                ? id_maquina
+                : usuarioExistente.id_maquina;
+
+            if (turnoFinal && maquinaFinal) {
+                const conflito = await UsuarioController.buscarConflitoMaquinaTurno(
+                    id_empresa,
+                    turnoFinal,
+                    maquinaFinal,
+                    id_usuario
+                );
+
+                if (conflito) {
+                    return res.status(409).json({
+                        sucesso: false,
+                        erro: 'Maquina indisponivel no turno',
+                        mensagem: `A maquina ${conflito.maquina?.nome ?? maquinaFinal} ja esta sendo gerenciada por ${conflito.operador?.nome ?? 'outro operador'} no turno ${conflito.turno?.nome_turno ?? turnoFinal}.`
+                    });
+                }
+            }
+        }
 
         // dados usuario
 
