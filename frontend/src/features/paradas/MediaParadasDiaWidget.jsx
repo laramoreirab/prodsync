@@ -14,6 +14,8 @@ export function MediaParadasDiaWidget() {
     <KPIHorizontal
       title={data?.titulo}
       value={data?.valor}
+      type="text"
+      subtitle="*Últimos 7 dias"
     />
   );
 }

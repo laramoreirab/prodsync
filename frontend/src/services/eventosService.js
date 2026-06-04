@@ -11,7 +11,9 @@ export const eventosService = {
       : "/api/eventos/tempo_parado_produzindo";
     const data = await apiFetch(url);
     const dados = (data.dados || data).map((item) => ({
-      name: item.name ?? item.nome,
+      name: (item.name ?? item.nome) === "Tempo Produzido"
+        ? "Tempo Produzindo"
+        : item.name ?? item.nome,
       value: item.value ?? item.valor,
     }));
     return ParadasComparadasArraySchema.parse(dados);

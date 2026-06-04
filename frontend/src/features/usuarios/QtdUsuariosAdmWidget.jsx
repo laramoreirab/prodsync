@@ -1,8 +1,8 @@
 "use client";
 
-import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
+import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 import { useQtdUsuariosPorPerfil } from "./hooks/useQtdUsuariosPorPerfil";
-import { qtdUsuariosPerfilConfig } from "./config/usuarioChartConfig";
+import { qtdUsuariosPerfilBarConfig, qtdUsuariosPerfilConfig } from "./config/usuarioChartConfig";
 
 export function QtdUsuariosAdmWidget() {
   const { data, loading, error } = useQtdUsuariosPorPerfil();
@@ -12,18 +12,21 @@ export function QtdUsuariosAdmWidget() {
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponivel.</p>;
 
-  const chartData = data.map((item) => {
-    const name = item.name?.toLowerCase();
-    const normalizedName =
-      name === "gestor" ? "gestores" :
-      name === "operador" ? "operadores" :
-      name;
+  const chartData = data
+    .filter((item) => {
+      const name = item.name?.toLowerCase();
+      return name === "gestor" || name === "gestores" || name === "operador" || name === "operadores";
+    })
+    .map((item) => {
+      const name = item.name?.toLowerCase();
+      const perfil = name === "gestor" || name === "gestores" ? "Gestores" : "Operadores";
 
-    return {
-      ...item,
-      name: normalizedName,
-    };
-  });
+      return {
+        perfil,
+        quantidade: item.value ?? 0,
+        color: qtdUsuariosPerfilConfig[perfil.toLowerCase()]?.color,
+      };
+    });
 
   return (
     <div className="h-full">
@@ -33,11 +36,16 @@ export function QtdUsuariosAdmWidget() {
       <p className="text-xs text-gray-400 font-semibold mt-1">
         *Atualizado em tempo real
       </p>
-      <CustomPieChart
-        data={chartData}
-        config={qtdUsuariosPerfilConfig}
-        dataKey="value"
-      />
+      <div className="mt-12 -ml-6">
+        <BarHorizontal
+          data={chartData}
+          config={qtdUsuariosPerfilBarConfig}
+          yKey="perfil"
+          heightClassName="h-[180px]"
+          colorKey="color"
+          showValueLabels
+        />
+      </div>
     </div>
   );
 }

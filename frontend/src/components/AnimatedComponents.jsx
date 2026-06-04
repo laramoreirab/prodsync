@@ -598,7 +598,7 @@ export function EmptyState({
  * @param {string} message — texto abaixo do spinner
  * @param {string} bg — override do bg (default: bg_app.svg)
  */
-export function LoadingState({ message = "Sincronizando...", className }) {
+export function LoadingState({ message = "Sincronizando...", className, bg }) {
   return (
     <div
       className={cn(

@@ -4,7 +4,7 @@ import { CheckCircle2, TriangleAlert, Wrench } from "lucide-react";
 
 const statusMeta = {
   emProducao: {
-    label: "Em produÃ§Ã£o",
+    label: "Em produção",
     accent: "bg-emerald-500",
     badge: "bg-emerald-50 text-emerald-700",
     Icon: CheckCircle2,

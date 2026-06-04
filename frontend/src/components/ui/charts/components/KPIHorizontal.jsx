@@ -2,12 +2,17 @@
 
 import { useEffect, useState, useRef } from "react";
 
-export function KPIHorizontal({ title, value, type = "number" }) {
+export function KPIHorizontal({ title, value, type = "number", subtitle = "*Atualizado em tempo real" }) {
     const [displayValue, setDisplayValue] = useState(0);
     const prevValueRef = useRef(0);
     const animationRef = useRef(null);
 
     useEffect(() => {
+        if (type === "text") {
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            return;
+        }
+
         const target = Number(value) || 0;
         const start = prevValueRef.current;
         const duration = 800;
@@ -36,9 +41,12 @@ export function KPIHorizontal({ title, value, type = "number" }) {
         return () => {
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
         };
-    }, [value]);
+    }, [value, type]);
 
     const formatValue = (val) => {
+        if (type === "text") {
+            return value ?? "-";
+        }
         if (type === "currency") {
             return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(val);
         }
@@ -56,7 +64,7 @@ export function KPIHorizontal({ title, value, type = "number" }) {
                     {title}
                 </p>
                 <p className="text-[11px] text-gray-400 font-medium mt-0.5 self-start">
-                    *Atualizado em tempo real
+                    {subtitle}
                 </p>
             </div>
 
