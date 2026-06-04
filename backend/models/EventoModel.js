@@ -346,12 +346,12 @@ class EventoModel {
             }
 
             const ultimoEvento = await this.obterUltimoEventoMaquina(id_empresa, id_maquina);
-            if (ultimoEvento?.status_atual === statusNormalizado && !ultimoEvento.termino) {
+            if (ultimoEvento?.status_atual === statusNormalizado) {
                 await prisma.maquinas.updateMany({
                     where:{ id_empresa, id_maquina, ativo: true },
                     data:{ status_atual: statusNormalizado }
                 });
-                console.warn(`[AVISO] Maquina ${id_maquina} ja esta com status ${statusNormalizado}. Evento duplicado ignorado.`);
+                console.warn(`[AVISO] Último evento da maquina ${id_maquina} ja é ${statusNormalizado}. Evento duplicado ignorado.`);
                 return this.formatarEvento(ultimoEvento);
             }
 

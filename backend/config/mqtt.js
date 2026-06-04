@@ -37,6 +37,28 @@ function normalizarStatus(status) {
   return status;
 }
 
+function publicarStatusRegistrado(dados, status, id_empresa, id_maquina, evento) {
+  if (!dados?.board_uid) return;
+
+  publicarControlePlaca(dados.board_uid, {
+    tipo: 'STATUS_REGISTRADO',
+    status,
+    id_empresa,
+    id_maquina,
+    id_evento: evento?.id_evento ?? evento?.id ?? null
+  });
+}
+
+function publicarStatusRejeitado(dados, status, mensagem) {
+  if (!dados?.board_uid) return;
+
+  publicarControlePlaca(dados.board_uid, {
+    tipo: 'STATUS_REJEITADO',
+    status: status ?? dados.status ?? null,
+    mensagem
+  });
+}
+
 async function processarPareamento(dados, topic) {
   const resultado = await MaquinaModel.registrarSolicitacaoPareamentoPlaca({
     id_empresa: dados.id_empresa,
@@ -82,8 +104,10 @@ clienteMQTT.on('connect', () => {
 });
 
 clienteMQTT.on('message', async (topic, message) => {
+  let dados = null;
+
   try {
-    const dados = JSON.parse(message.toString());
+    dados = JSON.parse(message.toString());
 
     if (topic === 'phietro/fabrica/pareamento' || dados.tipo === 'PAIRING_REQUEST') {
       await processarPareamento(dados, topic);
@@ -98,6 +122,7 @@ clienteMQTT.on('message', async (topic, message) => {
       const vinculo = await MaquinaModel.buscarVinculoPlaca(dados.board_uid);
       if (!vinculo) {
         console.warn(`[MQTT AVISO] Placa ${dados.board_uid} ainda nao sincronizada. Ignorando status.`);
+        publicarStatusRejeitado(dados, status_maquina, 'Placa ainda nao sincronizada.');
         return;
       }
 
@@ -110,16 +135,19 @@ clienteMQTT.on('message', async (topic, message) => {
 
     if (!status_maquina || String(status_maquina).trim() === '') {
       console.warn('[MQTT AVISO] Status da maquina e obrigatorio. Ignorando mensagem.');
+      publicarStatusRejeitado(dados, status_maquina, 'Status da maquina e obrigatorio.');
       return;
     }
 
     if (!Number.isInteger(id_maquina) || id_maquina <= 0) {
       console.warn('[MQTT AVISO] ID da maquina invalido. Ignorando mensagem.');
+      publicarStatusRejeitado(dados, status_maquina, 'ID da maquina invalido.');
       return;
     }
 
     if (!id_empresa) {
       console.warn('[MQTT AVISO] ID da empresa nao fornecido. Ignorando mensagem.');
+      publicarStatusRejeitado(dados, status_maquina, 'ID da empresa nao fornecido.');
       return;
     }
 
@@ -131,7 +159,11 @@ clienteMQTT.on('message', async (topic, message) => {
     );
 
     console.log('[MQTT SUCESSO] Evento registrado no banco via Model:', evento.id_evento ?? evento.id);
+    publicarStatusRegistrado(dados, status_maquina, id_empresa, id_maquina, evento);
   } catch (erro) {
+    const statusRejeitado = dados?.status ? normalizarStatus(dados.status) : null;
+    publicarStatusRejeitado(dados, statusRejeitado, erro.message);
+
     if (erro.code === 'EVENTO_PENDENTE') {
       console.warn(`[MQTT BLOQUEADO] ${erro.message}`);
       return;
