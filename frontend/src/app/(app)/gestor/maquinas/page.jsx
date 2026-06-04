@@ -114,27 +114,16 @@ export default function MaquinasGestor() {
     // Aplica a busca por texto
     if (busca) {
       const termo = busca.toLowerCase();
-<<<<<<< HEAD
       resultado = resultado.filter((maquina) =>
         maquina.nome?.toLowerCase().includes(termo) ||
         String(maquina.id_maquina).includes(termo)
-=======
-      resultado = resultado.filter(
-        (maquina) =>
-          maquina.nome?.toLowerCase().includes(termo) ||
-          String(maquina.id_maquina).includes(termo),
->>>>>>> db05a75b9548480549b8cdc5366e139a61b4cbdb
       );
     }
 
     // Aplica o filtro de status
     if (filtrosAtivos.status?.length > 0) {
       resultado = resultado.filter((maquina) =>
-<<<<<<< HEAD
         filtrosAtivos.status.includes(maquina.status)
-=======
-        filtrosAtivos.status.includes(maquina.status),
->>>>>>> db05a75b9548480549b8cdc5366e139a61b4cbdb
       );
     }
 
@@ -177,19 +166,6 @@ export default function MaquinasGestor() {
         }
       />
 
-<<<<<<< HEAD
-          <DialogContent>
-            <FormCadastroMaquina onCadastroSucesso={refresh} />
-          </DialogContent>
-        </Dialog>
-      } />
-
-      {/* Gráficos */}
-      <KPIGrid cols={3} className="mt-4">
-        <WidgetCard><MaquinaStatusDonutWidget setorId={setorId} /></WidgetCard>
-        <WidgetCard><MaquinasPorSetorWidget setorId={setorId} /></WidgetCard>
-        <WidgetCard><TempoMedioParadaWidget setorId={setorId} /></WidgetCard>
-=======
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
         <WidgetCard>
@@ -201,7 +177,6 @@ export default function MaquinasGestor() {
         <WidgetCard>
           <TempoMedioParadaWidget setorId={setorId} />
         </WidgetCard>
->>>>>>> db05a75b9548480549b8cdc5366e139a61b4cbdb
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
