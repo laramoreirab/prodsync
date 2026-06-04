@@ -36,9 +36,9 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-red-900 flex items-center px-4 py-2 rounded-md">
-                    <Trash2 className="mr-2 text-4xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-vermelho-vivido flex text-center justify-center px-4 py-2 rounded-md">
+                    <Trash2 strokeWidth={2.5} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">
                         Excluir OP
                     </DialogTitle>
                 </div>
@@ -60,7 +60,7 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
                         <button
                             type="button"
                             disabled={carregando}
-                            className='border py-3 px-4 rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
+                            className='border py-3 px-4 cursor-pointer rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
                         >
                             Cancelar
                         </button>
@@ -68,7 +68,7 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
                     <button
                         type="submit"
                         disabled={carregando}
-                        className='py-3 px-5 bg-[var(--trash)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
+                        className='py-3 px-5 cursor-pointer bg-[var(--trash)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
                     >
                         {carregando && <Loader2 className="w-4 h-4 animate-spin" />}
                         Excluir

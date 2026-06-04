@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Pencil, Plus, EyeIcon, Trash2, Search } from 'lucide-react';
+import { Loader2, Pencil, Plus, EyeIcon, Trash2, Search, AlertTriangle, ArrowDown, Flame, MoveHorizontal } from 'lucide-react';
 import TableListagens from "@/components/table";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
@@ -92,15 +92,38 @@ const colunasOrdemProd = [
     label: "Prioridade",
     className: "w-45",
     icone: (valor) => {
-      const item = getPrioridadeBadgeConfig(valor) || {};
-      const Icon = item.icon;
-      return (
-        <Badge variant="outline" className={`whitespace-nowrap ${item.className || ""} text-sm font-medium p-2.5`}>
-          {Icon ? <Icon className={`mr-1 h-4 w-4 ${item.iconClassName || ""}`} /> : null}
-          {item.label || valor}
-        </Badge>
-      );
-    }
+          const config = {
+            "Média": {
+              variant: "outline",
+              className: "border border-[var(--azul-cobalto)]",
+              icon: <MoveHorizontal className="text-azul-cobalto" />
+            },
+            "Alta": {
+              variant: "secondary",
+              className: "border border-[var(--amarelo)] bg-transparent",
+              icon: <AlertTriangle className="text-amarelo" />
+            },
+            "Crítica": {
+              variant: "destructive",
+              className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+              icon: <Flame className="text-vermelho-vivido" />
+            },
+            "Baixa": {
+              variant: "destructive",
+              className: "border border-gray-400 text-sm bg-transparent text-black",
+              icon: <ArrowDown className="text-gray-400" />
+            }
+          };
+    
+    
+          const item = config[valor] || { icon: null };
+          return (
+            <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+              {item.icon}
+              {valor}
+            </Badge>
+          );
+        }
   },
   {
     id: "setor",
@@ -114,9 +137,17 @@ const colunasOrdemProd = [
     label: 'Status',
     className: "text-center",
     icone: (valor) => {
-      const className = getOrdemStatusBadgeClass(valor);
+      const config = {
+        "Produzindo": { variant: "produzindo" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" },
+        "Concluída": { variant: "concluida" },
+        "Aguardando Início": { variant: "aguardando" }
+      };
+      const item = config[valor] || { icon: null };
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${className} text-sm font-medium p-2.5`}>
+        <Badge variant={item.variant} className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+          {item.icon}
           {valor}
         </Badge>
       );

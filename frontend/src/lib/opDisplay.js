@@ -59,27 +59,61 @@ export function getPrioridadeBadgeConfig(prioridade) {
   const normalized = normalizePrioridade(prioridade);
 
   const config = {
-    "Crítica": {
-      className: "border-rose-500/30 bg-rose-500/10 text-rose-700",
-      icon: Flame,
-      iconClassName: "text-rose-600",
-    },
-    Alta: {
-      className: "border-amber-500/30 bg-amber-500/10 text-amber-700",
-      icon: AlertTriangle,
-      iconClassName: "text-amber-600",
-    },
     "Média": {
-      className: "border-sky-500/30 bg-sky-500/10 text-sky-700",
-      icon: MoveHorizontal,
-      iconClassName: "text-sky-600",
+      variant: "outline",
+      className: "border border-[var(--azul-cobalto)]",
+      icon: <MoveHorizontal className="text-azul-cobalto" />
     },
-    Baixa: {
-      className: "border-slate-400/30 bg-slate-100 text-slate-700",
-      icon: ArrowDown,
-      iconClassName: "text-slate-400",
+    "Alta": {
+      variant: "secondary",
+      className: "border border-[var(--amarelo)] bg-transparent",
+      icon: <AlertTriangle className="text-amarelo" />
     },
+    "Crítica": {
+      variant: "destructive",
+      className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+      icon: <Flame className="text-vermelho-vivido" />
+    },
+    "Baixa": {
+      variant: "destructive",
+      className: "border border-gray-400 text-sm bg-transparent text-black",
+      icon: <ArrowDown className="text-gray-400" />
+    }
   };
+
+  icone: (valor) => {
+    const config = {
+      "Média": {
+        variant: "outline",
+        className: "border border-[var(--azul-cobalto)]",
+        icon: <MoveHorizontal className="text-azul-cobalto" />
+      },
+      "Alta": {
+        variant: "secondary",
+        className: "border border-[var(--amarelo)] bg-transparent",
+        icon: <AlertTriangle className="text-amarelo" />
+      },
+      "Crítica": {
+        variant: "destructive",
+        className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+        icon: <Flame className="text-vermelho-vivido" />
+      },
+      "Baixa": {
+        variant: "destructive",
+        className: "border border-gray-400 text-sm bg-transparent text-black",
+        icon: <ArrowDown className="text-gray-400" />
+      }
+    };
+
+
+    const item = config[valor] || { icon: null };
+    return (
+      <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+        {item.icon}
+        {valor}
+      </Badge>
+    );
+  }
 
   return {
     label: normalized || "-",

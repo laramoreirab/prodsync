@@ -31,6 +31,7 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
+  LoadingState,
 } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
@@ -406,6 +407,11 @@ export default function UsuarioDetalheGestor({ params }) {
 
     return a.op.toLowerCase().includes(termo) || String(a.id).includes(termo);
   });
+
+  // if(loading) {
+  //   return (
+  //     <LoadingState message="Carregando dados do usuário..." />
+  //   )}
 
   return (
     <PageLayout>
