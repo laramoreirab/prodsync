@@ -3,18 +3,10 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EyeIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
-import {
-  ContentGrid,
-  FadeUpItem,
-  KPIGrid,
-  PageHeader,
-  PageLayout,
-  SectionDivider,
-  WidgetCard,
-} from "@/components/AnimatedComponents";
-import SearchBar from "@/components/ui/searchBar";
+import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard } from "@/components/AnimatedComponents";
 import { FilterRow } from "@/components/AnimatedComponents";
 import { EmptyState } from "@/components/AnimatedComponents";
+import { SearchBar } from "@/components/AnimatedComponents";
 
 import TableListagens from "@/components/table";
 import { Badge } from "@/components/ui/badge";
@@ -122,17 +114,16 @@ export default function MaquinasGestor() {
     // Aplica a busca por texto
     if (busca) {
       const termo = busca.toLowerCase();
-      resultado = resultado.filter(
-        (maquina) =>
-          maquina.nome?.toLowerCase().includes(termo) ||
-          String(maquina.id_maquina).includes(termo),
+      resultado = resultado.filter((maquina) =>
+        maquina.nome?.toLowerCase().includes(termo) ||
+        String(maquina.id_maquina).includes(termo)
       );
     }
 
     // Aplica o filtro de status
     if (filtrosAtivos.status?.length > 0) {
       resultado = resultado.filter((maquina) =>
-        filtrosAtivos.status.includes(maquina.status),
+        filtrosAtivos.status.includes(maquina.status)
       );
     }
 
@@ -206,7 +197,6 @@ export default function MaquinasGestor() {
       {/* LISTAGEM MAQUINAS */}
       <SectionDivider title="Inventário de Máquinas" className="mt-8" />
 
-      {/* Busca */}
       <SearchBar
         value={busca}
         onChange={(e) => setBusca(e.target.value)}

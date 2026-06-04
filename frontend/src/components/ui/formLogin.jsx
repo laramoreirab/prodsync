@@ -93,7 +93,7 @@ export default function LoginForm() {
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
                             <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
-                            <Input className="h-9" placeholder="Ex: 11.111.-11"
+                            <Input className="h-9" placeholder="Ex: 11111111"
                                 value={id} onChange={(e) => setId(e.target.value)} />
                         </div>
 
@@ -153,7 +153,7 @@ export default function LoginForm() {
                     <Button id="btn_login"
                         type="submit"
                         disabled={carregando}
-                        className="mt-5 h-9 w-full cursor-pointer rounded-lg bg-primary py-3 text-sm font-semibold text-white hover:bg-primary/80 lg:mt-8">
+                        className="mt-5 h-9 w-full cursor-pointer rounded-lg bg-primary py-3 text-sm font-semibold text-white shadow-md lg:mt-8">
                         {carregando ? "Entrando..." : "Entrar"}
                     </Button>
                 </form>
@@ -170,7 +170,6 @@ export default function LoginForm() {
 
                 <div className="flex items-center justify-center text-center font-semibold text-foreground">
                     <a href="/primeiro-acesso" className="flex cursor-pointer items-center gap-2 text-sm hover:underline">
-                        <KeyRound width={20} />
                         <span>É seu primeiro acesso?</span>
                     </a>
                 </div>

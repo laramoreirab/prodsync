@@ -154,7 +154,7 @@ export default function FormCadastroEventoGestor({ onCadastroSucesso }) {
                         <button
                             type="button"
                             onClick={() => setTipoEvento('Setup')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xl font-medium transition-colors ${tipoEvento === 'Setup'
+                            className={`flex items-center gap-2 px-4 mt-2 py-2 rounded-md text-xl font-medium transition-colors ${tipoEvento === 'Setup'
                                 ? 'bg-amber-100 text-amber-700 border border-amber-200'
                                 : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'
                                 }`}
