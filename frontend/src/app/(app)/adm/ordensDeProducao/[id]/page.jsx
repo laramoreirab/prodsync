@@ -61,20 +61,17 @@ const colunasEventos = [
     className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        Setup: {
-          variant: "outline",
-          className:
-            "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100",
-        },
-        Parada: { variant: "destructive", className: "font-semibold text-sm border-none" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" }
       };
-      const estilo = config[valor] || { variant: "outline", className: "" };
+      const item = config[valor] || { icon: null };
       return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+        <Badge variant={item.variant} className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+          {item.icon}
           {valor}
         </Badge>
       );
-    },
+    }
   },
   {
     id: "data",
@@ -156,11 +153,11 @@ const formatarDataHora = (valor) => {
 const prioridadeBadge = (prioridade) => {
   const valor = prioridade || "";
   const config = {
-    Média: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
-    Media: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
+    Média: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-sky-600" /> },
+    // Media: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-sky-600" /> },
     Alta: { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700", icon: <AlertTriangle className="text-amber-600" /> },
-    Crítica: { className: "border border-rose-500/30 bg-rose-500/10 text-rose-700", icon: <Flame className="text-rose-600" /> },
-    Critica: { className: "border border-rose-500/30 bg-rose-500/10 text-rose-700", icon: <Flame className="text-rose-600" /> },
+    Crítica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-rose-600" /> },
+    // Critica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-rose-600" /> },
     Baixa: { className: "border border-slate-400/30 bg-slate-100 text-slate-700", icon: <ArrowDown className="text-slate-400" /> },
   };
   const item = config[valor] || { icon: null, className: "" };

@@ -34,7 +34,7 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
             if (onCriadoSucesso) {
                 onCriadoSucesso();
             }
-            
+
         } catch (error) {
             toast.error(error.message || "Erro ao conectar com o servidor.");
         } finally {
@@ -45,12 +45,14 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
     return (
         <div className="flex flex-col">
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-white h-6 w-6" />
-                    <DialogTitle className="text-2xl text-white">Criar Motivo de Evento</DialogTitle>
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Plus strokeWidth={2} size={30} className="mr-2" />
+                    <DialogTitle className="text-3xl font-semibold">
+                        Criar Motivo de Evento
+                    </DialogTitle>
                 </div>
             </div>
-            
+
             <Separator className="my-4 bg-gray-300" />
 
             <form onSubmit={handleSubmitMotivo} className="px-2 flex flex-col gap-4">

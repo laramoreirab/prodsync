@@ -61,18 +61,20 @@ const colunasMaquina = [
     id: 'tipo', key: 'tipoEvento', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Setup": {
-          variant: "outline",
-          className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
+        "Produzindo": { variant: "produzindo" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" },
+        "Concluída": { variant: "concluida" },
+        "Aguardando Início": { variant: "aguardando" }
       };
-      const estilo = config[valor] || { variant: "outline", className: "" };
-      return <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>{valor}</Badge>;
-    },
+      const item = config[valor] || { icon: null };
+      return (
+        <Badge variant={item.variant} className={`whitespace-nowrap ${item.className} text-sm p-2.5`}>
+          {item.icon}
+          {valor}
+        </Badge>
+      );
+    }
   },
   {
     id: 'data', key: 'data', label: 'Data (Início - Fim)',
@@ -501,42 +503,42 @@ export default function MaquinaDetalhePage({ params }) {
             }
           >
             <FadeUpItem>
-            {dadosExibidos.length > 0 ? (
-              <TableListagens
-                data={dadosExibidos}
-                columns={colunasMaquina}
-                acoesDropdown={(maq) => (
-                  <>
-                    <Dialog>
-                      <DialogTrigger asChild>
+              {dadosExibidos.length > 0 ? (
+                <TableListagens
+                  data={dadosExibidos}
+                  columns={colunasMaquina}
+                  acoesDropdown={(maq) => (
+                    <>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                            <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                            Ver Detalhes
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent><DetalhesEvento eventoId={maq.id} /></DialogContent>
+                      </Dialog>
+                      <SolicitarJustificativaMenuItem idEvento={maq.id}>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
-                          Ver Detalhes
+                          <BellRing className="mr-2 h-4 w-4" />
+                          Solicitar Justificativa
                         </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent><DetalhesEvento eventoId={maq.id} /></DialogContent>
-                    </Dialog>
-                    <SolicitarJustificativaMenuItem idEvento={maq.id}>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar Justificativa
-                      </DropdownMenuItem>
-                    </SolicitarJustificativaMenuItem>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                          <Pencil className="mr-2 h-4 w-4 text-primary" />
-                          Editar Evento
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent><FormEdicaoEvento /></DialogContent>
-                    </Dialog>
-                  </>
-                )}
-              />
-            ) : (
-              <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
-            )}
+                      </SolicitarJustificativaMenuItem>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                            <Pencil className="mr-2 h-4 w-4 text-primary" />
+                            Editar Evento
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent><FormEdicaoEvento /></DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                />
+              ) : (
+                <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
+              )}
             </FadeUpItem>
           </DetailListingSection>
         ) : (
@@ -571,25 +573,25 @@ export default function MaquinaDetalhePage({ params }) {
             }
           >
             <FadeUpItem>
-            {dadosApontamentosFiltrados.length > 0 ? (
-              <TableListagens
-                data={dadosApontamentosFiltrados}
-                columns={colunasApontamento}
-                acoesDropdown={(apontamento) => (
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver OP relacionada
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-              />
-            ) : (
-              <EmptyState
-                title="Nenhum apontamento encontrado"
-                message="Não encontramos apontamentos correspondentes ao filtro ou busca."
-              />
-            )}
+              {dadosApontamentosFiltrados.length > 0 ? (
+                <TableListagens
+                  data={dadosApontamentosFiltrados}
+                  columns={colunasApontamento}
+                  acoesDropdown={(apontamento) => (
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`/adm/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
+                        <EyeIcon className="mr-2 h-4 w-4" />
+                        Ver OP relacionada
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                />
+              ) : (
+                <EmptyState
+                  title="Nenhum apontamento encontrado"
+                  message="Não encontramos apontamentos correspondentes ao filtro ou busca."
+                />
+              )}
             </FadeUpItem>
           </DetailListingSection>
         )}

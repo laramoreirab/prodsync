@@ -12,15 +12,15 @@ export default function RegisterPage() {
     },
     {
       title: "Sobre nós",
-      href: "#about-us",
+      href: "/#sobre-nos",
     },
     {
       title: "Serviços",
-      href: "#servicos",
+      href: "/#servicos",
     },
     {
       title: "FAQs",
-      href: "#faqs",
+      href: "/#faqs",
     }
   ];
 
