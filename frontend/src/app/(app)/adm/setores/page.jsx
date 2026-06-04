@@ -163,7 +163,6 @@ export default function PageSetores() {
               <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                 <PlusChevronToggleIcon className="mr-2" />
                 Criar
-                <ChevronDown className="ml-2 w-5 h-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-48">
                 <DropdownMenuItem

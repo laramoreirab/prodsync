@@ -358,6 +358,50 @@ class MaquinaController {
         }
     }
 
+    static async listarMaquinasDisponiveisPorTurno(req, res) {
+        try {
+            const { id_setor } = req.params;
+            const { id_turno, turno, id_operador } = req.query;
+            const id_empresa = req.user.id_empresa;
+            const turnoSelecionado = id_turno ?? turno;
+
+            if (!id_setor || isNaN(id_setor)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'ID do setor invalido',
+                    mensagem: 'O ID do setor deve ser um numero valido'
+                });
+            }
+
+            if (!turnoSelecionado || isNaN(turnoSelecionado)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Turno invalido',
+                    mensagem: 'Selecione um turno valido para listar maquinas disponiveis'
+                });
+            }
+
+            const maquinas = await MaquinaModel.listarMaquinasDisponiveisPorTurno(
+                id_empresa,
+                Number(id_setor),
+                Number(turnoSelecionado),
+                id_operador
+            );
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: maquinas
+            });
+        } catch (error) {
+            console.error('Erro ao listar maquinas disponiveis por turno:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel listar as maquinas disponiveis'
+            });
+        }
+    }
+
     static async obterMaquinaOperador(req, res) {
         try {
             const id_operador = req.params.id_operador
