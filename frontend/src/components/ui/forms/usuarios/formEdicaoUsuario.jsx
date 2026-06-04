@@ -13,6 +13,16 @@ import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 import { mascaraCPF } from '@/utils/mascaras';
 
+const resolverImagemPerfil = (imagem) => {
+    if (!imagem) return null;
+    if (imagem.startsWith("http")) return imagem;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+    return `${apiUrl}/uploads/imagens/${imagem}`;
+};
+
 export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const fileInputFotoRef = useRef(null);
@@ -88,7 +98,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                 if (dados.imagem_perfil) {
                     setFotoPerfil({
                         nome: 'Imagem atual',
-                        preview: dados.imagem_perfil,
+                        preview: resolverImagemPerfil(dados.imagem_perfil),
                         raw: null
                     });
                 }

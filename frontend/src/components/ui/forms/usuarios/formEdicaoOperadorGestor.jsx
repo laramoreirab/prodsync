@@ -12,6 +12,16 @@ import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 
 
+const resolverImagemPerfil = (imagem) => {
+    if (!imagem) return null;
+    if (imagem.startsWith("http")) return imagem;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+    return `${apiUrl}/uploads/imagens/${imagem}`;
+};
+
 export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const fileInputFotoRef = useRef(null);
@@ -68,7 +78,7 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                 if (dados.imagem_perfil) {
                     setFotoPerfil({
                         nome: 'Imagem atual',
-                        preview: dados.imagem_perfil,
+                        preview: resolverImagemPerfil(dados.imagem_perfil),
                         raw: null
                     });
                 }
@@ -164,7 +174,8 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
         payload.append('id_usuario', operadorId);          // backend espera id_usuario no body
 
         // Só anexa a foto se o usuário tiver selecionado uma nova
-        if (fotoPerfil?.raw) payload.append("foto", fotoPerfil.raw);
+        payload.set('funcao', 'Operador');
+        if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
         try {
             await usuariosCrudService.update(operadorId, payload);

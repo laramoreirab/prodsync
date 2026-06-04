@@ -84,9 +84,11 @@ model Maquinas {
   imagem                  String?             @db.VarChar(255)
   categoria               String?             @db.VarChar(100)
   status                  String?             @db.VarChar(50)
-  board_uid               String?             @db.VarChar(100)
   board_sincronizado_em   DateTime?
+  board_uid               String?             @db.VarChar(100)
   board_ultimo_contato_em DateTime?
+  pairing_code            String?             @db.VarChar(10)
+  pairing_expires_at      DateTime?
   apontamentos            Apontamento[]
   escala_trabalho         EscalaTrabalho[]
   historico_eventos       Historico_Eventos[]

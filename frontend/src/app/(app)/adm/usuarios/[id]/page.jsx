@@ -135,6 +135,17 @@ const formatarDuracao = (minutos) => {
   return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
 };
 
+const resolverImagemPerfil = (imagem) => {
+  if (!imagem) return "/userdefault.svg";
+
+  if (imagem.startsWith("http")) return imagem;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+  return `${apiUrl}/uploads/imagens/${imagem}`;
+};
+
 export default function UsuarioDetalhePage({ params }) {
   const { id } = use(params);
   const operadorId = Number(id);
@@ -348,11 +359,7 @@ if (carregando) {
         <div className={`grid gap-4 sm:gap-6 grid-cols-1 ${usuario?.maquina ? "lg:grid-cols-2" : ""}`}>
           {/* Card do Usuário */}
           <UserProfileCard
-            imageSrc={
-              usuario?.imagem_perfil
-                ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
-                : "/userdefault.svg"
-            }
+            imageSrc={resolverImagemPerfil(usuario?.imagem_perfil)}
             name={usuario?.nome || "-"}
             fieldsLeft={[
               { label: "ID", value: String(usuario?.id_usuario || operadorId) },

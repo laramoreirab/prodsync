@@ -197,7 +197,7 @@ class UsuarioModel {
                 const novoUsuario = await prisma.usuarios.create({
                     data: {
                         ...dados,
-                        id_usuario: gerarIdUsuario(dados.tipo),
+                        id_usuario: dados.id_usuario ?? gerarIdUsuario(dados.tipo),
                         senha: ""
                     },
                     select: { id_usuario: true } //vai retornar o Id do novo usuário

@@ -4,9 +4,10 @@ import SetorModel from '../models/SetorModel.js';
 import MaquinaModel from '../models/MaquinaModel.js'
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 import prisma from '../config/prisma.js';
-import { TypeOverrides } from 'pg';
 import EmpresaModel from '../models/EmpresaModel.js';
 import Papa from 'papaparse'
+import { gerarIdUsuario } from '../dev-utils/gerarIdUsuario.js';
+import { removerImagemCloudinary, uploadImagemPerfil } from '../services/cloudinaryService.js';
 
 class UsuarioController {
 
@@ -240,23 +241,33 @@ class UsuarioController {
             };
 
             //preparar dados do usuario para tabela usuarios
+            const idUsuarioNovo = gerarIdUsuario(funcao);
+            let imagemPerfilUpload = null;
+
+            if (req.file) {
+                imagemPerfilUpload = await uploadImagemPerfil(req.file.buffer, {
+                    id_empresa,
+                    id_usuario: idUsuarioNovo
+                });
+            }
+
             const dadosUsuario = {
+                id_usuario: idUsuarioNovo,
                 id_empresa: Number(id_empresa),
                 nome: nome,
                 tipo: funcao,
                 cpf: cpf.trim(),
-                email: email
-            }
-
-            // Adicionar imagem se foi enviada
-            if (req.file) {
-                dadosUsuario.imagem_perfil = req.file.filename;
+                email: email,
+                ...(imagemPerfilUpload ? {
+                    imagem_perfil: imagemPerfilUpload.secure_url,
+                    imagem_perfil_public_id: imagemPerfilUpload.public_id
+                } : {})
             }
 
             //Registrar usuário na tabela Usuarios
             const usuarioId = await UsuarioModel.criarUsuario(dadosUsuario);
             if (!usuarioId || isNaN(usuarioId)) {
-                res.status(400).json({
+                return res.status(400).json({
                     sucesso: false,
                     erro: 'Id do usuário não retornado',
                     mensagem: 'Id do usuário não retornado!'
@@ -336,6 +347,10 @@ static async atualizarUsuario(req, res) {
             });
         }
 
+        const funcaoNormalizada = funcao !== undefined
+            ? (String(funcao).trim().toLowerCase() === 'gestor' ? 'Gestor' : 'Operador')
+            : undefined;
+
         // dados usuario
 
         const dadosUpdateUsuario = {};
@@ -349,20 +364,18 @@ static async atualizarUsuario(req, res) {
         if (email !== undefined)
             dadosUpdateUsuario.email = email;
 
-        if (funcao !== undefined)
-            dadosUpdateUsuario.tipo = funcao;
+        if (funcaoNormalizada !== undefined)
+            dadosUpdateUsuario.tipo = funcaoNormalizada;
 
         // imagem
         if (req.file) {
+            const imagemPerfilUpload = await uploadImagemPerfil(req.file.buffer, {
+                id_empresa,
+                id_usuario
+            });
 
-            if (usuarioExistente.imagem_perfil) {
-                await removerArquivoAntigo(
-                    usuarioExistente.imagem_perfil,
-                    'imagem'
-                );
-            }
-
-            dadosUpdateUsuario.imagem_perfil = req.file.filename;
+            dadosUpdateUsuario.imagem_perfil = imagemPerfilUpload.secure_url;
+            dadosUpdateUsuario.imagem_perfil_public_id = imagemPerfilUpload.public_id;
         }
 
         // atualiza usuário
@@ -373,7 +386,7 @@ static async atualizarUsuario(req, res) {
                 dadosUpdateUsuario
             );
         // operador
-        if (funcao === "Operador") {
+        if (funcaoNormalizada === "Operador") {
 
             const dadosEscala = {};
 
@@ -397,13 +410,17 @@ static async atualizarUsuario(req, res) {
         }
         // gestor
 
-        if (funcao === "Gestor" && id_setor) {
+        if (funcaoNormalizada === "Gestor" && id_setor) {
 
             await EscalaTrabalhoModel.atualizarSetorGestor(
                 id_usuario,
                 id_empresa,
                 id_setor
             );
+        }
+
+        if (req.file && !usuarioExistente.imagem_perfil_public_id && usuarioExistente.imagem_perfil) {
+            await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
         }
 
         return res.status(200).json({
@@ -448,8 +465,9 @@ static async atualizarUsuario(req, res) {
                 });
             }
 
-            // Remover imagem do produto se existir
-            if (usuarioExistente.imagem_perfil) {
+            if (usuarioExistente.imagem_perfil_public_id) {
+                await removerImagemCloudinary(usuarioExistente.imagem_perfil_public_id);
+            } else if (usuarioExistente.imagem_perfil) {
                 await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
             }
 
@@ -498,20 +516,34 @@ static async atualizarUsuario(req, res) {
                 });
             }
 
-            // Remover imagem antiga se existir
-            if (usuarioExistente.imagem_perfil) {
-                await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
+            if (!req.file) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'Imagem nao enviada',
+                    mensagem: 'Envie uma imagem no campo imagem_perfil'
+                });
             }
 
-            // Atualizar produto com a nova imagem
-            await UsuarioModel.atualizar(id, { imagem_perfil: req.file.filename });
+            const imagemPerfilUpload = await uploadImagemPerfil(req.file.buffer, {
+                id_empresa,
+                id_usuario
+            });
+
+            await UsuarioModel.atualizar(id_usuario, id_empresa, {
+                imagem_perfil: imagemPerfilUpload.secure_url,
+                imagem_perfil_public_id: imagemPerfilUpload.public_id
+            });
+
+            if (!usuarioExistente.imagem_perfil_public_id && usuarioExistente.imagem_perfil) {
+                await removerArquivoAntigo(usuarioExistente.imagem_perfil, 'imagem');
+            }
 
             return res.status(200).json({
                 sucesso: true,
                 mensagem: 'Imagem enviada com sucesso',
                 dados: {
-                    nomeArquivo: req.file.filename,
-                    caminho: `/uploads/imagens/${req.file.filename}`
+                    url: imagemPerfilUpload.secure_url,
+                    public_id: imagemPerfilUpload.public_id
                 }
             });
         } catch (error) {

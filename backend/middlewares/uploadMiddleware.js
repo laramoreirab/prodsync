@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Criar pastas de uploads se não existirem
 const uploadPathImagens = path.join(__dirname, '..', 'uploads', 'imagens');
 const uploadPathArquivos = path.join(__dirname, '..', 'uploads', 'arquivos');
 
@@ -18,7 +17,6 @@ if (!fs.existsSync(uploadPathArquivos)) {
     fs.mkdirSync(uploadPathArquivos, { recursive: true });
 }
 
-// Função para gerar nome único com timestamp
 const gerarNomeUnico = (nomeOriginal) => {
     const timestamp = Date.now();
     const extensao = path.extname(nomeOriginal);
@@ -26,10 +24,10 @@ const gerarNomeUnico = (nomeOriginal) => {
     return `${timestamp}-${nomeSemExtensao}${extensao}`;
 };
 
-// Configuração do multer para upload de imagens
+const storageImagensCloudinary = multer.memoryStorage();
+
 const storageImagens = multer.diskStorage({
     destination: (req, file, cb) => {
-        // Verificar se pasta existe, criar se não existir
         if (!fs.existsSync(uploadPathImagens)) {
             fs.mkdirSync(uploadPathImagens, { recursive: true });
         }
@@ -41,10 +39,8 @@ const storageImagens = multer.diskStorage({
     }
 });
 
-// Configuração do multer para upload de outros arquivos
 const storageArquivos = multer.diskStorage({
     destination: (req, file, cb) => {
-        // Verificar se pasta existe, criar se não existir
         if (!fs.existsSync(uploadPathArquivos)) {
             fs.mkdirSync(uploadPathArquivos, { recursive: true });
         }
@@ -56,34 +52,24 @@ const storageArquivos = multer.diskStorage({
     }
 });
 
-// Verificar se é imagem
-const isImage = (mimetype) => {
-    return mimetype.startsWith('image/');
-};
-
-// Filtro para tipos de arquivo permitidos (imagens)
 const fileFilterImagens = (req, file, cb) => {
-    const tiposPermitidos = process.env.ALLOWED_FILE_TYPES ?
-        process.env.ALLOWED_FILE_TYPES.split(',').map(t => t.trim()) :
-        ['image/jpeg', 'image/png', 'image/webp'];
-        
+    const tiposPermitidos = process.env.ALLOWED_FILE_TYPES
+        ? process.env.ALLOWED_FILE_TYPES.split(',').map(t => t.trim())
+        : ['image/jpeg', 'image/png', 'image/webp'];
+
     if (tiposPermitidos.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error(`Tipo de arquivo não permitido. Tipos aceitos: ${tiposPermitidos.join(', ')}`), false);
+        cb(new Error(`Tipo de arquivo nao permitido. Tipos aceitos: ${tiposPermitidos.join(', ')}`), false);
     }
 };
 
-// Filtro genérico para outros arquivos (pode ser expandido)
 const fileFilterArquivos = (req, file, cb) => {
-    // Por padrão, aceitar qualquer tipo de arquivo para uploads genéricos
     cb(null, true);
 };
 
-// Obter tamanho máximo do arquivo
-const maxFileSize = parseInt(process.env.MAX_FILE_SIZE) || 5242880; // 5MB por padrão
+const maxFileSize = parseInt(process.env.MAX_FILE_SIZE) || 5242880;
 
-// Upload para imagens
 const uploadImagens = multer({
     storage: storageImagens,
     limits: {
@@ -92,45 +78,51 @@ const uploadImagens = multer({
     fileFilter: fileFilterImagens
 });
 
-// Upload para outros arquivos
+const uploadImagensCloudinary = multer({
+    storage: storageImagensCloudinary,
+    limits: {
+        fileSize: maxFileSize
+    },
+    fileFilter: fileFilterImagens
+});
+
 const uploadArquivos = multer({
     storage: storageArquivos,
     limits: {
-        fileSize: maxFileSize * 2 // 10MB para arquivos não-imagem
+        fileSize: maxFileSize * 2
     },
     fileFilter: fileFilterArquivos
 });
 
-// Middleware para tratamento de erros do multer
 const handleUploadError = (error, req, res, next) => {
     if (error instanceof multer.MulterError) {
         if (error.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({
                 sucesso: false,
                 erro: 'Arquivo muito grande',
-                mensagem: `Tamanho máximo permitido: ${maxFileSize / 1024 / 1024}MB`
+                mensagem: `Tamanho maximo permitido: ${maxFileSize / 1024 / 1024}MB`
             });
         }
         if (error.code === 'LIMIT_FILE_COUNT') {
             return res.status(400).json({
                 sucesso: false,
                 erro: 'Muitos arquivos',
-                mensagem: 'Apenas um arquivo por vez é permitido'
+                mensagem: 'Apenas um arquivo por vez e permitido'
             });
         }
         if (error.code === 'LIMIT_UNEXPECTED_FILE') {
             return res.status(400).json({
                 sucesso: false,
-                erro: 'Campo de arquivo inválido',
-                mensagem: 'Verifique o nome do campo no formulário'
+                erro: 'Campo de arquivo invalido',
+                mensagem: 'Verifique o nome do campo no formulario'
             });
         }
     }
 
-    if (error.message && error.message.includes('Tipo de arquivo não permitido')) {
+    if (error.message && error.message.includes('Tipo de arquivo nao permitido')) {
         return res.status(400).json({
             sucesso: false,
-            erro: 'Tipo de arquivo inválido',
+            erro: 'Tipo de arquivo invalido',
             mensagem: error.message
         });
     }
@@ -138,10 +130,9 @@ const handleUploadError = (error, req, res, next) => {
     next(error);
 };
 
-// Função helper para remover arquivo antigo
 export const removerArquivoAntigo = async (nomeArquivo, tipo = 'imagem') => {
     try {
-        if (!nomeArquivo) return;
+        if (!nomeArquivo) return false;
 
         const nomeNormalizado = path.basename(nomeArquivo);
         const caminhoArquivo = tipo === 'imagem'
@@ -159,4 +150,4 @@ export const removerArquivoAntigo = async (nomeArquivo, tipo = 'imagem') => {
     }
 };
 
-export { uploadImagens, uploadArquivos, handleUploadError };
+export { uploadImagens, uploadImagensCloudinary, uploadArquivos, handleUploadError };
