@@ -3,6 +3,10 @@ export const qtdUsuariosPerfilConfig = {
   operadores: { label: "Operadores:", color: "var(--chart2)" },
 };
 
+export const qtdUsuariosPerfilBarConfig = {
+  quantidade: { label: "Usuarios:", color: "var(--chart2)" },
+};
+
 export const qtdUsuariosSetorConfig = {
   qtd: { label: "Usuários:", color: "var(--chart2)" },
 };

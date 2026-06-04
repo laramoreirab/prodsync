@@ -35,7 +35,7 @@ export const ProducaoDefeitoPorSetorSchema = z.object({
   maquina:      z.string(),
   produzidas: z.number(),
   defeito:    z.number(),
-   setorId: z.number().optional(),
+  setorId: z.number().nullable().optional(),
 });
 export const ProducaoDefeitoPorSetorArraySchema = z.array(ProducaoDefeitoPorSetorSchema);
 

@@ -51,9 +51,10 @@ export const tempoMedioParadaService = {
 };
 
 export const producaoDefeitosService = {
-  async getProducaoDefeitos() {
+  async getProducaoDefeitos(setorId = null) {
     if (USE_MOCK) return ProducaoDefeitoPorSetorArraySchema.parse(mockProducaoDefeitos);
-    const data = await apiFetch("/api/setores/obterProducaoDefeitosPorSetor");
+    const query = setorId ? `?setorId=${setorId}` : "";
+    const data = await apiFetch(`/api/setores/obterProducaoDefeitosPorSetor${query}`);
     return ProducaoDefeitoPorSetorArraySchema.parse(data.dados);
   },
 };

@@ -714,7 +714,7 @@ class SetorModel {
                     // total_produzido: total,
                     // total_refugo: setor.defeitos
                 };
-            }).sort((a, b) => b.total_refugo - a.total_refugo);
+            }).sort((a, b) => b.defeito - a.defeito);
         } catch (error) {
             console.error('Erro ao obter producao de defeitos por setor:', error);
             throw error;
