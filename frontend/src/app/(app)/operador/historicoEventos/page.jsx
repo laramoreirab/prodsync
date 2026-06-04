@@ -68,6 +68,7 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
+  LoadingState,
 } from "@/components/AnimatedComponents";
 
 const colunasEventos = [
@@ -80,7 +81,8 @@ const colunasEventos = [
       const config = {
         Setup: {
           variant: "secondary",
-          className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm ",
+          className:
+            "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm ",
         },
         Parada: {
           variant: "destructive",
@@ -114,7 +116,12 @@ const colunasEventos = [
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
   { id: "motivo", key: "motivo", label: "Motivo" },
-  { id: "observacao", key: "observacao", label: "Observação", className: "pl-5" },
+  {
+    id: "observacao",
+    key: "observacao",
+    label: "Observação",
+    className: "pl-5",
+  },
 ];
 
 export default function HistoricoEventos() {
@@ -162,10 +169,14 @@ export default function HistoricoEventos() {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
-      if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
-      if (criterio === "duracao_asc") return duracaoEmMinutos(a) - duracaoEmMinutos(b);
-      if (criterio === "duracao_desc") return duracaoEmMinutos(b) - duracaoEmMinutos(a);
+      if (criterio === "data_asc")
+        return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === "data_desc")
+        return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === "duracao_asc")
+        return duracaoEmMinutos(a) - duracaoEmMinutos(b);
+      if (criterio === "duracao_desc")
+        return duracaoEmMinutos(b) - duracaoEmMinutos(a);
       return 0;
     });
 
@@ -193,14 +204,20 @@ export default function HistoricoEventos() {
 
     if (filtrosSelecionados.tipo?.length > 0) {
       dadosFiltrados = dadosFiltrados.filter((item) =>
-        filtrosSelecionados.tipo.includes(item.tipo)
+        filtrosSelecionados.tipo.includes(item.tipo),
       );
     }
 
-    dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
+    dadosFiltrados = filtrarPorDataInicio(
+      dadosFiltrados,
+      filtrosSelecionados.data,
+    );
 
     if (filtrosSelecionados.duracao?.max) {
-      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
+      dadosFiltrados = filtrarPorDuracaoMax(
+        dadosFiltrados,
+        filtrosSelecionados.duracao.max,
+      );
     }
 
     setDados(dadosFiltrados);
@@ -219,16 +236,7 @@ export default function HistoricoEventos() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">
-            Carregando eventos...
-          </p>
-        </div>
-      </main>
-    );
+    return <LoadingState message="Carregando eventos..." />;
   }
 
   return (
@@ -268,6 +276,7 @@ export default function HistoricoEventos() {
 
         <FilterRow
           count={dadosExibidos.length}
+          className="mb-6"
           label="eventos"
           actions={
             <>
@@ -286,6 +295,7 @@ export default function HistoricoEventos() {
 
         {dadosExibidos.length > 0 ? (
           <TableListagens
+          className="mt-4"
             data={dadosExibidos}
             columns={colunasEventos}
             acoesDropdown={(maquina) => (

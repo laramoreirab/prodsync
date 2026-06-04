@@ -13,6 +13,16 @@ import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
 import { mascaraCPF } from '@/utils/mascaras';
 
+const resolverImagemPerfil = (imagem) => {
+    if (!imagem) return null;
+    if (imagem.startsWith("http")) return imagem;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+    return `${apiUrl}/uploads/imagens/${imagem}`;
+};
+
 export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [fotoPerfil, setFotoPerfil] = useState(null);
     const fileInputFotoRef = useRef(null);
@@ -88,7 +98,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                 if (dados.imagem_perfil) {
                     setFotoPerfil({
                         nome: 'Imagem atual',
-                        preview: dados.imagem_perfil,
+                        preview: resolverImagemPerfil(dados.imagem_perfil),
                         raw: null
                     });
                 }
@@ -118,7 +128,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
         carregarSetores();
     }, []);
-      // A função que vai rodar quando o usuário digitar:
+    // A função que vai rodar quando o usuário digitar:
     const handleCpfChange = (e) => {
         const valorMascarado = mascaraCPF(e.target.value);
 
@@ -203,7 +213,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
         carregarMaquinas();
     }, [formData.id_setor]);
 
-   const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
+    const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
     const inputStyle = "w-full border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none";
 
     if (carregando) {
@@ -218,9 +228,9 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Pencil className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Pencil strokeWidth={2.8} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">
                         Editar Usuário
                     </DialogTitle>
                 </div>
@@ -317,7 +327,6 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -335,7 +344,6 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                             <option value="Operador">Operador</option>
                             <option value="Gestor">Gestor</option>
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                     <div className="relative">
                         <label htmlFor="id_turno" className={labelStyle}>Turno</label>
@@ -358,7 +366,6 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -386,12 +393,11 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 )}
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg">
                         Editar
                     </button>
                 </div>

@@ -574,8 +574,6 @@ select:focus {
   stroke: rgba(111, 155, 255, 0.45) !important;
 }
 
-
-
 /* Remove setas dos inputs type="number" */
 input.input-no-spinner::-webkit-outer-spin-button,
 input.input-no-spinner::-webkit-inner-spin-button {

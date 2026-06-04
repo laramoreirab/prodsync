@@ -30,7 +30,12 @@ import { ProducaoTotalWidget } from "@/features/maquinas/ProducaoTotalWidget";
 const colunasMaquinas = [
   // Ajuste nas classes do Tailwind: w-1/8 -> w-[12.5%], w-30 -> w-32, w-45 -> w-48, w-1/7 -> w-[14%]
   { id: "nome", key: "nome", label: "Nome", className: "w-[12.5%]" },
-  { id: "id_maquina", key: "id_maquina", label: "ID", className: "w-32 text-center justify-center" },
+  {
+    id: "id_maquina",
+    key: "id_maquina",
+    label: "ID",
+    className: "w-32 text-center justify-center",
+  },
   {
     id: "status",
     key: "status",
@@ -45,7 +50,10 @@ const colunasMaquinas = [
       const estilo = config[valor] || { variant: "outline", className: "" };
 
       return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+        <Badge
+          variant={estilo.variant}
+          className={`whitespace-nowrap ${estilo.className}`}
+        >
           {valor || "-"}
         </Badge>
       );
@@ -56,7 +64,12 @@ const colunasMaquinas = [
 ];
 
 const maquinasFilter = [
-  { id: "status", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "Manutencao", "Aguardando"] },
+  {
+    id: "status",
+    label: "Status",
+    type: "checkbox",
+    options: ["Produzindo", "Setup", "Parada", "Manutencao", "Aguardando"],
+  },
 ];
 
 const opcoesOrdenacao = [
@@ -88,7 +101,9 @@ export default function MaquinasGestor() {
   // 1. Memoiza apenas as máquinas tratadas e do setor correto
   const maquinasDoSetor = useMemo(() => {
     return (maquinas || [])
-      .filter((maquina) => !setorId || String(maquina.id_setor) === String(setorId))
+      .filter(
+        (maquina) => !setorId || String(maquina.id_setor) === String(setorId),
+      )
       .map(normalizarMaquina);
   }, [maquinas, setorId]);
 
@@ -99,16 +114,27 @@ export default function MaquinasGestor() {
     // Aplica a busca por texto
     if (busca) {
       const termo = busca.toLowerCase();
+<<<<<<< HEAD
       resultado = resultado.filter((maquina) =>
         maquina.nome?.toLowerCase().includes(termo) ||
         String(maquina.id_maquina).includes(termo)
+=======
+      resultado = resultado.filter(
+        (maquina) =>
+          maquina.nome?.toLowerCase().includes(termo) ||
+          String(maquina.id_maquina).includes(termo),
+>>>>>>> db05a75b9548480549b8cdc5366e139a61b4cbdb
       );
     }
 
     // Aplica o filtro de status
     if (filtrosAtivos.status?.length > 0) {
       resultado = resultado.filter((maquina) =>
+<<<<<<< HEAD
         filtrosAtivos.status.includes(maquina.status)
+=======
+        filtrosAtivos.status.includes(maquina.status),
+>>>>>>> db05a75b9548480549b8cdc5366e139a61b4cbdb
       );
     }
 
@@ -116,9 +142,12 @@ export default function MaquinasGestor() {
     if (ordenacao) {
       resultado.sort((a, b) => {
         if (ordenacao === "nome") return a.nome.localeCompare(b.nome);
-        if (ordenacao === "id_asc") return Number(a.id_maquina) - Number(b.id_maquina);
-        if (ordenacao === "id_desc") return Number(b.id_maquina) - Number(a.id_maquina);
-        if (ordenacao === "status") return String(a.status).localeCompare(String(b.status));
+        if (ordenacao === "id_asc")
+          return Number(a.id_maquina) - Number(b.id_maquina);
+        if (ordenacao === "id_desc")
+          return Number(b.id_maquina) - Number(a.id_maquina);
+        if (ordenacao === "status")
+          return String(a.status).localeCompare(String(b.status));
         return 0;
       });
     }
@@ -127,22 +156,28 @@ export default function MaquinasGestor() {
   }, [maquinasDoSetor, busca, filtrosAtivos, ordenacao]);
 
   if (loading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="animate-spin text-blue-900 w-12 h-12" />
-      </main>
-    );
+    return <LoadingState message="Carregando máquinas do setor..." />;
   }
 
   return (
     <PageLayout>
-      <PageHeader title={`Máquinas do Setor ${setorNome || 'Desconhecido'}`} action={
-        <Dialog>
-          <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
-            <Plus className="mr-2" />
-            Cadastrar
-          </DialogTrigger>
+      <PageHeader
+        title={`Máquinas do Setor ${setorNome || "Desconhecido"}`}
+        action={
+          <Dialog>
+            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
+              <Plus className="mr-2" />
+              Cadastrar
+            </DialogTrigger>
 
+            <DialogContent>
+              <FormCadastroMaquina onCadastroSucesso={refresh} />
+            </DialogContent>
+          </Dialog>
+        }
+      />
+
+<<<<<<< HEAD
           <DialogContent>
             <FormCadastroMaquina onCadastroSucesso={refresh} />
           </DialogContent>
@@ -154,11 +189,28 @@ export default function MaquinasGestor() {
         <WidgetCard><MaquinaStatusDonutWidget setorId={setorId} /></WidgetCard>
         <WidgetCard><MaquinasPorSetorWidget setorId={setorId} /></WidgetCard>
         <WidgetCard><TempoMedioParadaWidget setorId={setorId} /></WidgetCard>
+=======
+      {/* Gráficos */}
+      <KPIGrid cols={3} className="mt-4">
+        <WidgetCard>
+          <MaquinaStatusDonutWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
+          <MaquinasPorSetorWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
+          <TempoMedioParadaWidget setorId={setorId} />
+        </WidgetCard>
+>>>>>>> db05a75b9548480549b8cdc5366e139a61b4cbdb
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
-        <WidgetCard><ProducaoDefeitosWidget setorId={setorId} /></WidgetCard>
-        <WidgetCard><MaquinasPorTurnoWidget /></WidgetCard>
+        <WidgetCard>
+          <ProducaoDefeitosWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
+          <MaquinasPorTurnoWidget />
+        </WidgetCard>
       </ContentGrid>
 
       <FadeUpItem className="mt-8">
@@ -212,13 +264,19 @@ export default function MaquinasGestor() {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
                       <Pencil className="mr-2 h-4 w-4 text-primary" />
                       Editar
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <FormEdicaoMaquina maquinaId={maquina.id_maquina} onEdicaoSucesso={refresh} />
+                    <FormEdicaoMaquina
+                      maquinaId={maquina.id_maquina}
+                      onEdicaoSucesso={refresh}
+                    />
                   </DialogContent>
                 </Dialog>
 
@@ -260,6 +318,6 @@ export default function MaquinasGestor() {
           )}
         </DialogContent>
       </Dialog>
-    </PageLayout >
+    </PageLayout>
   );
 }

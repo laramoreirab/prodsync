@@ -5,7 +5,15 @@ import TableListagens from "@/components/table";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { DataEvento } from "@/components/ui/dataEvento";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Pencil, Plus, Flame, Search, EyeIcon, Loader2 } from "lucide-react";
+import {
+  ChevronDown,
+  Pencil,
+  Plus,
+  Flame,
+  Search,
+  EyeIcon,
+  Loader2,
+} from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { OPProgressoWidget } from "@/features/ordens/OPProgressoWidget";
@@ -26,45 +34,49 @@ import {
 } from "@/lib/filterUtils";
 
 const prioridadeIcone = {
-  "Crítica": { icon: Flame, className: "border border-rose-500/30 bg-rose-500/10 text-rose-700" },
-  "Alta": { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700" },
-  "Média": { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700" },
-  "Baixa": { className: "border border-slate-400/30 bg-slate-100 text-slate-700" },
+  Crítica: {
+    icon: Flame,
+    className: "border border-rose-500/30 bg-rose-500/10 text-rose-700",
+  },
+  Alta: {
+    className: "border border-amber-500/30 bg-amber-500/10 text-amber-700",
+  },
+  Média: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700" },
+  Baixa: {
+    className: "border border-slate-400/30 bg-slate-100 text-slate-700",
+  },
 };
 
 function formatarDataHora(valor) {
   if (!valor) return "-";
   return new Date(valor).toLocaleString("pt-BR", {
-    day: "2-digit", month: "2-digit", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
 import { motion } from "framer-motion";
 
-
 import {
-  PageLayout,
-  PageSection,
   SearchBar,
   FilterRow,
   EmptyState,
-  LoadingState,
+  FadeUpItem,
+  LoadingState, PageLayout, SectionHighlight, KPIGrid,
+
 } from "@/components/AnimatedComponents";
-import {
-  DetailPageContainer,
-  DetailBackLink,
-  DetailHeader,
-  DetailActions,
-  DetailWidgetGrid,
-  DetailWidgetCard,
-  DetailListingSection,
-  SectionHighlight,
-} from "@/components/DetailComponents";
+
+// DetailComponents
+import { DetailListingSection, DetailHeader,activeListTab,setActiveListTab, DetailActions,  ListingTabs, DetailPageContainer, DetailBackLink, } from "@/components/DetailComponents";
 
 export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const opId = id;
+
+  const [activeListTab, setActiveListTab] = useState("eventos");
 
   const [op, setOp] = useState(null);
   const [eventos, setEventos] = useState([]);
@@ -83,12 +95,16 @@ export default function OPDetalhePage({ params }) {
       ]);
       setOp(opData);
       setEventos(eventosData || []);
-      setApontamentos((apontamentosData || []).map((a) => ({
-        ...a,
-        data: a.data || (a.inicio && a.fim
-          ? `${formatarDataHora(a.inicio)} - ${formatarDataHora(a.fim)}`
-          : formatarDataHora(a.inicio)),
-      })));
+      setApontamentos(
+        (apontamentosData || []).map((a) => ({
+          ...a,
+          data:
+            a.data ||
+            (a.inicio && a.fim
+              ? `${formatarDataHora(a.inicio)} - ${formatarDataHora(a.fim)}`
+              : formatarDataHora(a.inicio)),
+        })),
+      );
       setError(null);
     } catch (err) {
       console.error(err);
@@ -133,7 +149,8 @@ export default function OPDetalhePage({ params }) {
         const config = {
           Setup: {
             variant: "secondary",
-            className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm",
+            className:
+              "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm",
           },
           Parada: {
             variant: "destructive",
@@ -183,10 +200,14 @@ export default function OPDetalhePage({ params }) {
     copia.sort((a, b) => {
       if (criterio === "id_asc") return a.id - b.id;
       if (criterio === "id_desc") return b.id - a.id;
-      if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
-      if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
-      if (criterio === "duracao_asc") return duracaoEmMinutos(a) - duracaoEmMinutos(b);
-      if (criterio === "duracao_desc") return duracaoEmMinutos(b) - duracaoEmMinutos(a);
+      if (criterio === "data_asc")
+        return new Date(a.inicio) - new Date(b.inicio);
+      if (criterio === "data_desc")
+        return new Date(b.inicio) - new Date(a.inicio);
+      if (criterio === "duracao_asc")
+        return duracaoEmMinutos(a) - duracaoEmMinutos(b);
+      if (criterio === "duracao_desc")
+        return duracaoEmMinutos(b) - duracaoEmMinutos(a);
       return 0;
     });
     setEventosOrdenados(copia);
@@ -212,9 +233,15 @@ export default function OPDetalhePage({ params }) {
       );
     }
 
-    dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
+    dadosFiltrados = filtrarPorDataInicio(
+      dadosFiltrados,
+      filtrosSelecionados.data,
+    );
     if (filtrosSelecionados.duracao?.max) {
-      dadosFiltrados = filtrarPorDuracaoMax(dadosFiltrados, filtrosSelecionados.duracao.max);
+      dadosFiltrados = filtrarPorDuracaoMax(
+        dadosFiltrados,
+        filtrosSelecionados.duracao.max,
+      );
     }
 
     setEventosFiltrados(dadosFiltrados);
@@ -300,8 +327,16 @@ export default function OPDetalhePage({ params }) {
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
     let dadosFiltrados = [...apontamentos];
-    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "produzido", filtrosSelecionados.produzido);
-    dadosFiltrados = filtrarPorNumberRange(dadosFiltrados, "refugo", filtrosSelecionados.refugo);
+    dadosFiltrados = filtrarPorNumberRange(
+      dadosFiltrados,
+      "produzido",
+      filtrosSelecionados.produzido,
+    );
+    dadosFiltrados = filtrarPorNumberRange(
+      dadosFiltrados,
+      "refugo",
+      filtrosSelecionados.refugo,
+    );
     setDadosApontamentoState(dadosFiltrados);
   };
 
@@ -321,8 +356,15 @@ export default function OPDetalhePage({ params }) {
   if (error || !op) {
     return (
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed flex flex-col items-center justify-center p-8">
-        <p className="text-red-500 text-lg">{error || "Ordem não encontrada"}</p>
-        <Link href="/operador/ordensDeProducao" className="mt-4 text-blue-900 underline">Voltar</Link>
+        <p className="text-red-500 text-lg">
+          {error || "Ordem não encontrada"}
+        </p>
+        <Link
+          href="/operador/ordensDeProducao"
+          className="mt-4 text-blue-900 underline"
+        >
+          Voltar
+        </Link>
       </main>
     );
   }
@@ -339,7 +381,7 @@ export default function OPDetalhePage({ params }) {
     Produzindo: "bg-emerald-500/15 text-emerald-700",
     Parada: "bg-rose-500/15 text-rose-700",
     Setup: "bg-amber-500/15 text-amber-900",
-    "Concluída": "bg-sky-500/15 text-sky-700",
+    Concluída: "bg-sky-500/15 text-sky-700",
     "Aguardando Início": "bg-slate-500/15 text-slate-700",
   };
 
@@ -382,161 +424,234 @@ export default function OPDetalhePage({ params }) {
           }
         />
 
-        <section>
-          <motion.div
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
-          >
+<section className="bg-transparent text-zinc-900 dark:text-zinc-50 p-4 rounded-xl dark:border-zinc-800 transition-colors duration-200">
+            {" "}
+            {/* Container principal responsivo ao tema */}
             <motion.div
-              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-              className="md:col-span-2"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+                },
+              }}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center"
             >
-              <div className="flex items-center">
-                <div className="flex gap-2 bg-white border rounded-xl shadow-sm w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4">
-                  <Image src={maquinaImagem} className="rounded-lg object-cover" alt="Máquina" width={150} height={150} />
-                  <p className="text-2xl">{maquinaNome}</p>
-                  <p className="text-[#7c7c81] text-2xl font-semibold">Meta: {op.qtd_planejada ?? "-"} peças</p>
-                </div>
-                <div className="py-3 font-semibold text-gray-900 text-2xl">
-                  <div className="flex flex-col gap-5">
-                    <p>
-                      Status:
-                      <Badge variant="outline" className={`ml-2 border-none font-semibold ${statusBadge[statusOp] || ""}`}>
-                        {statusOp}
-                      </Badge>
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 18 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.5, ease: "easeOut" },
+                  },
+                }}
+                className="md:col-span-2"
+              >
+                <div className="flex items-center">
+                  {/* Card da Máquina */}
+                  <div className="flex gap-2 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-md w-1/4.7 flex-col items-center justify-center text-center font-bold p-8 mr-4 transition-colors duration-200">
+                    <Image
+                      src={maquinaImagem}
+                      className="rounded-lg object-cover opacity-90"
+                      alt="Máquina"
+                      width={150}
+                      height={150}
+                    />
+                    <p className="text-2xl text-zinc-900 dark:text-zinc-100">{maquinaNome}</p>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-2xl font-semibold">
+                      Meta: {op.qtd_planejada ?? "-"} peças
                     </p>
-                    <p>
-                      Prioridade:
-                      <Badge variant="outline" className={`ml-2 text-sm font-medium ${prioConfig.className}`}>
-                        {PrioIcon && <PrioIcon className="text-vermelho-vivido inline mr-1" />}
-                        {prioridade}
-                      </Badge>
-                    </p>
-                    <div className="flex">
-                      <p>Início:</p>
-                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_inicio ?? op.data_hora_inicio)}</p>
-                    </div>
-                    <div className="flex">
-                      <p>Prazo Final:</p>
-                      <p className="text-2xl font-medium ml-2">{formatarDataHora(op.data_fim ?? op.data_hora_fim)}</p>
+                  </div>
+
+                  {/* Informações da OP */}
+                  <div className="py-3 font-semibold text-zinc-900 dark:text-zinc-100 text-2xl">
+                    <div className="flex flex-col gap-5">
+                      <p className="text-zinc-600 dark:text-zinc-300">
+                        Status:
+                        <Badge
+                          variant="outline"
+                          className={`ml-2 border-none font-semibold ${statusBadge[statusOp] || ""}`}
+                        >
+                          {statusOp}
+                        </Badge>
+                      </p>
+                      <p className="text-zinc-600 dark:text-zinc-300">
+                        Prioridade:
+                        <Badge
+                          variant="outline"
+                          className={`ml-2 text-sm font-medium border-zinc-300 dark:border-zinc-700 ${prioConfig.className}`}
+                        >
+                          {PrioIcon && (
+                            <PrioIcon className="text-vermelho-vivido inline mr-1" />
+                          )}
+                          {prioridade}
+                        </Badge>
+                      </p>
+                      <div className="flex text-zinc-600 dark:text-zinc-300">
+                        <p>Início:</p>
+                        <p className="text-2xl font-medium ml-2 text-zinc-900 dark:text-zinc-100">
+                          {formatarDataHora(
+                            op.data_inicio ?? op.data_hora_inicio,
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex text-zinc-600 dark:text-zinc-300">
+                        <p>Prazo Final:</p>
+                        <p className="text-2xl font-medium ml-2 text-zinc-900 dark:text-zinc-100">
+                          {formatarDataHora(op.data_fim ?? op.data_hora_fim)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Card do Widget de Progresso */}
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 18 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.5, ease: "easeOut" },
+                  },
+                }}
+                className="md:col-span-1 bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-md transition-colors duration-200"
+              >
+                <OPProgressoWidget opId={opId} />
+              </motion.div>
             </motion.div>
+          </section>
 
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-              className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm"
-            >
-              <OPProgressoWidget opId={opId} />
-            </motion.div>
-          </motion.div>
-        </section>
+        <FadeUpItem className="bg-white border rounded-xl p-6 mb-12 shadow-sm">
+          <OPOEEDetalheWidget
+            opId={opId}
+            maquinaId={op.id_maquina ?? op.maquina?.id_maquina}
+          />
+        </FadeUpItem>
 
-        <SectionHighlight>
-          <OPOEEDetalheWidget opId={opId} maquinaId={op.id_maquina ?? op.maquina?.id_maquina} />
-        </SectionHighlight>
+{/* Listagens */}
+        <ListingTabs
+          className="mt-4"
+          activeTab={activeListTab}
+          onChange={setActiveListTab}
+          tabs={[
+            { id: "eventos", label: "Histórico de Eventos" },
+            { id: "apontamentos", label: "Histórico de Apontamentos" },
+          ]}
+        />
 
-        <DetailListingSection
-          id="listagem_histEventos"
-          title="Histórico de Eventos da OP"
-          search={
-            <SearchBar
-              value={buscaEvento}
-              onChange={(e) => setBuscaEvento(e.target.value)}
-              placeholder="Busque por id ou tipo de evento..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosEventosExibidos.length}
-              label="eventos"
-              actions={
-                <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
-                </>
-              }
-            />
-          }
-        >
-          {dadosEventosExibidos.length > 0 ? (
-            <TableListagens
-              data={dadosEventosExibidos}
-              columns={colunasOP}
-              acoesDropdown={(evento) => (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="cursor-pointer"
-                    >
-                      <EyeIcon
-                        strokeWidth={2}
-                        className="mr-1 h-4 w-4 text-primary"
-                      />
-                      Ver Detalhes
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DetalhesEvento eventoId={evento.id} />
-                  </DialogContent>
-                </Dialog>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum evento encontrado"
-              message="Não encontramos nenhum evento com esse termo ou filtro."
-            />
-          )}
-        </DetailListingSection>
+        {/* Renderização Condicional baseada na Tab Ativa */}
+        {activeListTab === "eventos" ? (
+          <DetailListingSection
+            id="listagem_histEventos"
+            title="Histórico de Eventos da OP"
+            search={
+              <SearchBar
+                value={buscaEvento}
+                onChange={(e) => setBuscaEvento(e.target.value)}
+                placeholder="Busque por id ou tipo de evento..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={dadosEventosExibidos.length}
+                label="eventos"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoEventos}
+                      onSortChange={handleSortEventos}
+                    />
+                    <FilterDropdown
+                      filtersConfig={eventosFilter}
+                      onApply={aplicarFiltrosEventos}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            {dadosEventosExibidos.length > 0 ? (
+              <TableListagens
+                data={dadosEventosExibidos}
+                columns={colunasOP}
+                acoesDropdown={(evento) => (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <EyeIcon
+                          strokeWidth={2}
+                          className="mr-1 h-4 w-4 text-primary"
+                        />
+                        Ver Detalhes
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DetalhesEvento eventoId={evento.id} />
+                    </DialogContent>
+                  </Dialog>
+                )}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum evento encontrado"
+                message="Não encontramos nenhum evento com esse termo ou filtro."
+              />
+            )}
+          </DetailListingSection>
+        ) : (
+          <DetailListingSection
+            id="listagem_histApontamentos"
+            title="Histórico de Apontamentos da OP"
+            search={
+              <SearchBar
+                value={buscaApontamento}
+                onChange={(e) => setBuscaApontamento(e.target.value)}
+                placeholder="Busque por id..."
+              />
+            }
+            filterRow={
+              <FilterRow
+                count={dadosApontamentosFiltrados.length}
+                label="apontamentos"
+                actions={
+                  <>
+                    <OrdenarDropdown
+                      label="Ordenar por"
+                      options={opcoesOrdenacaoApontamento}
+                      onSortChange={handleSortApontamento}
+                    />
+                    <FilterDropdown
+                      filtersConfig={apontamentoFilter}
+                      onApply={aplicarFiltrosApontamento}
+                    />
+                  </>
+                }
+              />
+            }
+          >
+            {dadosApontamentosFiltrados.length > 0 ? (
+              <TableListagens
+                data={dadosApontamentosFiltrados}
+                columns={colunasApontamento}
+              />
+            ) : (
+              <EmptyState
+                title="Nenhum apontamento encontrado"
+                message="Não encontramos nenhum apontamento com esse termo ou filtro."
+              />
+            )}
+          </DetailListingSection>
+        )}
 
-        <DetailListingSection
-          id="listagem_histApontamentos"
-          title="Histórico de Apontamentos da OP"
-          search={
-            <SearchBar
-              value={buscaApontamento}
-              onChange={(e) => setBuscaApontamento(e.target.value)}
-              placeholder="Busque por id..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosApontamentosFiltrados.length}
-              label="apontamentos"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoApontamento}
-                    onSortChange={handleSortApontamento}
-                  />
-                  <FilterDropdown
-                    filtersConfig={apontamentoFilter}
-                    onApply={aplicarFiltrosApontamento}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          {dadosApontamentosFiltrados.length > 0 ? (
-            <TableListagens
-              data={dadosApontamentosFiltrados}
-              columns={colunasApontamento}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum apontamento encontrado"
-              message="Não encontramos nenhum apontamento com esse termo ou filtro."
-            />
-          )}
-        </DetailListingSection>
       </DetailPageContainer>
     </PageLayout>
   );

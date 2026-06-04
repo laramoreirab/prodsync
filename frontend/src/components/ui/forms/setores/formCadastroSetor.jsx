@@ -149,9 +149,11 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
     return (
         <>
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Criar Setor</DialogTitle>
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Plus strokeWidth={2} size={30} className="mr-2" />
+                    <DialogTitle className="text-3xl font-semibold">
+                        Criar Setor
+                    </DialogTitle>
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
@@ -199,10 +201,10 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                                 {listaMaquinas
                                     .filter((maquina) => !maquina.id_setor)
                                     .map((maquina) => (
-                                    <option key={maquina.id_maquina} value={maquina.id_maquina}>
-                                        {maquina.nome}
-                                    </option>
-                                ))}
+                                        <option key={maquina.id_maquina} value={maquina.id_maquina}>
+                                            {maquina.nome}
+                                        </option>
+                                    ))}
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                                 <ChevronDown className="h-4 w-4" />

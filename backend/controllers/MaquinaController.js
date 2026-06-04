@@ -68,6 +68,33 @@ class MaquinaController {
         }
     }
 
+    // GET /maquinas/:id/sincronizacao-placa - Consulta sessão de pareamento da placa
+    static async obterStatusSincronizacaoPlaca(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            const status = await MaquinaModel.obterStatusSincronizacaoPlaca({
+                id_empresa,
+                id_maquina
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                dados: status
+            });
+        } catch (error) {
+            console.error('Erro ao consultar sincronização da placa:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível consultar a sincronização da placa'
+            });
+        }
+    }
+
     // GET /maquinas/:id - Buscar máquina por ID
     static async buscarMaquinaPorId(req, res) {
         try {
@@ -654,6 +681,61 @@ class MaquinaController {
         } catch (error) {
             console.error('Erro producaoMaquinas:', error)
             return res.status(500).json({ sucesso: false, erro: 'Erro interno' })
+        }
+    }
+
+    // POST /maquinas/:id/parar-sincronizacao - Cancela sessão de pareamento da placa
+    static async pararSincronizacaoPlaca(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            await MaquinaModel.cancelarSessaoSincronizacaoPlaca({
+                id_empresa,
+                id_maquina
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Sincronização cancelada com sucesso.'
+            });
+        } catch (error) {
+            console.error('Erro ao parar sincronização da placa:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Não foi possível cancelar a sincronização da placa'
+            });
+        }
+    }
+
+    // POST /maquinas/:id/desconectar-placa - Remove o vinculo da placa com a maquina
+    static async desconectarPlacaMaquina(req, res) {
+        try {
+            const id_maquina = MaquinaController.obterIdMaquina(req, res);
+            if (!id_maquina) return;
+
+            const id_empresa = req.user.id_empresa;
+
+            const dados = await MaquinaModel.desconectarPlacaMaquina({
+                id_empresa,
+                id_maquina
+            });
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: 'Placa desconectada com sucesso.',
+                dados
+            });
+        } catch (error) {
+            console.error('Erro ao desconectar placa da maquina:', error);
+            return res.status(500).json({
+                sucesso: false,
+                erro: 'Erro interno do servidor',
+                mensagem: 'Nao foi possivel desconectar a placa da maquina'
+            });
         }
     }
 

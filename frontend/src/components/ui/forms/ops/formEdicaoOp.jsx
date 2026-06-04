@@ -113,9 +113,11 @@ export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
     return (
         <>
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Pencil className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Editar OP</DialogTitle>
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Pencil strokeWidth={2.8} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">
+                        Editar OP
+                    </DialogTitle>
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />

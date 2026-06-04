@@ -255,7 +255,7 @@ export function SectionDivider({ title, action, className }) {
       )}
     >
       <div className="flex items-center gap-5 flex-1 min-w-0">
-        <h2 className="text-3xl mb-6 sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap text-[#17233b] dark:text-[#f4f8ff]">
+        <h2 className="text-3xl sm:text-4xl font-semibold whitespace-normal sm:whitespace-nowrap text-[#17233b] dark:text-[#f4f8ff]">
           {title}
         </h2>
         <hr className="hidden sm:block flex-1 h-0.75 rounded-full bg-[#315aa8]/50 dark:bg-[#243754]" />
@@ -366,6 +366,7 @@ export function AnimatedTitle({ children, className, as: Tag = "h1" }) {
  */
 export function KPIGrid({ children, cols = 4, className }) {
   const colClasses = {
+    1: "grid-cols-1",
     2: "grid-cols-1 sm:grid-cols-2",
     3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
     4: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4",
@@ -595,19 +596,41 @@ export function EmptyState({
 
 /**
  * @param {string} message — texto abaixo do spinner
+ * @param {string} bg — override do bg (default: bg_app.svg)
  */
-export function LoadingState({ message = "Sincroninzando...", className }) {
+export function LoadingState({ message = "Sincronizando...", className }) {
   return (
     <div
       className={cn(
-        "min-h-screen flex items-center justify-center",
+        "relative min-h-screen flex items-center justify-center bg-transparent dark:bg-zinc-950",
         className,
       )}
     >
+      {/* Light mode: SVG aparece normalmente */}
+      <div
+        className="fixed inset-0 -z-10 bg-no-repeat dark:hidden"
+        style={{
+          backgroundImage: bg ?? "url('/bg_app.svg')",
+          backgroundPosition: "right 0 top -6rem",
+          backgroundSize: "75% auto",
+        }}
+      />
+
+      {/* Dark mode: SVG com a cor do fundo (invisível/sutil) */}
+      <div
+        className="fixed inset-0 -z-10 bg-no-repeat hidden dark:block"
+        style={{
+          backgroundImage: bg ?? "url('/bg_app.svg')",
+          backgroundPosition: "right 0 top -6rem",
+          backgroundSize: "75% auto",
+          filter: "brightness(0) invert(0) opacity(0.07)",
+        }}
+      />
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center gap-4"
+        className="flex flex-col items-center gap-4 z-10"
       >
         <Loader2 className="w-12 h-12 animate-spin text-[#00357a] dark:text-[#6f9bff]" />
         <p className="text-lg text-gray-600 font-medium dark:text-[#aebbd1]">{message}</p>
@@ -668,3 +691,5 @@ export function KPICardDecorated({ children, className, colSpan }) {
 // ─────────────────────────────────────────────
 
 export { VARIANTS as animationVariants };
+
+

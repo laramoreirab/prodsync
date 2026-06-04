@@ -70,28 +70,35 @@ model Categoria_Maquina {
 }
 
 model Maquinas {
-  id_maquina        Int                 @id @default(autoincrement())
-  id_empresa        Int
-  nome              String              @db.VarChar(100)
-  serie             String?             @unique @db.VarChar(50)
-  status_atual      StatusMaquina       @default(Parada)
-  id_setor          Int?
-  data_ativacao     DateTime?           @db.Date
-  ativo             Boolean             @default(true)
-  capacidade        String?             @db.VarChar(100)
-  data_aquisicao    DateTime?           @db.Date
-  id_operador       Int?
-  imagem            String?             @db.VarChar(255)
-  categoria         String?             @db.VarChar(100)
-  status            String?             @db.VarChar(50)
-  apontamentos      Apontamento[]
-  escala_trabalho   EscalaTrabalho[]
-  historico_eventos Historico_Eventos[]
-  empresa           Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  operador          Usuarios?           @relation(fields: [id_operador], references: [id_usuario])
-  setor             Setores?            @relation(fields: [id_setor], references: [id_setor])
-  notificacoes      Notificacoes[]
-  ordens_producao   OrdemProducao[]
+  id_maquina              Int                 @id @default(autoincrement())
+  id_empresa              Int
+  nome                    String              @db.VarChar(100)
+  serie                   String?             @unique @db.VarChar(50)
+  status_atual            StatusMaquina       @default(Parada)
+  id_setor                Int?
+  data_ativacao           DateTime?           @db.Date
+  ativo                   Boolean             @default(true)
+  capacidade              String?             @db.VarChar(100)
+  data_aquisicao          DateTime?           @db.Date
+  id_operador             Int?
+  imagem                  String?             @db.VarChar(255)
+  categoria               String?             @db.VarChar(100)
+  status                  String?             @db.VarChar(50)
+  board_sincronizado_em   DateTime?
+  board_uid               String?             @db.VarChar(100)
+  board_ultimo_contato_em DateTime?
+  pairing_code            String?             @db.VarChar(10)
+  pairing_expires_at      DateTime?
+  apontamentos            Apontamento[]
+  escala_trabalho         EscalaTrabalho[]
+  historico_eventos       Historico_Eventos[]
+  empresa                 Empresas            @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  operador                Usuarios?           @relation(fields: [id_operador], references: [id_usuario])
+  setor                   Setores?            @relation(fields: [id_setor], references: [id_setor])
+  notificacoes            Notificacoes[]
+  ordens_producao         OrdemProducao[]
+
+  @@index([board_uid])
 }
 
 model Setor_Gestor {

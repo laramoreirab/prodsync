@@ -23,7 +23,7 @@ import { ProducaoMediaUsuarioSetorWidget } from "@/features/usuarios/ProducaoMed
 import { UsuarioTaxaRefugoWidget } from "@/features/usuarios/UsuarioTaxaRefugoWidget";
 
 // Layout geral
-import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid, LoadingState } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
 import {
@@ -145,9 +145,7 @@ export default function UsuariosGestor() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-900" />
-      </main>
+      <LoadingState message="Carregando usuários..." />
     );
   }
 

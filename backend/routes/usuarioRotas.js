@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js'
 import UsuarioController from '../controllers/UsuarioController.js'
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js'
-import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js'
+import { uploadImagensCloudinary, handleUploadError } from '../middlewares/uploadMiddleware.js'
 import multer from 'multer';
 import { aplicarEscopoGestor, autorizarSetorParam, autorizarUsuarioParam, validarBodySetorGestor } from '../middlewares/setorAccessMiddleware.js'
 
@@ -23,12 +23,12 @@ router.get('/dashboard/metaProducaoPorSetor', authMiddleware, aplicarEscopoGesto
 router.get('/turnos', authMiddleware, aplicarEscopoGestor, UsuarioController.turnosOperadores)
 router.get('/taxa_refugo', authMiddleware, aplicarEscopoGestor, UsuarioController.taxaRefugo)
 router.get('/producao_media_por_usuario', authMiddleware, aplicarEscopoGestor, UsuarioController.producaoMediaPorUsuario)
-router.post('/criar', authMiddleware, uploadImagens.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.criarUsuario)
+router.post('/criar', authMiddleware, uploadImagensCloudinary.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.criarUsuario)
 router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), UsuarioController.cadastroLote);
 router.get('/operadores/:id_setor', authMiddleware, autorizarSetorParam('id_setor'), UsuarioController.listarOperadoresporSetor)
 router.get('/:id', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.buscarPorId)
 router.delete('/:id/deletar', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.deletarUsuario)
-router.put('/:id/atualizar', authMiddleware, autorizarUsuarioParam('id'), uploadImagens.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.atualizarUsuario)
+router.put('/:id/atualizar', authMiddleware, autorizarUsuarioParam('id'), uploadImagensCloudinary.single('imagem_perfil'), handleUploadError, validarBodySetorGestor('id_setor'), UsuarioController.atualizarUsuario)
 router.get('/:id/historico-eventos', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.listarHistoricoEventosUsuario)
 router.get('/:id/apontamentos', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.listarApontamentosUsuario)
 router.get('/:id/producao_por_hora', authMiddleware, autorizarUsuarioParam('id'), UsuarioController.getProducaoPorHora);

@@ -6,7 +6,11 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "simulate": "node scripts/db-simulator.js",
+    "simulate:once": "node scripts/db-simulator.js --once",
+    "simulate:seed": "node scripts/db-simulator.js --seed-only",
+    "simulate:backfill": "node scripts/db-simulator.js --backfill"
   },
   "author": "",
   "license": "ISC",
