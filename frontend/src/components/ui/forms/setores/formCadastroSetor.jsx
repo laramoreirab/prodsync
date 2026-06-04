@@ -159,7 +159,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
             <Separator className="m-2 bg-[#a6a6a6]" />
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div>
-                    <h2 className="text-2xl font-semibold text-black dark:text-white mb-4">1. Informacoes Basicas</h2>
+                    <h2 className="text-2xl font-semibold text-black dark:text-white mb-4">1. Informações Básicas</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Nome do Setor</label>
@@ -172,7 +172,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                             />
                         </div>
                         <div>
-                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Localizacao Fisica</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Localização Física</label>
                             <input
                                 type="text"
                                 value={localizacao}
@@ -187,8 +187,8 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                 <Separator className="bg-gray-200" />
 
                 <div>
-                    <h2 className="text-2xl font-semibold text-black dark:text-white">2. Maquinas do Setor</h2>
-                    <p className="text-xl text-[#545454] font-medium mb-4 dark:text-slate-300">Vincule os equipamentos que operarao nesse setor.</p>
+                    <h2 className="text-2xl font-semibold text-black dark:text-white">2. Máquinas do Setor</h2>
+                    <p className="text-xl text-[#545454] font-medium mb-4 dark:text-slate-300">Vincule os equipamentos que operarão nesse setor.</p>
 
                     <div className="flex items-center gap-3">
                         <div className="relative w-full max-w-md">
@@ -244,7 +244,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
 
                     <div className="flex items-end gap-3 max-w-4xl">
                         <div className="flex-1">
-                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Selecione o Usuario</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Selecione o Usuário</label>
                             <div className="relative">
                                 <select
                                     value={usuarioSelecionado}
@@ -265,7 +265,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex-1">
-                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Definir Funcao</label>
+                            <label className="block text-xl font-medium text-gray-700 mb-1 dark:text-slate-300">Definir Função</label>
                             <div className="relative">
                                 <select
                                     value={funcaoSelecionada}

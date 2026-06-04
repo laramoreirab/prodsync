@@ -3,8 +3,9 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckCheck, Eraser } from "lucide-react";
+import { CheckCheck, Eraser, FileDown } from "lucide-react";
 import { PERIODOS_EVENTOS_RELATORIO } from "../utils/formatters";
+import { exportRelatorioPdf } from "../exportRelatorioPdf";
 
 export function RelatorioCustomizer({
   areas,
@@ -18,6 +19,9 @@ export function RelatorioCustomizer({
   ativos,
   total,
 }) {
+
+  const nenhumaSecao = ativos === 0;
+
   return (
     <aside
       data-print-hide
@@ -117,6 +121,21 @@ export function RelatorioCustomizer({
             </div>
           );
         })}
+        <div
+          className="flex items-center justify-center"
+        >
+          <Button
+            type="button"
+            size="md"
+            className="h-auto gap-2.5 bg-secondary-foreground px-6 py-2 text-lg font-semibold cursor-pointer text-white hover:bg-secondary-foreground/90"
+            disabled={nenhumaSecao}
+            onClick={exportRelatorioPdf}
+          >
+            <FileDown className="size-5" />
+            Salvar como PDF
+          </Button>
+        </div>
+
       </div>
     </aside>
   );
