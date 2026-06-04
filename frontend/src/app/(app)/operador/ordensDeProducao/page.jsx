@@ -43,6 +43,7 @@ import {
   FadeUpItem,
   LoadingState,
 } from "@/components/AnimatedComponents";
+import { KPI } from "@/components/ui/charts/components/KPI";
 
 const opsFilter = [
   {
@@ -282,38 +283,41 @@ export default function OrdensDeProducao() {
     <PageLayout>
       <PageHeader title="Ordens de Produção" />
 
-      <StaggerWrapper className="grid grid-cols-5 gap-6 w-full">
-        <FadeUpItem className="col-span-1 bg-[-var(--cinza-claro)] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
-          <h1 className="text-[#545454] text-lg text-center font-semibold align-text-top">
-            Aguardando Início
-          </h1>
-          <span className="text-black text-center text-4xl font-bold">
-            {resumoOps.aguardando}
-          </span>
-        </FadeUpItem>
+<StaggerWrapper className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full items-stretch">
+  
+  {/* Aguardando Início */}
+  <FadeUpItem className="col-span-1 bg-zinc-100 dark:bg-zinc-900 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
+    <KPI 
+      title="Aguardando Início" 
+      value={resumoOps.aguardando} 
+      titleClass="text-zinc-600 dark:text-zinc-400 text-base lg:text-lg text-center"
+    />
+  </FadeUpItem>
 
-        <FadeUpItem className="col-span-1 bg-[#effff5] p-5 flex flex-col gap-15 rounded-lg shadow-sm">
-          <h1 className="text-[#369948] text-lg text-center font-semibold">
-            Em Andamento
-          </h1>
-          <span className="text-black text-4xl text-center font-bold">
-            {resumoOps.emAndamento}
-          </span>
-        </FadeUpItem>
+  {/* Em Andamento */}
+  <FadeUpItem className="col-span-1 bg-[#effff5] dark:bg-emerald-950/20 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
+    <KPI 
+      title="Em Andamento" 
+      value={resumoOps.emAndamento} 
+      titleClass="text-[#369948] dark:text-emerald-400 text-base lg:text-lg text-center"
+    />
+  </FadeUpItem>
 
-        <FadeUpItem className="col-span-1 bg-[#e8f0ff] p-6 flex flex-col gap-15 rounded-lg shadow-sm">
-          <h1 className="text-[#00357a] text-lg text-center font-semibold">
-            Concluídas
-          </h1>
-          <span className="text-black text-4xl text-center font-bold">
-            {resumoOps.concluidas}
-          </span>
-        </FadeUpItem>
+  {/* Concluídas */}
+  <FadeUpItem className="col-span-1 bg-[#e8f0ff] dark:bg-blue-950/30 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
+    <KPI 
+      title="Concluídas" 
+      value={resumoOps.concluidas} 
+      titleClass="text-[#00357a] dark:text-blue-400 text-base lg:text-lg text-center"
+    />
+  </FadeUpItem>
 
-        <FadeUpItem className="col-span-2 bg-white border border-gray-100 shadow-sm p-4 rounded-lg flex flex-col justify-center min-h-60">
-          <MetaProducaoWidget operadorId={operadorId} />
-        </FadeUpItem>
-      </StaggerWrapper>
+  {/* Widget de Meta de Produção */}
+  <FadeUpItem className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 shadow-sm p-5 rounded-lg flex flex-col justify-center min-h-60 transition-colors duration-200">
+    <MetaProducaoWidget operadorId={operadorId} />
+  </FadeUpItem>
+
+</StaggerWrapper>
 
       <PageSection id="listagem_ops">
         <SectionDivider title="OPs" />
@@ -326,6 +330,7 @@ export default function OrdensDeProducao() {
 
         <FilterRow
           count={dadosExibidos.length}
+          className="mb-6"
           label="OPs"
           actions={
             <>

@@ -27,10 +27,8 @@ export default function DashboardGeralOperador() {
   <PageLayout>
     <PageHeader
       title="Dashboard Geral"
-      subtitle="Acompanhe seu desempenho operacional em tempo real."
     />
 
-    <SectionDivider title="Performance principal" className="mt-2" />
     <ContentGrid cols={3} className="mt-2">
       <WidgetCard>
         <OEEMaquinaWidget operadorId={operadorId} />
@@ -43,7 +41,6 @@ export default function DashboardGeralOperador() {
       </WidgetCard>
     </ContentGrid>
 
-    <SectionDivider title="Qualidade e ritmo de produção" className="mt-6" />
     <ContentGrid cols={3} className="mt-2">
       <WidgetCard>
         <ProducaoPorHoraOperadorWidget operadorId={operadorId} />

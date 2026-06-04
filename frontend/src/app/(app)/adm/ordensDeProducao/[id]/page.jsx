@@ -49,7 +49,7 @@ import {
 } from "@/components/AnimatedComponents";
 
 // DetailComponents
-import { DetailListingSection, ListingTabs, DetailPageContainer, DetailBackLink, } from "@/components/DetailComponents";
+import { DetailListingSection, DetailHeader, DetailActions, ListingTabs, DetailPageContainer, DetailBackLink } from "@/components/DetailComponents";
 import { filtrarPorDuracaoMax } from "@/lib/filterUtils";
 
 const colunasEventos = [
@@ -195,6 +195,7 @@ export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const router = useRouter();
   const opId = Number(id);
+  
 
   // Estado para controlar a Tab Ativa das Listagens
   const [activeListTab, setActiveListTab] = useState("eventos");
@@ -421,6 +422,8 @@ export default function OPDetalhePage({ params }) {
       </main>
     );
   }
+
+
 
   return (
     <PageLayout>

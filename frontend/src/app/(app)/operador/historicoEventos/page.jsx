@@ -276,6 +276,7 @@ export default function HistoricoEventos() {
 
         <FilterRow
           count={dadosExibidos.length}
+          className="mb-6"
           label="eventos"
           actions={
             <>
@@ -294,6 +295,7 @@ export default function HistoricoEventos() {
 
         {dadosExibidos.length > 0 ? (
           <TableListagens
+          className="mt-4"
             data={dadosExibidos}
             columns={colunasEventos}
             acoesDropdown={(maquina) => (
