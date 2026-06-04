@@ -307,7 +307,7 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
       {filterRow && <div>{filterRow}</div>}
 
       {/* Conteúdo (tabela ou empty state) */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-2 sm:p-3">{children}</div>
+      <div className="rounded-2xl bg-transparent p-2 sm:p-3">{children}</div>
     </motion.section>
   );
 }

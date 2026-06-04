@@ -17,8 +17,8 @@ import { SetorProducaoMaquinaWidget } from "@/features/setores/SetorProducaoMaqu
 import { useEffect, useState } from "react";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 import Link from "next/link";
-import { ChevronDown, Loader2 } from "lucide-react";
-import { AnimatedTitle, FadeUpItem } from "@/components/AnimatedComponents";
+import { ChevronDown } from "lucide-react";
+import { AnimatedTitle, FadeUpItem, LoadingState } from "@/components/AnimatedComponents";
 
 export default function GestorDetalhePage({ params }) {
   const { id } = use(params);
@@ -37,12 +37,7 @@ export default function GestorDetalhePage({ params }) {
   }, [gestorId]);
 
   if (carregando) {
-    return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col items-center justify-center p-20">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-900 mb-4" />
-        <p className="text-lg text-gray-600 font-medium">Carregando gestor...</p>
-      </main>
-    );
+    return <LoadingState message="Carregando gestor..." />;
   }
 
   return (

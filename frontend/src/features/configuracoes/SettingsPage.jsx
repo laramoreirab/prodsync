@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
 import { toast } from "sonner"
-import { json } from "zod"
+import { PageLayout } from "@/components/AnimatedComponents"
 
 const adminTabs = [
   { id: "conta", label: "Conta", icon: UserRound },
@@ -56,13 +56,8 @@ const passwordRules = [
 
 function getInitialDarkMode() {
   if (typeof window === "undefined") return false
-
   const storedTheme = window.localStorage.getItem("prodsync-theme")
-
-  if (storedTheme) {
-    return storedTheme === "dark"
-  }
-
+  if (storedTheme) return storedTheme === "dark"
   return document.documentElement.classList.contains("dark")
 }
 
@@ -72,7 +67,6 @@ function SettingsSidebar({ activeTab, onTabChange, tabs }) {
       <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:overflow-visible">
         {tabs.map(({ id, label, icon: Icon }) => {
           const isActive = activeTab === id
-
           return (
             <button
               key={id}
@@ -145,93 +139,72 @@ function AccountSettings({ role }) {
         enderecoEmpresa: dadosUsuario.dados.endereco || "",
         cpfRepresentante: aplicarMascaraCPF(dadosUsuario.dados.cpf_representante) || ""
       })
-      console.log("Dados do usuário:", dadosUsuario)
     }
     buscarDados()
   }, [])
 
-
   async function handleInputChange(e) {
     let { id, value } = e.target
-
     if (id === "telefoneEmpresa") {
       value = aplicarMascaraTelefone(value)
     } else if (id === "cpfRepresentante") {
-      value = aplicarMascaraCPF(value) 
+      value = aplicarMascaraCPF(value)
     }
-
-    setFormData((dadosAnteriores) => ({
-      ...dadosAnteriores,
-      [id]: value, // Usa colchetes para transformar a string do 'id' em uma chave do objeto
-    }));
+    setFormData((dadosAnteriores) => ({ ...dadosAnteriores, [id]: value }))
   }
 
   const fields = isAdmin ? adminAccountFields : userAccountFields
 
   function aplicarMascaraTelefone(valor) {
-     let v = String(valor || "").replace(/\D/g, "");
-
-  // limita a 11 dígitos
-  v = v.slice(0, 11);
-
-  if (v.length <= 10) {
+    let v = String(valor || "").replace(/\D/g, "")
+    v = v.slice(0, 11)
+    if (v.length <= 10) {
+      return v.replace(
+        /^(\d{2})(\d{0,4})(\d{0,4}).*/,
+        (_, ddd, parte1, parte2) => `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
+      )
+    }
     return v.replace(
-      /^(\d{2})(\d{0,4})(\d{0,4}).*/,
-      (_, ddd, parte1, parte2) =>
-        `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
-    );
+      /^(\d{2})(\d{0,5})(\d{0,4}).*/,
+      (_, ddd, parte1, parte2) => `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
+    )
   }
 
-  return v.replace(
-    /^(\d{2})(\d{0,5})(\d{0,4}).*/,
-    (_, ddd, parte1, parte2) =>
-      `(${ddd}) ${parte1}${parte2 ? "-" + parte2 : ""}`
-  );
-  }
-  
   function aplicarMascaraCPF(valor) {
-    if (!valor) return "";
-    let v = String(valor).replace(/\D/g, "");
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    return v.substring(0, 14);
+    if (!valor) return ""
+    let v = String(valor).replace(/\D/g, "")
+    v = v.replace(/(\d{3})(\d)/, "$1.$2")
+    v = v.replace(/(\d{3})(\d)/, "$1.$2")
+    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+    return v.substring(0, 14)
   }
 
   async function handleSubmitPerfil(e) {
-    e.preventDefault() 
+    e.preventDefault()
     setSalvando(true)
-  
     try {
-      // Movido para DENTRO do try para que qualquer erro seja capturado pelo catch
-      // Adicionado o fallback ( || "" ) e o String() por segurança
       const dadosParaEnviar = {
         email: formData.emailEmpresa,
-        telefone: String(formData.telefoneEmpresa || "").replace(/\D/g, ""), 
+        telefone: String(formData.telefoneEmpresa || "").replace(/\D/g, ""),
         endereco: formData.enderecoEmpresa,
-        cpf_representante: String(formData.cpfRepresentante || "").replace(/\D/g, "") 
+        cpf_representante: String(formData.cpfRepresentante || "").replace(/\D/g, "")
       }
-      console.log(dadosParaEnviar)
-      const response = await apiFetch('/api/usuarios/atualizarEmpresa', { 
-        method: 'PATCH', 
+      const response = await apiFetch('/api/usuarios/atualizarEmpresa', {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dadosParaEnviar)
       })
-      console.log("resposta do endpoint:", response.dados)
-  
       if (response.sucesso) {
-        // Usando o toast no lugar do Toaster
         toast.success("Informações da empresa atualizadas com sucesso!")
         if (response.dados) {
           setFormData((dadosAnteriores) => ({
             ...dadosAnteriores,
             emailEmpresa: response.dados.email || dadosAnteriores.emailEmpresa,
-            telefoneEmpresa: aplicarMascaraTelefone(response.dados.telefone) ? aplicarMascaraTelefone(response.dados.telefone) : aplicarMascaraTelefone(dadosAnteriores.telefoneEmpresa),
+            telefoneEmpresa: aplicarMascaraTelefone(response.dados.telefone) || aplicarMascaraTelefone(dadosAnteriores.telefoneEmpresa),
             enderecoEmpresa: response.dados.endereco || dadosAnteriores.enderecoEmpresa,
-            cpfRepresentante: aplicarMascaraCPF(response.dados.cpf_representante) ? aplicarMascaraCPF(response.dados.cpf_representante) : aplicarMascaraCPF(dadosAnteriores.cpfRepresentante),
-          }));
+            cpfRepresentante: aplicarMascaraCPF(response.dados.cpf_representante) || aplicarMascaraCPF(dadosAnteriores.cpfRepresentante),
+          }))
         }
-        
       } else {
         toast.error(response.mensagem || "Erro ao atualizar dados. Verifique os campos.")
       }
@@ -249,13 +222,10 @@ function AccountSettings({ role }) {
         title="Informações da Conta"
         description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
       />
-
-      <form className="space-y-3" onSubmit={handleSubmitPerfil}> 
+      <form className="space-y-3" onSubmit={handleSubmitPerfil}>
         {fields.map(({ id, label, type = "text", readOnly }) => {
           const isDisabled = !isAdmin || readOnly
-
           const valorDoInput = formData[id] || ""
-
           return (
             <div key={id} className="space-y-1">
               <label htmlFor={id} className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
@@ -267,16 +237,13 @@ function AccountSettings({ role }) {
                 disabled={isDisabled}
                 value={valorDoInput}
                 onChange={isDisabled ? undefined : handleInputChange}
-                className={cn(
-                  isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500"
-                )}
+                className={cn(isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500")}
               />
             </div>
           )
         })}
-
         {isAdmin && (
-          <Button type="submit"  disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+          <Button type="submit" disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
             <Save className="size-4" />
             {salvando ? "Salvando..." : "Salvar Alterações"}
           </Button>
@@ -289,11 +256,7 @@ function AccountSettings({ role }) {
 function AppearanceSettings({ darkMode, onDarkModeChange }) {
   return (
     <div className="max-w-xl space-y-3">
-      <SectionTitle
-        title="Aparência"
-        description="Personalize o visual do seu espaço."
-      />
-
+      <SectionTitle title="Aparência" description="Personalize o visual do seu espaço." />
       <div className="flex min-h-14 items-center justify-between gap-4 rounded-lg border border-zinc-300 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-950">
         <div className="space-y-1">
           <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Modo Escuro</h3>
@@ -312,14 +275,18 @@ function AppearanceSettings({ darkMode, onDarkModeChange }) {
   )
 }
 
+const passwordRulesList = [
+  { label: "Pelo menos 1 caractere especial (como !#$%@)", test: (v) => /[!@#$%^&*(),.?":{}|<>_\-=\[\];'\\/]/.test(v) },
+  { label: "Pelo menos 1 letra maiúscula (A-Z)", test: (v) => /[A-Z]/.test(v) },
+  { label: "No mínimo 8 caracteres", test: (v) => v.length >= 8 },
+]
+
 function PasswordRuleList({ password }) {
   const hasPassword = password.length > 0
-
   return (
     <ul className="space-y-0.5 pt-1 text-[10px] font-medium">
-      {passwordRules.map(({ label, test }) => {
+      {passwordRulesList.map(({ label, test }) => {
         const isValid = test(password)
-
         return (
           <li
             key={label}
@@ -346,83 +313,46 @@ function SecuritySettings({ role }) {
   const [confirmPasswordDelete, setConfirmPasswordDelete] = useState("")
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false)
   const showDeleteAccount = role === "admin"
-
-  const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword;
+  const senhasNaoBatem = confirmPassword.length > 0 && newPassword !== confirmPassword
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (senhasNaoBatem) {
-      toast("As senhas digitadas não estão iguais!")
-      return
-    }
-
+    if (senhasNaoBatem) { toast("As senhas digitadas não estão iguais!"); return }
     setCarregando(true)
-
     try {
       const response = await apiFetch('/api/auth/trocarSenha', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          senhaAtual: currentPassword,
-          novaSenha: newPassword,
-          confirmacaoNovaSenha: confirmPassword
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senhaAtual: currentPassword, novaSenha: newPassword, confirmacaoNovaSenha: confirmPassword })
       })
-
       if (response.sucesso) {
         toast("Senha alterada com sucesso!")
-        setCurrentPassword("")
-        setNewPassword("")
-        setConfirmPassword("")
+        setCurrentPassword(""); setNewPassword(""); setConfirmPassword("")
       } else {
-       toast("Erro ao alterar senha. Verifique os requisitos.")
+        toast("Erro ao alterar senha. Verifique os requisitos.")
       }
-
     } catch (error) {
       console.error("Erro ao trocar senha:", error)
       toast("Ocorreu um erro ao tentar alterar a senha.")
-
     } finally {
       setCarregando(false)
     }
   }
 
-  async function handleDeletarContar(e) {
-    if (!confirmCNPJ || !confirmPasswordDelete) {
-    toast("Por favor, preencha o CNPJ e a senha para confirmar.");
-    return;
-  }
-  
-    const confirmar = window.confirm(
-      "ATENÇÃO: Você está prestes a deletar sua conta de Administrador. Isso apagará PERMANENTEMENTE todos os dados da sua empresa e de seus funcionários. Deseja mesmo continuar?"
-    )
-
+  async function handleDeletarContar() {
+    if (!confirmCNPJ || !confirmPasswordDelete) { toast("Por favor, preencha o CNPJ e a senha para confirmar."); return }
+    const confirmar = window.confirm("ATENÇÃO: Você está prestes a deletar sua conta de Administrador. Isso apagará PERMANENTEMENTE todos os dados da sua empresa e de seus funcionários. Deseja mesmo continuar?")
     if (!confirmar) return
-
     setDeletando(true)
-
     try {
       const response = await apiFetch('/api/usuarios/deletarEmpresa', {
         method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        cnpj: confirmCNPJ,
-        senhaAdmin: confirmPasswordDelete
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cnpj: confirmCNPJ, senhaAdmin: confirmPasswordDelete })
       })
-      });
-
       if (response.sucesso) {
         toast.success("Conta e empresa excluídas com sucesso! Volte quando quiser, Prodsync está sempre pronto para te sincronizar!")
-
-        // Limpa o token e desloga o usuário após alguns segundos
-        setTimeout(() => {
-          localStorage.removeItem("token")
-          window.location.href = "/"
-        }, 2000)
+        setTimeout(() => { localStorage.removeItem("token"); window.location.href = "/" }, 2000)
       } else {
         toast.error("Não foi possível deletar a conta. Tente novamente.")
       }
@@ -435,72 +365,43 @@ function SecuritySettings({ role }) {
   }
 
   function aplicarMascaraCNPJ(valor) {
-    let v = valor.replace(/\D/g, "");
-
-    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-    v = v.replace(/(\d{4})(\d)/, "$1-$2");
-  
-    return v.substring(0, 18);
+    let v = valor.replace(/\D/g, "")
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2")
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2")
+    v = v.replace(/(\d{4})(\d)/, "$1-$2")
+    return v.substring(0, 18)
   }
 
   return (
     <div className="max-w-2xl space-y-5">
-      <SectionTitle
-        title="Segurança"
-        description="Proteja sua conta com credenciais robustas."
-      />
-
+      <SectionTitle title="Segurança" description="Proteja sua conta com credenciais robustas." />
       <form className="space-y-3" onSubmit={handleSubmit}>
         <div className="space-y-1">
-          <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-            Senha Atual
-          </label>
+          <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">Senha Atual</label>
           <div className="relative max-w-sm">
             <LockKeyhole className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-            <SettingsInput
-              id="senhaAtual"
-              type="password"
-              value={currentPassword}
-              onChange={(event) => setCurrentPassword(event.target.value)}
-              className="pl-8" />
+            <SettingsInput id="senhaAtual" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="pl-8" />
           </div>
         </div>
-
         <div className="grid max-w-xl gap-3 sm:grid-cols-2">
           <div className="space-y-1">
-            <label htmlFor="novaSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-              Nova Senha
-            </label>
-            <SettingsInput
-              id="novaSenha"
-              type="password"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-            />
+            <label htmlFor="novaSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">Nova Senha</label>
+            <SettingsInput id="novaSenha" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <label htmlFor="confirmarSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-              Confirmar Nova Senha
-            </label>
-            <SettingsInput
-              id="confirmarSenha"
-              value={confirmPassword}
-              type="password"
-              onChange={(event) => setConfirmPassword(event.target.value)} />
+            <label htmlFor="confirmarSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">Confirmar Nova Senha</label>
+            <SettingsInput id="confirmarSenha" value={confirmPassword} type="password" onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
         </div>
-
         <PasswordRuleList password={newPassword} />
-
         <Button type="submit" className="h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold" disabled={carregando || senhasNaoBatem}>
           <Save className="size-4" />
           {carregando ? "Salvando..." : "Salvar Senha"}
         </Button>
       </form>
 
-      {showDeleteAccount ? (
+      {showDeleteAccount && (
         <div className="border-t border-zinc-100 pt-4 dark:border-zinc-800">
           <section className="rounded-lg border border-red-400 bg-red-50 px-4 py-4 dark:border-red-500/70 dark:bg-red-950/30">
             <div className="flex items-center gap-2 text-red-600 dark:text-red-300">
@@ -510,79 +411,35 @@ function SecuritySettings({ role }) {
             <p className="mt-2 max-w-lg text-xs font-medium text-zinc-600 dark:text-zinc-300">
               Excluir permanentemente sua conta de Administrador e todos os dados da empresa. Esta ação é irreversível.
             </p>
-
             {!mostrarConfirmacao ? (
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => setMostrarConfirmacao(true)} 
-                className="mt-4 h-8 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30"
-              >
+              <Button type="button" variant="destructive" size="sm" onClick={() => setMostrarConfirmacao(true)}
+                className="mt-4 h-8 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30">
                 Excluir Conta
               </Button>
             ) : (
-       
               <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-xs font-bold text-red-600 dark:text-red-400">
-                  Para confirmar, preencha os dados abaixo:
-                </p>
-
+                <p className="text-xs font-bold text-red-600 dark:text-red-400">Para confirmar, preencha os dados abaixo:</p>
                 <div className="mt-3 grid max-w-md gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">
-                      CNPJ da Empresa
-                    </label>
-                    <SettingsInput
-                      id="deleteCnpj"
-                      placeholder="00.000.000/0000-00"
-                      value={confirmCNPJ}
-                      className="placeholder:text-xs text-xs"
-                      onChange={(e) => {
-                        const valorComMascara = aplicarMascaraCNPJ(e.target.value);
-                        setConfirmCNPJ(valorComMascara);
-                      }}
-                    />
+                    <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">CNPJ da Empresa</label>
+                    <SettingsInput id="deleteCnpj" placeholder="00.000.000/0000-00" value={confirmCNPJ} className="placeholder:text-xs text-xs"
+                      onChange={(e) => setConfirmCNPJ(aplicarMascaraCNPJ(e.target.value))} />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">
-                      Senha de Administrador
-                    </label>
-                    <SettingsInput 
-                      id="deletePassword"
-                      type="password"
-                      placeholder="Digite sua senha"
-                      className="placeholder:text-xs text-xs"
-                      value={confirmPasswordDelete}
-                      onChange={(e) => setConfirmPasswordDelete(e.target.value)}
-                    />
+                    <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">Senha de Administrador</label>
+                    <SettingsInput id="deletePassword" type="password" placeholder="Digite sua senha" className="placeholder:text-xs text-xs"
+                      value={confirmPasswordDelete} onChange={(e) => setConfirmPasswordDelete(e.target.value)} />
                   </div>
                 </div>
-
                 <div className="mt-4 flex gap-3">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={handleDeletarContar}
-                    size="sm"
+                  <Button type="button" variant="destructive" onClick={handleDeletarContar} size="sm"
                     disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
-                    className="h-8 rounded-md bg-red-600 px-4 text-xs font-bold text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
-                  >
+                    className="h-8 rounded-md bg-red-600 px-4 text-xs font-bold text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700">
                     {deletando ? "Excluindo..." : "Confirmar Exclusão"}
                   </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setMostrarConfirmacao(false)
-                      setConfirmCNPJ("") 
-                      setConfirmPasswordDelete("") 
-                    }}
-                    size="sm"
-                    disabled={deletando}
-                    className="h-8 rounded-md px-4 text-xs font-bold"
-                  >
+                  <Button type="button" variant="outline" size="sm" disabled={deletando}
+                    onClick={() => { setMostrarConfirmacao(false); setConfirmCNPJ(""); setConfirmPasswordDelete("") }}
+                    className="h-8 rounded-md px-4 text-xs font-bold">
                     Cancelar
                   </Button>
                 </div>
@@ -590,7 +447,7 @@ function SecuritySettings({ role }) {
             )}
           </section>
         </div>
-      ) : null}
+      )}
     </div>
   )
 }
@@ -601,9 +458,7 @@ export default function SettingsPage({ role = "operator" }) {
   const [activeTab, setActiveTab] = useState(tabs[0].id)
   const [darkMode, setDarkMode] = useState(getInitialDarkMode)
 
-  useEffect(() => {
-    setActiveTab(tabs[0].id)
-  }, [tabs])
+  useEffect(() => { setActiveTab(tabs[0].id) }, [tabs])
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode)
@@ -611,25 +466,24 @@ export default function SettingsPage({ role = "operator" }) {
   }, [darkMode])
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-7 pb-10">
-      <header>
-        <h1 className="text-3xl font-bold text-zinc-950 dark:text-zinc-100">Configurações</h1>
-        <p className="text-base font-medium text-zinc-500 dark:text-zinc-400">
-          Gerencie suas informações da conta e preferências.
-        </p>
-      </header>
+    <PageLayout>
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-7 pb-10">
+        <header>
+          <h1 className="text-3xl font-bold text-zinc-950 dark:text-zinc-100">Configurações</h1>
+          <p className="text-base font-medium text-zinc-500 dark:text-zinc-400">
+            Gerencie suas informações da conta e preferências.
+          </p>
+        </header>
 
-      <section className="flex min-h-[350px] overflow-hidden rounded-xl border border-zinc-100 bg-white/75 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
-        <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
-
-        <div className="flex-1 p-4 sm:p-6">
-          {activeTab === "conta" ? <AccountSettings role={role} /> : null}
-          {activeTab === "aparencia" ? (
-            <AppearanceSettings darkMode={darkMode} onDarkModeChange={setDarkMode} />
-          ) : null}
-          {activeTab === "seguranca" ? <SecuritySettings role={role} /> : null}
-        </div>
-      </section>
-    </div>
+        <section className="flex min-h-[350px] overflow-hidden rounded-xl border border-zinc-100 bg-white/75 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+          <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
+          <div className="flex-1 p-4 sm:p-6">
+            {activeTab === "conta" && <AccountSettings role={role} />}
+            {activeTab === "aparencia" && <AppearanceSettings darkMode={darkMode} onDarkModeChange={setDarkMode} />}
+            {activeTab === "seguranca" && <SecuritySettings role={role} />}
+          </div>
+        </section>
+      </div>
+    </PageLayout>
   )
 }

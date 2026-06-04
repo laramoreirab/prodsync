@@ -22,10 +22,7 @@ export default function DashboardGeralGestor() {
 
   if (loading) {
     return (
-      <PageLayout>
-        <PageHeader title="Dashboard Geral do Setor" subtitle="Acompanhando os indicadores do seu setor..." />
-        <p className="text-sm text-muted-foreground">Carregando dados do setor...</p>
-      </PageLayout>
+      <LoadingState message="Carregando dashboard..." />
     );
   }
 
