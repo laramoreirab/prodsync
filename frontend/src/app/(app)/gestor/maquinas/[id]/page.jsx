@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { MotivoRefugoMaquinaWidget } from "@/features/maquinas/MotivoRefugoMaquinaWidget";
 import { MotivoSetupMaquinaWidget } from "@/features/maquinas/MotivoSetupMaquinaWidget";
@@ -7,7 +7,14 @@ import { OEEEvolucaoMaquinaWidget } from "@/features/maquinas/OEEEvolucaoMaquina
 import { VelocidadeMaquinaWidget } from "@/features/maquinas/VelocidadeMaquinaWidget";
 
 import { use, useState, useEffect } from "react";
-import { Plus, Loader2, Search, ChevronDown, Pencil, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Loader2,
+  Search,
+  ChevronDown,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 
 import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
@@ -29,7 +36,13 @@ import { filtrarPorDuracaoMax, filtrarPorNumberRange } from "@/lib/filterUtils";
 import SyncPlacaDialog from "@/components/ui/forms/maquinas/SyncPlacaDialog";
 
 // Layout geral
-import { PageLayout, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+import {
+  PageLayout,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  LoadingState,
+} from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
 import {
@@ -46,83 +59,110 @@ import {
 } from "@/components/DetailComponents";
 
 const colunasMaquina = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
   {
-    id: 'tipo',
-    key: 'tipoEvento',
-    label: 'Tipo',
-    className: 'text-center justify-center',
+    id: "id",
+    key: "id",
+    label: "ID",
+    className: "w-20 text-center justify-center",
+  } /* id da máquina */,
+  {
+    id: "tipo",
+    key: "tipoEvento",
+    label: "Tipo",
+    className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        "Setup": {
+        Setup: {
           variant: "secondary",
-          className: "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm "
+          className:
+            "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm ",
         },
-        "Parada": {
+        Parada: {
           variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
+          className: "font-semibold text-sm border-none",
+        },
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
       return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+        <Badge
+          variant={estilo.variant}
+          className={`whitespace-nowrap ${estilo.className}`}
+        >
           {valor}
         </Badge>
       );
-    }
+    },
   },
   {
-    id: 'data',
-    key: 'data',
-    label: 'Data (Início - Fim)',
-    icone: (valor, row) => (
-      <DataEvento inicio={row.inicio} fim={row.fim} />
-    )
+    id: "data",
+    key: "data",
+    label: "Data (Início - Fim)",
+    icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
   },
   {
-    id: 'duracao', key: 'duracao', label: 'Duração',
-    icone: (valor, row) => (
-      <DuracaoEvento inicio={row.inicio} fim={row.fim} />
-    )
+    id: "duracao",
+    key: "duracao",
+    label: "Duração",
+    icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
-  { id: 'motivo', key: 'motivo', label: 'Motivo' },
-  { id: 'observacao', key: 'observacao', label: 'Observação' },
+  { id: "motivo", key: "motivo", label: "Motivo" },
+  { id: "observacao", key: "observacao", label: "Observação" },
 ];
 
 const colunasApontamento = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
-  { id: 'op', key: 'op', label: 'OP Afetada', className: 'w-30 text-center justify-center pl-5' },
   {
-    id: 'data',
-    key: 'data',
-    label: 'Data (Início - Fim)',
-    className: 'pl-10',
-    icone: (valor, row) => (
-      <DataEvento inicio={row.inicio} fim={row.fim} />
-    )
+    id: "id",
+    key: "id",
+    label: "ID",
+    className: "w-20 text-center justify-center",
   },
   {
-    id: 'produzido', key: 'produzido', label: 'Produzido', className: 'text-center justify-center',
+    id: "op",
+    key: "op",
+    label: "OP Afetada",
+    className: "w-30 text-center justify-center pl-5",
+  },
+  {
+    id: "data",
+    key: "data",
+    label: "Data (Início - Fim)",
+    className: "pl-10",
+    icone: (valor, row) => <DataEvento inicio={row.inicio} fim={row.fim} />,
+  },
+  {
+    id: "produzido",
+    key: "produzido",
+    label: "Produzido",
+    className: "text-center justify-center",
     icone: (valor) => {
       return (
-        <Badge variant="outline" className="bg-green-500/15 text-green-600 text-sm font-semibold border-none">
+        <Badge
+          variant="outline"
+          className="bg-green-500/15 text-green-600 text-sm font-semibold border-none"
+        >
           {valor}
         </Badge>
       );
-    }
+    },
   },
   {
-    id: 'refugo', key: 'refugo', label: 'Refugo', className: 'text-center justify-center',
+    id: "refugo",
+    key: "refugo",
+    label: "Refugo",
+    className: "text-center justify-center",
     icone: (valor) => {
       return (
-        <Badge variant="destructive" className="font-semibold text-sm border-none">
+        <Badge
+          variant="destructive"
+          className="font-semibold text-sm border-none"
+        >
           {valor}
         </Badge>
       );
-    }
+    },
   },
-  { id: 'observacao', key: 'observacao', label: 'Observação' },
+  { id: "observacao", key: "observacao", label: "Observação" },
 ];
 
 export default function MaquinaDetalheGestor({ params }) {
@@ -135,9 +175,10 @@ export default function MaquinaDetalheGestor({ params }) {
   const [todosApontamentos, setTodosApontamentos] = useState([]);
   const [loadingMaquina, setLoadingMaquina] = useState(true);
 
-
   const imagemMaquina = (() => {
-    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
+    const apiUrl = (
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+    ).replace(/\/$/, "");
     if (!maquina?.imagem) return "/demo_maq.png";
     const imagem = String(maquina.imagem).replaceAll("\\", "/");
     if (imagem.startsWith("http")) return imagem;
@@ -155,9 +196,20 @@ export default function MaquinaDetalheGestor({ params }) {
     if (!inicio) return "-";
     const dataInicio = new Date(inicio);
     const dataFim = fim ? new Date(fim) : null;
-    const data = dataInicio.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
-    const horaInicio = dataInicio.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-    const horaFim = dataFim ? dataFim.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--";
+    const data = dataInicio.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+    });
+    const horaInicio = dataInicio.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const horaFim = dataFim
+      ? dataFim.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "--:--";
     return `${data} (${horaInicio} - ${horaFim})`;
   };
 
@@ -192,7 +244,10 @@ export default function MaquinaDetalheGestor({ params }) {
           .filter((item) => item.tipo === "Producao")
           .map((item) => ({
             ...item,
-            op: item.ordem_producao?.codigo_lote || item.ordem_producao?.id_ordem || "-",
+            op:
+              item.ordem_producao?.codigo_lote ||
+              item.ordem_producao?.id_ordem ||
+              "-",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
@@ -226,23 +281,94 @@ export default function MaquinaDetalheGestor({ params }) {
   };
 
   const dadosApontamento = [
-    { id: 1, op: '0098', data: '26/03 (08:00 - 09:00)', duracao: '00:35', produzido: '15', refugo: '2', observacao: 'Troca de ferramenta', inicio: "2025-03-26T08:00:00.000Z", fim: null },
-    { id: 2, op: '1234', data: '06/01 (09:30 - 10:15)', duracao: '00:45', produzido: '10', refugo: '5', observacao: 'Manutenção corretiva', inicio: "2025-03-26T08:00:00.000Z", fim: null },
-    { id: 3, op: '5678', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '00:20', produzido: '20', refugo: '1', observacao: 'Ajuste de parâmetros' },
-    { id: 4, op: '9012', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '01:00', produzido: '5', refugo: '8', observacao: 'Refugo elevado devido a falta de aquecimento' },
-    { id: 5, op: '1223', inicio: "2025-09-13T10:15:00.000Z", fim: "2025-09-13T10:35:00.000Z", duracao: '01:00', produzido: '6', refugo: '8', observacao: 'Retirada de amostras para o laboratório de qualidade' },
-    { id: 6, op: '1206', data: '30/07 (17:00 - 18:00)', duracao: '01:00', produzido: '13', refugo: '6', observacao: 'Finalização de OP' },
-    { id: 7, op: '8912', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Falta de material' },
-    { id: 8, op: '0607', data: '20/09 (16:00 - 19:00)', duracao: '01:00', produzido: '20', refugo: '5', observacao: 'Boa qualidade' },
+    {
+      id: 1,
+      op: "0098",
+      data: "26/03 (08:00 - 09:00)",
+      duracao: "00:35",
+      produzido: "15",
+      refugo: "2",
+      observacao: "Troca de ferramenta",
+      inicio: "2025-03-26T08:00:00.000Z",
+      fim: null,
+    },
+    {
+      id: 2,
+      op: "1234",
+      data: "06/01 (09:30 - 10:15)",
+      duracao: "00:45",
+      produzido: "10",
+      refugo: "5",
+      observacao: "Manutenção corretiva",
+      inicio: "2025-03-26T08:00:00.000Z",
+      fim: null,
+    },
+    {
+      id: 3,
+      op: "5678",
+      inicio: "2025-09-13T10:15:00.000Z",
+      fim: "2025-09-13T10:35:00.000Z",
+      duracao: "00:20",
+      produzido: "20",
+      refugo: "1",
+      observacao: "Ajuste de parâmetros",
+    },
+    {
+      id: 4,
+      op: "9012",
+      inicio: "2025-09-13T10:15:00.000Z",
+      fim: "2025-09-13T10:35:00.000Z",
+      duracao: "01:00",
+      produzido: "5",
+      refugo: "8",
+      observacao: "Refugo elevado devido a falta de aquecimento",
+    },
+    {
+      id: 5,
+      op: "1223",
+      inicio: "2025-09-13T10:15:00.000Z",
+      fim: "2025-09-13T10:35:00.000Z",
+      duracao: "01:00",
+      produzido: "6",
+      refugo: "8",
+      observacao: "Retirada de amostras para o laboratório de qualidade",
+    },
+    {
+      id: 6,
+      op: "1206",
+      data: "30/07 (17:00 - 18:00)",
+      duracao: "01:00",
+      produzido: "13",
+      refugo: "6",
+      observacao: "Finalização de OP",
+    },
+    {
+      id: 7,
+      op: "8912",
+      data: "20/09 (16:00 - 19:00)",
+      duracao: "01:00",
+      produzido: "20",
+      refugo: "5",
+      observacao: "Falta de material",
+    },
+    {
+      id: 8,
+      op: "0607",
+      data: "20/09 (16:00 - 19:00)",
+      duracao: "01:00",
+      produzido: "20",
+      refugo: "5",
+      observacao: "Boa qualidade",
+    },
   ];
   // -------------------------------------------------------------------------------------------------- Eventos --------------------------------------------------------------------------------------------------
   const opcoesOrdenacaoEventos = [
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'Data Crescente', value: 'data_asc' },
-    { label: 'Data Decrescente', value: 'data_desc' },
-    { label: 'Duração Crescente', value: 'duracao_asc' },
-    { label: 'Duração Decrescente', value: 'duracao_desc' }
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "Data Crescente", value: "data_asc" },
+    { label: "Data Decrescente", value: "data_desc" },
+    { label: "Duração Crescente", value: "duracao_asc" },
+    { label: "Duração Decrescente", value: "duracao_desc" },
   ];
 
   //lógica de ordenação de Eventos
@@ -250,22 +376,23 @@ export default function MaquinaDetalheGestor({ params }) {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === "id_asc") return a.id - b.id;
+      if (criterio === "id_desc") return b.id - a.id;
 
-      if (criterio === 'data_asc') return parseData(a.data) - parseData(b.data);
-      if (criterio === 'data_desc') return parseData(b.data) - parseData(a.data);
+      if (criterio === "data_asc") return parseData(a.data) - parseData(b.data);
+      if (criterio === "data_desc")
+        return parseData(b.data) - parseData(a.data);
 
-      if (criterio === 'duracao_asc') {
-        const [hA, mA] = a.duracao.split(':').map(Number);
-        const [hB, mB] = b.duracao.split(':').map(Number);
-        return (hA * 60 + mA) - (hB * 60 + mB);
+      if (criterio === "duracao_asc") {
+        const [hA, mA] = a.duracao.split(":").map(Number);
+        const [hB, mB] = b.duracao.split(":").map(Number);
+        return hA * 60 + mA - (hB * 60 + mB);
       }
 
-      if (criterio === 'duracao_desc') {
-        const [hA, mA] = a.duracao.split(':').map(Number);
-        const [hB, mB] = b.duracao.split(':').map(Number);
-        return (hB * 60 + mB) - (hA * 60 + mA);
+      if (criterio === "duracao_desc") {
+        const [hA, mA] = a.duracao.split(":").map(Number);
+        const [hB, mB] = b.duracao.split(":").map(Number);
+        return hB * 60 + mB - (hA * 60 + mA);
       }
 
       return 0;
@@ -274,10 +401,14 @@ export default function MaquinaDetalheGestor({ params }) {
     setDados(dadosCopiados);
   };
 
-
   //filtros para eventos
   const eventosFilter = [
-    { id: "tipoEvento", label: "Tipo", type: "checkbox", options: ["Parada", "Setup"] },
+    {
+      id: "tipoEvento",
+      label: "Tipo",
+      type: "checkbox",
+      options: ["Parada", "Setup"],
+    },
     { id: "data", label: "Data", type: "date-range" },
     { id: "duracao", label: "Duração máx.", type: "time-max" },
   ];
@@ -287,30 +418,36 @@ export default function MaquinaDetalheGestor({ params }) {
 
     // filtro por status
     if (filtrosSelecionados.tipoEvento?.length) {
-      dadosFiltrados = dadosFiltrados.filter(evento =>
-        filtrosSelecionados.tipoEvento.includes(evento.tipoEvento)
+      dadosFiltrados = dadosFiltrados.filter((evento) =>
+        filtrosSelecionados.tipoEvento.includes(evento.tipoEvento),
       );
     }
 
     // filtro por data
     if (filtrosSelecionados.data) {
       if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(evento =>
-          parseData(evento.data) >= new Date(filtrosSelecionados.data.start)
+        dadosFiltrados = dadosFiltrados.filter(
+          (evento) =>
+            parseData(evento.data) >= new Date(filtrosSelecionados.data.start),
         );
       }
 
       if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(evento =>
-          parseData(evento.data) <= new Date(filtrosSelecionados.data.end)
+        dadosFiltrados = dadosFiltrados.filter(
+          (evento) =>
+            parseData(evento.data) <= new Date(filtrosSelecionados.data.end),
         );
       }
     }
 
     if (filtrosSelecionados.duracao?.max) {
       dadosFiltrados = filtrarPorDuracaoMax(
-        dadosFiltrados.map((e) => ({ ...e, inicio: e.inicio ?? parseData(e.data), fim: e.fim })),
-        filtrosSelecionados.duracao.max
+        dadosFiltrados.map((e) => ({
+          ...e,
+          inicio: e.inicio ?? parseData(e.data),
+          fim: e.fim,
+        })),
+        filtrosSelecionados.duracao.max,
       );
     }
 
@@ -330,14 +467,14 @@ export default function MaquinaDetalheGestor({ params }) {
 
   // -------------------------------------------------------------------------------------------------- Apontamentos  --------------------------------------------------------------------------------------------------
   const opcoesOrdenacaoApontamento = [
-    { label: 'ID Crescente', value: 'id_asc' },
-    { label: 'ID Decrescente', value: 'id_desc' },
-    { label: 'OP Afetada Crescente', value: 'opAfetada_asc' },
-    { label: 'OP Afetada Decrescente', value: 'opAfetada_desc' },
-    { label: 'Produzido Crescente', value: 'produzido_asc' },
-    { label: 'Produzido Decrescente', value: 'produzido_desc' },
-    { label: 'Refugo Crescente', value: 'refugo_asc' },
-    { label: 'Refugo Decrescente', value: 'refugo_desc' }
+    { label: "ID Crescente", value: "id_asc" },
+    { label: "ID Decrescente", value: "id_desc" },
+    { label: "OP Afetada Crescente", value: "opAfetada_asc" },
+    { label: "OP Afetada Decrescente", value: "opAfetada_desc" },
+    { label: "Produzido Crescente", value: "produzido_asc" },
+    { label: "Produzido Decrescente", value: "produzido_desc" },
+    { label: "Refugo Crescente", value: "refugo_asc" },
+    { label: "Refugo Decrescente", value: "refugo_desc" },
   ];
 
   //lógica de ordenação de Apontamentos
@@ -345,17 +482,17 @@ export default function MaquinaDetalheGestor({ params }) {
     const dadosCopiados = [...dadosApontamentoState];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === "id_asc") return a.id - b.id;
+      if (criterio === "id_desc") return b.id - a.id;
 
-      if (criterio === 'opAfetada_asc') return Number(a.op) - Number(b.op);
-      if (criterio === 'opAfetada_desc') return Number(b.op) - Number(a.op);
+      if (criterio === "opAfetada_asc") return Number(a.op) - Number(b.op);
+      if (criterio === "opAfetada_desc") return Number(b.op) - Number(a.op);
 
-      if (criterio === 'produzido_asc') return a.produzido - b.produzido;
-      if (criterio === 'produzido_desc') return b.produzido - a.produzido;
+      if (criterio === "produzido_asc") return a.produzido - b.produzido;
+      if (criterio === "produzido_desc") return b.produzido - a.produzido;
 
-      if (criterio === 'refugo_asc') return a.refugo - b.refugo;
-      if (criterio === 'refugo_desc') return b.refugo - a.refugo;
+      if (criterio === "refugo_asc") return a.refugo - b.refugo;
+      if (criterio === "refugo_desc") return b.refugo - a.refugo;
 
       return 0;
     });
@@ -363,12 +500,11 @@ export default function MaquinaDetalheGestor({ params }) {
     setDadosApontamentoState(dadosCopiados);
   };
 
-
   //filtros para apontamentos
   const apontamentoFilter = [
     { id: "data", label: "Data", type: "date-range" },
     { id: "produzido", label: "Produzido", type: "number-range" },
-    { id: "refugo", label: "Refugo", type: "number-range" }
+    { id: "refugo", label: "Refugo", type: "number-range" },
   ];
 
   const aplicarFiltrosApontamento = (filtrosSelecionados) => {
@@ -377,14 +513,14 @@ export default function MaquinaDetalheGestor({ params }) {
     //filtro por produzido
     if (filtrosSelecionados.produzido) {
       if (filtrosSelecionados.produzido.min != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.produzido) >= filtrosSelecionados.produzido.min
+        dadosFiltrados = dadosFiltrados.filter(
+          (a) => Number(a.produzido) >= filtrosSelecionados.produzido.min,
         );
       }
 
       if (filtrosSelecionados.produzido.max != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.produzido) <= filtrosSelecionados.produzido.max
+        dadosFiltrados = dadosFiltrados.filter(
+          (a) => Number(a.produzido) <= filtrosSelecionados.produzido.max,
         );
       }
     }
@@ -392,14 +528,14 @@ export default function MaquinaDetalheGestor({ params }) {
     //filtro por refugo
     if (filtrosSelecionados.refugo) {
       if (filtrosSelecionados.refugo.min != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.refugo) >= filtrosSelecionados.refugo.min
+        dadosFiltrados = dadosFiltrados.filter(
+          (a) => Number(a.refugo) >= filtrosSelecionados.refugo.min,
         );
       }
 
       if (filtrosSelecionados.refugo.max != null) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          Number(a.refugo) <= filtrosSelecionados.refugo.max
+        dadosFiltrados = dadosFiltrados.filter(
+          (a) => Number(a.refugo) <= filtrosSelecionados.refugo.max,
         );
       }
     }
@@ -407,14 +543,14 @@ export default function MaquinaDetalheGestor({ params }) {
     //filtro por data
     if (filtrosSelecionados.data) {
       if (filtrosSelecionados.data.start) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          parseData(a.data) >= new Date(filtrosSelecionados.data.start)
+        dadosFiltrados = dadosFiltrados.filter(
+          (a) => parseData(a.data) >= new Date(filtrosSelecionados.data.start),
         );
       }
 
       if (filtrosSelecionados.data.end) {
-        dadosFiltrados = dadosFiltrados.filter(a =>
-          parseData(a.data) <= new Date(filtrosSelecionados.data.end)
+        dadosFiltrados = dadosFiltrados.filter(
+          (a) => parseData(a.data) <= new Date(filtrosSelecionados.data.end),
         );
       }
     }
@@ -427,26 +563,19 @@ export default function MaquinaDetalheGestor({ params }) {
     const termo = buscaApontamento.toLowerCase();
 
     return (
-      String(a.op || "").toLowerCase().includes(termo) ||
-      a.id?.toString().includes(termo)
+      String(a.op || "")
+        .toLowerCase()
+        .includes(termo) || a.id?.toString().includes(termo)
     );
   });
 
-  // if (loadingMaquina) {
-  //   return (
-  //     <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-  //       <div className="flex flex-col items-center">
-  //         <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-  //         <p className="text-lg text-gray-600 font-medium">Carregando máquina...</p>
-  //       </div>
-  //     </main>
-  //   );
-  // }
+  if (loadingMaquina) {
+    return <LoadingState message="Carregando detalhes da máquina..." />;
+  }
 
   return (
     <PageLayout>
       <DetailPageContainer>
-
         {/* Informações da Máquina */}
 
         {/* Voltar */}
@@ -461,12 +590,19 @@ export default function MaquinaDetalheGestor({ params }) {
             { label: "Setor", value: maquina?.id_setor || "-" },
             {
               label: "Status",
-              value: <StatusBadge status={maquina?.status_atual || maquina?.status || "Parada"} />,
+              value: (
+                <StatusBadge
+                  status={maquina?.status_atual || maquina?.status || "Parada"}
+                />
+              ),
             },
           ]}
           fieldsRight={[
             { label: "Operador", value: maquina?.id_operador || "-" },
-            { label: "Data de Aquisição", value: formatarData(maquina?.data_aquisicao) },
+            {
+              label: "Data de Aquisição",
+              value: formatarData(maquina?.data_aquisicao),
+            },
             { label: "Velocidade Média", value: maquina?.capacidade || "-" },
           ]}
           actions={
@@ -486,7 +622,10 @@ export default function MaquinaDetalheGestor({ params }) {
                   <Trash2 className=" w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>
-                  <FormExclusaoMaquina maquinaId={maquinaId} onExcluir={maquinaCrudService.delete} />
+                  <FormExclusaoMaquina
+                    maquinaId={maquinaId}
+                    onExcluir={maquinaCrudService.delete}
+                  />
                 </DialogContent>
               </Dialog>
             </DetailActions>
@@ -547,8 +686,15 @@ export default function MaquinaDetalheGestor({ params }) {
               label="eventos"
               actions={
                 <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoEventos} onSortChange={handleSortEventos} />
-                  <FilterDropdown filtersConfig={eventosFilter} onApply={aplicarFiltrosEventos} />
+                  <OrdenarDropdown
+                    label="Ordenar por"
+                    options={opcoesOrdenacaoEventos}
+                    onSortChange={handleSortEventos}
+                  />
+                  <FilterDropdown
+                    filtersConfig={eventosFilter}
+                    onApply={aplicarFiltrosEventos}
+                  />
                 </>
               }
             />
@@ -558,13 +704,20 @@ export default function MaquinaDetalheGestor({ params }) {
           {dadosExibidos.length > 0 ? (
             <TableListagens
               /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
-              data={dadosExibidos} columns={colunasMaquina}
+              data={dadosExibidos}
+              columns={colunasMaquina}
               acoesDropdown={(maquina) => (
                 <>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <EyeIcon strokeWidth={2} className="mr-1 h-4 w-4 text-primary" />
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
+                        <EyeIcon
+                          strokeWidth={2}
+                          className="mr-1 h-4 w-4 text-primary"
+                        />
                         Ver Detalhes
                       </DropdownMenuItem>
                     </DialogTrigger>
@@ -574,7 +727,10 @@ export default function MaquinaDetalheGestor({ params }) {
                   </Dialog>
 
                   <SolicitarJustificativaMenuItem idEvento={maquina.id}>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
                       <BellRing className="mr-2 h-4 w-4" />
                       Solicitar Justificativa
                     </DropdownMenuItem>
@@ -582,7 +738,10 @@ export default function MaquinaDetalheGestor({ params }) {
 
                   <Dialog>
                     <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="cursor-pointer"
+                      >
                         <Pencil className="mr-2 h-4 w-4 text-primary" />
                         Editar Evento
                       </DropdownMenuItem>
@@ -593,11 +752,13 @@ export default function MaquinaDetalheGestor({ params }) {
                   </Dialog>
                 </>
               )}
-
             />
           ) : (
             //caso não encontre nada correspondente
-            <EmptyState title="Nenhum evento encontrado" message={`Sem eventos para "${buscaEvento}".`} />
+            <EmptyState
+              title="Nenhum evento encontrado"
+              message={`Sem eventos para "${buscaEvento}".`}
+            />
           )}
         </DetailListingSection>
 
@@ -618,8 +779,15 @@ export default function MaquinaDetalheGestor({ params }) {
               label="apontamentos"
               actions={
                 <>
-                  <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacaoApontamento} onSortChange={handleSortApontamento} />
-                  <FilterDropdown filtersConfig={apontamentoFilter} onApply={aplicarFiltrosApontamento} />
+                  <OrdenarDropdown
+                    label="Ordenar por"
+                    options={opcoesOrdenacaoApontamento}
+                    onSortChange={handleSortApontamento}
+                  />
+                  <FilterDropdown
+                    filtersConfig={apontamentoFilter}
+                    onApply={aplicarFiltrosApontamento}
+                  />
                 </>
               }
             />
@@ -639,11 +807,13 @@ export default function MaquinaDetalheGestor({ params }) {
               )}
             />
           ) : (
-            <EmptyState title="Nenhum apontamento encontrado" message={`Sem apontamentos para "${buscaApontamento}".`} />
+            <EmptyState
+              title="Nenhum apontamento encontrado"
+              message={`Sem apontamentos para "${buscaApontamento}".`}
+            />
           )}
         </DetailListingSection>
-
-    </DetailPageContainer>
-    </PageLayout >
+      </DetailPageContainer>
+    </PageLayout>
   );
 }

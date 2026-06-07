@@ -28,6 +28,7 @@ router.get('/producaoMaquinas/:id_setor', autorizarSetorParam('id_setor'), Maqui
 router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), MaquinaController.cadastroLote);
 
 router.get('/status/:status', aplicarEscopoGestor, MaquinaController.listarMaquinasPorStatus);
+router.get('/setor/:id_setor/disponiveis', autorizarSetorParam('id_setor'), MaquinaController.listarMaquinasDisponiveisPorTurno);
 router.get('/setor/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.listarMaquinasPorSetor);
 router.get('/obter-maquina-operador/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.obterMaquinaOperador)
 
@@ -43,6 +44,9 @@ router.get('/eficienciaMaquina/:id_operador', autorizarUsuarioParam('id_operador
 
 // Pareamento / Sincronização de placa (ESP32)
 router.post('/:id/sincronizar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.iniciarSincronizacaoPlaca);
+router.get('/:id/sincronizacao-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.obterStatusSincronizacaoPlaca);
+router.post('/:id/parar-sincronizacao', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.pararSincronizacaoPlaca);
+router.post('/:id/desconectar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.desconectarPlacaMaquina);
 
 router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);
 router.put('/:id', adminMiddleware, uploadImagens.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);

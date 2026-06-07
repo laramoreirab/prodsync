@@ -307,7 +307,7 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
       {filterRow && <div>{filterRow}</div>}
 
       {/* Conteúdo (tabela ou empty state) */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-2 sm:p-3">{children}</div>
+      <div className="rounded-2xl bg-transparent p-2 sm:p-3">{children}</div>
     </motion.section>
   );
 }
@@ -495,6 +495,11 @@ export function MachineProfileCard({
   headerSlot,
   className,
 }) {
+  const enrichedFieldsRight = [
+    ...fieldsRight,
+    ...(status ? [{ label: "Status", value: <StatusBadge status={status} /> }] : []),
+  ];
+
   return (
     <EntityProfileCard
       name={machineName}
@@ -503,9 +508,9 @@ export function MachineProfileCard({
       imageFallback={imageFallback}
       imageShape="square"
       fieldsLeft={fieldsLeft}
-      fieldsRight={fieldsRight}
+      fieldsRight={enrichedFieldsRight}
       actions={actions}
-      headerSlot={headerSlot ?? (status ? <StatusBadge status={status} /> : null)}
+      headerSlot={headerSlot ?? null}
       className={className}
     />
   );

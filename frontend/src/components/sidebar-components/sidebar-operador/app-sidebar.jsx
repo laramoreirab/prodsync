@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from "react"
-import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main"
+import { useEffect, useMemo, useState } from "react";
+import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-} from "@/components/ui/sidebar"
-import ProfileDropdown from "@/components/shadcn-space/blocks/topbar/dropdown-profile"
-import NotificationDropdown from "@/components/shadcn-space/blocks/topbar/notification-dropdown"
+} from "@/components/ui/sidebar";
+import ProfileDropdown from "@/components/shadcn-space/blocks/topbar/dropdown-profile";
+import NotificationDropdown from "@/components/shadcn-space/blocks/topbar/notification-dropdown";
 import {
   BellRing,
   Calendar,
   PieChartIcon,
   RefreshCw,
   Wrench,
-} from "lucide-react"
-import { ListBulletsIcon } from "@phosphor-icons/react"
-import { apiFetch } from "@/lib/api"
-import { getUserFromToken } from "@/lib/auth"
+} from "lucide-react";
+import { ListBulletsIcon } from "@phosphor-icons/react";
+import { apiFetch } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
 
 const data = {
   navMain: [
@@ -29,17 +29,17 @@ const data = {
       icon: <PieChartIcon />,
     },
     {
-      title: "Maquinas",
+      title: "Máquinas",
       url: "/operador/maquinas",
       icon: <Wrench />,
     },
     {
-      title: "Historico de Eventos",
+      title: "Histórico de Eventos",
       url: "/operador/historicoEventos",
       icon: <Calendar />,
     },
     {
-      title: "Ordem de Producao",
+      title: "Ordem de Produção",
       url: "/operador/ordensDeProducao",
       icon: <ListBulletsIcon size={32} />,
     },
@@ -49,50 +49,48 @@ const data = {
       icon: <RefreshCw />,
     },
   ],
-}
+};
 
-export function AppSidebar({
-  ...props
-}) {
-  const [maquinaUrl, setMaquinaUrl] = useState("/operador/maquinas")
+export function AppSidebar({ ...props }) {
+  const [maquinaUrl, setMaquinaUrl] = useState("/operador/maquinas");
 
   useEffect(() => {
-    let ativo = true
+    let ativo = true;
 
     async function carregarMaquinaOperador() {
-      const usuario = getUserFromToken()
-      const idOperador = usuario?.id_usuario
+      const usuario = getUserFromToken();
+      const idOperador = usuario?.id_usuario;
 
-      if (!idOperador) return
+      if (!idOperador) return;
 
       try {
-        const resposta = await apiFetch(`/api/maquinas/obter-maquina-operador/${idOperador}`)
-        const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina
+        const resposta = await apiFetch(
+          `/api/maquinas/obter-maquina-operador/${idOperador}`,
+        );
+        const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
 
         if (ativo && idMaquina) {
-          setMaquinaUrl(`/operador/maquinas/${idMaquina}`)
+          setMaquinaUrl(`/operador/maquinas/${idMaquina}`);
         }
       } catch (error) {
-        console.error("Erro ao carregar maquina do operador:", error)
+        console.error("Erro ao carregar maquina do operador:", error);
       }
     }
 
-    carregarMaquinaOperador()
+    carregarMaquinaOperador();
 
     return () => {
-      ativo = false
-    }
-  }, [])
+      ativo = false;
+    };
+  }, []);
 
   const navMain = useMemo(
     () =>
       data.navMain.map((item) =>
-        item.title === "Maquinas"
-          ? { ...item, url: maquinaUrl }
-          : item
+        item.title === "Maquinas" ? { ...item, url: maquinaUrl } : item,
       ),
-    [maquinaUrl]
-  )
+    [maquinaUrl],
+  );
 
   return (
     <Sidebar
@@ -109,11 +107,23 @@ export function AppSidebar({
         "--sidebar-border": "#3462ac",
         "--sidebar-ring": "#93c5fd",
       }}
-      {...props}>
+      {...props}
+    >
       <SidebarHeader className="px-4 py-5 group-data-[collapsible=icon]:px-3">
-        <a href="#" className="inline-flex items-center group-data-[collapsible=icon]:justify-center">
-          <img src="/logo.svg" alt="Logo ProdSync" className="h-9 w-auto max-w-11 brightness-0 invert transition-all duration-300 group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:block group-hover/sidebar:max-w-none" />
-          <img src="/logo.svg" alt="Logo ProdSync" className="hidden h-16 w-16 brightness-0 invert transition-all duration-300 group-data-[state=collapsed]/sidebar:block group-data-[state=collapsed]/sidebar:group-hover/sidebar:hidden" />
+        <a
+          href="#"
+          className="relative inline-flex h-16 items-center group-data-[collapsible=icon]:justify-center"
+        >
+          <img
+            src="/logo.svg"
+            alt="Logo ProdSync"
+            className="h-12 w-auto max-w-11 brightness-0 invert opacity-100 transition-all duration-300 ease-in-out group-data-[state=collapsed]/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:scale-95 group-data-[state=collapsed]/sidebar:group-hover/sidebar:opacity-100 group-data-[state=collapsed]/sidebar:group-hover/sidebar:scale-100 group-hover/sidebar:max-w-none"
+          />
+          <img
+            src="/logo.svg"
+            alt="Logo ProdSync"
+            className="absolute h-16 w-16 brightness-0 invert opacity-0 scale-95 transition-all duration-300 ease-in-out group-data-[state=collapsed]/sidebar:opacity-100 group-data-[state=collapsed]/sidebar:scale-100 group-data-[state=collapsed]/sidebar:group-hover/sidebar:opacity-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:scale-95"
+          />
         </a>
       </SidebarHeader>
 
@@ -125,24 +135,26 @@ export function AppSidebar({
         <NotificationDropdown
           align="end"
           trigger={
-            <div
-              className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg px-2 text-left text-[#ffffff] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
-            >
+            <div className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg px-2 text-left text-[#ffffff] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2">
               <BellRing className="size-4 shrink-0" />
-              <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificacoes</span>
+              <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificações</span>
             </div>
           }
         />
         <ProfileDropdown
           align="end"
-          trigger={
-            <div
-              className="flex h-10 w-full items-center gap-2 overflow-hidden  rounded-lg px-2 text-left text-[#FFFFFF] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff]  group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
-            >
-              <img src="/userdefault.svg" alt="Usuario" className="h-6 w-6 shrink-0 rounded-full" />
-              <span className="truncate text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Minha conta</span>
+          trigger={({ avatarSrc }) => (
+            <div className="flex h-10 w-full items-center gap-2 overflow-hidden  rounded-lg px-2 text-left text-[#FFFFFF] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff]  group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2">
+              <img
+                src={avatarSrc}
+                alt="Usuario"
+                className="h-6 w-6 shrink-0 rounded-full object-cover"
+              />
+              <span className="truncate text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">
+                Minha conta
+              </span>
             </div>
-          }
+          )}
         />
       </SidebarFooter>
     </Sidebar>

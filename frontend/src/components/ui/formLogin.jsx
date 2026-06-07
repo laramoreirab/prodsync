@@ -76,7 +76,7 @@ export default function LoginForm() {
 
     return (
         <>
-            <div className="lg:min-w-120 w-95 space-y-4 gap-0 border-2 lg:pt-15 lg:pb-10 lg:px-10 rounded-[36px] pt-10 pb-8 px-8">
+            <div className="login-card-shell w-95 gap-0 space-y-4 rounded-[36px] bg-white px-8 pb-8 pt-10 lg:min-w-120 lg:px-10 lg:pb-10 lg:pt-15">
 
                 {/* TITULO */}
                 <div className="space-y-1">
@@ -93,7 +93,7 @@ export default function LoginForm() {
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
                             <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
-                            <Input className="h-9" placeholder="Ex: 11.111.-11"
+                            <Input className="h-9" placeholder="Ex: 11111111"
                                 value={id} onChange={(e) => setId(e.target.value)} />
                         </div>
 
@@ -105,7 +105,7 @@ export default function LoginForm() {
                             {/* Container relativo para prender o botão absoluto */}
                             <div className="relative flex items-center">
                                 <Input
-                                    className="h-9 pr-10 w-full" // pr-10 garante que o texto não fique por baixo do botão
+                                    className="h-9 w-full pr-10"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
                                     value={senha}
@@ -153,7 +153,7 @@ export default function LoginForm() {
                     <Button id="btn_login"
                         type="submit"
                         disabled={carregando}
-                        className="cursor-pointer py-3 w-full lg:mt-8 mt-5 h-9 bg-primary hover:bg-primary/80 text-white text-sm font-semibold rounded-lg">
+                        className="mt-5 h-9 w-full cursor-pointer rounded-lg bg-primary py-3 text-sm font-semibold text-white shadow-md lg:mt-8">
                         {carregando ? "Entrando..." : "Entrar"}
                     </Button>
                 </form>
@@ -162,15 +162,14 @@ export default function LoginForm() {
                 <p className="text-sm text-center font-medium text-[#545454]">
                     Não tem uma conta?{" "}
                     <a href="/cadastro">
-                        <span className="font-semibold text-foreground cursor-pointer hover:underline">
+                        <span className="cursor-pointer font-semibold text-foreground hover:underline">
                             Cadastre-se
                         </span>
                     </a>
                 </p>
 
-                <div className="flex justify-center items-center text-center font-semibold text-foreground">
-                    <a href="/primeiro-acesso" className="flex items-center gap-2 text-sm hover:underline cursor-pointer">
-                        <KeyRound width={20} />
+                <div className="flex items-center justify-center text-center font-semibold text-foreground">
+                    <a href="/primeiro-acesso" className="flex cursor-pointer items-center gap-2 text-sm hover:underline">
                         <span>É seu primeiro acesso?</span>
                     </a>
                 </div>

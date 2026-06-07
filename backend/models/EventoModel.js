@@ -39,6 +39,33 @@ class EventoModel {
             : 0;
     }
 
+    static normalizarStatusMaquina(status) {
+        const valor = String(status ?? '')
+            .trim()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toUpperCase()
+            .replace(/[\s_-]+/g, ' ');
+
+        if (['PRODUZINDO', 'PRODUCAO', 'EM PRODUCAO', 'PRODUCING', 'RUNNING', 'RUN', 'START', 'ON', 'LIGADA', 'GREEN', 'VERDE'].includes(valor)) {
+            return 'Produzindo';
+        }
+        if (['PARADA', 'PARADO', 'STOPPED', 'STOP', 'OFF', 'DESLIGADA', 'RED', 'VERMELHO'].includes(valor)) {
+            return 'Parada';
+        }
+        if (['SETUP', 'SETUP/AJUSTE', 'AJUSTE', 'YELLOW', 'AMARELO'].includes(valor)) {
+            return 'Setup';
+        }
+        if (['MANUTENCAO', 'MAINTENANCE'].includes(valor)) {
+            return 'Manutencao';
+        }
+        if (['AGUARDANDO', 'WAITING', 'IDLE'].includes(valor)) {
+            return 'Aguardando';
+        }
+
+        return null;
+    }
+
     static formatarTempo(minutos) {
         const total = Math.max(0, Number(minutos) || 0);
         const horas = Math.floor(total / 60);
@@ -276,7 +303,8 @@ class EventoModel {
         if (
             ultimoEvento &&
             this.requerJustificativa(ultimoEvento.status_atual) &&
-            !ultimoEvento.id_motivo_parada
+            !ultimoEvento.id_motivo_parada &&
+            !ultimoEvento.termino
         ) {
             const erro = new Error(
                 `A máquina ${id_maquina} possui o evento #${ultimoEvento.id_evento} (${ultimoEvento.status_atual}) sem justificativa. Justifique-o antes de registrar um novo evento.`
@@ -289,10 +317,9 @@ class EventoModel {
 
     static async registrarEventoMaquina(id_empresa, status_maquina, id_maquina, datastamp) {
         try {
-            await this.validarPodeRegistrarEvento(id_empresa, id_maquina);
-            function capitalizar(texto) {
-                if (!texto) return '';
-                return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+            const statusNormalizado = this.normalizarStatusMaquina(status_maquina);
+            if (!statusNormalizado) {
+                throw new Error(`Status de maquina invalido: ${status_maquina}`);
             }
             const inicio = this.converterTimestamp(datastamp);
             let status_op = null
@@ -313,21 +340,46 @@ class EventoModel {
                 throw new Error('Maquina nao encontrada ou inativa');
             }
 
-            const atualizarMaquina = await prisma.maquinas.updateMany({
-                where:{ id_empresa, id_maquina, ativo: true },
-                data:{ status_atual: capitalizar(status_maquina) }
-            })
-            if(atualizarMaquina.count === 0){
-                throw new Error('Erro ao atualizar status da máquina'); 
-            }
-
             const turno = await TurnoModel.obterTurnoAtual(id_empresa, inicio);
             if (!turno) {
                 throw new Error('Nenhum turno ativo encontrado para o horario informado');
             }
 
+            const ultimoEvento = await this.obterUltimoEventoMaquina(id_empresa, id_maquina);
+            if (ultimoEvento?.status_atual === statusNormalizado) {
+                await prisma.maquinas.updateMany({
+                    where:{ id_empresa, id_maquina, ativo: true },
+                    data:{ status_atual: statusNormalizado }
+                });
+                console.warn(`[AVISO] Último evento da maquina ${id_maquina} ja é ${statusNormalizado}. Evento duplicado ignorado.`);
+                return this.formatarEvento(ultimoEvento);
+            }
+
+            if (
+                ultimoEvento &&
+                !ultimoEvento.termino
+            ) {
+                await prisma.historico_Eventos.updateMany({
+                    where: { id_empresa, id_maquina, id_evento: ultimoEvento.id_evento },
+                    data: {
+                        termino: inicio,
+                        duracao: this.calcularDuracao(ultimoEvento.inicio, inicio)
+                    }
+                });
+            }
+
+            await this.validarPodeRegistrarEvento(id_empresa, id_maquina);
+
+            const atualizarMaquina = await prisma.maquinas.updateMany({
+                where:{ id_empresa, id_maquina, ativo: true },
+                data:{ status_atual: statusNormalizado }
+            })
+            if(atualizarMaquina.count === 0){
+                throw new Error('Erro ao atualizar status da máquina'); 
+            }
+
             //fazer um if se o status for produzindo mudar status da op vinculada a máquina para em_andamento, se vier setup ou parada buscar a op ativa e setar status
-            switch (capitalizar(status_maquina)) {
+            switch (statusNormalizado) {
                 case 'Produzindo':
                     status_op = 'Em_Andamento'
                     prioridade = 'Media'
@@ -358,7 +410,7 @@ class EventoModel {
                         prioridade: prioridade
                     }
                 });
-            } else if (capitalizar(status_maquina) === 'Produzindo' && !ordemProducaoId) {
+            } else if (statusNormalizado === 'Produzindo' && !ordemProducaoId) {
                 console.warn(`[ALERTA] Máquina ${id_maquina} está PRODUZINDO, mas nenhuma OP ativa foi encontrada no sistema!`);
             }
 
@@ -368,15 +420,14 @@ class EventoModel {
                     id_maquina,
                     id_ordemProducao: ordemProducaoId,
                     id_turno: turno.id_turno,
-                    status_atual: capitalizar(status_maquina),
+                    status_atual: statusNormalizado,
                     setor_afetado: maquina.id_setor ?? 0,
                     inicio,
                     observacao: ''
                 }
             });
 
-            const statusCapitalizado = capitalizar(status_maquina);
-            if (this.requerJustificativa(statusCapitalizado)) {
+            if (this.requerJustificativa(statusNormalizado)) {
                 const maquinaInfo = await prisma.maquinas.findFirst({
                     where: { id_empresa, id_maquina },
                     select: { nome: true },
@@ -651,7 +702,7 @@ class EventoModel {
         const tempoParado = paradas._sum.duracao ?? 0
 
         return [
-            { nome: 'Tempo Produzido', valor: tempoProduzido },
+            { nome: 'Tempo Produzindo', valor: tempoProduzido },
             { nome: 'Tempo Parado', valor: tempoParado }
         ]
     }

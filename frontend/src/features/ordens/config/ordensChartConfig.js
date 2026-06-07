@@ -7,8 +7,8 @@ export const opTopRefugoConfig = {
 
 export const opCargaSetorConfig = {
   carga: {
-    label: "OPs:",
-    color: "var(--chart1)",
+    label: "Pecas restantes:",
+    color: "var(--chart2)",
   },
 };
 

@@ -16,7 +16,7 @@ export function OPCargaSetorWidget({ setorId = null }) {
   return (
     <div className="p-1 h-full">
       <BarVerticalBase
-        title="Carga de Trabalho por Setor"
+        title="Carga Restante por Setor"
         description="*Atualizado em tempo real"
         data={data}
         config={opCargaSetorConfig}

@@ -191,11 +191,6 @@ select {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
   width: 100%;
   cursor: pointer;
-  /* chevron down personalziado  */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2323304c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 12px center !important;
-  background-size: 16px !important;
 }
 
 select option {
@@ -290,6 +285,7 @@ select:focus {
   outline: none !important;
 }
 
+/* MODO DARK */
 .dark body {
   background: #050b16;
   color: #f4f8ff;
@@ -578,8 +574,6 @@ select:focus {
   stroke: rgba(111, 155, 255, 0.45) !important;
 }
 
-
-
 /* Remove setas dos inputs type="number" */
 input.input-no-spinner::-webkit-outer-spin-button,
 input.input-no-spinner::-webkit-inner-spin-button {
@@ -599,6 +593,60 @@ input.input-no-spinner {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ─── Home: Plexus (marca d'água) + profundidade à direita ─── */
+.home-plexus-region {
+  isolation: isolate;
+  background-color: #ffffff;
+}
+
+.home-plexus-mesh {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.65) 30%,
+    rgba(0, 0, 0, 0.88) 55%,
+    rgba(0, 0, 0, 1) 75%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.65) 30%,
+    rgba(0, 0, 0, 0.88) 55%,
+    rgba(0, 0, 0, 1) 75%
+  );
+}
+
+/* Luz difusa atrás da área do login (direita) */
+.home-plexus-glow {
+  background: radial-gradient(
+    ellipse 52% 46% at 78% 38%,
+    rgba(143, 164, 196, 0.22) 0%,
+    rgba(184, 200, 220, 0.1) 38%,
+    transparent 72%
+  );
+}
+
+/* Leve fade à esquerda (não esconder o preenchimento da malha) */
+.home-plexus-depth-mask {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.12) 32%,
+    transparent 55%
+  );
+}
+
+/* Sombra envolvente ao redor do card de login */
+.login-card-shell {
+  box-shadow:
+    0 0 0 1px rgba(35, 48, 76, 0.06),
+    0 2px 4px rgba(35, 48, 76, 0.04),
+    0 8px 20px rgba(35, 48, 76, 0.07),
+    0 20px 40px rgba(35, 48, 76, 0.09),
+    0 36px 72px rgba(35, 48, 76, 0.08),
+    0 52px 100px rgba(143, 164, 196, 0.14);
 }
 
 /* ─── Relatórios: impressão / exportar PDF (Salvar como PDF no diálogo) ─── */

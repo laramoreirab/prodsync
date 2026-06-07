@@ -123,9 +123,11 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
     return (
         <>
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Registrar Evento</DialogTitle>
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Plus strokeWidth={2} size={30} className="mr-2" />
+                    <DialogTitle className="text-3xl font-semibold">
+                        Registrar Evento
+                    </DialogTitle>
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
@@ -151,7 +153,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
                         <button
                             type="button"
                             onClick={() => setTipoEvento('Setup')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xl font-medium transition-colors ${tipoEvento === 'Setup'
+                            className={`flex items-center gap-2 px-4  mt-2 py-2 rounded-md text-xl font-medium transition-colors ${tipoEvento === 'Setup'
                                 ? 'bg-amber-100 text-amber-700 border border-amber-200'
                                 : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'
                                 }`}
@@ -392,7 +394,7 @@ export default function FormCadastroEvento({ onCadastroSucesso }) {
                                 <Dialog open={isModalAberto} onOpenChange={setIsModalAberto}>
                                     <DialogTrigger asChild>
                                         <button type="button" className="w-full text-xl font-semibold flex justify-center px-4 shadow-md text-white items-center py-3 bg-[#7d95c6] rounded-md">
-                                            <Plus className='mr-2'/>
+                                            <Plus className='mr-2' />
                                             Criar Motivo
                                         </button>
                                     </DialogTrigger>

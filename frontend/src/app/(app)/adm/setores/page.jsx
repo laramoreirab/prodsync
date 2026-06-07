@@ -41,7 +41,7 @@ import {
   KPIGrid, ContentGrid, WidgetCard,
   SearchBar, FilterRow, EmptyState, LoadingState,
   PageSection,
-  AsymmetricGrid, WidgetCard2,
+  AsymmetricGrid, WidgetCard2, KPICardDecorated,
 } from "@/components/AnimatedComponents";
 
 const setoresFilter = [
@@ -149,14 +149,7 @@ export default function PageSetores() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando setores...</p>
-        </div>
-      </main>
-    );
+    return <LoadingState message="Carregando setores..." />;
   }
 
   return (
@@ -170,7 +163,6 @@ export default function PageSetores() {
               <DropdownMenuTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
                 <PlusChevronToggleIcon className="mr-2" />
                 Criar
-                <ChevronDown className="ml-2 w-5 h-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-48">
                 <DropdownMenuItem
@@ -210,13 +202,13 @@ export default function PageSetores() {
           <OEEPorSetorWidget />
         </WidgetCard>
         <div className="flex flex-col gap-4 h-full">
-          <WidgetCard className="flex-1" centered>
+          <KPICardDecorated className="flex-1" centered>
             <SetorTotalWidget />
-          </WidgetCard>
+          </KPICardDecorated>
 
-          <WidgetCard className="flex-1" centered>
+          <KPICardDecorated className="flex-1" centered>
             <OperadoresMediaWidget />
-          </WidgetCard>
+          </KPICardDecorated>
         </div>
       </AsymmetricGrid>
 

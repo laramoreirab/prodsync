@@ -134,9 +134,9 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
         <>
             <div className="flex items-center">
                 <div className="title_modal flex items-center">
-                    <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                        <Plus className="mr-2 text-3xl text-white" />
-                        <DialogTitle className="text-3xl text-white">
+                    <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                        <Plus strokeWidth={2} size={30} className="mr-2" />
+                        <DialogTitle className="text-3xl font-semibold">
                             Criar OP
                         </DialogTitle>
                     </div>

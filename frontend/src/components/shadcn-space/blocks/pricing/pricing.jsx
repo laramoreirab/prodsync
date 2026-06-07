@@ -81,7 +81,7 @@ const Pricing = () => {
           <div className="flex flex-col gap-4 justify-center items-center">
 
            <h2
-              className="text-2xl sm:text-2x1 lg:text-3xl text-primary text-center tracking-tight font-semibold">
+              className="text-2xl sm:text-2x1 lg:text-3xl text-black text-center tracking-tight font-semibold">
               Funções sob medida para cada perfil, cada usuário com as ferramentas
               certas para garantir o controle da produção de sua empresa
             </h2>

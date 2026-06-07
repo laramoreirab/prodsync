@@ -73,9 +73,9 @@ export default function DetalhesEvento({ eventoId }) {
     return (
         <>
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <ReceiptText className="mr-2 text-4xl text-white" />
-                    <DialogTitle className="text-3xl text-white">
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <ReceiptText strokeWidth={2.5} size={35} className="mr-2" />
+                    <DialogTitle className="text-3xl font-semibold">
                         Detalhes do Evento
                     </DialogTitle>
                 </div>

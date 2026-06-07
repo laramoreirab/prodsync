@@ -3,8 +3,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-
-const ID_EMPRESA = 1; //vai precisar mudar, nn sei como vamos receber o id
+import { apiFetch } from "@/lib/api";
 
 export default function FormCriarMotivo({ onCriadoSucesso }) {
     const [descricao, setDescricao] = useState("");
@@ -23,15 +22,10 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(`/api/motivos-parada/${ID_EMPRESA}`, { //vai precisar colocar o endpoint real
+            await apiFetch(`/api/eventos/motivos-parada`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ descricao: descricao.trim(), tipo }),
             });
-
-            if (!response.ok){
-                throw new Error("Erro ao criar motivo");
-            } 
 
             toast.success("Motivo criado com sucesso!");
             setDescricao("");
@@ -40,9 +34,9 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
             if (onCriadoSucesso) {
                 onCriadoSucesso();
             }
-            
+
         } catch (error) {
-            toast.error("Erro ao conectar com o servidor.");
+            toast.error(error.message || "Erro ao conectar com o servidor.");
         } finally {
             setIsSubmitting(false);
         }
@@ -51,12 +45,14 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
     return (
         <div className="flex flex-col">
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Plus className="mr-2 text-white h-6 w-6" />
-                    <DialogTitle className="text-2xl text-white">Criar Motivo de Evento</DialogTitle>
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Plus strokeWidth={2} size={30} className="mr-2" />
+                    <DialogTitle className="text-3xl font-semibold">
+                        Criar Motivo de Evento
+                    </DialogTitle>
                 </div>
             </div>
-            
+
             <Separator className="my-4 bg-gray-300" />
 
             <form onSubmit={handleSubmitMotivo} className="px-2 flex flex-col gap-4">
@@ -67,7 +63,7 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
                         type="text"
                         value={descricao}
                         onChange={(e) => setDescricao(e.target.value)}
-                        className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white focus:ring-2 focus:ring-blue-500"
+                        className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
                     />
                 </div>
 

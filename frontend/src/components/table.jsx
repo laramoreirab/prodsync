@@ -86,10 +86,6 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
   }, [table.getPageCount(), table.getState().pagination.pageIndex]);
 
   const currentPage = table.getState().pagination.pageIndex + 1;
-  const pageSize = table.getState().pagination.pageSize;
-  const totalItems = data.length;
-  const rangeStart = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const rangeEnd = Math.min(currentPage * pageSize, totalItems);
   const selectedRows = table.getSelectedRowModel().rows;
   const hasSelection = selectedRows.length > 0;
 
@@ -99,21 +95,11 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
 
   const barraSelecionados = enableSelection && hasSelection && (excluirLote || editarLote || solicitarJustificativa);
 
-  /* const handleBatchDelete = () => {
-    const selectedData = selectedRows.map(row => row.original);
-    onDeleteSelected?.(selectedData);
-  };
- 
-  const handleBatchEdit = () => {
-    const selectedData = selectedRows.map(row => row.original);
-    onEditSelected?.(selectedData);
-  }; */
-
   return (
-    <div className='w-full mb-5'>
+    <div className='w-full mb-5 bg-transparent'>
 
       {barraSelecionados && (
-        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 w-full dark:border-[#365b94] dark:bg-[#10203a]">
+        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 w-full dark:border-[#365b94] dark:bg-[#10203a]/30">
           <div className="flex items-center gap-1">
             <span className="flex items-center justify-center text-md text-primary font-medium">
               {selectedRows.length}
@@ -124,23 +110,10 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Botão de edição em lote — só aparece se onEditSelected foi passado */}
-            {/* {editarLote && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="h-8 bg-primary text-white">
-                    <Pencil className="mr-1 h-4 w-4" />
-                    Editar
-                  </Button>
-                </DialogTrigger>
-                {editarLote}
-              </Dialog>
-            )} */}
-
             {solicitarJustificativa && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="h-8 border-primary text-primary hover:bg-primary/10">
+                  <Button variant="outline" className="h-8 border-primary text-primary bg-transparent hover:bg-primary/10">
                     <BellRing className="mr-1 h-4 w-4" />
                     Solicitar Justificativa
                   </Button>
@@ -149,7 +122,6 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
               </Dialog>
             )}
 
-            {/* Botão de exclusão em lote — só aparece se onDeleteSelected foi passado */}
             {excluirLote && (
               <Dialog>
                 <DialogTrigger asChild>
@@ -165,14 +137,16 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         </div>
       )}
 
-      <div className='overflow-x-auto rounded-lg border border-slate-200 bg-white/80 backdrop-blur-sm w-full shadow-sm dark:border-[#1d2d49] dark:bg-[#07101f] dark:shadow-[0_18px_50px_rgba(0,0,0,0.28)]'>
-        <Table className="overflow-auto">
+      {/* Container da Tabela: Totalmente transparente e sem sombras */}
+      <div className='overflow-x-auto rounded-lg border border-slate-200/40 bg-transparent w-full dark:border-[#1d2d49]/40'>
+        <Table className="overflow-auto bg-transparent">
 
-          <TableHeader>
-            <TableRow className="font-semibold bg-[#eef3fb] h-14 text-[#17233b] dark:bg-[#101b31] dark:text-[#e7eefc]">
+          <TableHeader className="bg-transparent">
+            {/* Removido bg-[#eef3fb] e dark:bg-[#101b31] */}
+            <TableRow className="font-semibold h-14 text-[#17233b] bg-transparent border-slate-200/40 dark:border-[#1d2d49]/40 dark:text-[#e7eefc]">
 
               {enableSelection && (
-                <TableHead className="w-12.5">
+                <TableHead className="w-12.5 bg-transparent">
                   <Checkbox
                     checked={table.getIsAllPageRowsSelected()}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
@@ -182,29 +156,29 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                 </TableHead>
               )}
 
-              {/* Renderiza as colunas dinâmicas (a coluna vai no page específico [Usuários, Máquinas ou Setores]) */}
               {columns.map((col) => (
-                <TableHead key={col.key} className={col.className}>
+                <TableHead key={col.key} className={`${col.className} bg-transparent`}>
                   {col.label}
                 </TableHead>
               ))}
 
               {acoesDropdown && (
-                <TableHead className='text-right'>Ações</TableHead>
+                <TableHead className='text-right bg-transparent'>Ações</TableHead>
               )}
 
             </TableRow>
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="bg-transparent">
             {table.getRowModel().rows.map((row, index) => (
+              /* Removido hover:bg-slate-50/80 e dark:hover:bg-[#101b31] para evitar qualquer cor ao passar o mouse */
               <TableRow
                 key={row.id || index}
-                className='font-medium h-14 border-slate-200/80 text-[#23304c] transition-colors hover:bg-slate-50/80 dark:border-[#1d2d49] dark:text-[#d7e2f4] dark:hover:bg-[#101b31]'
-                data-state={row.getIsSelected() ? "selected" : undefined} > {/* linhas selecioanada */}
+                className='font-medium h-14 border-slate-200/40 text-[#23304c] bg-transparent transition-colors dark:border-[#1d2d49]/40 dark:text-[#d7e2f4]'
+                data-state={row.getIsSelected() ? "selected" : undefined} >
 
                 {enableSelection && (
-                  <TableCell>
+                  <TableCell className="bg-transparent">
                     <Checkbox
                       checked={row.getIsSelected()}
                       onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -214,24 +188,21 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                   </TableCell>
                 )}
 
-                {/* Renderiza linhas de dados dinâmicos */}
                 {columns.map((col) => (
-                  <TableCell key={`${row.id}-${col.key}`} className={col.className}>
-
+                  <TableCell key={`${row.id}-${col.key}`} className={`${col.className} bg-transparent`}>
                     {col.icone
                       ? (col.icone(row.original[col.key], row.original) ?? null)
                       : (row.original?.[col.key] ?? null)
                     }
-
                   </TableCell>
                 ))}
 
                 {acoesDropdown && (
-                  <TableCell className='text-right'>
+                  <TableCell className='text-right bg-transparent'>
                     <div className="flex justify-end">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant='outline' className="border-none bg-transparent cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-[#aebbd1] dark:hover:bg-[#17253f] dark:hover:text-[#f4f8ff]">
+                          <Button variant='outline' className="border-none bg-transparent cursor-pointer text-slate-600 hover:bg-slate-100/20 dark:text-[#aebbd1] dark:hover:bg-[#17253f]/30">
                             <EllipsisVertical />
                           </Button>
                         </DropdownMenuTrigger>
@@ -244,8 +215,6 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                   </TableCell>
                 )}
 
-
-
               </TableRow>
             ))}
           </TableBody>
@@ -253,30 +222,28 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
         </Table>
       </div>
 
-      <div className='mt-3 flex flex-col items-center gap-1.5'>
-        <Pagination className='w-auto'>
-          <PaginationContent className='rounded-full border border-slate-200 bg-white/95 px-1.5 py-1 shadow-sm dark:border-[#243754] dark:bg-[#07101f]'>
+      {/* Paginação: Removido bg-white/95, shadow-sm e dark:bg-[#07101f] */}
+      <div className='mt-3 flex flex-col items-center gap-1.5 bg-transparent'>
+        <Pagination className='w-auto bg-transparent'>
+          <PaginationContent className='rounded-full border border-slate-200/40 bg-transparent px-1.5 py-1 dark:border-[#243754]/40'>
 
-            <PaginationItem className="flex items-center">
+            <PaginationItem className="flex items-center bg-transparent">
               <Button
                 variant='outline'
-                className='h-7 w-7 rounded-full border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-35 cursor-pointer dark:border-[#243754] dark:bg-[#0b1324] dark:text-[#aebbd1] dark:hover:bg-[#17253f] dark:hover:text-[#f4f8ff]'
+                className='h-7 w-7 rounded-full border-slate-200 bg-transparent text-slate-500 hover:bg-slate-100/20 disabled:opacity-35 cursor-pointer dark:border-[#243754]/40 dark:text-[#aebbd1] dark:hover:bg-[#17253f]/30'
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
                 aria-label='Página anterior'>
-                <ChevronLeftIcon aria-hidden='true'
-                  strokeWidth={3}
-                  size={16} />
+                <ChevronLeftIcon aria-hidden='true' strokeWidth={3} size={16} />
               </Button>
             </PaginationItem>
 
             {pagesToShow.map((page, index) => {
               const pageAnterior = pagesToShow[index - 1];
-
               const showEllipsis = pageAnterior && page - pageAnterior > 1;
 
               return (
-                <div key={page} className='flex items-center'>
+                <div key={page} className='flex items-center bg-transparent'>
                   {showEllipsis && (
                     <PaginationItem>
                       <PaginationEllipsis />
@@ -287,7 +254,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
                     <Button
                       size='icon'
                       variant='ghost'
-                      className={`h-7 min-w-7 rounded-full px-2 text-[11px] sm:text-xs cursor-pointer border ${page === currentPage ? 'border-primary/20 bg-primary/10 text-primary hover:bg-primary/15 dark:border-[#6f9bff]/30 dark:bg-[#17345f] dark:text-[#dbe8ff]' : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 dark:text-[#aebbd1] dark:hover:border-[#243754] dark:hover:bg-[#17253f]'}`}
+                      className={`h-7 min-w-7 rounded-full px-2 text-[11px] sm:text-xs cursor-pointer border ${page === currentPage ? 'border-primary/20 bg-primary/10 text-primary dark:border-[#6f9bff]/30 dark:bg-[#17345f]/40 dark:text-[#dbe8ff]' : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100/10 dark:text-[#aebbd1] dark:hover:bg-[#17253f]/20'}`}
                       onClick={() => table.setPageIndex(page - 1)}
                     >
                       {page}
@@ -297,26 +264,22 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
               );
             })}
 
-            <PaginationItem className="flex items-center">
+            <PaginationItem className="flex items-center bg-transparent">
               <Button
                 variant='outline'
-                className='h-7 w-7 rounded-full border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-35 cursor-pointer dark:border-[#243754] dark:bg-[#0b1324] dark:text-[#aebbd1] dark:hover:bg-[#17253f] dark:hover:text-[#f4f8ff]'
+                className='h-7 w-7 rounded-full border-slate-200 bg-transparent text-slate-500 hover:bg-slate-100/20 disabled:opacity-35 cursor-pointer dark:border-[#243754]/40 dark:text-[#aebbd1] dark:hover:bg-[#17253f]/30'
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
                 aria-label='Vá para a próxima página'>
-                <ChevronRightIcon aria-hidden='true'
-                  strokeWidth={3}
-                  className='w-5! h-5!' />
+                <ChevronRightIcon aria-hidden='true' strokeWidth={3} className='w-5! h-5!' />
               </Button>
             </PaginationItem>
           </PaginationContent>
         </Pagination>
 
-        <p
-          className='text-[11px] sm:text-xs text-slate-500 font-medium dark:text-[#aebbd1]'
-          aria-live='polite'>
-          Mostrando <span className='text-slate-700 dark:text-[#f4f8ff]'>{rangeStart}</span>-<span className='text-slate-700 dark:text-[#f4f8ff]'>{rangeEnd}</span> de{" "}
-          <span className='text-slate-700 dark:text-[#f4f8ff]'>{totalItems}</span>
+        <p className='text-[11px] sm:text-xs text-slate-500 font-medium dark:text-[#aebbd1]' aria-live='polite'>
+          Página <span className='text-slate-700 dark:text-[#f4f8ff]'>{currentPage}</span> de{" "}
+          <span className='text-slate-700 dark:text-[#f4f8ff]'>{table.getPageCount()}</span>
         </p>
       </div>
 

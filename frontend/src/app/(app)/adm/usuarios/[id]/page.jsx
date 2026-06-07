@@ -26,7 +26,7 @@ import FilterDropdown from "@/components/ui/FilterDropdown";
 import { apiFetch } from "@/lib/api";
 import { usuariosCrudService } from "@/services/usuariosCrudService";
 
-import { PageLayout, AsymmetricGrid, SearchBar, FilterRow, EmptyState } from "@/components/AnimatedComponents";
+import { PageLayout, AsymmetricGrid, SearchBar, FilterRow, EmptyState, LoadingState } from "@/components/AnimatedComponents";
 import {
   DetailPageContainer,
   DetailBackLink,
@@ -133,6 +133,17 @@ const formatarDuracao = (minutos) => {
   const horas = Math.floor(total / 60);
   const mins = Math.round(total % 60);
   return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+};
+
+const resolverImagemPerfil = (imagem) => {
+  if (!imagem) return "/userdefault.svg";
+
+  if (imagem.startsWith("http")) return imagem;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+  return `${apiUrl}/uploads/imagens/${imagem}`;
 };
 
 export default function UsuarioDetalhePage({ params }) {
@@ -331,14 +342,13 @@ export default function UsuarioDetalhePage({ params }) {
     return String(a.op).toLowerCase().includes(termo) || String(a.id).includes(termo);
   });
 
-  if (carregando) {
-    return (
-      <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col items-center justify-center p-20">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-900 mb-4" />
-        <p className="text-lg text-gray-600 font-medium">Carregando usuário...</p>
-      </main>
-    );
-  }
+if (carregando) {
+  return (
+    <PageLayout>
+      <LoadingState message="Carregando usuário..." />
+    </PageLayout>
+  );
+}
 
   return (
     <PageLayout>
@@ -349,11 +359,7 @@ export default function UsuarioDetalhePage({ params }) {
         <div className={`grid gap-4 sm:gap-6 grid-cols-1 ${usuario?.maquina ? "lg:grid-cols-2" : ""}`}>
           {/* Card do Usuário */}
           <UserProfileCard
-            imageSrc={
-              usuario?.imagem_perfil
-                ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/imagens/${usuario.imagem_perfil}`
-                : "/userdefault.svg"
-            }
+            imageSrc={resolverImagemPerfil(usuario?.imagem_perfil)}
             name={usuario?.nome || "-"}
             fieldsLeft={[
               { label: "ID", value: String(usuario?.id_usuario || operadorId) },
@@ -401,7 +407,7 @@ export default function UsuarioDetalhePage({ params }) {
                   { label: "Série", value: usuario.maquina.serie || "-" },
                 ]}
                 fieldsRight={[
-                  { label: "Status", value: usuario.maquina.status_atual || "-" },
+                  // { label: "Status", value: usuario.maquina.status_atual || "-" },
                 ]}
                 status={usuario.maquina.status_atual}
                 className="h-full"

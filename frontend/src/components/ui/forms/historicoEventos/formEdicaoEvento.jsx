@@ -121,9 +121,9 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     return (
         <>
             <div className="flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Pencil className="mr-2 text-3xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Editar Evento</DialogTitle>
+                <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Pencil strokeWidth={2.8} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">Editar Evento</DialogTitle>
                 </div>
             </div>
             <Separator className="m-2 bg-[#a6a6a6]" />
@@ -149,7 +149,7 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                         <button
                             type="button"
                             onClick={() => setTipoEvento('Setup')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xl font-medium transition-colors ${tipoEvento === 'Setup'
+                            className={`flex items-center gap-2 px-4 mt-2 py-2 rounded-md text-xl font-medium transition-colors ${tipoEvento === 'Setup'
                                 ? 'bg-amber-100 text-amber-700 border border-amber-200'
                                 : 'bg-gray-50 text-gray-500 border border-transparent hover:bg-gray-100'
                                 }`}

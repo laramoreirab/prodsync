@@ -1,15 +1,8 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
-import { Instrument_Serif } from "next/font/google";
 import { useEffect, useRef } from "react";
 import { motion, useSpring, useTransform, useInView } from "motion/react";
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["italic"],
-});
 
 const AnimatedCounter = ({
   value,
@@ -53,17 +46,28 @@ const AboutUs = ({
             }}
             className="flex flex-col items-center justify-center gap-4">
             <h2
-              className="text-3xl sm:text-3xl lg:text-4xl text-primary text-center tracking-tight font-bold max-w-6xl">
+              className="text-3xl sm:text-3xl lg:text-4xl text-black text-center tracking-tight font-bold max-w-6xl pb-6">
               Elabore estratégias excepcionais, baseadas em experiência e 
               tecnologia, para gerar resultados impactantes para sua fábrica com
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {aboutusData.map((item, index) => (
                 <div
                   key={index}
-                  className={cn("flex items-center gap-3 px-6 py-2 rounded-full", item.color)}>
-                  <item.icon className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
-                  <span className="text-2xl font-semibold" >
+                  className={cn(
+                    "flex items-center gap-3 rounded-full border px-5 py-2.5 sm:px-6 sm:py-3",
+                    item.color,
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10",
+                      item.iconBg,
+                    )}
+                  >
+                    <item.icon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2} />
+                  </span>
+                  <span className="text-xl font-semibold tracking-tight sm:text-2xl">
                     {item.title}
                   </span>
                 </div>
@@ -80,7 +84,7 @@ const AboutUs = ({
               return (
                 <div
                   key={index}
-                  className="relative px-6 py-5 sm:py-10 gap-3 flex flex-col items-center justify-center">
+                  className="relative px-6 py-5 sm:py-10 gap-3 flex flex-col items-center justify-center text-primary">
                   {index !== 0 && (
                     <div
                       className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-40 bg-border" />

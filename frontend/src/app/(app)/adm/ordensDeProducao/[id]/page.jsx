@@ -43,11 +43,13 @@ import {
   SearchBar,
   FilterRow,
   EmptyState,
-  FadeUpItem
+  FadeUpItem,
+  LoadingState, PageLayout
+
 } from "@/components/AnimatedComponents";
 
 // DetailComponents
-import { DetailListingSection } from "@/components/DetailComponents";
+import { DetailListingSection, DetailHeader, DetailActions, ListingTabs, DetailPageContainer, DetailBackLink } from "@/components/DetailComponents";
 import { filtrarPorDuracaoMax } from "@/lib/filterUtils";
 
 const colunasEventos = [
@@ -59,20 +61,17 @@ const colunasEventos = [
     className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        Setup: {
-          variant: "outline",
-          className:
-            "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100",
-        },
-        Parada: { variant: "destructive", className: "font-semibold text-sm border-none" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" }
       };
-      const estilo = config[valor] || { variant: "outline", className: "" };
+      const item = config[valor] || { icon: null };
       return (
-        <Badge variant={estilo.variant} className={`whitespace-nowrap ${estilo.className}`}>
+        <Badge variant={item.variant} className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+          {item.icon}
           {valor}
         </Badge>
       );
-    },
+    }
   },
   {
     id: "data",
@@ -154,11 +153,11 @@ const formatarDataHora = (valor) => {
 const prioridadeBadge = (prioridade) => {
   const valor = prioridade || "";
   const config = {
-    Média: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
-    Media: { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
+    Média: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-sky-600" /> },
+    // Media: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-sky-600" /> },
     Alta: { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700", icon: <AlertTriangle className="text-amber-600" /> },
-    Crítica: { className: "border border-rose-500/30 bg-rose-500/10 text-rose-700", icon: <Flame className="text-rose-600" /> },
-    Critica: { className: "border border-rose-500/30 bg-rose-500/10 text-rose-700", icon: <Flame className="text-rose-600" /> },
+    Crítica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-rose-600" /> },
+    // Critica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-rose-600" /> },
     Baixa: { className: "border border-slate-400/30 bg-slate-100 text-slate-700", icon: <ArrowDown className="text-slate-400" /> },
   };
   const item = config[valor] || { icon: null, className: "" };
@@ -193,6 +192,10 @@ export default function OPDetalhePage({ params }) {
   const { id } = use(params);
   const router = useRouter();
   const opId = Number(id);
+  
+
+  // Estado para controlar a Tab Ativa das Listagens
+  const [activeListTab, setActiveListTab] = useState("eventos");
 
   const [op, setOp] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -417,13 +420,13 @@ export default function OPDetalhePage({ params }) {
     );
   }
 
+
+
   return (
-    <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col">
-      <div className="w-full mt-8 pb-10 px-8 space-y-4">
-        <Link className="flex items-center" href="/adm/ordensDeProducao">
-          <ChevronDown className="mr-1 text-gray-500 inline-block transform -rotate-270" />
-          <p className="text-xl font-semibold text-gray-800">Voltar para Ordens de Produção</p>
-        </Link>
+    <PageLayout>
+      <DetailPageContainer>
+
+        <DetailBackLink href="/adm/ordensDeProducao" label="Voltar para Ordens de Produção" />
 
         <FadeUpItem id="infos_op" className="flex flex-col">
           <div className="flex justify-between items-center">
@@ -540,164 +543,174 @@ export default function OPDetalhePage({ params }) {
           </div>
         </section>
 
-        <section className="bg-white border rounded-xl p-6 shadow-sm">
+        <FadeUpItem className="bg-white border rounded-xl p-6 mb-12 shadow-sm">
           <OPOEEDetalheWidget opId={opId} maquinaId={op?.id_maquina ?? maquina?.id_maquina} />
-        </section>
+        </FadeUpItem>
 
         {/* Listagens */}
-        <DetailListingSection
-          id="listagem_histEventos"
-          title="Histórico de Eventos da OP"
-          action={
-            <Dialog>
-              <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-2xl gap-2">
-                <Plus size={28} className="text-white cursor-pointer" />
-                Cadastrar
-              </DialogTrigger>
+        <ListingTabs
+          className="mt-4"
+          activeTab={activeListTab}
+          onChange={setActiveListTab}
+          tabs={[
+            { id: "eventos", label: "Histórico de Eventos" },
+            { id: "apontamentos", label: "Histórico de Apontamentos" },
+          ]}
+        />
 
-              <DialogContent>
-                <FormCadastroEvento onCadastroSucesso={carregarDados} />
-              </DialogContent>
-            </Dialog>
-          }
-          search={
-            <SearchBar
-              value={buscaEvento}
-              onChange={(e) => setBuscaEvento(e.target.value)}
-              placeholder="Busque por id, tipo ou motivo..."
-            />
-          }
-          filterRow={
-            <FilterRow
-              count={dadosExibidos.length}
-              label="eventos"
-              actions={
-                <>
-                  <OrdenarDropdown
-                    label="Ordenar por"
-                    options={opcoesOrdenacaoEventos}
-                    onSortChange={handleSortEventos}
-                  />
-                  <FilterDropdown
-                    filtersConfig={eventosFilter}
-                    onApply={aplicarFiltrosEventos}
-                  />
-                </>
-              }
-            />
-          }
-        >
-          {/* Tabela */}
-          <FadeUpItem>
-            {dadosExibidos.length > 0 ? (
-              <TableListagens
-                data={dadosExibidos}
-                columns={colunasEventos}
-                enableSelection={true}
-                onEditSelected={(rows) => handleEditBatch(rows)}
-                acoesDropdown={(evento) => (
-                  <>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem
-                          onSelect={(e) => e.preventDefault()}
-                          className="cursor-pointer"
-                        >
-                          <EyeIcon
-                            strokeWidth={2}
-                            className="mr-1 h-4 w-4 text-primary"
-                          />
-                          Ver Detalhes
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DetalhesEvento eventoId={evento.id} />
-                      </DialogContent>
-                    </Dialog>
-
-                    <SolicitarJustificativaMenuItem idEvento={evento.id}>
-                      <DropdownMenuItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="cursor-pointer"
-                      >
-                        <BellRing className="mr-2 h-4 w-4" />
-                        Solicitar Justificativa
-                      </DropdownMenuItem>
-                    </SolicitarJustificativaMenuItem>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <DropdownMenuItem
-                          onSelect={(e) => e.preventDefault()}
-                          className="cursor-pointer"
-                        >
-                          <Pencil className="mr-2 h-4 w-4 text-primary" />
-                          Editar Evento
-                        </DropdownMenuItem>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                )}
-              />
-            ) : (
-              <EmptyState
-                title="Nenhum evento encontrado"
-                message="Ajuste os filtros ou o termo de busca."
-              />
-            )}
-          </FadeUpItem>
-        </DetailListingSection>
-
-        {/* Listagem de Hist. Apontamentos da OP  */}
-        <FadeUpItem>
+        {/* Renderização Condicional baseada na Tab Ativa */}
+        {activeListTab === "eventos" ? (
           <DetailListingSection
-            id="listagem_histApontamentos"
-            title="Histórico de Apontamentos da OP"
+            id="listagem_histEventos"
+            title="Histórico de Eventos da OP"
+            action={
+              <Dialog>
+                <DialogTrigger className="cursor-pointer bg-blue-900 flex items-center px-3 py-1.5 rounded-md text-white font-semibold text-2xl gap-2">
+                  <Plus size={28} className="text-white cursor-pointer" />
+                  Cadastrar
+                </DialogTrigger>
+                <DialogContent>
+                  <FormCadastroEvento onCadastroSucesso={carregarDados} />
+                </DialogContent>
+              </Dialog>
+            }
             search={
               <SearchBar
-                value={buscaApontamento}
-                onChange={(e) => setBuscaApontamento(e.target.value)}
-                placeholder="Busque por id ou observação..."
+                value={buscaEvento}
+                onChange={(e) => setBuscaEvento(e.target.value)}
+                placeholder="Busque por id, tipo ou motivo..."
               />
             }
             filterRow={
               <FilterRow
-                count={dadosApontamentosFiltrados.length}
-                label="apontamentos"
+                count={dadosExibidos.length}
+                label="eventos"
                 actions={
                   <>
                     <OrdenarDropdown
                       label="Ordenar por"
-                      options={opcoesOrdenacaoApontamento}
-                      onSortChange={handleSortApontamento}
+                      options={opcoesOrdenacaoEventos}
+                      onSortChange={handleSortEventos}
                     />
                     <FilterDropdown
-                      filtersConfig={apontamentoFilter}
-                      onApply={aplicarFiltrosApontamento}
+                      filtersConfig={eventosFilter}
+                      onApply={aplicarFiltrosEventos}
                     />
                   </>
                 }
               />
             }
           >
-            {/* Tabela */}
-            {dadosApontamentosFiltrados.length > 0 ? (
-              <TableListagens
-                data={dadosApontamentosFiltrados}
-                columns={colunasApontamento}
-              />
-            ) : (
-              <EmptyState
-                title="Nenhum apontamento encontrado"
-                message="Ajuste os filtros ou o termo de busca."
-              />
-            )}
+            <FadeUpItem>
+              {dadosExibidos.length > 0 ? (
+                <TableListagens
+                  data={dadosExibidos}
+                  columns={colunasEventos}
+                  enableSelection={true}
+                  onEditSelected={(rows) => handleEditBatch(rows)}
+                  acoesDropdown={(evento) => (
+                    <>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            className="cursor-pointer"
+                          >
+                            <EyeIcon
+                              strokeWidth={2}
+                              className="mr-1 h-4 w-4 text-primary"
+                            />
+                            Ver Detalhes
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DetalhesEvento eventoId={evento.id} />
+                        </DialogContent>
+                      </Dialog>
+
+                      <SolicitarJustificativaMenuItem idEvento={evento.id}>
+                        <DropdownMenuItem
+                          onSelect={(e) => e.preventDefault()}
+                          className="cursor-pointer"
+                        >
+                          <BellRing className="mr-2 h-4 w-4" />
+                          Solicitar Justificativa
+                        </DropdownMenuItem>
+                      </SolicitarJustificativaMenuItem>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            className="cursor-pointer"
+                          >
+                            <Pencil className="mr-2 h-4 w-4 text-primary" />
+                            Editar Evento
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <FormEdicaoEvento eventoId={evento.id} onEdicaoSucesso={carregarDados} />
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                />
+              ) : (
+                <EmptyState
+                  title="Nenhum evento encontrado"
+                  message="Ajuste os filtros ou o termo de busca."
+                />
+              )}
+            </FadeUpItem>
           </DetailListingSection>
-        </FadeUpItem>
-      </div>
-    </main>
+        ) : (
+          <FadeUpItem>
+            <DetailListingSection
+              id="listagem_histApontamentos"
+              title="Histórico de Apontamentos da OP"
+              search={
+                <SearchBar
+                  value={buscaApontamento}
+                  onChange={(e) => setBuscaApontamento(e.target.value)}
+                  placeholder="Busque por id ou observação..."
+                />
+              }
+              filterRow={
+                <FilterRow
+                  count={dadosApontamentosFiltrados.length}
+                  label="apontamentos"
+                  actions={
+                    <>
+                      <OrdenarDropdown
+                        label="Ordenar por"
+                        options={opcoesOrdenacaoApontamento}
+                        onSortChange={handleSortApontamento}
+                      />
+                      <FilterDropdown
+                        filtersConfig={apontamentoFilter}
+                        onApply={aplicarFiltrosApontamento}
+                      />
+                    </>
+                  }
+                />
+              }
+            >
+              {dadosApontamentosFiltrados.length > 0 ? (
+                <TableListagens
+                  data={dadosApontamentosFiltrados}
+                  columns={colunasApontamento}
+                />
+              ) : (
+                <EmptyState
+                  title="Nenhum apontamento encontrado"
+                  message="Ajuste os filtros ou o termo de busca."
+                />
+              )}
+            </DetailListingSection>
+          </FadeUpItem>
+        )}
+
+    </DetailPageContainer>
+    </PageLayout>
   );
 }

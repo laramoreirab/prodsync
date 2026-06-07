@@ -56,6 +56,7 @@ export const setorTotalKPIService = {
 export const operadoresMediaKPIService = {
   async getKPI() {
     const data = await apiFetch("/api/setores/obterQuantidadeOperadoresPorSetor");
+    if (!data.dados || typeof data.dados !== "object") return [];
     return SetorKPISchema.parse(data.dados);
   },
 };
@@ -82,6 +83,7 @@ export const refugoSetorService = {
 export const oeeCriticoService = {
   async getOEECritico() {
     const data = await apiFetch("/api/oee/setores/critico");
+    if (!data.dados) return [];
     return OEECriticoSchema.parse(data.dados);
   },
 };

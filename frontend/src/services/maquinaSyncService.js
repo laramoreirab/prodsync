@@ -7,5 +7,24 @@ export const maquinaSyncService = {
     });
     return data?.dados ?? data;
   },
+
+  obterStatusSincronizacaoPlaca: async (maquinaId) => {
+    const data = await apiFetch(`/api/maquinas/${maquinaId}/sincronizacao-placa`);
+    return data?.dados ?? data;
+  },
+
+  pararSincronizacaoPlaca: async (maquinaId) => {
+    const data = await apiFetch(`/api/maquinas/${maquinaId}/parar-sincronizacao`, {
+      method: "POST",
+    });
+    return data?.dados ?? data;
+  },
+
+  desconectarPlacaMaquina: async (maquinaId) => {
+    const data = await apiFetch(`/api/maquinas/${maquinaId}/desconectar-placa`, {
+      method: "POST",
+    });
+    return data?.dados ?? data;
+  },
 };
 

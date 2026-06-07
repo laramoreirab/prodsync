@@ -4,6 +4,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   XAxis,
   YAxis,
 } from "recharts";
@@ -22,6 +23,7 @@ export function BarVerticalBase({
   loading,
   error,
   xKey,
+  colorKey,
 }) {
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
@@ -54,9 +56,16 @@ export function BarVerticalBase({
             <Bar 
               key={key}
               dataKey={key} 
-              fill={`var(--color-${key})`} 
+              fill={colorKey ? undefined : `var(--color-${key})`}
               radius={[4, 4, 0, 0]} 
-            />
+            >
+              {colorKey && data.map((entry, index) => (
+                <Cell
+                  key={`cell-${key}-${index}`}
+                  fill={entry[colorKey] || `var(--color-${key})`}
+                />
+              ))}
+            </Bar>
           ))}
         </BarChart>
       </ChartContainer>
