@@ -46,7 +46,7 @@ const AboutUs = ({
             }}
             className="flex flex-col items-center justify-center gap-4">
             <h2
-              className="text-3xl sm:text-3xl lg:text-4xl text-primary text-center tracking-tight font-bold max-w-6xl">
+              className="text-3xl sm:text-3xl lg:text-4xl text-black text-center tracking-tight font-bold max-w-6xl pb-6">
               Elabore estratégias excepcionais, baseadas em experiência e 
               tecnologia, para gerar resultados impactantes para sua fábrica com
             </h2>
@@ -84,7 +84,7 @@ const AboutUs = ({
               return (
                 <div
                   key={index}
-                  className="relative px-6 py-5 sm:py-10 gap-3 flex flex-col items-center justify-center">
+                  className="relative px-6 py-5 sm:py-10 gap-3 flex flex-col items-center justify-center text-primary">
                   {index !== 0 && (
                     <div
                       className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-px h-40 bg-border" />

@@ -26,7 +26,7 @@ export default function Testimonial01({
                             <img
                                 src="/logo.png"
                                 alt="Logo da Empresa"
-                                className="w-48 shrink-0 object-contain"
+                                className="w-50 shrink-0 object-contain"
                             />
                         </div>
 

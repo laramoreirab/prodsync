@@ -1,25 +1,25 @@
 "use client";
 import AboutUs from "@/components/shadcn-space/blocks/about-us/about-us";
-import { Gauge, Target, Cpu } from "lucide-react";
+import { Lightbulb, Goal,ChartNoAxesCombined } from "lucide-react";
 
 const aboutusData = [
   {
-    icon: Gauge,
+    icon: ChartNoAxesCombined,
     title: "Produtividade",
-    color: "bg-[#eef2f8] text-[#23304c] border-[#23304c]/12",
-    iconBg: "bg-[#23304c]/10 text-[#23304c]",
+    color: "bg-[#eef2f8] text-[#00357a]",
+    iconBg: "bg-[#23304c]/10 text-[#00357a]",
   },
   {
-    icon: Target,
+    icon: Goal,
     title: "Foco",
-    color: "bg-[#e8ecf4] text-[#23304c] border-[#23304c]/15",
-    iconBg: "bg-[#23304c]/12 text-[#23304c]",
+    color: "bg-[#e8ecf4] text-[#00357a]",
+    iconBg: "bg-[#23304c]/10 text-[#00357a]",
   },
   {
-    icon: Cpu,
+    icon: Lightbulb,
     title: "Inovação",
-    color: "bg-[#e4eaf4] text-[#00357a] border-[#00357a]/15",
-    iconBg: "bg-[#00357a]/10 text-[#00357a]",
+    color: "bg-[#e4eaf4] text-[#00357a]",
+    iconBg: "bg-[#23304c]/10 text-[#00357a]",
   },
 ];
 
