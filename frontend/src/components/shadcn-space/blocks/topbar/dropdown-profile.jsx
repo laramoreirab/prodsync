@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -109,10 +108,10 @@ const ProfileDropdown = ({
 
           {PROFILE_ITEMS.map(({ label, icon: Icon }) => (
             <DropdownMenuItem key={label} className={itemClass}>
-              <Link href={settingsHref} className="flex items-center gap-3">
+              <a href={settingsHref} className="flex items-center gap-3">
               <Icon size={20} className="text-foreground" />
               <span>{label}</span>
-              </Link>
+              </a>
             </DropdownMenuItem>
           ))}
 
@@ -121,10 +120,10 @@ const ProfileDropdown = ({
           <DropdownMenuGroup>
             {SETTINGS_ITEMS.map(({ label, icon: Icon }) => (
               <DropdownMenuItem key={label} className={itemClass} asChild>
-                <Link href={settingsHref}>
+                <a href={settingsHref}>
                   <Icon size={20} className="text-foreground" />
                   <span>{label}</span>
-                </Link>
+                </a>
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
