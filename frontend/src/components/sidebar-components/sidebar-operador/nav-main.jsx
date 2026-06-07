@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import {
@@ -29,12 +30,12 @@ function NavMainItem({
         tooltip={item.title}
         isActive={isActive}
         className="h-10 rounded-xl border border-transparent bg-transparent px-3 text-sidebar-foreground/95 transition-all duration-300 group-hover/sidebar:h-11 group-hover/sidebar:px-4 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center hover:bg-white/12 data-[active=true]:!border-white/20 data-[active=true]:!bg-white/22 data-[active=true]:text-sidebar-foreground data-[active=true]:shadow-[inset_3px_0_0_0_rgba(255,255,255,0.95)] data-[active=true]:hover:!bg-white/22 group-data-[collapsible=icon]:data-[active=true]:!border-[#bfdbfe] group-data-[collapsible=icon]:data-[active=true]:!bg-[#dbeafe] group-data-[collapsible=icon]:data-[active=true]:!text-[#0f3d84] group-data-[collapsible=icon]:data-[active=true]:shadow-[0_0_0_1px_rgba(255,255,255,0.45)]">
-        <a href={item.url}>
+        <Link href={item.url}>
           <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground/90 transition-colors duration-300 group-data-[collapsible=icon]:data-[active=true]:text-[#0f3d84] [&_svg]:size-[1.1rem]">
             {item.icon}
           </div>
           <span className="font-semibold">{item.title}</span>
-        </a>
+        </Link>
       </SidebarMenuButton>
     )
   }
