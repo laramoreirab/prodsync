@@ -22,6 +22,7 @@ export const OPRefugoSchema = z.object({
 export const OPCargaSetorSchema = z.object({
   setor: z.string(),
   carga: z.number(),
+  color: z.string().optional(),
 });
 
 // Status das OPs (pie chart)
