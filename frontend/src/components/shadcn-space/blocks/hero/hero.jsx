@@ -48,7 +48,7 @@ function HeroSection() {
                 className="flex flex-col items-center justify-center gap-8 md:flex-row"
               >
                 <Button
-                  className="relative h-12 w-fit cursor-pointer overflow-hidden rounded-full bg-secondary-foreground p-1 ps-6 pe-14 text-lg font-semibold transition-all duration-500 group hover:ps-14 hover:pe-6"
+                  className="relative h-12 w-fit cursor-pointer overflow-hidden rounded-full bg-primary p-1 ps-6 pe-14 text-lg font-semibold transition-all duration-500 group hover:ps-14 hover:pe-6"
                   href="/cadastro"
                 >
                   <span className="relative z-10 transition-all duration-500">Cadastre-se</span>

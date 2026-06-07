@@ -76,7 +76,7 @@ export default function LoginForm() {
 
     return (
         <>
-            <div className="login-card-shell w-95 gap-0 space-y-4 rounded-[36px] border border-[#23304c]/10 bg-white px-8 pb-8 pt-10 lg:min-w-120 lg:px-10 lg:pb-10 lg:pt-15">
+            <div className="login-card-shell w-95 gap-0 space-y-4 rounded-[36px] bg-white px-8 pb-8 pt-10 lg:min-w-120 lg:px-10 lg:pb-10 lg:pt-15">
 
                 {/* TITULO */}
                 <div className="space-y-1">
