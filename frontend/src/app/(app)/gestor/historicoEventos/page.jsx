@@ -148,7 +148,7 @@ export default function HistoricoEventosGestor() {
 
   const modalJustificativa = (
     <DialogContent>
-      <SolicitarJustificativaConteudo idsEventos={selecionados.map((row) => row.id)} />
+      <SolicitarJustificativaConteudo idsEventos={selecionados.map((row) => row.id)} onSucesso={refresh} />
     </DialogContent>
   );
 
@@ -165,7 +165,7 @@ export default function HistoricoEventosGestor() {
           <DetalhesEvento eventoId={row.id} />
         </DialogContent>
       </Dialog>
-      <SolicitarJustificativaMenuItem idEvento={row.id} />
+      <SolicitarJustificativaMenuItem idEvento={row.id} onSucesso={refresh} />
       <Dialog>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
