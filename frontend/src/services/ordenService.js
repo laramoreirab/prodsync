@@ -123,10 +123,14 @@ export const opCargaSetorService = {
     if (USE_MOCK) return OPCargaSetorArraySchema.parse(mockOPCargaSetor);
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/carga-setor", setorId));
-      const dados = (response.dados || []).map((item) => ({
-        setor: item.setor,
-        carga: item.qtd_ops,
-      }));
+      const dados = (response.dados || []).map((item) => {
+        const carga = item.carga_restante ?? item.qtd_ops ?? 0;
+
+        return {
+          setor: item.setor,
+          carga,
+        };
+      });
       return OPCargaSetorArraySchema.parse(dados);
     } catch (error) {
       console.error("Erro ao buscar carga por setor:", error);

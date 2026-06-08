@@ -440,14 +440,17 @@ class OrdemProducaoModel {
         try {
             const statusAtivos = ['Em_Andamento', 'Parada', 'Setup']
 
-            const resultado = await prisma.ordemProducao.groupBy({
-                by: ['id_setor'],
+            const ordens = await prisma.ordemProducao.findMany({
                 where: {
                     id_empresa,
                     ...(setorId ? { id_setor: Number(setorId) } : {}),
                     status_op: { in: statusAtivos }
                 },
-                _count: { id_ordem: true }
+                select: {
+                    id_ordem: true,
+                    id_setor: true,
+                    qtd_planejada: true
+                }
             })
 
             const setores = await prisma.setores.findMany({
@@ -459,12 +462,44 @@ class OrdemProducaoModel {
                 setores.map(s => [s.id_setor, s.nome_setor])
             )
 
-            return resultado
-                .map(r => ({
-                    setor: nomeSetor[r.id_setor] ?? 'Sem setor',
-                    qtd_ops: r._count.id_ordem
+            if (ordens.length === 0) return []
+
+            const idsOrdens = ordens.map(ordem => ordem.id_ordem)
+            const apontamentosPorOrdem = await prisma.apontamento.groupBy({
+                by: ['id_ordemProducao'],
+                where: {
+                    id_empresa,
+                    id_ordemProducao: { in: idsOrdens }
+                },
+                _sum: {
+                    qtd_boa: true,
+                    qtd_refugo: true
+                }
+            })
+
+            const produzidoPorOrdem = new Map(
+                apontamentosPorOrdem.map(item => [
+                    item.id_ordemProducao,
+                    (item._sum.qtd_boa ?? 0) + (item._sum.qtd_refugo ?? 0)
+                ])
+            )
+
+            const cargaPorSetor = new Map()
+
+            for (const ordem of ordens) {
+                const produzido = produzidoPorOrdem.get(ordem.id_ordem) ?? 0
+                const restante = Math.max((ordem.qtd_planejada ?? 0) - produzido, 0)
+                const atual = cargaPorSetor.get(ordem.id_setor) ?? 0
+
+                cargaPorSetor.set(ordem.id_setor, atual + restante)
+            }
+
+            return Array.from(cargaPorSetor.entries())
+                .map(([idSetor, cargaRestante]) => ({
+                    setor: nomeSetor[idSetor] ?? 'Sem setor',
+                    carga_restante: cargaRestante
                 }))
-                .sort((a, b) => b.qtd_ops - a.qtd_ops)
+                .sort((a, b) => b.carga_restante - a.carga_restante)
         } catch (error) {
             console.error('Erro ao retornar gráfico Carga de Trabalho por Setor do banco de dados:', error);
             throw error;

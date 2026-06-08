@@ -8,12 +8,16 @@ import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 function Accordion({
   className,
+  type = "single",
+  collapsible = true,
   ...props
 }) {
   return (
     <AccordionPrimitive.Root
       data-slot="accordion"
       className={cn("flex w-full flex-col", className)}
+      type={type}
+      collapsible={collapsible}
       {...props} />
   );
 }
