@@ -10,8 +10,9 @@ export const paradaService = {
 };
 
 export const paradasPorDiaService = {
-  async getParadasDia() {
-    const data = await apiFetch("/api/dashboard/media-paradas-por-dia");
+  async getParadasDia(setorId = null) {
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/dashboard/media-paradas-por-dia${query}`);
     return MediaParadasDiaArraychema.parse(data.dados);
   },
 };

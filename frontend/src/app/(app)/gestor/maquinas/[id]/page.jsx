@@ -27,6 +27,9 @@ import OrdenarDropdown from "@/components/ui/OrdenarDropdown";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 
 import TableListagens from "@/components/table";
+import { Badge } from "@/components/ui/badge";
+import { DataEvento } from "@/components/ui/dataEvento";
+import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
