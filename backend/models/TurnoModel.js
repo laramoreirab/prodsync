@@ -157,7 +157,7 @@ class TurnoModel {
     }
 
     //Obtém o turno atual com base na hora atual e ID da empresa
-    static async obterTurnoAtual(id_empresa, hora_atual = new Date(), dia_semana = null) {
+    static async obterTurnoAtual(id_empresa, hora_atual = new Date(), dia_semana = null, setorId = null) {
         try {
             const dataReferencia = this.normalizarDataReferencia(hora_atual);
             const minutoAtual = this.minutosDoDia(dataReferencia);
@@ -167,6 +167,7 @@ class TurnoModel {
             const turnos = await prisma.turno.findMany({
                 where: {
                     id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
                     dia_semana: {
                         in: Array.from(new Set([diaAtual, diaAnterior]))
                     }
@@ -317,7 +318,7 @@ class TurnoModel {
     }
 
     // Busca a soma total de lotes produzidos em um turno específico (para KPI)
-    static async buscarProducaoTurnoLotes(id_turno, id_empresa = null, dataInicio = null, dataFim = null) {
+    static async buscarProducaoTurnoLotes(id_turno, id_empresa = null, dataInicio = null, dataFim = null, setorId = null) {
         try {
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
@@ -326,6 +327,7 @@ class TurnoModel {
                         not: 0
                     },
                     ...(id_empresa ? { id_empresa } : {}),
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     ...(dataInicio || dataFim ? {
                         data_hora_fim: {
                             ...(dataInicio ? { gte: dataInicio } : {}),
@@ -346,12 +348,13 @@ class TurnoModel {
     }
 
     // Busca a quantidade de máquinas únicas ativas em um turno específico (para KPI)
-    static async buscarMaquinasAtivasTurno(id_turno, id_empresa = null, dataInicio = null, dataFim = null) {
+    static async buscarMaquinasAtivasTurno(id_turno, id_empresa = null, dataInicio = null, dataFim = null, setorId = null) {
         try {
             const result = await prisma.apontamento.findMany({
                 where: {
                     id_turno: Number(id_turno),
                     ...(id_empresa ? { id_empresa } : {}),
+                    ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     ...(dataInicio || dataFim ? {
                         data_hora_fim: {
                             ...(dataInicio ? { gte: dataInicio } : {}),
@@ -371,9 +374,9 @@ class TurnoModel {
         }
     }
 
-    static async obterKpisTurnoAtual(id_empresa, dataReferencia = new Date()) {
+    static async obterKpisTurnoAtual(id_empresa, dataReferencia = new Date(), setorId = null) {
         try {
-            const turno = await this.obterTurnoAtual(id_empresa, dataReferencia);
+            const turno = await this.obterTurnoAtual(id_empresa, dataReferencia, null, setorId);
 
             if (!turno) {
                 return {
@@ -385,8 +388,8 @@ class TurnoModel {
 
             const periodo = this.obterPeriodoTurno(turno, dataReferencia);
             const [maquinasAtivas, producaoLotes] = await Promise.all([
-                this.buscarMaquinasAtivasTurno(turno.id_turno, id_empresa, periodo.inicio, periodo.fim),
-                this.buscarProducaoTurnoLotes(turno.id_turno, id_empresa, periodo.inicio, periodo.fim)
+                this.buscarMaquinasAtivasTurno(turno.id_turno, id_empresa, periodo.inicio, periodo.fim, setorId),
+                this.buscarProducaoTurnoLotes(turno.id_turno, id_empresa, periodo.inicio, periodo.fim, setorId)
             ]);
 
             return {
