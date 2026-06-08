@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EyeIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
-import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard } from "@/components/AnimatedComponents";
+import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard, LoadingState } from "@/components/AnimatedComponents";
 import { FilterRow } from "@/components/AnimatedComponents";
 import { EmptyState } from "@/components/AnimatedComponents";
 import { SearchBar } from "@/components/AnimatedComponents";
