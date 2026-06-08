@@ -1,25 +1,26 @@
 "use client";
 
 import { useSetorMaquinaStatus } from "./hooks/useSetorMaquinaStatus";
+import { KPI } from "@/components/ui/charts/components";
 
 const statusCards = [
   {
     key: "emProducao",
     label: "Em Produção",
-    border: "border-green-500",
-    text: "text-green-600",
+    bg: "bg-green-50 dark:bg-green-950/40",
+    accent: "text-[#369948] dark:text-green-400",
   },
   {
     key: "emSetup",
     label: "Em Setup",
-    border: "border-orange-400",
-    text: "text-orange-500",
+    bg: "bg-yellow-50 dark:bg-yellow-950/40",
+    accent: "text-[#ffac1e] dark:text-yellow-400",
   },
   {
     key: "emParada",
     label: "Em Parada",
-    border: "border-red-500",
-    text: "text-red-600",
+    bg: "bg-red-50 dark:bg-red-950/40",
+    accent: "text-[#b30000] dark:text-red-400",
   },
 ];
 
@@ -28,7 +29,7 @@ export function SetorMaquinaStatusWidget({ setorId }) {
 
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar status.</p>;
-   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
 
@@ -38,22 +39,24 @@ export function SetorMaquinaStatusWidget({ setorId }) {
         <p className="text-sm font-semibold text-black">Status das Máquinas</p>
         <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
       </div>
-
-      <div className="flex gap-3 mt-2">
-        {statusCards.map(({ key, label, border, text }) => (
-          <div
-            key={key}
-            className={`flex-1 aspect-square border-2 ${border} rounded-lg p-2 flex flex-col items-center justify-center gap-1`}
-          >
-            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-500 text-center leading-tight">
-              {label}
-            </span>
-            <span className={`text-3xl font-bold ${text}`}>
-              {data[key]}
-            </span>
-          </div>
-        ))}
+      <div className="space-y-4 w-full h-full flex flex-col">
+        <div className="grid gap-4 grid-cols-3 w-full flex-1">
+          {statusCards.map(({ key, label, bg, accent }) => (
+            <div
+              key={key}
+              className={`flex w-full h-full flex-col rounded-xl p-4 ${bg}`}
+            >
+              <KPI
+                title={label}
+                value={Number(data[key]) || 0}
+                type="number"
+                titleClass={accent}
+              />
+            </div>
+          ))}
+        </div>
       </div>
+
     </div>
   );
 }

@@ -134,7 +134,7 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 w-80 bg-gray-100 dark:bg-slate-900 shadow-2xl rounded-lg p-4 border border-gray-200 dark:border-zinc-700 z-50">
+        <div className="absolute left-0 sm:left-auto sm:right-0 top-12 w-80 bg-gray-100 dark:bg-slate-900 shadow-2xl rounded-lg p-4 border border-gray-200 dark:border-zinc-700 z-50">
           {" "}
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
             {filtersConfig.map((filter) => (

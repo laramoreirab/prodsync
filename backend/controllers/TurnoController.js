@@ -233,11 +233,11 @@ class TurnoController {
                     ...dados,
                     cards: {
                         maquinasAtivas: {
-                            titulo: 'Maquinas Ativas por Turno',
+                            titulo: 'Máquinas Ativas por Turno',
                             valor: String(dados.maquinasAtivas)
                         },
                         producaoLotes: {
-                            titulo: 'Producao por Turno em Lotes',
+                            titulo: 'Produção por Turno em Lotes',
                             valor: String(dados.producaoLotes)
                         }
                     }

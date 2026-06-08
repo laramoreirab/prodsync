@@ -316,7 +316,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
                     <button
                         type="submit"
                         disabled={carregando}
-                        className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-2xl text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {carregando && <Loader2 className="h-5 w-5 animate-spin" />}
                         {carregando ? "Criando..." : "Criar"}

@@ -96,7 +96,7 @@ export default function FormCadastroTurnoSetor({ onSuccess }) {
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5">
                     <label htmlFor="nome" className="text-xl font-medium text-[#545454]">Nome</label>
-                    <input type="text" id="nome" name="nome" className="w-full border border-[#e0e0e0] rounded-md px-3 py-2.5 text-xl text-[#333] outline-none transition-colors duration-200 focus:border-[#a0a0a0]" required />
+                    <input type="text" id="nome" name="nome" className="w-full border border-gray-200 shadow-md rounded-md px-3 py-2.5 text-xl text-[#333] outline-none " required />
                 </div>
 
                 {/*dias de operação */}
@@ -107,7 +107,7 @@ export default function FormCadastroTurnoSetor({ onSuccess }) {
                         <button
                             type="button"
                             onClick={() => setIsOpen(!isOpen)}
-                            className="w-full bg-white border border-[#e0e0e0] rounded-md px-3 py-2.5 text-xl text-[#545454] outline-none flex justify-between items-center transition-colors duration-200 focus:border-[#a0a0a0]"
+                            className="bg-white w-full border font-medium border-gray-200 shadow-md rounded-md px-3 py-2.5 text-xl text-[#545454] outline-none flex justify-between items-center"
                         >
                             <span>Selecione...</span>
                             <ChevronDown className="w-5 h-5 text-[#d0d0d0]" />
@@ -115,7 +115,7 @@ export default function FormCadastroTurnoSetor({ onSuccess }) {
 
                         {/*dropdown com checkboxes */}
                         {isOpen && (
-                            <div className="w-full mt-1 bg-white border border-[#e0e0e0] rounded-md max-h-48 overflow-y-auto py-1">
+                            <div className="w-full shadow-sm border border-gray-200 mt-1 bg-white rounded-md max-h-48 overflow-y-auto py-1">
                                 {DIAS_DA_SEMANA.map((dia) => (
                                     <label key={dia} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer text-xl text-[#333]">
                                         <input
@@ -156,14 +156,14 @@ export default function FormCadastroTurnoSetor({ onSuccess }) {
                     <div className="flex flex-col gap-1.5 flex-1">
                         <label htmlFor="inicio" className="text-xl font-medium text-[#545454]">Horário de Início</label>
                         <div className="relative flex items-center">
-                            <input type="time" id="inicio" name="horario_inicio" className="w-full border border-[#e0e0e0] rounded-md py-2.5 pr-3 pl-2 text-xl font-medium outline-none transition-colors duration-200 focus:border-[#a0a0a0] placeholder-[#c4c4c4]" required />
+                            <input type="time" id="inicio" name="horario_inicio" className="w-full border border-gray-200 shadow-md rounded-md py-2.5 pr-3 pl-2 text-xl font-medium outline-none transition-colors duration-200 focus:border-[#a0a0a0] placeholder-[#c4c4c4]" required />
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5 flex-1">
                         <label htmlFor="fim" className="text-xl font-medium text-[#545454]">Horário de Fim</label>
                         <div className="relative flex items-center">
-                            <input type="time" id="fim" name="horario_fim" className="w-full border border-[#e0e0e0] rounded-md py-2.5 pr-3 pl-2 text-xl font-medium outline-none transition-colors duration-200 focus:border-[#a0a0a0] placeholder-[#c4c4c4]" required />
+                            <input type="time" id="fim" name="horario_fim" className="w-full border border-gray-200 shadow-md rounded-md py-2.5 pr-3 pl-2 text-xl font-medium outline-none transition-colors duration-200 focus:border-[#a0a0a0] placeholder-[#c4c4c4]" required />
                         </div>
                     </div>
                 </div>
@@ -172,7 +172,7 @@ export default function FormCadastroTurnoSetor({ onSuccess }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-[#002866] text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-50"
+                        className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-2xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-50"
                     >
                         {loading ? 'Criando...' : 'Criar'}
                     </button>

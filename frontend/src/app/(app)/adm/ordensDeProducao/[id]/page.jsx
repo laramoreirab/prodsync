@@ -44,12 +44,26 @@ import {
   FilterRow,
   EmptyState,
   FadeUpItem,
-  LoadingState, PageLayout
+  LoadingState, PageLayout,
+  AsymmetricGrid
 
 } from "@/components/AnimatedComponents";
 
 // DetailComponents
-import { DetailListingSection, DetailHeader, DetailActions, ListingTabs, DetailPageContainer, DetailBackLink } from "@/components/DetailComponents";
+import {
+  DetailListingSection,
+  DetailHeader,
+  DetailActions,
+  ListingTabs,
+  DetailPageContainer,
+  DetailBackLink,
+  EntityProfileCard,
+  DetailInfoField,
+  DetailSectionTitle,
+  DetailWidgetGrid,
+  DetailWidgetCard,
+  StatusBadge
+} from "@/components/DetailComponents";
 import { filtrarPorDuracaoMax } from "@/lib/filterUtils";
 
 const colunasEventos = [
@@ -140,7 +154,7 @@ const formatarDuracao = (minutos) => {
 };
 
 const formatarDataHora = (valor) => {
-  if (!valor) return "-";
+  if (!valor) return "Não Informado";
   return new Date(valor).toLocaleString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -399,6 +413,17 @@ export default function OPDetalhePage({ params }) {
   const operador = maquina?.operador;
   const tituloOp = op?.codigo_lote || op?.produto || `OP #${opId}`;
 
+  const imagemMaquina = (() => {
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
+    const imgPath = maquina?.imagem;
+    if (!imgPath) return "/demo_maq.png";
+    const imagem = String(imgPath).replaceAll("\\", "/");
+    if (imagem.startsWith("http")) return imagem;
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+    const nomeArquivo = imagem.split("/").pop();
+    return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+  })();
+
   if (carregando) {
     return (
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col items-center justify-center p-20">
@@ -428,15 +453,54 @@ export default function OPDetalhePage({ params }) {
 
         <DetailBackLink href="/adm/ordensDeProducao" label="Voltar para Ordens de Produção" />
 
-        <FadeUpItem id="infos_op" className="flex flex-col">
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-black">
-              Ordem de Produção — {tituloOp}
-            </h1>
-            <div className="flex space-x-2">
+        <EntityProfileCard
+          name={`Ordem de Produção ${tituloOp}`}
+          imageSrc={imagemMaquina}
+          imageAlt={maquina?.nome || "Máquina"}
+          imageShape="square"
+          fieldsLeft={[
+            { label: "ID", value: opId },
+            { label: "Produto", value: op.produto || "Não Informado" },
+            { label: "Lote", value: op.codigo_lote || "Não Informado" },
+            {
+              label: "Setor",
+              value: setor?.id_setor ? (
+                <Link href={`/adm/setores/${setor.id_setor}`} className="hover:underline font-semibold text-blue-900">
+                  {setor.nome_setor}
+                </Link>
+              ) : "Não Informado"
+            },
+            {
+              label: "Máquina",
+              value: maquina?.id_maquina ? (
+                <Link href={`/adm/maquinas/${maquina.id_maquina}`} className="hover:underline font-semibold text-blue-900">
+                  {maquina.nome || maquina.serie || "-"}
+                </Link>
+              ) : "Não Informado"
+            },
+            {
+              label: "Operador",
+              value: operador?.id_usuario ? (
+                <Link href={`/adm/usuarios/${operador.id_usuario}`} className="hover:underline font-semibold text-blue-900">
+                  {operador.nome}
+                </Link>
+              ) : "Não Informado"
+            },
+          ]}
+          fieldsRight={[
+            
+            { label: "Status", value: statusBadge(op.status_op) },
+            { label: "Prioridade", value: prioridadeBadge(op.prioridade) },
+            { label: "Início", value: formatarDataHora(op.data_inicio) },
+            { label: "Prazo Final", value: formatarDataHora(op.data_fim) },
+            { label: "Meta Planejada", value: `${op.qtd_planejada ?? 0} peças` },
+            { label: "Produção Atual", value: `${op.produzido ?? 0} peças produzidas / ${op.refugo_total ?? 0} peças em refugo` },
+          ]}
+          actions={
+            <DetailActions>
               <Dialog>
                 <DialogTrigger className="text-[#122f60] cursor-pointer">
-                  <Pencil size={36} className="mr-1" />
+                  <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
                   <FormEdicaoOp opId={opId} onEdicaoSucesso={carregarDados} />
@@ -444,7 +508,7 @@ export default function OPDetalhePage({ params }) {
               </Dialog>
               <Dialog>
                 <DialogTrigger className="text-[#b30000] cursor-pointer">
-                  <Trash2 className="w-9 h-9" />
+                  <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>
                   <FormExclusaoOp
@@ -453,99 +517,20 @@ export default function OPDetalhePage({ params }) {
                   />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-        </FadeUpItem>
+            </DetailActions>
+          }
+        />
 
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div className="md:col-span-2">
-              <div className="flex items-center flex-wrap gap-4">
-                <div className="flex gap-2 bg-white border rounded-xl shadow-sm flex-col items-center justify-center text-center font-bold p-8 min-w-[200px]">
-                  {maquina?.id_maquina ? (
-                    <Link href={`/adm/maquinas/${maquina.id_maquina}`}>
-                      <Image
-                        src="/demo_maq.png"
-                        className="rounded-lg"
-                        alt={maquina.nome || "Máquina"}
-                        width={150}
-                        height={150}
-                      />
-                      <p className="text-2xl mt-2 hover:underline">{maquina.nome || maquina.serie || "-"}</p>
-                    </Link>
-                  ) : (
-                    <>
-                      <Image src="/demo_maq.png" className="rounded-lg" alt="Máquina" width={150} height={150} />
-                      <p className="text-2xl mt-2">-</p>
-                    </>
-                  )}
-                  <p className="text-[#7c7c81] text-xl font-semibold mt-1">
-                    Meta: {op.qtd_planejada ?? 0} peças
-                  </p>
-                  <p className="text-[#7c7c81] text-lg">
-                    Produzido: {op.produzido ?? 0} · Refugo: {op.refugo_total ?? 0}
-                  </p>
-                </div>
+        <DetailSectionTitle title="Produção da OP" />
 
-                <div className="py-3 font-semibold text-gray-900 text-2xl">
-                  <div className="flex flex-col gap-3">
-                    <p className="text-lg text-gray-600">Produto: {op.produto || "-"}</p>
-                    <p className="text-lg text-gray-600">Lote: {op.codigo_lote || "-"}</p>
-                    <p>
-                      Setor:
-                      {setor?.id_setor ? (
-                        <Link
-                          href={`/adm/setores/${setor.id_setor}`}
-                          className="font-medium hover:underline ml-2"
-                        >
-                          {setor.nome_setor}
-                        </Link>
-                      ) : (
-                        <span className="ml-2 font-medium">-</span>
-                      )}
-                    </p>
-                    <p>
-                      Status:
-                      {statusBadge(op.status_op)}
-                    </p>
-                    <p className="flex items-center flex-wrap">
-                      Prioridade:
-                      {prioridadeBadge(op.prioridade)}
-                    </p>
-                    <p>
-                      Operador:
-                      {operador?.id_usuario ? (
-                        <Link
-                          href={`/adm/usuarios/${operador.id_usuario}`}
-                          className="font-medium hover:underline ml-2"
-                        >
-                          {operador.nome}
-                        </Link>
-                      ) : (
-                        <span className="ml-2 font-medium">-</span>
-                      )}
-                    </p>
-                    <p>
-                      Início:
-                      <span className="text-xl font-medium ml-2">{formatarDataHora(op.data_inicio)}</span>
-                    </p>
-                    <p>
-                      Prazo final:
-                      <span className="text-xl font-medium ml-2">{formatarDataHora(op.data_fim)}</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="md:col-span-1 bg-white border rounded-xl p-6 shadow-sm">
-              <OPProgressoWidget opId={opId} />
-            </div>
-          </div>
-        </section>
-
-        <FadeUpItem className="bg-white border rounded-xl p-6 mb-12 shadow-sm">
-          <OPOEEDetalheWidget opId={opId} maquinaId={op?.id_maquina ?? maquina?.id_maquina} />
-        </FadeUpItem>
+        <AsymmetricGrid side="right">
+          <DetailWidgetCard className="flex justify-center items-center">
+            <OPProgressoWidget opId={opId} />
+          </DetailWidgetCard>
+          <DetailWidgetCard>
+            <OPOEEDetalheWidget opId={opId} maquinaId={op?.id_maquina ?? maquina?.id_maquina} />
+          </DetailWidgetCard>
+        </AsymmetricGrid>
 
         {/* Listagens */}
         <ListingTabs

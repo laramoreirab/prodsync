@@ -111,7 +111,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
 
         <DropdownMenuContent
           align={align}
-          className="p-0 w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
+          className="p-0 ml-3  w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <DropdownMenuGroup>
