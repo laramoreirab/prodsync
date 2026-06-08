@@ -187,8 +187,8 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
         }
     };
 
-    const labelStyle = "text-gray-600 text-sm font-medium mb-1.5 block";
-    const inputStyle = "w-full border border-gray-200 rounded-md p-3 text-sm outline-none focus:ring-2 focus:ring-blue-900/10 transition-all";
+    const labelStyle = "block text-lg text-gray-700 font-medium dark:text-slate-300";
+    const inputStyle = "w-full border shadow-md mt-1 border-gray-200 rounded-md p-2.5 outline-none";
 
     if (carregando) {
         return (
@@ -204,12 +204,12 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
             <div className="title_modal flex items-center">
                 <div className="text-secondary flex items-center px-4 py-2 rounded-md">
                     <Pencil strokeWidth={2.8} className="mr-2" size={30} />
-                    <DialogTitle className="font-semibold text-3xl">
+                    <DialogTitle className="text-3xl font-semibold">
                         Editar Operador
                     </DialogTitle>
                 </div>
             </div>
-            <Separator className="m-2 bg-[#a6a6a6]" />
+            <Separator className="my-2" />
 
             <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 flex flex-col gap-6">
                 <input
@@ -304,7 +304,6 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                     <div className="relative">
                         <label htmlFor="id_turno" className={labelStyle}>Turno</label>
@@ -328,7 +327,6 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
 
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
 
@@ -354,11 +352,10 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
 
                         ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-9.5 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg">
+                    <button type="submit" className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-8 rounded-lg">
                         Editar
                     </button>
                 </div>

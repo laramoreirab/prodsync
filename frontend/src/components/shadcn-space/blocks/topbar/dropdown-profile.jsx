@@ -34,13 +34,15 @@ const LOGOUT_ITEM = {
 const itemClass = "px-4 py-2.5 text-base cursor-pointer gap-3";
 
 const resolverImagemPerfil = (imagem) => {
-  if (!imagem) return "/userdefault.svg";
+  if (!imagem || imagem === "null") return "/userdefault.svg";
   if (imagem.startsWith("http")) return imagem;
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+  const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
 
-  return `${apiUrl}/uploads/imagens/${imagem}`;
+  if (imagem.startsWith("/uploads/")) return `${baseUrl}${imagem}`;
+
+  return `${baseUrl}/uploads/imagens/${imagem}`;
 };
 
 const ProfileDropdown = ({
@@ -91,7 +93,14 @@ const ProfileDropdown = ({
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
             <div className="relative">
-              <img src={avatarSrc} className="h-10 w-10 rounded-full object-cover" alt={nomeUsuario || "Usuario"} />
+              <img
+                src={avatarSrc}
+                className="h-10 w-10 rounded-full object-cover"
+                alt={nomeUsuario || "Usuario"}
+                onError={(e) => {
+                  e.currentTarget.src = "/userdefault.svg";
+                }}
+              />
               <span className="ring-card absolute right-0 bottom-0 size-2 rounded-full bg-green-600 ring-2" />
             </div>
 

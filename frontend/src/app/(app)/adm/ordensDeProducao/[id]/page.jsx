@@ -454,10 +454,11 @@ export default function OPDetalhePage({ params }) {
         <DetailBackLink href="/adm/ordensDeProducao" label="Voltar para Ordens de Produção" />
 
         <EntityProfileCard
-          name={`Ordem de Produção ${tituloOp}`}
+          name={`Ordem de Produção — ${tituloOp}`}
           imageSrc={imagemMaquina}
           imageAlt={maquina?.nome || "Máquina"}
           imageShape="square"
+          imageFallback="/demo_maq.png"
           fieldsLeft={[
             { label: "ID", value: opId },
             { label: "Produto", value: op.produto || "Não Informado" },

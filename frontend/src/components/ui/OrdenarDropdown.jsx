@@ -26,8 +26,8 @@ const OrdenarDropdown = ({ options = [], label, onSortChange }) => {
                 >
                     {options.map((option) => (
                         <SelectItem
-                            key={option.value}
-                            value={option.value}
+                            key={option.value || option.id}
+                            value={option.value || option.id}
                             className="cursor-pointer rounded-sm px-3 py-2 text-sm font-medium text-[#23304c] focus:bg-[#eef4ff] focus:text-[#23304c] data-[state=checked]:bg-[#eef4ff] data-[state=checked]:text-[#23304c]"
                         >
                             {option.label}

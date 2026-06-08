@@ -552,7 +552,6 @@ export default function UsuarioDetalheGestor({ params }) {
         >
           {dadosApontamentosFiltrados.length > 0 ? (
             <TableListagens
-              /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
               data={dadosApontamentosFiltrados}
               columns={colunasUsuario}
               acoesDropdown={(usuario) => (

@@ -12,7 +12,7 @@ import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget"
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider, LoadingState } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider, LoadingState, AsymmetricGrid } from "@/components/AnimatedComponents";
 import { usePerfil } from "@/hooks/usePerfil";
 import { ArrowUpFromLine } from "lucide-react";
 

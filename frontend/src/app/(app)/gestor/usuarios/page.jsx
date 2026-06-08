@@ -41,10 +41,10 @@ import {
 const turnoLabel = { 1: "Manhã", 2: "Tarde", 3: "Noite" };
 
 const opcoesOrdenacao = [
-  { id: "nome", label: "Nome (A-Z)" },
-  { id: "id_asc", label: "ID (Crescente)" },
-  { id: "id_desc", label: "ID (Decrescente)" },
-  { id: "turno", label: "Turno" },
+  { value: "nome", label: "Ordem Alfabética" },
+  { value: "id_asc", label: "ID (Crescente)" },
+  { value: "id_desc", label: "ID (Decrescente)" },
+  { value: "turno", label: "Turno" },
 ];
 
 const usuariosFilter = [
@@ -185,7 +185,7 @@ export default function UsuariosGestor() {
       </ContentGrid>
 
       {/* Listagem */}
-      <SectionDivider title="Listagem de operadores" className="mt-8" />
+      <SectionDivider title="Listagem de Operadores" className="mt-8" />
 
       {/* Busca */}
       <SearchBar
