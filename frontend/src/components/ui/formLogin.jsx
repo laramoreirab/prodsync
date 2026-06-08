@@ -94,8 +94,7 @@ export default function LoginForm() {
                         <div className="grid gap-3">
                             <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
                             <Input className="h-9" placeholder="Ex: 11111111"
-                                value={id} onChange={(e) => setId(e.target.value)}
-                                type="number" />
+                                value={id} onChange={(e) => setId(e.target.value)} />
                         </div>
 
                         <div className="grid gap-3">

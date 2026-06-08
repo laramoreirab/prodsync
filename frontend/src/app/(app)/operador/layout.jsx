@@ -2,7 +2,7 @@ import { AppSidebar } from "@/components/sidebar-components/sidebar-operador/app
 
 export default function AdminLayout({ children }) {
   return (
-<div data-app-shell className="relative h-screen w-full overflow-hidden bg-[#f8f8f8] dark:bg-zinc-950 select-none">{/* Light mode: aparece normalmente */}
+<div data-app-shell className="relative min-h-screen w-full bg-[#f8f8f8] dark:bg-zinc-950 select-none">{/* Light mode: aparece normalmente */}
       <img
         src="/bg_app.svg"
         alt=""
