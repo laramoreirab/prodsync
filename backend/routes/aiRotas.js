@@ -5,10 +5,10 @@ import { uploadArquivos, handleUploadError } from '../middlewares/uploadMiddlewa
 
 const router = Router();
 
-// Só usuários autenticados podem acessar chat
+// só usuários autenticados podem acessar chat
 router.post('/chat', authMiddleware, AIController.chat);
 
-// Rota para analisar arquivos (PDF, Imagens, etc)
-router.post('/analisar-arquivo', authMiddleware, uploadArquivos.single('arquivo'), handleUploadError, AIController.analisarArquivo);
+// rota para analisar arquivos (PDF, Imagens, etc) - aceita até 10 arquivos por vez, cada um com no máximo 5MB 
+router.post('/analisar-arquivo', authMiddleware, uploadArquivos.array('files', 10), handleUploadError, AIController.analisarArquivo);
 
 export default router;

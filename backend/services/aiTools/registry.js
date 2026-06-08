@@ -58,6 +58,6 @@ export const tools = [
 ];
 
 export const executeTool = async ({ name, args, user }) => {
-    // Por enquanto apenas ferramentas de leitura (Read)
+    // apenas ferramentas de leitura (read)
     return await executeReadTool({ name, args, user });
 };

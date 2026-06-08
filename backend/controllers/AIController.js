@@ -37,11 +37,11 @@ class AIController {
 
     static async analisarArquivo(req, res) {
         try {
-            const file = req.file;
+            const files = req.files; // array de arquivos
             const user = req.user;
-            const { prompt } = req.body;
+            const { prompt, contexto } = req.body;
 
-            if (!file) {
+            if (!files || files.length === 0) {
                 return res.status(400).json({
                     sucesso: false,
                     mensagem: "Nenhum arquivo foi enviado."
@@ -49,9 +49,10 @@ class AIController {
             }
 
             const result = await AIService.analisarArquivo({
-                file,
+                files,
                 user,
-                promptCustomizado: prompt
+                promptCustomizado: prompt,
+                contextoTela: contexto
             });
 
             return res.status(200).json({

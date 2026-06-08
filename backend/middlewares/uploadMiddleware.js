@@ -114,7 +114,7 @@ const handleUploadError = (error, req, res, next) => {
             return res.status(400).json({
                 sucesso: false,
                 erro: 'Campo de arquivo invalido',
-                mensagem: 'Verifique o nome do campo no formulario'
+                mensagem: `Campo inesperado: ${error.field || 'desconhecido'}. Verifique se o frontend está enviando o campo correto.`
             });
         }
     }
