@@ -168,7 +168,7 @@ export default function MaquinasGestor() {
 
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-        <WidgetCard>
+        <WidgetCard className="h-120">
           <MaquinaStatusDonutWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>

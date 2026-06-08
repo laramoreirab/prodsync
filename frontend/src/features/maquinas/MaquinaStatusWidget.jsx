@@ -13,7 +13,7 @@ export function MaquinaStatusWidget() {
 
   return (
 
-    <div className="w-full max-w-[240px] mx-auto">
+<div className="w-full h-full">
       <CustomPieChart
         title="Status das Máquinas"
         data={data}

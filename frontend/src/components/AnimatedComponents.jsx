@@ -461,6 +461,7 @@ export function WidgetCard({ children, className, colSpan, centered }) {
   );
 }
 
+
 export function WidgetCard2({ children, className, colSpan, centered }) {
   return (
     <FadeUpItem

@@ -60,9 +60,8 @@ export function ProducaoTotalWidget({ setorId }) {
           <p className="text-sm font-semibold text-[#17233b] truncate dark:text-[#f4f8ff]">
             Produção total das máquinas
           </p>
-          <p className="text-xs text-gray-400 font-semibold mt-1 dark:text-[#aebbd1]">
-            *Atualizado em tempo real
-          </p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+
         </div>
   
         {/* Bloco dos Botões */}

@@ -199,7 +199,7 @@ export default function Maquinas() {
         <WidgetCard>
           <ProducaoTotalWidget />
         </WidgetCard>
-        <WidgetCard>
+        <WidgetCard className="h-120">
           <MaquinaStatusDonutWidget />
         </WidgetCard>
       </AsymmetricGrid>

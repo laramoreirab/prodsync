@@ -17,7 +17,6 @@ export function OEEPorSetorWidget() {
     <div className="w-full h-full"> 
       <BarVerticalBase
         title="OEE Médio por Setor"
-        description="*Atualizado em tempo real"
         data={data}
         config={oeeSetorConfig}
         loading={loading}

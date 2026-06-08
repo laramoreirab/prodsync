@@ -23,7 +23,7 @@ export function OEEMaquinaWidget({ maquinaId }) {
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
           Resumo OEE Geral da Máquina
         </h2>
-        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
 
       {/* Container do Conteúdo - Alterado para flex-row com Split 50% / 50% */}

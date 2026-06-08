@@ -30,13 +30,19 @@ export function SetorStatusDonutWidget({ setorId }) {
       })
     : values.map((item) => ({ ...item, value: 0 }));
 
-  return (
-    <div>
-      <p className="text-sm font-semibold text-black">Status das Máquinas</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
-      <div className="mt-4">
+ return (
+    <div className="flex flex-col w-full h-full">
+      {/* Header próprio — title não passado ao CustomPieChart */}
+      <div className="shrink-0">
+        <p className="text-sm font-semibold text-foreground">Status das Máquinas</p>
+        <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+          Atualizado em tempo real
+        </p>
+      </div>
+ 
+      {/* Gráfico preenche o restante do card */}
+      <div className="flex-1 min-h-0 mt-4">
         <CustomPieChart
-          title="Status das Máquinas"
           data={normalized}
           dataKey="value"
           config={setorStatusDonutConfig}
@@ -47,3 +53,4 @@ export function SetorStatusDonutWidget({ setorId }) {
     </div>
   );
 }
+ 

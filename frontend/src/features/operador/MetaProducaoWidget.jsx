@@ -23,7 +23,7 @@ export function MetaProducaoWidget({ operadorId }) {
     <div className="flex flex-col gap-2 w-full h-full p-4 justify-between">
       <div className="text-left">
         <p className="text-sm font-semibold text-black">Meta da Produção</p>
-        <p className="text-xs text-gray-400 font-semibold">*Atualizado em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
       {/* Container central do gráfico */}
       <div className="flex flex-col items-center">

@@ -22,7 +22,7 @@ export function EficienciaMaquinaWidget({ operadorId }) {
   return (
     <div className="flex flex-col">
       <p className="text-sm font-semibold text-black">Eficiência da Máquina por Dia</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1 mb-2">*Atualizado em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
       <BarHorizontal
         data={formattedData}

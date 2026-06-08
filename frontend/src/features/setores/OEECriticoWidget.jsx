@@ -17,9 +17,8 @@ export function OEECriticoWidget() {
     <div className=" flex flex-col gap-2">
       <div>
         <h2 className="text-sm font-semibold text-black">Setor com OEE mais crítico</h2>
-        <p className="text-xs text-gray-400 font-semibold mt-1">
-          *Atualizado em tempo real
-        </p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+
       </div>
 
       <div className="flex items-center justify-center py-4">
