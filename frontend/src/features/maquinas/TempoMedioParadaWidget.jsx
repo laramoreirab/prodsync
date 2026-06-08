@@ -4,8 +4,8 @@ import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
 import { useTempoMedioParada } from "./hooks/useTempoMedioParada";
 import { tempoMedioParadaConfig } from "./config/maquinaChartConfig";
 
-export function TempoMedioParadaWidget() {
-  const { data, loading, error } = useTempoMedioParada();
+export function TempoMedioParadaWidget({ setorId = null }) {
+  const { data, loading, error } = useTempoMedioParada(setorId);
 
  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;

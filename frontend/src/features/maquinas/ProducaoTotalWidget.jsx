@@ -20,9 +20,11 @@ export function ProducaoTotalWidget({ setorId }) {
 
   async function carregarDados() {
     try {
+      const params = new URLSearchParams({ dias: String(diasSelecionados) });
+      if (setorId) params.set("setorId", String(setorId));
 
       const response = await apiFetch(
-        `/api/maquinas/dashboard/obter-producao-total-maquinas?dias=${diasSelecionados}`
+        `/api/maquinas/dashboard/obter-producao-total-maquinas?${params.toString()}`
       );
 
       setData(response.dados);
@@ -34,7 +36,7 @@ export function ProducaoTotalWidget({ setorId }) {
 
   useEffect(() => {
     carregarDados();
-  }, [diasSelecionados]);
+  }, [diasSelecionados, setorId]);
 
   const dadosGrafico = data.map(item => ({
     ...item,

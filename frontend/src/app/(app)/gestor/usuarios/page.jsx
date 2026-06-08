@@ -169,7 +169,7 @@ export default function UsuariosGestor() {
 
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-        <WidgetCard><QtdUsuariosWidget /></WidgetCard>
+        <WidgetCard><QtdUsuariosWidget setorId={setorId} /></WidgetCard>
         <WidgetCard><TurnosOperadoresWidget setorId={setorId} /></WidgetCard>
         <WidgetCard><TopOperadoresWidget setorId={setorId}/></WidgetCard>
       </KPIGrid>

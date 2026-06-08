@@ -35,9 +35,10 @@ const filterBySetorId = (items, setorId) => {
 const USE_MOCK = false;
 
 export const qtdUsuariosPerfilService = {
-  async getQtdPorPerfil() {
+  async getQtdPorPerfil(setorId = null) {
     if (USE_MOCK) return QtdUsuariosPorPerfilArraySchema.parse(mockQtdUsuariosPorPerfil);
-    const data = await apiFetch("/api/usuarios/dashboard/qtdUsuariosPorTipo");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/usuarios/dashboard/qtdUsuariosPorTipo${query}`);
     return QtdUsuariosPorPerfilArraySchema.parse(data.dados);
   },
 };
@@ -53,7 +54,8 @@ export const qtdUsuariosSetorService = {
 export const topOperadoresService = {
   async getTopOperadores(setorId) {
     if (USE_MOCK) return TopOperadoresArraySchema.parse(mockTopOperadores);
-    const data = await apiFetch("/api/usuarios/dashboard/top5Operadores");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/usuarios/dashboard/top5Operadores${query}`);
     const normalized = (data.dados || []).map((item) => ({
       operador: item.operador ?? item.nome ?? "Sem nome",
       media: item.media ?? item.pecas_boas ?? item.qtd ?? 0,
@@ -75,7 +77,8 @@ export const tempoSessaoService = {
 export const rotatividadeService = {
   async getRotatividade(setorId) {
     if (USE_MOCK) return RotatividadeArraySchema.parse(mockRotatividade);
-    const data = await apiFetch("/api/usuarios/dashboard/rotatividadeUsuarios");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/usuarios/dashboard/rotatividadeUsuarios${query}`);
     return RotatividadeArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
@@ -101,7 +104,8 @@ export const turnosOperadoresService = {
     if (USE_MOCK) {
       return UsuariosPorTurnoArraySchema.parse(filterBySetorId(mockUsuariosPorTurno, setorId));
     }
-    const data = await apiFetch("/api/usuarios/turnos");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/usuarios/turnos${query}`);
     return UsuariosPorTurnoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
@@ -113,7 +117,8 @@ export const producaoMediaUsuarioSetorService = {
         filterBySetorId(mockProducaoMediaUsuarioSetor, setorId)
       );
     }
-    const data = await apiFetch("/api/usuarios/producao_media_por_usuario");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/usuarios/producao_media_por_usuario${query}`);
     const normalized = (data.dados || []).map((item) => ({
       usuario: item.usuario ?? item.nome ?? "Sem nome",
       media: item.media ?? item.qtd ?? 0,
@@ -128,7 +133,8 @@ export const usuarioTaxaRefugoService = {
     if (USE_MOCK) {
       return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(mockUsuarioTaxaRefugo, setorId));
     }
-    const data = await apiFetch("/api/usuarios/taxa_refugo");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/usuarios/taxa_refugo${query}`);
     return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
