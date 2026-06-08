@@ -24,27 +24,27 @@ export function ParadasComparadasWidget({ setorId = null }) {
   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar eventos.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) {
-    return <p className="text-xs text-muted-foreground">Nenhum registro disponivel.</p>;
-  }
+  if (Array.isArray(data) && data.length === 0)
+    return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
   return (
-    <div>
-      <p className="text-sm font-semibold text-black">
-        Tempo Parado x Tempo Produzindo
-      </p>
-      <p className="text-xs text-gray-400 font-semibold mt-1">
-        *Dados desta semana
-      </p>
+    <div className="flex flex-col w-full h-full">
+      <div className="shrink-0">
+        <p className="text-sm font-semibold text-foreground">
+          Tempo Parado x Tempo Produzindo
+        </p>
+        <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+          Atualizado em tempo real
+        </p>
+      </div>
 
-      <div className="mt-8">
+      <div className="flex-1 min-h-0 mt-4">
         <DonutChart
           data={data}
           nameKey="name"
           dataKey="value"
           config={paradasComparadasConfig}
           valueFormatter={formatarMinutos}
-          chartClassName="h-[220px] w-full"
           cy="54%"
         />
       </div>

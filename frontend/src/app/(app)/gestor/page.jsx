@@ -87,7 +87,7 @@ export default function DashboardGeralGestor() {
         <WidgetCard>
           <SetorProducaoMaquinaWidget setorId={setorId} />
         </WidgetCard>
-        <WidgetCard>
+        <WidgetCard className="h-120">
           <SetorStatusDonutWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>

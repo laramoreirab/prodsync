@@ -18,7 +18,7 @@ export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
           Evolução do OEE nos últimos 7 dias
         </h2>
-        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
 
       <div className="mt-4 w-full h-full min-h-[160px]">

@@ -17,7 +17,6 @@ export function MaquinasPorSetorWidget({ setorId }) {
 
        <BarHorizontal
       title="Quantidade de máquinas por setor"
-      description="*Atualizado em tempo real"
       data={data}
       config={qtdMaquinasPorSetorConfig}
       loading={loading}

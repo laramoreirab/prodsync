@@ -253,7 +253,7 @@ export default function HistoricoEventos() {
 
       {/* Gráficos */}
       <ContentGrid cols={3} className="mt-2">
-        <WidgetCard colSpan="md:col-span-1">
+        <WidgetCard classname="h-120" colSpan="md:col-span-1">
           <ParadasComparadasWidget />
         </WidgetCard>
         <WidgetCard colSpan="md:col-span-2">

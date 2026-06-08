@@ -7,12 +7,16 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
   if (!data?.length) return null;
 
   return (
-    <div className="flex flex-col items-center justify-center w-full">
-      {/* Title sits cleanly outside the chart positioning logic */}
-      {title && <h3 className="text-sm font-medium mb-3 self-start">{title}</h3>}
+    <div className="relative flex flex-col items-center justify-center w-full">
+      {title && (
+        <div className="absolute top-0 left-0 z-10 text-left">
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+        </div>
+      )}
       
       {/* Relative wrapper holding both the chart and the absolute center text */}
-      <div className="relative flex items-center justify-center h-[180px] w-[320px]">
+      <div className="relative flex items-center justify-center h-[180px] w-[320px] pt-10">
         <ChartContainer config={config} className="h-full w-full">
           <RechartsPieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />

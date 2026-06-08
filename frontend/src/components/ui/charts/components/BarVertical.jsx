@@ -34,12 +34,17 @@ export function BarVerticalBase({
   const keys = Object.keys(config);
 
   return (
-    <div>
-      <h3 className="text-sm font-medium mb-3">{title}</h3>
-      {description && (
-        <p className="text-xs text-muted-foreground mb-3">{description}</p>
+    <div className="relative">
+      {title && (
+        <div className="absolute top-0 left-0 z-10 text-left">
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+          {description && (
+            <p className="text-xs text-muted-foreground mt-1">{description}</p>
+          )}
+        </div>
       )}
-      <ChartContainer config={config} className="h-[200px] w-full">
+      <ChartContainer config={config} className="h-[200px] w-full pt-12">
         <BarChart data={data} margin={{ top: 10 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis 

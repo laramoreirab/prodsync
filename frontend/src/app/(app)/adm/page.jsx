@@ -44,7 +44,7 @@ export default function DashboardGeralPage() {
           <ProducaoSetorWidget />
         </WidgetCard>
         <WidgetCard>
-          <MaquinaStatusWidget />
+          <MaquinaStatusWidget className="h-64" />
         </WidgetCard>
       </ContentGrid>
 
