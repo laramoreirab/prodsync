@@ -16,8 +16,8 @@ export function TendendiaRefugoWidget() {
   return (
     <AreaChartBase
       title="Tendência de Refugo"
-      description="Quantidade de refugo por dia"
       data={data}
+      size="pequeno"
       xKey="dia"
       yKey="qtd"
       config={tendenciaRefugoConfig}

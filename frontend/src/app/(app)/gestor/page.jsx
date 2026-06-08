@@ -12,25 +12,30 @@ import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget"
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider } from "@/components/AnimatedComponents";
+import {
+  PageLayout,
+  PageHeader,
+  WidgetCard,
+  KPIGrid,
+  ContentGrid,
+  SectionDivider,
+} from "@/components/AnimatedComponents";
 import { usePerfil } from "@/hooks/usePerfil";
 import { ArrowUpFromLine } from "lucide-react";
-
 
 export default function DashboardGeralGestor() {
   const { loading, setorId } = usePerfil();
 
   if (loading) {
-    return (
-      <LoadingState message="Carregando dashboard..." />
-    );
+    return <LoadingState message="Carregando dashboard..." />;
   }
 
   if (!setorId) {
     return (
       <PageLayout>
         <PageHeader
-          title="Dashboard Geral do Setor" subtitle="Acompanhando os indicadores do seu setor..."
+          title="Dashboard Geral do Setor"
+          subtitle="Acompanhando os indicadores do seu setor..."
           action={
             <a href="/gestor/relatorios">
               <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
@@ -40,17 +45,17 @@ export default function DashboardGeralGestor() {
             </a>
           }
         />
-        <p className="text-sm text-destructive">Nenhum setor vinculado ao seu perfil.</p>
-
+        <p className="text-sm text-destructive">
+          Nenhum setor vinculado ao seu perfil.
+        </p>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout>
+    <PageLayout className="pb-12">
       <PageHeader
         title="Dashboard Geral do Setor"
-        subtitle="Visão completa da produtividade, eficiência e qualidade do setor."
         action={
           <a href="/gestor/relatorios">
             <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
@@ -60,21 +65,16 @@ export default function DashboardGeralGestor() {
           </a>
         }
       />
-      <SectionDivider title="Panorama do setor" className="mt-2" />
-      <ContentGrid cols={1} className="mt-2">
+      <AsymmetricGrid className="mt-6">
         <WidgetCard>
           <SetorProducaoDiariaWidget setorId={setorId} />
         </WidgetCard>
-      </ContentGrid>
-
-      <ContentGrid cols={1} className="mt-6">
-        <WidgetCard>
+        <WidgetCard centered>
           <SetorOEEMedioWidget setorId={setorId} />
         </WidgetCard>
-      </ContentGrid>
+      </AsymmetricGrid>
 
-      <SectionDivider title="Eficiência e equipe" className="mt-6" />
-      <ContentGrid cols={2} className="mt-2">
+      <ContentGrid cols={2} className="mt-6">
         <WidgetCard centered>
           <SetorOEEEvolucaoWidget setorId={setorId} />
         </WidgetCard>
@@ -83,18 +83,16 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <SectionDivider title="Ativos de produção" className="mt-6" />
-      <ContentGrid cols={2} className="mt-2">
+      <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <SetorProducaoMaquinaWidget setorId={setorId} />
         </WidgetCard>
-        <WidgetCard>
+        <WidgetCard className="h-120">
           <SetorStatusDonutWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
-      <SectionDivider title="Perdas e qualidade" className="mt-6" />
-      <ContentGrid cols={2} className="mt-2">
+      <ContentGrid cols={2} className="mt-6">
         <WidgetCard>
           <SetorMotivosParadaWidget setorId={setorId} />
         </WidgetCard>
@@ -103,22 +101,20 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <SectionDivider title="Indicadores rápidos" className="mt-6" />
-      <KPIGrid cols={4} className="mt-2">
-        <WidgetCard>
+      <KPIGrid cols={4} className="mt-4">
+        <KPICardDecorated>
           <MediaParadasDiaWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <PecasPorMinutoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <MaquinaAtivaPorTurnoWidget />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <ProducaoPorTurnoLotesWidget />
-        </WidgetCard>
+        </KPICardDecorated>
       </KPIGrid>
     </PageLayout>
-
   );
 }

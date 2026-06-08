@@ -18,7 +18,7 @@ export function OPEficienciaWidget({ setorId = null }) {
   return (
     <div className="flex flex-col h-full">
       <p className="text-sm font-semibold text-black">Eficiências Geral das OPs</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       <div className="flex-1 flex items-center justify-center">
         <GaugeSemicircular
           title="Eficiência"
