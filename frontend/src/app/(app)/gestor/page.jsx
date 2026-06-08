@@ -48,7 +48,7 @@ export default function DashboardGeralGestor() {
   return (
     <PageLayout className="pb-12">
       <PageHeader
-        title="Dashboard Geral do Setor"
+        title="Dashboard Geral"
         action={
           <a href="/gestor/relatorios">
             <button className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">

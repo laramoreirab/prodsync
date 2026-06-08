@@ -153,7 +153,7 @@ export function PageLayout({
       <div
         className={cn(
           "flex flex-col flex-1 w-full",
-          padded && "px-4 sm:px-6 lg:px-8 pb-12",
+          padded && "px-4 sm:px-6 lg:px-8 pb-4",
           center && "items-center pt-16",
         )}
       >

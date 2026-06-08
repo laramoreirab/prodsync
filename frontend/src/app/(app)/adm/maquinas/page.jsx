@@ -248,7 +248,6 @@ export default function Maquinas() {
 
 
               <TableListagens
-                /* Dados e colunas a depender da página [no momento está estático definido em um json, posteriormente será um get]  */
                 data={dadosExibidos} columns={colunasMaquinas}
                 acoesDropdown={(maquina) => (
                   <>
