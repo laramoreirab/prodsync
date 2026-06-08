@@ -149,6 +149,9 @@ export function AppSidebar({ ...props }) {
                 src={avatarSrc}
                 alt="Usuario"
                 className="h-6 w-6 shrink-0 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/userdefault.svg";
+                }}
               />
               <span className="truncate text-sm font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">
                 Minha conta

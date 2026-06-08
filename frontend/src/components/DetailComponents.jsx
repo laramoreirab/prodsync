@@ -399,11 +399,13 @@ export function EntityProfileCard({
         {/* Corpo do Card */}
         <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-6 items-center md:items-start">
           
-          {/* Avatar do Usuário */}
+          {/* Avatar / Imagem da Entidade */}
           <div
             className={cn(
-              "w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 border-4 border-slate-50 dark:border-[#1e294b] shadow-inner overflow-hidden relative group bg-slate-100 dark:bg-[#0f172a]",
-              isSquare ? "rounded-xl" : "rounded-full"
+              "flex-shrink-0 border-4 border-slate-50 dark:border-[#1e294b] shadow-inner overflow-hidden relative group bg-slate-100 dark:bg-[#0f172a]",
+              isSquare
+                ? "w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-2xl"
+                : "w-28 h-28 sm:w-32 sm:h-32 rounded-full"
             )}
           >
             <img
