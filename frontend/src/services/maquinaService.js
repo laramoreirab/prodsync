@@ -19,33 +19,37 @@ import {
 const USE_MOCK = false;
 
 export const maquinaStatusService = {
-  async getStatus() {
+  async getStatus(setorId = null) {
     if (USE_MOCK) return MaquinaStatusArraySchema.parse(mockMaquinaStatus);
-    const data = await apiFetch("/api/maquinas/dashboard/status-geral");
-    return data.filter(item => String(item.setorId) === String(setorId));
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/maquinas/dashboard/status-geral${query}`);
+    return MaquinaStatusArraySchema.parse(data.dados || data);
   },
 };
 
 export const maquinaAtivaPorTurnoService = {
-  async getMaquinaAtivaPorTurnoService() {
+  async getMaquinaAtivaPorTurnoService(setorId = null) {
     if (USE_MOCK) return MaquinaAtivaPorTurnoSchema.parse(mockMaquinaAtivaPorTurno);
-    const data = await apiFetch("/api/turnos/kpis/turno-atual")
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/turnos/kpis/turno-atual${query}`)
     return MaquinaAtivaPorTurnoSchema.parse(data.dados.cards.maquinasAtivas);
   },
 };
 
 export const qtdMaquinasPorSetorService = {
-  async getQtdPorSetor() {
+  async getQtdPorSetor(setorId = null) {
     if (USE_MOCK) return QtdMaquinaPorSetorArraySchema.parse(mockQtdMaquinasPorSetor);
-    const data = await apiFetch("/api/setores/obterQuantidadeMaquinasPorSetor");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/setores/obterQuantidadeMaquinasPorSetor${query}`);
     return QtdMaquinaPorSetorArraySchema.parse(data.dados);
   },
 };
 
 export const tempoMedioParadaService = {
-  async getTempoMedio() {
+  async getTempoMedio(setorId = null) {
     if (USE_MOCK) return TempoMedioParadaArraySchema.parse(mockTempoMedioParada);
-    const data = await apiFetch("/api/setores/obterTempoMedioParadaPorSetor");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/setores/obterTempoMedioParadaPorSetor${query}`);
     return TempoMedioParadaArraySchema.parse(data.dados);
   },
 };
@@ -60,9 +64,10 @@ export const producaoDefeitosService = {
 };
 
 export const maquinasPorTurnoService = {
-  async getMaquinasPorTurno() {
+  async getMaquinasPorTurno(setorId = null) {
     if (USE_MOCK) return MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
-    const data = await apiFetch("/api/turnos/status-maquinas-por-turno");
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/turnos/status-maquinas-por-turno${query}`);
     return MaquinaPorTurnoArraySchema.parse(data.dados);
   },
 };

@@ -210,7 +210,7 @@ export function PageHeader({
           
           {underline && (
             <motion.div
-              className="absolute bottom-0 left-0 h-[5px] w-full rounded-full bg-[#315aa8] dark:bg-[#6f9bff]"
+              className="absolute bottom-0 left-0 h-1.25 w-full rounded-full bg-[#315aa8] dark:bg-[#6f9bff]"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               style={{ originX: 0 }} // Faz a animação começar estritamente da esquerda para a direita
@@ -461,6 +461,7 @@ export function WidgetCard({ children, className, colSpan, centered }) {
   );
 }
 
+
 export function WidgetCard2({ children, className, colSpan, centered }) {
   return (
     <FadeUpItem
@@ -548,7 +549,7 @@ export function FilterRow({ count, label = "resultados", actions, className }) {
 
       {actions && (
         // Garante que os botões fiquem alinhados e não quebrem linha entre si
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <div className="flex items-center justify-start gap-2 sm:gap-3 flex-wrap">
           {actions}
         </div>
       )}

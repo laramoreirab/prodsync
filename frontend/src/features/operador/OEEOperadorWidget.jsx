@@ -22,7 +22,7 @@ export function OEEOperadorWidget({ operadorId }) {
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
           OEE Médio da Máquina do Operador
         </h2>
-        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
 
       {/* Container do Conteúdo - Alterado para flex-row e centralizado verticalmente */}

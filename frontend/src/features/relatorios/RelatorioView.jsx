@@ -324,22 +324,22 @@ function RelatorioGestorConteudo({ estaAtivo, setorId, periodoEventos }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {estaAtivo("kpi-paradas") ? (
             <RelatorioWidgetCard>
-              <MediaParadasDiaWidget />
+              <MediaParadasDiaWidget setorId={setorId} />
             </RelatorioWidgetCard>
           ) : null}
           {estaAtivo("kpi-pecas-min") ? (
             <RelatorioWidgetCard>
-              <PecasPorMinutoWidget />
+              <PecasPorMinutoWidget setorId={setorId} />
             </RelatorioWidgetCard>
           ) : null}
           {estaAtivo("kpi-maquina-turno") ? (
             <RelatorioWidgetCard>
-              <MaquinaAtivaPorTurnoWidget />
+              <MaquinaAtivaPorTurnoWidget setorId={setorId} />
             </RelatorioWidgetCard>
           ) : null}
           {estaAtivo("kpi-producao-turno") ? (
             <RelatorioWidgetCard>
-              <ProducaoPorTurnoLotesWidget />
+              <ProducaoPorTurnoLotesWidget setorId={setorId} />
             </RelatorioWidgetCard>
           ) : null}
         </div>

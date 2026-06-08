@@ -3,8 +3,8 @@
 import { KPI } from "@/components/ui/charts/components/KPI";import { useQtdUsuariosPorPerfil } from "./hooks/useQtdUsuariosPorPerfil";
 import { qtdUsuariosPerfilConfig } from "./config/usuarioChartConfig";
 
-export function QtdUsuariosWidget() {
-  const { data, loading, error } = useQtdUsuariosPorPerfil();
+export function QtdUsuariosWidget({ setorId = null }) {
+  const { data, loading, error } = useQtdUsuariosPorPerfil(setorId);
   
 
  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;

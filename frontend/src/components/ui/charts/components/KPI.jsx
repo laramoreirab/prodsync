@@ -49,13 +49,13 @@ export function KPI({ title, value, type = "number", className = "", titleClass 
   };
 
   return (
-    <div className={`w-full h-full flex flex-col select-none p-1 ${className}`}>
-      
+       <div className={`w-full h-full flex flex-col select-none p-1 ${className}`}>
+        {/* Favor, não mexer pois afeta diretamente na formatação do andon e outros componentes de status! */}
       <div className="flex flex-col items-center shrink-0">
         <p className={`text-sm font-semibold leading-snug ${titleClass}`}>{title}</p>
       </div>
 
-      {/* 
+      {/*
        - `min-h-[64px]`: Garante uma distância mínima aceitável caso o card esteja na altura padrão (default).
       */}
       <div className="flex flex-1 items-center justify-center min-h-16 mt-2">

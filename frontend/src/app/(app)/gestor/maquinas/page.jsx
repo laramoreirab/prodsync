@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EyeIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
-import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard } from "@/components/AnimatedComponents";
+import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard, LoadingState } from "@/components/AnimatedComponents";
 import { FilterRow } from "@/components/AnimatedComponents";
 import { EmptyState } from "@/components/AnimatedComponents";
 import { SearchBar } from "@/components/AnimatedComponents";
@@ -168,7 +168,7 @@ export default function MaquinasGestor() {
 
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-        <WidgetCard>
+        <WidgetCard className="h-120">
           <MaquinaStatusDonutWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
@@ -184,13 +184,13 @@ export default function MaquinasGestor() {
           <ProducaoDefeitosWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
-          <MaquinasPorTurnoWidget />
+          <MaquinasPorTurnoWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
       <FadeUpItem className="mt-8">
         <div className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
-          <ProducaoTotalWidget />
+          <ProducaoTotalWidget setorId={setorId} />
         </div>
       </FadeUpItem>
 

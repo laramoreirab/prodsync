@@ -61,9 +61,9 @@ export default function FormJustificativaEvento({ onFechar }) {
     return (
         <>
             <div className="title_modal flex items-center">
-                <div className="bg-blue-900 flex items-center px-4 py-2 rounded-md">
-                    <Pencil className="mr-2 text-4xl text-white" />
-                    <DialogTitle className="text-3xl text-white">Justificar Evento</DialogTitle>
+               <div className="text-secondary flex items-center px-4 py-2 rounded-md">
+                    <Pencil strokeWidth={2.8} className="mr-2" size={30} />
+                    <DialogTitle className="text-3xl font-semibold">Justificar Evento</DialogTitle>
                 </div>
             </div>
 
@@ -138,7 +138,7 @@ export default function FormJustificativaEvento({ onFechar }) {
                             <button
                                 type="submit"
                                 disabled={loadingSubmit}
-                                className="bg-[#002866] text-xl cursor-pointer text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-60 flex items-center gap-2"
+                                className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-10 rounded-lg disabled:opacity-60 flex items-center gap-2"
                             >
                                 {loadingSubmit && <Loader2 className="w-5 h-5 animate-spin" />}
                                 {loadingSubmit ? 'Enviando...' : 'Justificar'}

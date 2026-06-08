@@ -39,11 +39,18 @@ const Header = ({
             }
           />
           <ProfileDropdown
-            trigger={
-              <div id="profile-dropdown-trigger" className="rounded-full cursor-pointer">
-                <img src="/userdefault.svg" className="w-7"/>
+            trigger={({ avatarSrc }) => (
+              <div id="profile-dropdown-trigger" className="rounded-full cursor-pointer overflow-hidden border-2 border-slate-200/50 dark:border-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-600">
+                <img
+                  src={avatarSrc}
+                  className="w-8 h-8 object-cover"
+                  alt="Perfil"
+                  onError={(e) => {
+                    e.currentTarget.src = "/userdefault.svg";
+                  }}
+                />
               </div>
-            } />
+            )} />
         </div>
       </div>
     </header>

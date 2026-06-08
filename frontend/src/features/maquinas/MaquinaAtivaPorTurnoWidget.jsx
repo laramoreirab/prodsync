@@ -3,8 +3,8 @@ import { KPIHorizontal } from "@/components/ui/charts/components";
 import { useMaquinaAtivaPorTurno } from "./hooks/useMaquinaAtivaPorTurno.js";
 
 
-export function MaquinaAtivaPorTurnoWidget(){
-    const { data, loading, error } = useMaquinaAtivaPorTurno();
+export function MaquinaAtivaPorTurnoWidget({ setorId = null }){
+    const { data, loading, error } = useMaquinaAtivaPorTurno(setorId);
     
     if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
     if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;

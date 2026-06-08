@@ -200,8 +200,8 @@ class TurnoController {
 
             // Executa as duas buscas no banco ao mesmo tempo (mais rápido)
             const [totalLotes, totalMaquinasAtivas] = await Promise.all([
-                TurnoModel.buscarProducaoTurnoLotes(idTurno, id_empresa),
-                TurnoModel.buscarMaquinasAtivasTurno(idTurno, id_empresa)
+                TurnoModel.buscarProducaoTurnoLotes(idTurno, id_empresa, null, null, req.query.setorId),
+                TurnoModel.buscarMaquinasAtivasTurno(idTurno, id_empresa, null, null, req.query.setorId)
             ]);
 
             // Devolve um objeto simples com os valores absolutos para os cards
@@ -225,7 +225,7 @@ class TurnoController {
 
     static async obterKpisTurnoAtual(req, res) {
         try {
-            const dados = await TurnoModel.obterKpisTurnoAtual(req.user.id_empresa);
+            const dados = await TurnoModel.obterKpisTurnoAtual(req.user.id_empresa, new Date(), req.query.setorId);
 
             return res.status(200).json({
                 sucesso: true,
@@ -233,11 +233,11 @@ class TurnoController {
                     ...dados,
                     cards: {
                         maquinasAtivas: {
-                            titulo: 'Maquinas Ativas por Turno',
+                            titulo: 'Máquinas Ativas por Turno',
                             valor: String(dados.maquinasAtivas)
                         },
                         producaoLotes: {
-                            titulo: 'Producao por Turno em Lotes',
+                            titulo: 'Produção por Turno em Lotes',
                             valor: String(dados.producaoLotes)
                         }
                     }

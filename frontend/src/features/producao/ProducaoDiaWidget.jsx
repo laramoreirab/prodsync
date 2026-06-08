@@ -16,8 +16,8 @@ export function ProducaoDiaWidget() {
   return (
     <AreaChartBase
       title="Produção por hora"
-      description="Peças produzidas ao longo do dia"
       data={data}
+      size="grande"
       xKey="hora"
       yKey="pcs"
       config={producaoDiaConfig}

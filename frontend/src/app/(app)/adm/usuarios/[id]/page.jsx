@@ -342,13 +342,13 @@ export default function UsuarioDetalhePage({ params }) {
     return String(a.op).toLowerCase().includes(termo) || String(a.id).includes(termo);
   });
 
-if (carregando) {
-  return (
-    <PageLayout>
-      <LoadingState message="Carregando usuário..." />
-    </PageLayout>
-  );
-}
+  if (carregando) {
+    return (
+      <PageLayout>
+        <LoadingState message="Carregando usuário..." />
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>
@@ -356,68 +356,69 @@ if (carregando) {
         <DetailBackLink href="/adm/usuarios" label="Voltar para Usuários" />
 
 
-        <div className={`grid gap-4 sm:gap-6 grid-cols-1 ${usuario?.maquina ? "lg:grid-cols-2" : ""}`}>
-          {/* Card do Usuário */}
-          <UserProfileCard
-            imageSrc={resolverImagemPerfil(usuario?.imagem_perfil)}
-            name={usuario?.nome || "-"}
-            fieldsLeft={[
-              { label: "ID", value: String(usuario?.id_usuario || operadorId) },
-              { label: "Email", value: usuario?.email || "-" },
-              { label: "CPF", value: usuario?.cpf || "-" },
-            ]}
-            fieldsRight={[
-              { label: "Setor", value: usuario?.setor?.nome_setor || "-" },
-              { label: "Função", value: usuario?.tipo || usuario?.funcao || "-" },
-              { label: "Turno", value: usuario?.turno?.nome_turno || "-" },
-            ]}
-            actions={
-              <DetailActions>
-                <Dialog>
-                  <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
-                    <Pencil size={32} />
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormEdicaoUsuario usuarioId={operadorId} onEdicaoSucesso={carregarDados} />
-                  </DialogContent>
-                </Dialog>
-                <Dialog>
-                  <DialogTrigger className="text-[var(--trash)] cursor-pointer">
-                    <Trash2 size={32} />
-                  </DialogTrigger>
-                  <DialogContent>
-                    <FormExclusaoUsuario usuarioId={operadorId} />
-                  </DialogContent>
-                </Dialog>
-              </DetailActions>
-            }
-          />
+        {/* Card do Usuário */}
+        <UserProfileCard
+          imageSrc={resolverImagemPerfil(usuario?.imagem_perfil)}
+          name={usuario?.nome || "Não informado"}
+          fieldsLeft={[
+            { label: "ID", value: String(usuario?.id_usuario || operadorId) },
+            { label: "Email", value: usuario?.email || "Não informado" },
+            { label: "CPF", value: usuario?.cpf || "Não informado" },
+          ]}
+          fieldsRight={[
+            { label: "Setor", value: usuario?.setor?.nome_setor || "Não informado" },
+            { label: "Função", value: usuario?.tipo || usuario?.funcao || "Não informado" },
+            { label: "Turno", value: usuario?.turno?.nome_turno || "Não informado" },
+          ]}
+          actions={
+            <DetailActions>
+              <Dialog>
+                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
+                  <Pencil size={32} />
+                </DialogTrigger>
+                <DialogContent>
+                  <FormEdicaoUsuario usuarioId={operadorId} onEdicaoSucesso={carregarDados} />
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
+                  <Trash2 size={32} />
+                </DialogTrigger>
+                <DialogContent>
+                  <FormExclusaoUsuario usuarioId={operadorId} />
+                </DialogContent>
+              </Dialog>
+            </DetailActions>
+          }
+        />
 
-          {/* Card da Máquina (se houver) */}
-          {usuario?.maquina && (
-            <Link
-              href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}
-              className="block h-full"
-            >
-              <MachineProfileCard
-                machineName={usuario.maquina.nome ? `Responsável por: ${usuario.maquina.nome}` : "-"} imageSrc="/demo_maq.png"
-                imageAlt={usuario.maquina.nome || "Máquina"}
-                fieldsLeft={[
-                  { label: "ID", value: String(usuario.maquina.id_maquina || "-") },
-                  { label: "Série", value: usuario.maquina.serie || "-" },
-                ]}
-                fieldsRight={[
-                  // { label: "Status", value: usuario.maquina.status_atual || "-" },
-                ]}
-                status={usuario.maquina.status_atual}
-                className="h-full"
-              />
-            </Link>
-          )}
-        </div>
+        {/* Card da Máquina (se houver) */}
+        <p className="text-3xl font-bold text-black">
+          Responsável por:
+        </p>
+        {usuario?.maquina && (
+          <Link
+            href={usuario.maquina.id_maquina ? `/adm/maquinas/${usuario.maquina.id_maquina}` : "#"}
+            className="block h-full"
+          >
+            <MachineProfileCard
+              machineName={usuario.maquina.nome ? `${usuario.maquina.nome}` : "Não informado"}
+              imageSrc="/demo_maq.png"
+              imageAlt={usuario.maquina.nome || "Máquina"}
+              fieldsLeft={[
+                { label: "ID", value: String(usuario.maquina.id_maquina || "Não informado") },
+                { label: "Série", value: usuario.maquina.serie || "Não informado" },
+
+              ]}
+              status={usuario.maquina.status_atual}
+              className="h-full"
+            />
+          </Link>
+        )}
+
         <DetailSectionTitle title="Produção" />
         <AsymmetricGrid>
-          <DetailWidgetCard>    
+          <DetailWidgetCard>
             <OEEOperadorWidget operadorId={operadorId} />
           </DetailWidgetCard>
           <DetailWidgetCard centered>

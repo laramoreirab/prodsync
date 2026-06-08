@@ -1,26 +1,33 @@
 "use client";
 
 import {
-    Area,
-    AreaChart,
-    CartesianGrid,
-    XAxis,
-    YAxis,
-  } from "recharts";
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
   
-  import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-  } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
-  function useChart(config, key) {
-    const item = config?.[key];
-  
-    return {
-      color: item?.color || "var(--primary)",
-    };
-  }
+function useChart(config, key) {
+  const item = config?.[key];
+
+  return {
+    color: item?.color || "var(--primary)",
+  };
+}
+
+// Mapeamento de tamanhos para classes do Tailwind
+const sizeVariants = {
+  pequeno: "h-[180px]",
+  medio: "h-[300px]",
+  grande: "h-[450px]",
+};
 
 // ============================================================
 // AREA CHART (variação do LineChart com área preenchida)
@@ -33,26 +40,33 @@ export function AreaChartBase({
   xKey,
   yKey,
   config,
+  size = "medio", // Tamanho padrão caso nenhum seja informado
 }) {
   const { color } = useChart(config, yKey);
   const gradientId = `grad-${yKey}`;
 
-  const safeData = data || [];
+  // Garante que o tamanho selecionado existe, senão usa o padrão 'medio'
+  const heightClass = sizeVariants[size] || sizeVariants.medio;
 
   return (
-    <div>
-      <h3 className="text-sm font-medium mb-1">{title}</h3>
-
-      {description && (
-        <p className="text-xs text-muted-foreground mb-3">
-          {description}
-        </p>
+    <div className="relative">
+      {title && (
+        <div className="absolute top-0 left-0 z-10 text-left">
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+          {description && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {description}
+            </p>
+          )}
+        </div>
       )}
 
-      <ChartContainer config={config} className="h-[200px] w-full">
+      {/* A classe de altura agora é dinâmica com base no 'size' */}
+      <ChartContainer config={config} className={`${heightClass} w-full pt-12`}>
         <AreaChart data={data}>
           <defs>
-            <linearGradient id={gradientId}>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={color} stopOpacity={0.3} />
               <stop offset="95%" stopColor={color} stopOpacity={0} />
             </linearGradient>
@@ -75,11 +89,3 @@ export function AreaChartBase({
     </div>
   );
 }
-
-// <AreaChartBase
-//       title="Tendência de Refugo"
-//       data={data}
-//       xKey="dia"
-//       yKey="refugo"
-//       config={refugoConfig}
-//     />

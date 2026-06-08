@@ -2,8 +2,8 @@
 import { KPIHorizontal } from "@/components/ui/charts/components";
 import { useProducaoPorTurnoLotes} from "./hooks/useProducaoPorTurnoLotes";
 
-export function ProducaoPorTurnoLotesWidget(){
-    const { data, loading, error } = useProducaoPorTurnoLotes();
+export function ProducaoPorTurnoLotesWidget({ setorId = null }){
+    const { data, loading, error } = useProducaoPorTurnoLotes(setorId);
     
         if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
       if (error)   return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;

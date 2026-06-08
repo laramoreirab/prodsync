@@ -164,7 +164,9 @@ export function DetailInfoCard({ children, className, layout = "row" }) {
 export function DetailInfoField({ label, value, className }) {
   return (
     <div className={cn("flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2", className)}>
-      <span className="text-sm sm:text-base font-semibold text-gray-700">{label}:</span>
+      {label ? (
+        <span className="text-sm sm:text-base font-semibold text-gray-700">{label}:</span>
+      ) : null}
       <span className="text-sm sm:text-base font-medium text-black break-words">{value}</span>
     </div>
   );
@@ -297,7 +299,7 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
       {/* Cabeçalho: título + botão */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">{title}</h2>
-        {action && <div className="flex-shrink-0">{action}</div>}
+        {action && <div className="shrink-0">{action}</div>}
       </div>
 
       {/* Busca */}
@@ -323,13 +325,12 @@ export function ListingTabs({ tabs, activeTab, onChange, className }) {
               onClick={() => onChange(tab.id)}
               className={cn(
                 // base — espelha TabsTrigger da referencia_1
-                "relative inline-flex h-full items-center justify-center gap-1.5 rounded-md border border-transparent px-3.5 py-0.5 text-md font-medium whitespace-nowrap transition-all cursor-pointer",
-                "text-muted-foreground hover:text-foreground",
-                "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring",
+                "relative inline-flex rounded-full h-full items-center justify-center mr-2 border border-transparent px-3.5 py-0.5 text-md font-medium whitespace-nowrap transition-all cursor-pointer",
+                "text-muted-foreground hover:text-gray-600 hover:bg-gray-200 data-[state=active]:bg-blue-900 data-[state=active]:text-foreground",
                 "disabled:pointer-events-none disabled:opacity-50",
                 // ativo — espelha data-active do TabsTrigger
                 isActive
-                  ? "bg-background text-foreground shadow-sm dark:border-input dark:bg-input/30 dark:text-slate-300"
+                  ? "bg-blue-900 text-white hover:bg-blue-900 hover:text-white shadow-sm dark:border-input dark:bg-input/30 dark:text-slate-300"
                   : "bg-transparent"
               )}
             >
@@ -398,11 +399,13 @@ export function EntityProfileCard({
         {/* Corpo do Card */}
         <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-6 items-center md:items-start">
           
-          {/* Avatar do Usuário */}
+          {/* Avatar / Imagem da Entidade */}
           <div
             className={cn(
-              "w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 border-4 border-slate-50 dark:border-[#1e294b] shadow-inner overflow-hidden relative group bg-slate-100 dark:bg-[#0f172a]",
-              isSquare ? "rounded-xl" : "rounded-full"
+              "flex-shrink-0 border-4 border-slate-50 dark:border-[#1e294b] shadow-inner overflow-hidden relative group bg-slate-100 dark:bg-[#0f172a]",
+              isSquare
+                ? "w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-2xl"
+                : "w-28 h-28 sm:w-32 sm:h-32 rounded-full"
             )}
           >
             <img
