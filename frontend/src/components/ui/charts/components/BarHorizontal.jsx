@@ -1,7 +1,7 @@
 // src/components/ui/charts/BarHorizontal.jsx
 "use client";
 
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, LabelList, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -14,7 +14,16 @@ import {
 // layout="vertical" inverte os eixos => barra fica horizontal.
 
 // Componente genérico 
-export function BarHorizontal({ data, config, title, yKey = "setor", chartSize = "default", heightClassName }) {
+export function BarHorizontal({
+  data,
+  config,
+  title,
+  yKey = "setor",
+  chartSize = "default",
+  heightClassName,
+  showValueLabels = false,
+  colorKey,
+}) {
   if (!data?.length) return null;
 
   const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
@@ -23,7 +32,7 @@ export function BarHorizontal({ data, config, title, yKey = "setor", chartSize =
   return (
     <div>
       {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
-      <ChartContainer config={config} className="h-[200px] w-full">
+      <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full`}>
         <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
           {/* Definição do Gradiente SVG */}
           <defs>
@@ -45,11 +54,26 @@ export function BarHorizontal({ data, config, title, yKey = "setor", chartSize =
           <ChartTooltip content={<ChartTooltipContent />} />
           
           {/* Aplicação do gradiente no fill */}
-          <Bar 
-            dataKey={dataKey} 
-            fill={`url(#${gradientId})`} 
-            radius={[0, 4, 4, 0]} 
-          />
+          <Bar
+            dataKey={dataKey}
+            fill={colorKey ? undefined : `url(#${gradientId})`}
+            radius={[0, 4, 4, 0]}
+          >
+            {colorKey && data.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={entry[colorKey] || `var(--color-${dataKey})`}
+              />
+            ))}
+
+            {showValueLabels && (
+              <LabelList
+                dataKey={dataKey}
+                position="right"
+                className="fill-gray-700 text-xs font-semibold"
+              />
+            )}
+          </Bar>
         </BarChart>
       </ChartContainer>
     </div>

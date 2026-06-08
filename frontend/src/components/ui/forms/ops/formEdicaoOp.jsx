@@ -295,7 +295,7 @@ export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
                 <div className="flex justify-center mt-4">
                     <button
                         type="submit"
-                        className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg"
+                        className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-10 rounded-lg"
                     >
                         Editar
                     </button>

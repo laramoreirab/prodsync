@@ -31,7 +31,7 @@ class DashboardController {
     static async mediaParadasPorDia(req, res) {
         try {
             const id_empresa = req.user.id_empresa
-            const dados = await DashboardModel.mediaParadasPorDia(id_empresa, req.query.setorId)
+            const dados = await DashboardModel.mediaParadasPorDia(id_empresa, req.query.setorId, req.query.dias)
             return res.status(200).json({ sucesso: true, dados })
         } catch (error) {
             console.error('Erro nos KPIs de Média de Parada por Dia:', error)

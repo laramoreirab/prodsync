@@ -66,7 +66,8 @@ export const topOperadoresService = {
 export const tempoSessaoService = {
   async getTempoSessao(setorId) {
     if (USE_MOCK) return TempoSessaoPerfilArraySchema.parse(mockTempoSessaoPerfil);
-    const data = await apiFetch("/api/usuarios/dashboard/tempo-medio-sessao-perfil");
+    const query = setorId ? `?setorId=${setorId}` : "";
+    const data = await apiFetch(`/api/usuarios/dashboard/tempo-medio-sessao-perfil${query}`);
     return TempoSessaoPerfilArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };

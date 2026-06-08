@@ -441,6 +441,8 @@ class UsuarioModel {
 
     static async tempoMedioSessaoPorTipo(id_empresa, setorId = null) {
         try {
+            const limiteInatividadeMinutos = 30;
+
             const usuarios = await prisma.usuarios.findMany({
                 where: { id_empresa, ...this.filtroSetorUsuario(setorId) },
                 select: {
@@ -459,20 +461,37 @@ class UsuarioModel {
                     sessoesPorTipo[usuario.tipo] = []
                 }
 
-                // agrupa logs por dia e calcula duração de cada sessão
-                const logsPorDia = {}
+                // Divide sessoes por intervalos de inatividade entre logs.
+                let inicioSessao = null;
+                let ultimoLog = null;
+
+                const registrarSessao = () => {
+                    if (!inicioSessao || !ultimoLog) return;
+
+                    const minutos = Math.round((ultimoLog - inicioSessao) / 1000 / 60);
+                    if (minutos > 0) sessoesPorTipo[usuario.tipo].push(minutos);
+                };
+
                 for (const log of usuario.logs) {
-                    const dia = log.criado_em.toISOString().split('T')[0]
-                    if (!logsPorDia[dia]) logsPorDia[dia] = []
-                    logsPorDia[dia].push(new Date(log.criado_em))
+                    const horarioLog = new Date(log.criado_em);
+
+                    if (!inicioSessao) {
+                        inicioSessao = horarioLog;
+                        ultimoLog = horarioLog;
+                        continue;
+                    }
+
+                    const intervaloMinutos = (horarioLog - ultimoLog) / 1000 / 60;
+
+                    if (intervaloMinutos > limiteInatividadeMinutos) {
+                        registrarSessao();
+                        inicioSessao = horarioLog;
+                    }
+
+                    ultimoLog = horarioLog;
                 }
 
-                for (const logs of Object.values(logsPorDia)) {
-                    const primeiro = new Date(Math.min(...logs))
-                    const ultimo = new Date(Math.max(...logs))
-                    const minutos = (ultimo - primeiro) / 1000 / 60
-                    if (minutos > 0) sessoesPorTipo[usuario.tipo].push(minutos)
-                }
+                registrarSessao();
             }
 
             return Object.entries(sessoesPorTipo).map(([tipo, sessoes]) => {
@@ -484,8 +503,9 @@ class UsuarioModel {
 
                 return {
                     perfil: tipo,
-                    minutos: media, // na verdade esta em minutos e 
-                    label: `${horas}:${minutos} h`
+                    minutos: media,
+                    label: `${horas}:${minutos} h`,
+                    setorId: setorId ? Number(setorId) : undefined
                 }
             })
         } catch (error) {

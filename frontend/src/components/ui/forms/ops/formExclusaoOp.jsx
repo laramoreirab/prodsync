@@ -60,7 +60,7 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
                         <button
                             type="button"
                             disabled={carregando}
-                            className='border py-3 px-4 cursor-pointer rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
+                            className='cursor-pointer shadow-md border border-gray-200 py-3 px-4 rounded-lg outline-none text-base font-bold text-[#7c7c81] hover:bg-gray-50 disabled:opacity-50'
                         >
                             Cancelar
                         </button>
@@ -68,7 +68,7 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
                     <button
                         type="submit"
                         disabled={carregando}
-                        className='py-3 px-5 cursor-pointer bg-[var(--trash)] font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
+                        className='cursor-pointer shadow-md py-3 px-5 bg-(--trash) font-bold text-white rounded-lg outline-none text-base hover:bg-red-800 transition-colors disabled:opacity-50 flex items-center gap-2'
                     >
                         {carregando && <Loader2 className="w-4 h-4 animate-spin" />}
                         Excluir

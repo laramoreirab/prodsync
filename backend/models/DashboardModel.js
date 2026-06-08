@@ -92,59 +92,36 @@ class DashboardModel {
     }
 
     // Média de paradas por dia
-    static async mediaParadasPorDia(id_empresa, setorId = null) {
+    static async mediaParadasPorDia(id_empresa, setorId = null, dias = 7) {
         try {
             const idSetor = setorId ? Number(setorId) : null;
+            const quantidadeDias = Number(dias) > 0 ? Number(dias) : 7;
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
 
             const amanha = new Date(hoje);
             amanha.setDate(amanha.getDate() + 1);
 
-            const dadosParadas = await prisma.historico_Eventos.aggregate({
+            const inicioPeriodo = new Date(hoje);
+            inicioPeriodo.setDate(hoje.getDate() - (quantidadeDias - 1));
+
+            const totalParadas = await prisma.historico_Eventos.count({
                 where: {
                     id_empresa: Number(id_empresa),
                     ...(idSetor ? { setor_afetado: idSetor } : {}),
-
-                    id_motivo_parada: {
-                        not: null
-                    },
-                    OR: [
-                        {
-                            inicio: {
-                                gte: hoje,
-                                lt: amanha
-                            }
-                        },
-                        {
-                            termino: {
-                                gte: hoje,
-                                lt: amanha
-                            }
-                        }
-                    ]
-                },
-
-                _sum: {
-                    duracao: true
-                },
-
-                _count: {
-                    id_evento: true
+                    status_atual: { in: ['Parada', 'Manutencao'] },
+                    inicio: {
+                        gte: inicioPeriodo,
+                        lt: amanha
+                    }
                 }
             });
 
-            const totalDuracao = dadosParadas._sum.duracao || 0;
-
-            const quantidadeParadas =
-                dadosParadas._count.id_evento || 1;
-
-            const mediaDuracao =
-                totalDuracao / quantidadeParadas;
+            const mediaParadas = totalParadas / quantidadeDias;
 
             return {
                 titulo: 'Média de Paradas por Dia',
-                valor: `${(mediaDuracao / 60).toFixed(1)}h`
+                valor: String(Math.round(mediaParadas))
             };
 
         } catch (error) {

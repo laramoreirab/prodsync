@@ -87,7 +87,7 @@ const ProfileDropdown = ({
       <DropdownMenuTrigger asChild>
         {typeof trigger === "function" ? trigger({ avatarSrc, nomeUsuario }) : trigger}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align={align}>
+      <DropdownMenuContent className="w-80 ml-3" align={align}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-4 px-4 py-2.5 font-normal">
             <div className="relative">
@@ -104,17 +104,6 @@ const ProfileDropdown = ({
               </span>
             </div>
           </DropdownMenuLabel>
-
-          <DropdownMenuSeparator />
-
-          {PROFILE_ITEMS.map(({ label, icon: Icon }) => (
-            <DropdownMenuItem key={label} className={itemClass}>
-              <Link href={settingsHref} className="flex items-center gap-3">
-              <Icon size={20} className="text-foreground" />
-              <span>{label}</span>
-              </Link>
-            </DropdownMenuItem>
-          ))}
 
           <DropdownMenuSeparator />
 

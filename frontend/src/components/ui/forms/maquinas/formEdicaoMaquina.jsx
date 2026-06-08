@@ -324,7 +324,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                     </div>
 
                     <div className="flex flex-col gap-1 col-span-2">
-                        <label className="text-md text-cinza-escuro">Operador</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Operador</label>
                         <select
                                 id="operador"
                                 className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
@@ -346,7 +346,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                    <button type="submit" className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-10 rounded-lg">
                         Editar
                     </button>
                 </div>

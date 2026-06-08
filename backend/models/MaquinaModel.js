@@ -654,6 +654,53 @@ class MaquinaModel {
     }
 
     // Lista as máquinas por categoria
+    static async listarMaquinasDisponiveisPorTurno(id_empresa, id_setor, id_turno, id_operador = null) {
+        try {
+            const turnoId = Number(id_turno);
+            const operadorId = id_operador ? Number(id_operador) : null;
+
+            const escalasOcupadas = await prisma.escalaTrabalho.findMany({
+                where: {
+                    id_empresa: Number(id_empresa),
+                    id_setor: Number(id_setor),
+                    id_turno: turnoId,
+                    id_maquina: { not: null },
+                    ...(operadorId ? { id_operador: { not: operadorId } } : {})
+                },
+                select: {
+                    id_maquina: true
+                }
+            });
+
+            const idsOcupados = escalasOcupadas
+                .map((escala) => escala.id_maquina)
+                .filter(Boolean);
+
+            return await prisma.maquinas.findMany({
+                where: {
+                    id_empresa: Number(id_empresa),
+                    id_setor: Number(id_setor),
+                    ativo: true,
+                    ...(idsOcupados.length ? { id_maquina: { notIn: idsOcupados } } : {})
+                },
+                orderBy: {
+                    nome: 'asc'
+                },
+                include: {
+                    operador: {
+                        select: {
+                            id_usuario: true,
+                            nome: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao listar maquinas disponiveis por turno:', error);
+            throw error;
+        }
+    }
+
     static async listarMaquinasPorCategoria(id_empresa, id_categoria) {
         try {
             const maquinas = await prisma.maquinas.findMany({
@@ -1240,7 +1287,7 @@ class MaquinaModel {
                 : 0;
 
             return {
-                titulo: 'Pecas por Minuto',
+                titulo: 'Peças por Minuto',
                 valor: String(pecasPorMinuto)
                 // pecas_por_minuto: pecasPorMinuto,
                 // total_pecas: totais.pecas,

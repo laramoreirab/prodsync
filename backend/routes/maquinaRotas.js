@@ -28,6 +28,7 @@ router.get('/producaoMaquinas/:id_setor', autorizarSetorParam('id_setor'), Maqui
 router.post('/cadastro-lote', authMiddleware, adminMiddleware, upload.single('file'), MaquinaController.cadastroLote);
 
 router.get('/status/:status', aplicarEscopoGestor, MaquinaController.listarMaquinasPorStatus);
+router.get('/setor/:id_setor/disponiveis', autorizarSetorParam('id_setor'), MaquinaController.listarMaquinasDisponiveisPorTurno);
 router.get('/setor/:id_setor', autorizarSetorParam('id_setor'), MaquinaController.listarMaquinasPorSetor);
 router.get('/obter-maquina-operador/:id_operador', autorizarUsuarioParam('id_operador'), MaquinaController.obterMaquinaOperador)
 

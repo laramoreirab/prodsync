@@ -702,7 +702,7 @@ class EventoModel {
         const tempoParado = paradas._sum.duracao ?? 0
 
         return [
-            { nome: 'Tempo Produzido', valor: tempoProduzido },
+            { nome: 'Tempo Produzindo', valor: tempoProduzido },
             { nome: 'Tempo Parado', valor: tempoParado }
         ]
     }
