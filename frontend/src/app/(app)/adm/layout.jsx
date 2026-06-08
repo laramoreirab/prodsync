@@ -2,7 +2,10 @@ import { AppSidebar } from "@/components/sidebar-components/sidebar-adm/app-side
 
 export default function AdminLayout({ children }) {
   return (
-    <div data-app-shell className="relative h-screen w-full overflow-hidden bg-[#f8f8f8] dark:bg-zinc-950 select-none">
+    <div
+      data-app-shell
+      className="relative min-h-screen w-full bg-[#f8f8f8] dark:bg-zinc-950 select-none"
+    >
       {/* Light mode: aparece normalmente */}
       <img
         src="/bg_app.svg"
@@ -20,10 +23,12 @@ export default function AdminLayout({ children }) {
         style={{ filter: "brightness(0) invert(0) opacity(0.07)" }}
       />
 
-      <div className="relative z-10 flex h-full w-full">
+      <div className="relative z-10 flex min-h-screen w-full">
         <AppSidebar />
-        <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden p-4 sm:p-6 lg:p-8">
-          <div className="min-h-0 flex-1 overflow-y-auto scrollbar-hide">{children}</div>
+        <main className="flex min-w-0 flex-1 flex-col sm:px-6 lg:px-8 px-4">
+          <div className="flex-1">
+            {children}
+          </div>
         </main>
       </div>
     </div>
