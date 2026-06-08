@@ -417,7 +417,7 @@ export default function SetorEspecificoPage({ params }) {
                 Turnos de Trabalho
               </span>
 
-              <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2 max-h-50 overflow-y-auto pr-1">
                 {turnosAgrupados.length > 0 ? (
                   turnosAgrupados.map((t) => (
                     <div
@@ -470,15 +470,15 @@ export default function SetorEspecificoPage({ params }) {
           </DetailWidgetCard>
         </AsymmetricGrid>
 
-        <KPIGrid cols={2} className="mt-6">
-
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[300px]">
           <DetailWidgetCard>
             <SetorMotivosParadaWidget setorId={id} />
           </DetailWidgetCard>
-          <DetailWidgetCard>
+          
+          <DetailWidgetCard className="h-full flex flex-col [&>div]:h-full [&>div]:flex [&>div]:flex-col">
             <SetorMaquinaStatusWidget setorId={id} />
           </DetailWidgetCard>
-        </KPIGrid>
+        </section>
                 <KPIGrid cols={2} className="mt-6">
           <DetailWidgetCard>
             <SetorProducaoSemanalWidget setorId={id} />

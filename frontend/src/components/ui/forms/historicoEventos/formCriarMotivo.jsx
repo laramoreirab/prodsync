@@ -56,38 +56,41 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
             <Separator className="my-4 bg-gray-300" />
 
             <form onSubmit={handleSubmitMotivo} className="px-2 flex flex-col gap-4">
-                <div className="flex flex-col gap-1">
-                    <label className="text-lg font-semibold text-black dark:text-white">Descrição</label>
-                    <input
-                        required
-                        type="text"
-                        value={descricao}
-                        onChange={(e) => setDescricao(e.target.value)}
-                        className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
-                    />
+                <div className="px-8">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-lg font-semibold text-black dark:text-white">Descrição</label>
+                        <input
+                            required
+                            type="text"
+                            value={descricao}
+                            onChange={(e) => setDescricao(e.target.value)}
+                            className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
+                        />
+                    </div>
+
+                    <div className="flex flex-col mt-3 gap-1">
+                        <label className="text-lg font-semibold text-black dark:text-white">Tipo</label>
+                        <select
+                            value={tipo}
+                            onChange={(e) => setTipo(e.target.value)}
+                            className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
+                        >
+                            <option value="Programada">Programada</option>
+                            <option value="Nao_Programada">Não Programada</option>
+                        </select>
+                    </div>
+
+                    <div className="flex justify-center mb-4 mt-8">
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 text-2xl text-white font-semibold py-3 px-12 rounded-lg disabled:opacity-60 transition-all flex items-center justify-center min-w-37.5"
+                        >
+                            {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : "Criar"}
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <label className="text-lg font-semibold text-black dark:text-white">Tipo</label>
-                    <select
-                        value={tipo}
-                        onChange={(e) => setTipo(e.target.value)}
-                        className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
-                    >
-                        <option value="Programada">Programada</option>
-                        <option value="Nao_Programada">Não Programada</option>
-                    </select>
-                </div>
-
-                <div className="flex justify-center mt-4">
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="bg-[#002866] hover:bg-[#001d4a] text-lg text-white font-semibold py-3 px-12 rounded-lg disabled:opacity-60 transition-all flex items-center justify-center min-w-37.5"
-                    >
-                        {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : "Criar"}
-                    </button>
-                </div>
             </form>
         </div>
     );

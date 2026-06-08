@@ -52,10 +52,10 @@ function DialogContent({
             <DialogPrimitive.Close asChild>
               <Button
                 variant="ghost"
-                className="absolute top-2 right-2"
-                size="icon-sm"
+                className="absolute top-3 cursor-pointer right-2 size-12 text-secondary hover:bg-secondary/10 hover:text-secondary rounded-full"
+                size="icon"
               >
-                <XIcon />
+                <XIcon className="size-8" />
               </Button>
             </DialogPrimitive.Close>
           )}

@@ -210,52 +210,52 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                             <DialogContent>
                                 <div className="flex items-center">
                                     <div className="text-secondary flex items-center px-4 py-2 rounded-md">
-                                        <Plus className="mr-2 text-3xl text-white" />
-                                        <DialogTitle className="text-3xl text-white">Criar Máquinas em Lote</DialogTitle>
+                                        <Plus strokeWidth={2} size={30} className="mr-2" />
+                                        <DialogTitle className="text-3xl font-semibold text-secondary">Criar Máquinas em Lote</DialogTitle>
                                     </div>
                                 </div>
                                 <Separator className="m-2 bg-[#a6a6a6]" />
 
+                                <div className="px-8 pb-8 pt-4 flex flex-col gap-6">
+                                    <input
+                                        type="file"
+                                        ref={fileInputLoteRef}
+                                        onChange={handleLoteChange}
+                                        accept=".csv"
+                                        className="hidden"
+                                    />
 
-                                <input
-                                    type="file"
-                                    ref={fileInputLoteRef}
-                                    onChange={handleLoteChange}
-                                    accept=".csv"
-                                    className="hidden"
-                                />
-
-                                {/* div do upload clicavel */}
-                                <div
-                                    onClick={() => fileInputLoteRef.current?.click()}
-                                    className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
-                                >
-                                    {!arquivoLote ? (
-                                        <div className="flex flex-col items-center text-gray-500">
-                                            <Upload className="w-12 h-12 mb-2 text-gray-400" />
-                                            <span className="text-md font-medium">Clique aqui para fazer upload do arquivo CSV.</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center w-full">
-                                            <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
-                                                <File className="w-4 h-4 mr-2 shrink-0" />
-                                                <span className="text-sm truncate">{arquivoLote.nome}</span>
+                                    {/* div do upload clicavel */}
+                                    <div
+                                        onClick={() => fileInputLoteRef.current?.click()}
+                                        className="border-2 border-dashed rounded-xl p-7 flex flex-col items-center justify-center bg-white border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors"
+                                    >
+                                        {!arquivoLote ? (
+                                            <div className="flex flex-col items-center text-gray-500">
+                                                <Upload className="w-12 h-12 mb-2 text-gray-400" />
+                                                <span className="text-md font-medium">Clique aqui para fazer upload do arquivo CSV.</span>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center w-full">
+                                                <div className="flex items-center bg-[#aebfdb] text-[#4a5f82] px-3 py-2 rounded-md w-full">
+                                                    <File className="w-4 h-4 mr-2 shrink-0" />
+                                                    <span className="text-sm truncate">{arquivoLote.nome}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                <div className="flex items-center">
-                                    <Info className="text-[#7c7c81] mr-2" />
-                                    <p className="text-[#7c7c81]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas.</p>
-                                </div>
+                                    <div className="flex items-center">
+                                        <Info className="text-[#7c7c81] mr-2" />
+                                        <p className="text-[#7c7c81]">O arquivo deve estar em .CSV e cada campo necessita estar corretamente separado por vírgulas.</p>
+                                    </div>
 
-                                <div className="flex justify-center mt-4">
-                                    <button type="button" onClick={handleSubmitLote} className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
-                                        Criar em Lote
-                                    </button>
+                                    <div className="flex justify-center mt-4">
+                                        <button type="button" onClick={handleSubmitLote} className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                                            Criar em Lote
+                                        </button>
+                                    </div>
                                 </div>
-
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -416,7 +416,7 @@ export default function FormCadastroMaquina({ onCadastroSucesso }) {
                         </div>
 
                         <div className="flex justify-center mt-4">
-                            <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-8 rounded-lg ">
+                            <button type="submit" className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-8 rounded-lg ">
                                 Cadastrar
                             </button>
                         </div>

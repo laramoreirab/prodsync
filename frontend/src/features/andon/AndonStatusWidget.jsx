@@ -35,7 +35,7 @@ export function AndonStatusWidget({ scope = "factory", idSetor = null, title }) 
 
   return (
     <div className="space-y-4 w-full h-full flex flex-col">
-<p className="text-md font-semibold text-slate-950 dark:text-slate-100 shrink-0">{heading}</p>
+      <p className="text-md font-semibold text-slate-950 dark:text-slate-100 shrink-0">{heading}</p>
       <div className="grid gap-4 grid-cols-3 w-full flex-1">
         {cards.map(({ key, label, bg, accent }) => (
           <div

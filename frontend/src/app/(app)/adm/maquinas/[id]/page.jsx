@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { DuracaoEvento } from "@/components/ui/duracaoEvento";
 import { DataEvento } from "@/components/ui/dataEvento";
 
-import { BellRing, Pencil, EyeIcon, Trash2, Plus, Search, Loader2 } from "lucide-react";
+import { BellRing, Pencil, EyeIcon, Trash2, Plus, Search, Loader2, CloudBackup } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -112,7 +112,7 @@ const colunasApontamento = [
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
-const formatarData = (valor) => (!valor ? "-" : new Date(valor).toLocaleDateString("pt-BR"));
+const formatarData = (valor) => (!valor ? "Não Informada" : new Date(valor).toLocaleDateString("pt-BR"));
 const formatarPeriodo = (inicio, fim) => {
   if (!inicio) return "-";
   const di = new Date(inicio);
@@ -374,7 +374,7 @@ export default function MaquinaDetalhePage({ params }) {
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando máquina...</p>
+          <p className="text-lg text-gray-600 font-medium">Sincronizando dados da máquina...</p>
         </div>
       </main>
     );
@@ -393,21 +393,21 @@ export default function MaquinaDetalhePage({ params }) {
           imageSrc={imagemMaquina}
           fieldsLeft={[
             { label: "ID", value: maquina?.id_maquina || maquinaId },
-            { label: "Série", value: maquina?.serie || "-" },
-            { label: "Setor", value: maquina?.id_setor || "-" },
+            { label: "Série", value: maquina?.serie || "Não Informado" },
+            { label: "Setor", value: maquina?.id_setor || "Sem setor atribuído" },
             {
               label: "Status",
               value: <StatusBadge status={maquina?.status_atual || maquina?.status || "Parada"} />,
             },
           ]}
           fieldsRight={[
-            { label: "Operador", value: maquina?.id_operador || "-" },
-            { label: "Data de Aquisição", value: formatarData(maquina?.data_aquisicao) },
-            { label: "Velocidade Média", value: velocidade?.velocidade_atual || "-" },
+            { label: "Operador", value: maquina?.id_operador || "Sem operador atribuído" },
+            { label: "Data de Aquisição", value: formatarData(maquina?.data_aquisicao) || "Não Informada"},
+            { label: "Velocidade Média", value: velocidade?.velocidade_atual || "Não Informada" },
           ]}
           actions={
             <DetailActions>
-              <SyncPlacaDialog maquinaId={maquinaId} iconSize={32} />
+              <SyncPlacaDialog maquinaId={maquinaId} iconSize={36} />
               <Dialog>
                 <DialogTrigger className="text-(--pencil) cursor-pointer">
                   <Pencil size={32} />
