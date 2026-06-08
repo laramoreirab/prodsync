@@ -16,7 +16,7 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
       )}
       
       {/* Relative wrapper holding both the chart and the absolute center text */}
-      <div className="relative flex items-center justify-center h-[180px] w-[320px] pt-10">
+      <div className="relative flex items-center justify-center h-[200px] w-[320px] pt-10">
         <ChartContainer config={config} className="h-full w-full">
           <RechartsPieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
