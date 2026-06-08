@@ -68,7 +68,7 @@ const fileFilterArquivos = (req, file, cb) => {
     cb(null, true);
 };
 
-const maxFileSize = parseInt(process.env.MAX_FILE_SIZE) || 5242880;
+const maxFileSize = parseInt(process.env.MAX_FILE_SIZE) || 20971520; // Aumentado para 20MB
 
 const uploadImagens = multer({
     storage: storageImagens,
@@ -89,7 +89,7 @@ const uploadImagensCloudinary = multer({
 const uploadArquivos = multer({
     storage: storageArquivos,
     limits: {
-        fileSize: maxFileSize * 2
+        fileSize: maxFileSize // Agora usa os 20MB
     },
     fileFilter: fileFilterArquivos
 });

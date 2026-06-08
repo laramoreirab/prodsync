@@ -1,16 +1,13 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
-import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logMiddleware } from './middlewares/logMiddleware.js'
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
-dotenv.config()
-
-import routes from './routes/rotas.js'; //todas as rotas estão sendo servidas do arquivo rotas.js 
+import routes from './routes/rotas.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +27,8 @@ app.use(cors({
     preflightContinue: false,
     optionsSuccessStatus: 200
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(logMiddleware)
