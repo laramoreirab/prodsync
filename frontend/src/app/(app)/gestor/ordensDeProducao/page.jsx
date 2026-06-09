@@ -28,7 +28,19 @@ import { OPProgressoCell } from "@/features/ordens/OPProgressoCell";
 
 
 // Layout geral
-import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid } from "@/components/AnimatedComponents";
+import {
+  PageLayout,
+  PageHeader,
+  SectionDivider,
+  FadeUpItem,
+  SearchBar,
+  FilterRow,
+  EmptyState,
+  KPIGrid,
+  WidgetCard,
+  ContentGrid,
+  KPICardDecorated,
+} from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
 import {
@@ -54,41 +66,75 @@ const colunasOrdemProd = [
     className: "w-45",
     icone: (valor) => {
       const config = {
-        "Media": { className: "border border-sky-500/30 bg-sky-500/10 text-sky-700", icon: <MoveHorizontal className="text-sky-600" /> },
-        "MÃ©dia": { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-azul-cobalto" /> },
-        Alta: { className: "border border-[var(--amarelo)] bg-transparent", icon: <AlertTriangle className="text-amarelo" /> },
-        Critica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },
-        "CrÃ­tica": { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-vermelho-vivido" /> },
-        Baixa: { className: "border border-gray-400 text-sm bg-transparent text-black", icon: <ArrowDown className="text-gray-400" /> },
+        "Média": {
+          className: "border border-[var(--azul-cobalto)]",
+          icon: <MoveHorizontal className="text-azul-cobalto" />
+        },
+        "Alta": {
+          className: "border border-[var(--amarelo)] bg-transparent",
+          icon: <AlertTriangle className="text-amarelo" />
+        },
+        "Crítica": {
+          className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+          icon: <Flame className="text-vermelho-vivido" />
+        },
+        "Baixa": {
+          className: "border border-gray-400 text-sm bg-transparent text-black",
+          icon: <ArrowDown className="text-gray-400" />
+        }
       };
-      const item = config[valor] || { icon: null, className: "" };
+
+
+      const item = config[valor] || { icon: null };
       return (
         <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
           {item.icon}
           {valor}
         </Badge>
       );
-    },
+    }
   },
   { id: "setor", key: "setor", label: "Setor", className: "w-1/5" },
   {
     id: "status_op",
     key: "status_op",
-    label: "Status",
+    label: 'Status',
     className: "text-center",
     icone: (valor) => {
       const config = {
-        Produzindo: "bg-green-500/15 text-green-600",
-        Setup: "bg-[var(--amarelo-setup)] text-amarelo",
-        Parada: "bg-vermelho-vivido/10 text-vermelho-vivido",
-        "ConcluÃ­da": "bg-blue-500/10 text-blue-600",
+        "Produzindo": {
+          variant: "produzindo",
+          label: "Produzindo"
+        },
+        "Setup": {
+          variant: "setup",
+          label: "Setup"
+        },
+        "Parada": {
+          variant: "parada",
+          label: "Parada"
+        },
+        "Concluída": {
+          variant: "concluida",
+          label: "Concluída"
+        },
+        "Aguardando": {
+          variant: "aguardando",
+          label: "Aguardando Início"
+        }
       };
+
+      const item = config[valor] || {
+        variant: "default",
+        label: valor
+      };
+
       return (
-        <Badge variant="outline" className={`whitespace-nowrap ${config[valor] || "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]"} text-sm font-semibold border-none p-2.5`}>
-          {valor || "-"}
+        <Badge variant={item.variant}>
+          {item.label}
         </Badge>
       );
-    },
+    }
   },
   {
     id: "progresso",
@@ -164,154 +210,154 @@ export default function OrdensDeProducaoGestor() {
   return (
     <PageLayout>
 
-        <PageHeader title="Ordens de Produção" action={
+      <PageHeader title="Ordens de Produção" action={
 
-          <Dialog>
-            <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
-              <Plus className="mr-2" />
-              Criar OP
-            </DialogTrigger>
-            <DialogContent>
-              <FormCadastroOp onCadastroSucesso={refresh} />
-            </DialogContent>
-          </Dialog>
+        <Dialog>
+          <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold">
+            <Plus className="mr-2" />
+            Criar OP
+          </DialogTrigger>
+          <DialogContent>
+            <FormCadastroOp onCadastroSucesso={refresh} />
+          </DialogContent>
+        </Dialog>
 
-        } />
+      } />
 
 
-          {/* GRÁFICOS */}
+      {/* GRÁFICOS */}
 
-        <KPIGrid cols={4} className="mt-4">
+      <KPIGrid cols={4} className="mt-4">
 
-          <WidgetCard>
-            <OPAtivasKPIWidget setorId={setorId} />
-          </WidgetCard>
+        <KPICardDecorated>
+          <OPAtivasKPIWidget setorId={setorId} />
+        </KPICardDecorated>
 
-          <WidgetCard>
-            <OPAtrasadasKPIWidget setorId={setorId} />
-          </WidgetCard>
+        <KPICardDecorated>
+          <OPAtrasadasKPIWidget setorId={setorId} />
+        </KPICardDecorated>
 
-          <WidgetCard>
-            <OPPecasBoasKPIWidget setorId={setorId} />
-          </WidgetCard>
+        <KPICardDecorated>
+          <OPPecasBoasKPIWidget setorId={setorId} />
+        </KPICardDecorated>
 
-          <WidgetCard>
-            <OPRefugoKPIWidget setorId={setorId} />
-          </WidgetCard>
+        <KPICardDecorated>
+          <OPRefugoKPIWidget setorId={setorId} />
+        </KPICardDecorated>
 
-        </KPIGrid>
+      </KPIGrid>
 
-        <KPIGrid cols={3} className="mt-4">
+      <KPIGrid cols={3} className="mt-4">
 
-          <WidgetCard>
-            <OPEficienciaWidget setorId={setorId} />
-          </WidgetCard>
+        <WidgetCard>
+          <OPEficienciaWidget setorId={setorId} />
+        </WidgetCard>
 
-          <WidgetCard>
-            <OPTopRefugoWidget setorId={setorId} />
-          </WidgetCard>
+        <WidgetCard>
+          <OPTopRefugoWidget setorId={setorId} />
+        </WidgetCard>
 
-          <WidgetCard>
-            <OPCargaSetorWidget setorId={setorId} />
-          </WidgetCard>
+        <WidgetCard>
+          <OPCargaSetorWidget setorId={setorId} />
+        </WidgetCard>
 
-        </KPIGrid>
+      </KPIGrid>
 
-        <ContentGrid cols={2} className="mt-6">
-          <WidgetCard>
-            <OPStatusWidget setorId={setorId} />
-          </WidgetCard>
-          <WidgetCard>
-            <OPConcluidasDiaWidget setorId={setorId} />
-          </WidgetCard>
-        </ContentGrid>
+      <ContentGrid cols={2} className="mt-6">
+        <WidgetCard>
+          <OPStatusWidget setorId={setorId} />
+        </WidgetCard>
+        <WidgetCard>
+          <OPConcluidasDiaWidget setorId={setorId} />
+        </WidgetCard>
+      </ContentGrid>
 
-        <SectionDivider title="OPs" className="mt-8" />
+      <SectionDivider title="OPs" className="mt-8" />
 
-        <SearchBar
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Busque por id ou nome..."
-        />
+      <SearchBar
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Busque por id ou nome..."
+      />
 
-        <FilterRow
-          count={dadosExibidos.length}
-          label="OPs"
-          actions={
-            <>
-              <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
-              <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
-            </>
-          }
-        />
+      <FilterRow
+        count={dadosExibidos.length}
+        label="OPs"
+        actions={
+          <>
+            <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
+            <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
+          </>
+        }
+      />
 
-        <FadeUpItem className="mt-4">
-          {dadosExibidos.length > 0 ? (
-            <TableListagens
-              data={dadosExibidos}
-              columns={colunasOrdemProd}
-              enableSelection
-              onSelectedChange={setSelecionados}
-              excluirLote={
-                <DialogContent>
-                  <FormExclusaoOp
-                    opIds={selecionados.map((op) => op.id ?? op.id_ordem)}
-                    onExclusaoSucesso={refresh}
-                  />
-                </DialogContent>
-              }
-              acoesDropdown={(op) => (
-                <>
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`ordensDeProducao/${op.id}`}>
-                      <EyeIcon className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </DropdownMenuItem>
+      <FadeUpItem className="mt-4">
+        {dadosExibidos.length > 0 ? (
+          <TableListagens
+            data={dadosExibidos}
+            columns={colunasOrdemProd}
+            enableSelection
+            onSelectedChange={setSelecionados}
+            excluirLote={
+              <DialogContent>
+                <FormExclusaoOp
+                  opIds={selecionados.map((op) => op.id ?? op.id_ordem)}
+                  onExclusaoSucesso={refresh}
+                />
+              </DialogContent>
+            }
+            acoesDropdown={(op) => (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`ordensDeProducao/${op.id}`}>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    Ver Detalhes
+                  </Link>
+                </DropdownMenuItem>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="cursor-pointer"
-                      >
-                        <Pencil className="mr-2 h-4 w-4 text-primary" />
-                        Editar OP
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
-                    </DialogContent>
-                  </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
+                      <Pencil className="mr-2 h-4 w-4 text-primary" />
+                      Editar OP
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormEdicaoOp opId={op.id} onEdicaoSucesso={refresh} />
+                  </DialogContent>
+                </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="cursor-pointer"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <FormExclusaoOp
-                        opId={op.id}
-                        idMaquina={op.id_maquina}
-                        onExclusaoSucesso={refresh}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum resultado encontrado"
-              message="Ajuste seus filtros ou termo de busca."
-            />
-          )}
-        </FadeUpItem>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="cursor-pointer"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4 text-vermelho-vivido" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <FormExclusaoOp
+                      opId={op.id}
+                      idMaquina={op.id_maquina}
+                      onExclusaoSucesso={refresh}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          />
+        ) : (
+          <EmptyState
+            title="Nenhum resultado encontrado"
+            message="Ajuste seus filtros ou termo de busca."
+          />
+        )}
+      </FadeUpItem>
     </PageLayout>
   );
 }

@@ -65,7 +65,7 @@ const colunasMaquina = [
         "Setup": { variant: "setup" },
         "Parada": { variant: "parada" },
         "Concluída": { variant: "concluida" },
-        "Aguardando Início": { variant: "aguardando" }
+        "Aguardando": { variant: "aguardando" }
       };
       const item = config[valor] || { icon: null };
       return (

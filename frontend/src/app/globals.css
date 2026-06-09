@@ -754,15 +754,9 @@ input.input-no-spinner {
   }
 }
 
-::-webkit-scrollbar {
-  width: 9px;
+* {
+  scrollbar-width: none;
 }
-
-::-webkit-scrollbar-thumb {
-  background: var(--secondary);
-  border-radius: 50px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f8f8f8;
+*::-webkit-scrollbar {
+  display: none;
 }

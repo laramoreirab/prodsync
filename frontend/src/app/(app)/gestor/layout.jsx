@@ -4,7 +4,7 @@ import RoleGuard from "@/components/auth/RoleGuard"
 export default function AdminLayout({ children }) {
   return (
     <RoleGuard allowedRoles={["Gestor"]}>
-    <div data-app-shell className="relative h-screen w-full overflow-hidden bg-[#f8f8f8] dark:bg-zinc-950 select-none">
+    <div data-app-shell className="relative min-h-screen w-full bg-[#f8f8f8] dark:bg-zinc-950 select-none">
         {/* Light mode: aparece normalmente */}
       <img
         src="/bg_app.svg"

@@ -84,18 +84,9 @@ const colunaMaquinaSetor = [
     className: 'text-center justify-center',
     icone: (valor) => {
       const config = {
-        "Produzindo": {
-          variant: "outline",
-          className: "bg-green-500/15 text-green-600 text-sm font-semibold border-none"
-        },
-        "Setup": {
-          variant: "outline",
-          className: "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100"
-        },
-        "Parada": {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none"
-        }
+        "Produzindo": { variant: "produzindo" },
+        "Setup": { variant: "setup" },
+        "Parada": { variant: "parada" }
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
