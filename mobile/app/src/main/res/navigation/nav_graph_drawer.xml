@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_drawer"
+    app:startDestination="@id/maquinasFragment">
+
+    <fragment
+        android:id="@+id/maquinasFragment"
+        android:name="com.senai.prodsync.ui.shared.MaquinasFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/PerfilFragment"
+        android:name="com.senai.prodsync.ui.shared.PerfilFragment"
+        android:label="Perfil" />
+
+    <fragment
+        android:id="@+id/UsuariosFragment"
+        android:name="com.senai.prodsync.ui.shared.UsuariosFragment"
+        android:label="Usuários" />
+
+    <fragment
+        android:id="@+id/ConfigFragment"
+        android:name="com.senai.prodsync.ui.shared.OpsFragment"
+        android:label="Configurações" />
+
+</navigation>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:gravity="bottom"
+    android:background="@color/azul_marinho"
+    android:padding="10dp">
+
+    <ImageView
+        android:layout_width="104dp"
+        android:layout_height="104dp"
+        android:src="@drawable/s_logo"
+        android:tint="#FFFFFF"
+    />
+
+</LinearLayout>
