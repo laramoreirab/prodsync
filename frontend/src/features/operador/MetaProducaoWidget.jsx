@@ -27,7 +27,7 @@ export function MetaProducaoWidget({ operadorId }) {
       </div>
       {/* Container central do gráfico */}
       <div className="flex flex-col items-center">
-        <CustomPieChart data={chartData} config={metaConfig}>
+        <CustomPieChart data={chartData} config={metaConfig} showOuterLabels>
           <div className="flex flex-col items-center pt-11">
             <span className="text-3xl font-bold text-black">{data.completo}%</span>
             <span className="text-xs text-gray-400 font-semibold">Completo</span>
