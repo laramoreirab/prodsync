@@ -99,7 +99,7 @@ const TableListagens = ({ data, columns, enableSelection = false, excluirLote, e
     <div className='w-full mb-5 bg-transparent'>
 
       {barraSelecionados && (
-        <div className="flex items-center justify-between p-3 mb-4 rounded-md border border-primary bg-primary/5 w-full dark:border-[#365b94] dark:bg-[#10203a]/30">
+        <div className="flex items-center justify-between p-3 mb-4 rounded-md bg-primary/5 w-full dark:border-[#365b94] dark:bg-[#10203a]/30">
           <div className="flex items-center gap-1">
             <span className="flex items-center justify-center text-md text-primary font-medium">
               {selectedRows.length}

@@ -1,6 +1,7 @@
 "use client"
 
 import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main"
+import { ProductionSetupTour } from "@/components/sidebar-components/sidebar-adm/production-setup-tour"
 import {
   Sidebar,
   SidebarContent,
@@ -88,6 +89,7 @@ export function AppSidebar({
 
       <SidebarContent className="px-1 py-2">
         <NavMain items={data.navMain} />
+        <ProductionSetupTour />
       </SidebarContent>
 
       <SidebarFooter className="p-3 pt-2 group-data-[collapsible=icon]:px-2">

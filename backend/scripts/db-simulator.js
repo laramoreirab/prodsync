@@ -9,7 +9,7 @@ const STATUS_OP_ATIVOS = ['Em_Andamento', 'Parada', 'Setup', 'Aguardando'];
 const STATUS_PARADA = ['Parada', 'Setup', 'Manutencao'];
 
 const config = {
-  empresaIds: parseIds(process.env.SIMULATOR_EMPRESA_IDS ?? process.env.SIMULATOR_EMPRESA_ID ?? '11,12,9,26'),
+  empresaIds: parseIds(process.env.SIMULATOR_EMPRESA_IDS ?? process.env.SIMULATOR_EMPRESA_ID ?? '10,12,9,26'),
   intervalMs: Number(process.env.SIMULATOR_INTERVAL_MS ?? 60000),
   batchSize: Number(process.env.SIMULATOR_BATCH_SIZE ?? 4),
   historyDays: Number(process.env.SIMULATOR_HISTORY_DAYS ?? 7),
