@@ -22,6 +22,7 @@ export function MotivoRefugoMaquinaWidget({ maquinaId }) {
           config={motivoRefugoConfig}
           dataKey="value"
           nameKey="name"
+          showLegend
         />
       </div>
     </div>

@@ -33,7 +33,7 @@ export default function DashboardGeralOperador() {
       <WidgetCard>
         <OEEMaquinaWidget operadorId={operadorId} />
       </WidgetCard>
-      <WidgetCard className="h-120">
+      <WidgetCard className="h-80">
         <ProdutividadeDiariaWidget operadorId={operadorId} />
       </WidgetCard>
       <WidgetCard>
@@ -45,7 +45,7 @@ export default function DashboardGeralOperador() {
       <WidgetCard>
         <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
       </WidgetCard>
-      <WidgetCard>
+      <WidgetCard className="h-80">
         <QualidadeWidget operadorId={operadorId} />
       </WidgetCard>
       <WidgetCard>

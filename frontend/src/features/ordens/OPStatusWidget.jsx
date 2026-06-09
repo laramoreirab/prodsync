@@ -26,6 +26,26 @@ const opStatusConfig = {
   },
 };
 
+const opStatusChartConfig = {
+  ...opStatusConfig,
+  Finalizada: {
+    label: "Finalizadas",
+    color: "#d9d9d9",
+  },
+  Finalizadas: {
+    label: "Finalizadas",
+    color: "#d9d9d9",
+  },
+  "Concluída": {
+    label: "Finalizadas",
+    color: "#d9d9d9",
+  },
+  "Concluídas": {
+    label: "Finalizadas",
+    color: "#d9d9d9",
+  },
+};
+
 export function OPStatusWidget({ setorId = null }) {
   const { data, loading, error } = useOPStatus(setorId);
 
@@ -37,10 +57,12 @@ export function OPStatusWidget({ setorId = null }) {
   const chartData = Array.isArray(data)
     ? data.map((item) => {
         const statusKey = item.status || item.name;
-        const configDoStatus = opStatusConfig[statusKey];
+        const configDoStatus = opStatusChartConfig[statusKey];
 
         return {
           ...item,
+          status: statusKey,
+          name: statusKey,
           fill: configDoStatus?.color || "var(--chart-1)",
         };
       })
@@ -59,9 +81,10 @@ export function OPStatusWidget({ setorId = null }) {
       <div className="flex items-center justify-center flex-1 w-full min-h-[200px]">
         <CustomPieChart
           data={chartData}
-          config={opStatusConfig}
+          config={opStatusChartConfig}
           dataKey="value"
           nameKey="status" 
+          showLegend
         />
       </div>
     </div>

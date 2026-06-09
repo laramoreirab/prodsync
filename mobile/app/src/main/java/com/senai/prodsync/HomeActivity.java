@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -26,10 +25,8 @@ import androidx.work.WorkManager;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.senai.prodsync.ui.shared.UsuariosFragment;
-import com.senai.prodsync.ui.shared.MaquinaDetalheFragment;
 import com.senai.prodsync.ui.shared.MaquinasFragment;
 import com.senai.prodsync.ui.shared.OpsFragment;
 import com.senai.prodsync.ui.shared.PerfilFragment;
@@ -40,7 +37,6 @@ public class HomeActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private BottomNavigationView bottomNav;
-    private String userRole;
     private static final int NOTIFICATION_PERMISSION_CODE = 101;
 
     @Override
@@ -53,13 +49,12 @@ public class HomeActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigation_view);
         bottomNav = findViewById(R.id.bottomNav);
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        FloatingActionButton fabTeste = findViewById(R.id.fab_teste_notificacao);
 
         // Configurar a Toolbar para abrir o Drawer
         toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
         // Recebe o cargo do usuário
-        userRole = getIntent().getStringExtra("USER_ROLE");
+        String userRole = getIntent().getStringExtra("USER_ROLE");
         if (userRole == null) userRole = "gestor";
 
         setupMenus(userRole);
@@ -75,13 +70,6 @@ public class HomeActivity extends AppCompatActivity {
         // 2. Iniciar monitoramento automático e imediato
         startImmediateCheck();
         startPeriodicCheck();
-
-        // 3. Botão de teste momentâneo
-        fabTeste.setOnClickListener(v -> {
-            Toast.makeText(this, "Sincronizando com API Render...", Toast.LENGTH_SHORT).show();
-            OneTimeWorkRequest testRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class).build();
-            WorkManager.getInstance(this).enqueue(testRequest);
-        });
     }
 
     private void checkNotificationPermission() {
