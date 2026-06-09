@@ -1,5 +1,7 @@
 "use client";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
+import { Cell, Pie, PieChart as RechartsPieChart } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useMaquinaStatus } from "./hooks/useMaquinaStatus";
 import { maquinaStatusConfig } from "./config/maquinaChartConfig";
 
@@ -32,13 +34,35 @@ export function MaquinaStatusDonutWidget({ setorId }) {
         </p>
       </div>
 
-      {/* Gráfico preenche o restante do card */}
-      <div className="flex-1 min-h-0 mt-4">
-        <CustomPieChart
-          data={chartData}
-          config={maquinaStatusConfig}
-          dataKey="value"
-        />
+      {/* Gráfico */}
+     <div className="flex-1 flex items-center justify-center min-h-0 mt-4">
+        <div className="relative h-[200px] w-[200px]">
+          <ChartContainer config={maquinaStatusConfig} className="h-full w-full">
+            <RechartsPieChart>
+              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={40}
+                outerRadius={60}
+                startAngle={90}
+                endAngle={-270}
+                strokeWidth={0}
+                className="stroke-background"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={maquinaStatusConfig[entry.name]?.color || "#ccc"} 
+                  />
+                ))}
+              </Pie>
+            </RechartsPieChart>
+          </ChartContainer>
+        </div>
       </div>
     </div>
   );
