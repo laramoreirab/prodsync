@@ -366,7 +366,7 @@ const ChatAI = () => {
       </div>
 
       {!isOpen && (
-        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-slate-100 overflow-hidden z-[9999]">
+        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-slate-100 overflow-hidden z-9999 cursor-pointer">
             <div className="relative w-full h-full flex items-center justify-center">
                 <img src="/ia_trigger.svg" alt="Sy AI" className="w-[75%] h-[75%] object-contain" />
             </div>
