@@ -38,6 +38,7 @@ export function MaquinaStatusDonutWidget({ setorId }) {
           data={chartData}
           config={maquinaStatusConfig}
           dataKey="value"
+          showLegend
         />
       </div>
     </div>
