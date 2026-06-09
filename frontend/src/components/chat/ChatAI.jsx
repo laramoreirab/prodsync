@@ -122,6 +122,7 @@ const ChatAI = () => {
       <AnimatePresence>
         {isOpen && isExpanded && (
           <motion.div
+            data-print-hide
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
