@@ -33,21 +33,6 @@ export function MetaProducaoWidget({ operadorId }) {
             <span className="text-xs text-gray-400 font-semibold">Completo</span>
           </div>
         </CustomPieChart>
-
-        {/* Legenda das cores */}
-        <div className="flex gap-4 mt-2">
-          {Object.entries(metaConfig).map(([key, item]) => (
-            <div key={key} className="flex items-center gap-1.5">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
-              <span className="text-xs font-medium text-gray-600">
-                {item.label}
-              </span>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

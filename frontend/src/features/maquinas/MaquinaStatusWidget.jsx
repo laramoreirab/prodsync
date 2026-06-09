@@ -19,6 +19,7 @@ export function MaquinaStatusWidget() {
         data={data}
         config={maquinaStatusConfig}
         dataKey="value"
+        showLegend
       />
     </div>
   );
