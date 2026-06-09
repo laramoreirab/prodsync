@@ -24,9 +24,9 @@ import {
 } from "@/components/DetailComponents";
 
 const statusConfig = {
-  Produzindo: "bg-green-500/15 text-green-600",
-  Setup: "bg-amber-100 text-amber-900",
-  Parada: "bg-red-100 text-red-700",
+  Produzindo: "bg-green-500/15 text-green-600 text-sm font-semibold border-none dark:!bg-green-300/20 dark:!text-green-100",
+  Setup: "font-semibold text-sm bg-[#fffbea] text-amarelo dark:!bg-amber-300/20 dark:!text-amber-100",
+  Parada: "font-semibold text-sm bg-vermelho-vivido/10 text-vermelho-vivido dark:!bg-red-500/20 dark:!text-red-100",
 };
 
 export default function MaquinaDetalhePage({ params }) {

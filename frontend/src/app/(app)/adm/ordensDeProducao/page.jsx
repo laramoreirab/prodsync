@@ -45,7 +45,7 @@ import {
   EmptyState,
   LoadingState,
   FadeUpItem,
-  AsymmetricGrid, 
+  AsymmetricGrid,
   KPICardDecorated,
 } from "@/components/AnimatedComponents";
 
@@ -92,38 +92,38 @@ const colunasOrdemProd = [
     label: "Prioridade",
     className: "w-45",
     icone: (valor) => {
-          const config = {
-            "Média": {
-              variant: "outline",
-              className: "border border-[var(--azul-cobalto)]",
-              icon: <MoveHorizontal className="text-azul-cobalto" />
-            },
-            "Alta": {
-              variant: "secondary",
-              className: "border border-[var(--amarelo)] bg-transparent",
-              icon: <AlertTriangle className="text-amarelo" />
-            },
-            "Crítica": {
-              variant: "destructive",
-              className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
-              icon: <Flame className="text-vermelho-vivido" />
-            },
-            "Baixa": {
-              variant: "destructive",
-              className: "border border-gray-400 text-sm bg-transparent text-black",
-              icon: <ArrowDown className="text-gray-400" />
-            }
-          };
-    
-    
-          const item = config[valor] || { icon: null };
-          return (
-            <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
-              {item.icon}
-              {valor}
-            </Badge>
-          );
+      const config = {
+        "Média": {
+          variant: "outline",
+          className: "border border-[var(--azul-cobalto)]",
+          icon: <MoveHorizontal className="text-azul-cobalto" />
+        },
+        "Alta": {
+          variant: "secondary",
+          className: "border border-[var(--amarelo)] bg-transparent",
+          icon: <AlertTriangle className="text-amarelo" />
+        },
+        "Crítica": {
+          variant: "destructive",
+          className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+          icon: <Flame className="text-vermelho-vivido" />
+        },
+        "Baixa": {
+          variant: "destructive",
+          className: "border border-gray-400 text-sm bg-transparent text-black",
+          icon: <ArrowDown className="text-gray-400" />
         }
+      };
+
+
+      const item = config[valor] || { icon: null };
+      return (
+        <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
+          {item.icon}
+          {valor}
+        </Badge>
+      );
+    }
   },
   {
     id: "setor",
@@ -138,17 +138,36 @@ const colunasOrdemProd = [
     className: "text-center",
     icone: (valor) => {
       const config = {
-        "Produzindo": { variant: "produzindo" },
-        "Setup": { variant: "setup" },
-        "Parada": { variant: "parada" },
-        "Concluída": { variant: "concluida" },
-        "Aguardando Início": { variant: "aguardando" }
+        "Produzindo": {
+          variant: "produzindo",
+          label: "Produzindo"
+        },
+        "Setup": {
+          variant: "setup",
+          label: "Setup"
+        },
+        "Parada": {
+          variant: "parada",
+          label: "Parada"
+        },
+        "Concluída": {
+          variant: "concluida",
+          label: "Concluída"
+        },
+        "Aguardando": {
+          variant: "aguardando",
+          label: "Aguardando Início"
+        }
       };
-      const item = config[valor] || { icon: null };
+
+      const item = config[valor] || {
+        variant: "default",
+        label: valor
+      };
+
       return (
-        <Badge variant={item.variant} className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
-          {item.icon}
-          {valor}
+        <Badge variant={item.variant}>
+          {item.label}
         </Badge>
       );
     }

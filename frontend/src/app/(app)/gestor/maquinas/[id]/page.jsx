@@ -79,15 +79,8 @@ const colunasMaquina = [
     className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        Setup: {
-          variant: "secondary",
-          className:
-            "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm ",
-        },
-        Parada: {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none",
-        },
+        Setup: { variant: "setup" },
+        Parada: { variant: "parada" },
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
