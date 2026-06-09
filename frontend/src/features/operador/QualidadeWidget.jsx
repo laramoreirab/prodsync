@@ -22,7 +22,7 @@ export function QualidadeWidget({ operadorId }) {
     <div>
       <p className="text-sm font-semibold text-black">Média de Qualidade</p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
-      <CustomPieChart data={chartData} config={config} dataKey="value" />
+      <CustomPieChart data={chartData} config={config} dataKey="value" showLegend />
     </div>
   );
 }

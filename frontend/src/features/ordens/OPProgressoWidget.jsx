@@ -31,6 +31,7 @@ export function OPProgressoWidget({ opId }) {
           config={progressoConfig}
           dataKey="value"
           nameKey="name"
+          showLegend
         />
       </div>
     </div>

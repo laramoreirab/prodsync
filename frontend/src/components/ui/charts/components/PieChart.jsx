@@ -3,8 +3,73 @@
 import { Cell, Pie, PieChart as RechartsPieChart } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-export function CustomPieChart({ data, config, title, dataKey = "value", children }) {
+const RADIAN = Math.PI / 180;
+
+export function CustomPieChart({
+  data,
+  config,
+  title,
+  dataKey = "value",
+  nameKey = "name",
+  children,
+  showLegend,
+  showOuterLabels = Boolean(showLegend),
+}) {
   if (!data?.length) return null;
+
+  const getLabel = (key) =>
+    String(config?.[key]?.label ?? key).replace(/:\s*$/, "");
+
+  const singleOuterLabel = showOuterLabels && data.length === 1
+    ? (() => {
+        const entry = data[0];
+        const entryKey = entry[nameKey];
+
+        return {
+          color: config?.[entryKey]?.color || entry.fill || "#7d95c6",
+          text: `${getLabel(entryKey)}: ${entry[dataKey]}`,
+        };
+      })()
+    : null;
+
+  const formatValue = (value) =>
+    typeof value === "number" ? value.toLocaleString("pt-BR") : value;
+
+  const renderOuterLabel = (props) => {
+    const { cx, cy, midAngle, outerRadius, payload, value } = props;
+    const entryKey = payload?.[nameKey] ?? props?.[nameKey] ?? props?.name;
+    const color = config?.[entryKey]?.color || payload?.fill || "#7d95c6";
+    const angle = -midAngle * RADIAN;
+    const direction = Math.cos(angle) >= 0 ? 1 : -1;
+    const startX = cx + (outerRadius + 2) * Math.cos(angle);
+    const startY = cy + (outerRadius + 2) * Math.sin(angle);
+    const elbowX = cx + (outerRadius + 16) * Math.cos(angle);
+    const elbowY = cy + (outerRadius + 16) * Math.sin(angle);
+    const endX = elbowX + direction * 18;
+    const textX = endX + direction * 6;
+    const textAnchor = direction > 0 ? "start" : "end";
+
+    return (
+      <g>
+        <path
+          d={`M ${startX} ${startY} L ${elbowX} ${elbowY} L ${endX} ${elbowY}`}
+          fill="none"
+          stroke={color}
+          strokeWidth={1}
+        />
+        <text
+          x={textX}
+          y={elbowY}
+          textAnchor={textAnchor}
+          dominantBaseline="central"
+          className="fill-current text-[11px] font-medium"
+          style={{ fill: color }}
+        >
+          {`${getLabel(entryKey)}: ${formatValue(value)}`}
+        </text>
+      </g>
+    );
+  };
 
   return (
     <div className="relative flex flex-col items-center justify-center w-full">
@@ -16,14 +81,36 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
       )}
       
       {/* Relative wrapper holding both the chart and the absolute center text */}
-      <div className="relative flex items-center justify-center h-[200px] w-[320px] pt-10">
+      <div className="relative flex h-[220px] w-full max-w-[460px] items-center justify-center pt-10">
         <ChartContainer config={config} className="h-full w-full">
-          <RechartsPieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+          <RechartsPieChart margin={{ top: 14, right: 80, bottom: 18, left: 80 }}>
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  formatter={(value, name, item) => {
+                    const entryKey = item?.payload?.[nameKey] ?? item?.payload?.name ?? name;
+                    const color = config?.[entryKey]?.color || item?.payload?.fill || "#7d95c6";
+
+                    return (
+                      <div className="flex items-center gap-1.5 text-foreground">
+                        <span
+                          className="h-2 w-2 rounded-[2px]"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span className="font-medium">
+                          {getLabel(entryKey)}: {formatValue(value)}
+                        </span>
+                      </div>
+                    );
+                  }}
+                />
+              }
+            />
             <Pie
               data={data}
               dataKey={dataKey}
-              nameKey="name"
+              nameKey={nameKey}
               cx="50%"
               cy="50%"
               innerRadius={55} 
@@ -32,34 +119,37 @@ export function CustomPieChart({ data, config, title, dataKey = "value", childre
               endAngle={-270}
               strokeWidth={0}
               className="stroke-background"
-              
-              // ATIVA AS "SETAS"/LINHAS:
-              // labelLine={{ stroke: "#94a3b8", strokeWidth: 1 }}
-              // label={({ name, cx, x, y, textAnchor }) => {
-              //   const color = config[name]?.color || "currentColor";
-              //   return (
-              //     <text
-              //       cx={cx}
-              //       x={x}
-              //       y={y}
-              //       textAnchor={textAnchor}
-              //       className="text-xs font-medium dynamic-label"
-              //       fill={color}
-              //     >
-              //       {config[name]?.label || name}
-              //     </text>
-              //   );
-              // }}
+              labelLine={false}
+              label={showOuterLabels && !singleOuterLabel ? renderOuterLabel : false}
             >
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={config[entry.name]?.color || "#ccc"} 
+                  fill={config[entry[nameKey]]?.color || entry.fill || "#ccc"} 
                 />
               ))}
             </Pie>
           </RechartsPieChart>
         </ChartContainer>
+
+        {singleOuterLabel && (
+          <div className="pointer-events-none absolute left-[calc(50%+62px)] top-[calc(50%-54px)] flex items-center">
+            <span
+              className="absolute -left-5 top-3 h-px w-7 origin-left rotate-[-48deg]"
+              style={{ backgroundColor: singleOuterLabel.color }}
+            />
+            <span
+              className="h-px w-5 shrink-0"
+              style={{ backgroundColor: singleOuterLabel.color }}
+            />
+            <span
+              className="whitespace-nowrap text-[11px] font-medium"
+              style={{ color: singleOuterLabel.color }}
+            >
+              {singleOuterLabel.text}
+            </span>
+          </div>
+        )}
 
         {children && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
