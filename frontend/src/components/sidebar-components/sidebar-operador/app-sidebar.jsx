@@ -21,6 +21,13 @@ import { ListBulletsIcon } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/api";
 import { getUserFromToken } from "@/lib/auth";
 
+const usuario = getUserFromToken();
+const idOperador = usuario?.id_usuario;
+const resposta = await apiFetch(
+          `/api/maquinas/obter-maquina-operador/${idOperador}`,
+        );
+const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
+
 const data = {
   navMain: [
     {
@@ -30,7 +37,7 @@ const data = {
     },
     {
       title: "Máquinas",
-      url: "/operador/maquinas",
+      url: `/operador/maquinas/${idMaquina}`,
       icon: <Wrench />,
     },
     {
@@ -52,7 +59,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }) {
-  const [maquinaUrl, setMaquinaUrl] = useState("/operador/maquinas");
+   const [maquinaUrl, setMaquinaUrl] = useState('');
 
   useEffect(() => {
     let ativo = true;
