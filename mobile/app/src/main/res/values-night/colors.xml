@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Search Bar Dark Mode -->
+    <color name="search_bar_bg">#2C2C2C</color>
+    <color name="search_bar_hint">#8E8E8E</color>
+    <color name="search_bar_icon">#FFFFFF</color>
+
+    <!-- Base Colors for Dark Mode -->
+    <color name="black">#FFFFFF</color>
+    <color name="white">#121212</color>
+    <color name="cinza_claro">#424242</color>
+    <color name="cinza">#BDBDBD</color>
+    <!-- Machine List Dark Mode -->
+    <color name="machine_title">#E0E0E0</color>
+    <color name="machine_sub">#8E8E8E</color>
+</resources>
