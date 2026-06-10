@@ -379,11 +379,7 @@ export default function OPDetalheGestor({ params }) {
             { label: "Lote", value: op.codigo_lote || "Não Informado" },
             {
               label: "Setor",
-              value: setor?.id_setor ? (
-                <Link href={`/gestor/setores/${setor.id_setor}`} className="hover:underline font-semibold text-blue-900">
-                  {setor.nome_setor}
-                </Link>
-              ) : "Não Informado"
+              value: setor?.nome_setor || "Não Informado",
             },
             {
               label: "Máquina",
