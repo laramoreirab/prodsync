@@ -402,7 +402,7 @@ class MaquinaModel {
     }
 
     // Cria uma nova máquina
-    static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem) {
+    static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem, imagem_public_id = null) {
         try {
             const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
             const statusNormalizado = statusValidos.includes(status) ? status : 'Parada';
@@ -419,7 +419,8 @@ class MaquinaModel {
                     status_atual: statusNormalizado,
                     data_aquisicao: data_aquisicao ? new Date(data_aquisicao) : null,
                     id_operador: idOperadorNormalizado,
-                    imagem: imagem || null
+                    imagem: imagem || null,
+                    imagem_public_id: imagem_public_id || null
                 }
             });
             if (idOperadorNormalizado) {
@@ -493,6 +494,10 @@ class MaquinaModel {
 
             if (dados.imagem) {
                 dataUpdate.imagem = dados.imagem;
+            }
+
+            if (dados.imagem_public_id) {
+                dataUpdate.imagem_public_id = dados.imagem_public_id;
             }
 
             const atualizarMaquina = await prisma.maquinas.updateMany({

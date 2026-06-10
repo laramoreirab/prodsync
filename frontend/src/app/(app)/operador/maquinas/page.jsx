@@ -16,6 +16,17 @@ const statusConfig = {
   Parada: "bg-red-100 text-red-700",
 };
 
+const resolverImagemMaquina = (imagem) => {
+  if (!imagem) return "/demo_maq.png";
+  if (imagem.startsWith("http")) return imagem;
+
+  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+  const nomeArquivo = imagem.replaceAll("\\", "/").split("/").pop();
+  return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+};
+
 export default function MaquinasOperadorPage() {
   const [maquina, setMaquina] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +94,7 @@ export default function MaquinasOperadorPage() {
         >
           <div className="flex items-center gap-6">
             <Image
-              src={maquina.imagem || "/demo_maq.png"}
+              src={resolverImagemMaquina(maquina.imagem)}
               alt={maquina.nome}
               width={120}
               height={120}
