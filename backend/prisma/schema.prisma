@@ -82,7 +82,8 @@ model Maquinas {
   capacidade              String?             @db.VarChar(100)
   data_aquisicao          DateTime?           @db.Date
   id_operador             Int?
-  imagem                  String?             @db.VarChar(255)
+  imagem                  String?             @db.Text
+  imagem_public_id        String?             @db.VarChar(255)
   categoria               String?             @db.VarChar(100)
   status                  String?             @db.VarChar(50)
   board_sincronizado_em   DateTime?

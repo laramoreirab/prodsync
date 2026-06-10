@@ -29,6 +29,17 @@ const statusConfig = {
   Parada: "font-semibold text-sm bg-vermelho-vivido/10 text-vermelho-vivido dark:!bg-red-500/20 dark:!text-red-100",
 };
 
+const resolverImagemMaquina = (imagem) => {
+  if (!imagem) return "/demo_maq.png";
+  if (imagem.startsWith("http")) return imagem;
+
+  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+  const nomeArquivo = imagem.replaceAll("\\", "/").split("/").pop();
+  return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+};
+
 export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
   const maquinaId = Number(id);
@@ -49,7 +60,7 @@ export default function MaquinaDetalhePage({ params }) {
   }
 
   const nome = maquina?.nome || `Máquina #${id}`;
-  const imagem = maquina?.imagem || "/demo_maq.png";
+  const imagem = resolverImagemMaquina(maquina?.imagem);
   const status = maquina?.status_atual || maquina?.status || "-";
   const statusClass = statusConfig[status] || "bg-gray-100 text-gray-700";
 

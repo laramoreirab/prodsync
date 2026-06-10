@@ -133,22 +133,27 @@ export function CustomPieChart({
         </ChartContainer>
 
         {singleOuterLabel && (
-          <div className="pointer-events-none absolute left-[calc(50%+62px)] top-[calc(50%-54px)] flex items-center">
-            <span
-              className="absolute -left-5 top-3 h-px w-7 origin-left rotate-[-48deg]"
-              style={{ backgroundColor: singleOuterLabel.color }}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+            viewBox="0 0 460 220"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <path
+              d="M 288 54 L 308 34 L 328 34"
+              fill="none"
+              stroke={singleOuterLabel.color}
+              strokeWidth="1"
             />
-            <span
-              className="h-px w-5 shrink-0"
-              style={{ backgroundColor: singleOuterLabel.color }}
-            />
-            <span
-              className="whitespace-nowrap text-[11px] font-medium"
-              style={{ color: singleOuterLabel.color }}
+            <text
+              x="334"
+              y="34"
+              dominantBaseline="central"
+              className="fill-current text-[11px] font-medium"
+              style={{ fill: singleOuterLabel.color }}
             >
               {singleOuterLabel.text}
-            </span>
-          </div>
+            </text>
+          </svg>
         )}
 
         {children && (
