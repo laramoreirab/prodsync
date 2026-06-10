@@ -59,7 +59,7 @@ function obterRotaNotificacao(tipoUsuario, notificacao) {
   return null;
 }
 
-const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem }) => {
+const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, onOpenChange }) => {
   const router = useRouter();
   const [aberto, setAberto] = useState(defaultOpen ?? false);
   const { notificacoes, loading, marcarComoLida, marcarTodasComoLidas, excluir } =
@@ -73,7 +73,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
 
     const rota = obterRotaNotificacao(tipoUsuario, notificacao);
     if (rota) {
-      setAberto(false);
+      handleOpenChange(false);
       router.push(rota);
     }
   };
@@ -89,6 +89,11 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
   const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
   const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
+  const handleOpenChange = (open) => {
+    setAberto(open);
+    onOpenChange?.(open);
+  };
+
   return (
     <div className={cn("relative flex items-center justify-center", triggerIsFullWidth && "w-full")}>
       {badgeContagem > 0 && (
@@ -97,7 +102,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
         </span>
       )}
 
-      <DropdownMenu open={aberto} onOpenChange={setAberto}>
+      <DropdownMenu open={aberto} onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
@@ -111,7 +116,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
 
         <DropdownMenuContent
           align={align}
-          className="p-0 w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
+          className="p-0 ml-3  w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <DropdownMenuGroup>
@@ -163,12 +168,6 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
                             <p className="text-sm font-medium text-popover-foreground">
                               {notificacao.titulo}
                             </p>
-                            {(notificacao.solicitado_pelo_adm ||
-                              notificacao.tipo === "Solicitar_Justificativa") && (
-                              <Badge className="h-5 bg-[#23304c] px-2 text-[10px] font-semibold uppercase tracking-wide hover:bg-[#23304c]">
-                                Solicitado pelo adm
-                              </Badge>
-                            )}
                           </div>
                           <p className="truncate text-sm text-muted-foreground">
                             {notificacao.mensagem}

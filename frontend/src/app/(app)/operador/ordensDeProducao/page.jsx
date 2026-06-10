@@ -95,87 +95,81 @@ export default function OrdensDeProducao() {
       id: "prioridade",
       key: "prioridade",
       label: "Prioridade",
-      className: "lg:pl-25 w-40",
+      className: "w-45",
       icone: (valor) => {
         const config = {
-          Média: {
+          "Média": {
             variant: "outline",
-            className: "border border-sky-500/30 bg-sky-500/10 text-sky-700",
-            icon: <MoveHorizontal className="text-sky-600" />,
+            className: "border border-[var(--azul-cobalto)]",
+            icon: <MoveHorizontal className="text-azul-cobalto" />
           },
-          Alta: {
+          "Alta": {
             variant: "secondary",
-            className:
-              "border border-amber-500/30 bg-amber-500/10 text-amber-700",
-            icon: <AlertTriangle className="text-amber-600" />,
+            className: "border border-[var(--amarelo)] bg-transparent",
+            icon: <AlertTriangle className="text-amarelo" />
           },
-          Crítica: {
+          "Crítica": {
             variant: "destructive",
-            className: "border border-rose-500/30 bg-rose-500/10 text-rose-700",
-            icon: <Flame className="text-rose-600" />,
+            className: "border border-[var(--vermelho-vivido)] bg-transparent text-black",
+            icon: <Flame className="text-vermelho-vivido" />
           },
-          Baixa: {
+          "Baixa": {
             variant: "destructive",
-            className: "border border-slate-400/30 bg-slate-100 text-slate-700",
-            icon: <ArrowDown className="text-slate-400" />,
-          },
+            className: "border border-gray-400 text-sm bg-transparent text-black",
+            icon: <ArrowDown className="text-gray-400" />
+          }
         };
+
 
         const item = config[valor] || { icon: null };
         return (
-          <Badge
-            variant="outline"
-            className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}
-          >
+          <Badge variant="outline" className={`whitespace-nowrap ${item.className} text-sm font-medium p-2.5`}>
             {item.icon}
             {valor}
           </Badge>
         );
-      },
+      }
     },
     {
-      id: "status",
+      id: "status_op",
       key: "status_op",
-      label: "Status",
+      label: 'Status',
       className: "text-center",
       icone: (valor) => {
         const config = {
-          Produzindo: {
-            variant: "outline",
-            className:
-              "bg-emerald-500/15 text-emerald-700 text-sm font-semibold border-none",
+          "Produzindo": {
+            variant: "produzindo",
+            label: "Produzindo"
           },
-          Setup: {
-            variant: "secondary",
-            className: "bg-amber-500/15 text-amber-900 font-semibold text-sm ",
+          "Setup": {
+            variant: "setup",
+            label: "Setup"
           },
-          Parada: {
-            variant: "destructive",
-            className:
-              "bg-rose-500/15 text-rose-700 font-semibold text-sm border-none",
+          "Parada": {
+            variant: "parada",
+            label: "Parada"
           },
-          Concluída: {
-            variant: "outline",
-            className:
-              "bg-sky-500/15 text-sky-700 text-sm font-semibold border-none",
+          "Concluída": {
+            variant: "concluida",
+            label: "Concluída"
           },
-          "Aguardando Início": {
-            variant: "outline",
-            className:
-              "bg-slate-500/15 text-slate-700 text-sm font-semibold border-none",
-          },
+          "Aguardando": {
+            variant: "aguardando",
+            label: "Aguardando Início"
+          }
         };
 
-        const estilo = config[valor] || { variant: "outline", className: "" };
+        const item = config[valor] || {
+          variant: "default",
+          label: valor
+        };
+
         return (
-          <Badge
-            variant={estilo.variant}
-            className={`whitespace-nowrap ${estilo.className}`}
-          >
-            {valor}
+          <Badge variant={item.variant}>
+            {item.label}
           </Badge>
         );
-      },
+      }
     },
     {
       id: "progresso",
@@ -283,41 +277,41 @@ export default function OrdensDeProducao() {
     <PageLayout>
       <PageHeader title="Ordens de Produção" />
 
-<StaggerWrapper className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full items-stretch">
-  
-  {/* Aguardando Início */}
-  <FadeUpItem className="col-span-1 bg-zinc-100 dark:bg-zinc-900 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
-    <KPI 
-      title="Aguardando Início" 
-      value={resumoOps.aguardando} 
-      titleClass="text-zinc-600 dark:text-zinc-400 text-base lg:text-lg text-center"
-    />
-  </FadeUpItem>
+      <StaggerWrapper className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full items-stretch">
 
-  {/* Em Andamento */}
-  <FadeUpItem className="col-span-1 bg-[#effff5] dark:bg-emerald-950/20 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
-    <KPI 
-      title="Em Andamento" 
-      value={resumoOps.emAndamento} 
-      titleClass="text-[#369948] dark:text-emerald-400 text-base lg:text-lg text-center"
-    />
-  </FadeUpItem>
+        {/* Aguardando Início */}
+        <FadeUpItem className="col-span-1 bg-zinc-100 dark:bg-zinc-900 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
+          <KPI
+            title="Aguardando Início"
+            value={resumoOps.aguardando}
+            titleClass="text-zinc-600 dark:text-zinc-400 text-base lg:text-lg text-center"
+          />
+        </FadeUpItem>
 
-  {/* Concluídas */}
-  <FadeUpItem className="col-span-1 bg-[#e8f0ff] dark:bg-blue-950/30 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
-    <KPI 
-      title="Concluídas" 
-      value={resumoOps.concluidas} 
-      titleClass="text-[#00357a] dark:text-blue-400 text-base lg:text-lg text-center"
-    />
-  </FadeUpItem>
+        {/* Em Andamento */}
+        <FadeUpItem className="col-span-1 bg-[#effff5] dark:bg-emerald-950/20 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
+          <KPI
+            title="Em Andamento"
+            value={resumoOps.emAndamento}
+            titleClass="text-[#369948] dark:text-emerald-400 text-base lg:text-lg text-center"
+          />
+        </FadeUpItem>
 
-  {/* Widget de Meta de Produção */}
-  <FadeUpItem className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 shadow-sm p-5 rounded-lg flex flex-col justify-center min-h-60 transition-colors duration-200">
-    <MetaProducaoWidget operadorId={operadorId} />
-  </FadeUpItem>
+        {/* Concluídas */}
+        <FadeUpItem className="col-span-1 bg-[#e8f0ff] dark:bg-blue-950/30 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
+          <KPI
+            title="Concluídas"
+            value={resumoOps.concluidas}
+            titleClass="text-[#00357a] dark:text-blue-400 text-base lg:text-lg text-center"
+          />
+        </FadeUpItem>
 
-</StaggerWrapper>
+        {/* Widget de Meta de Produção */}
+        <FadeUpItem className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 shadow-sm p-5 rounded-lg flex flex-col justify-center min-h-60 transition-colors duration-200">
+          <MetaProducaoWidget operadorId={operadorId} />
+        </FadeUpItem>
+
+      </StaggerWrapper>
 
       <PageSection id="listagem_ops">
         <SectionDivider title="OPs" />

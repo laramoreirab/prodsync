@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { KeyRound, LockKeyhole, Palette, Save, Trash2, UserRound } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { KeyRound, LockKeyhole, Palette, Save, Trash2, Upload, UserRound } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
 import { toast } from "sonner"
 import { PageLayout } from "@/components/AnimatedComponents"
+import { usuariosCrudService } from "@/services/usuariosCrudService"
 
 const adminTabs = [
   { id: "conta", label: "Conta", icon: UserRound },
@@ -61,6 +62,20 @@ function getInitialDarkMode() {
   return document.documentElement.classList.contains("dark")
 }
 
+const defaultAvatarSrc = "/userdefault.svg"
+
+function resolverImagemPerfil(imagem) {
+  if (!imagem || imagem === "null") return defaultAvatarSrc
+  if (imagem.startsWith("http")) return imagem
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || ""
+  const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl
+
+  if (imagem.startsWith("/uploads/")) return `${baseUrl}${imagem}`
+
+  return `${baseUrl}/uploads/imagens/${imagem}`
+}
+
 function SettingsSidebar({ activeTab, onTabChange, tabs }) {
   return (
     <aside className="w-full border-b border-zinc-100 p-4 dark:border-zinc-800 sm:w-44 sm:border-b-0 sm:border-r">
@@ -109,12 +124,61 @@ function SettingsInput(props) {
   )
 }
 
+function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
+  const hasPreview = Boolean(fotoPerfil?.preview)
+
+  return (
+    <div className="flex w-full flex-col items-center justify-center gap-4 py-8 sm:min-h-64 lg:min-h-full lg:flex-1 lg:translate-y-7 lg:py-0">
+      <input
+        type="file"
+        ref={inputRef}
+        onChange={onSelect}
+        accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
+        className="hidden"
+      />
+
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        aria-label="Selecionar foto de perfil"
+        className={cn(
+          "group relative flex size-56 cursor-pointer items-center justify-center bg-transparent text-zinc-500 transition-colors",
+          "hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:text-zinc-400 dark:hover:text-zinc-100"
+        )}
+      >
+        <span className="absolute left-0 top-0 h-14 w-14 rounded-tl-xl border-l-2 border-t-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
+        <span className="absolute right-0 top-0 h-14 w-14 rounded-tr-xl border-r-2 border-t-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
+        <span className="absolute bottom-0 left-0 h-14 w-14 rounded-bl-xl border-b-2 border-l-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
+        <span className="absolute bottom-0 right-0 h-14 w-14 rounded-br-xl border-b-2 border-r-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
+
+        {hasPreview ? (
+          <img
+            src={fotoPerfil.preview}
+            alt="Foto de perfil"
+            className="size-40 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-700"
+            onError={(event) => {
+              event.currentTarget.src = defaultAvatarSrc
+            }}
+          />
+        ) : (
+          <Upload className="size-24 stroke-[1.7]" />
+        )}
+      </button>
+
+    </div>
+  )
+}
+
 function AccountSettings({ role }) {
   const isAdmin = role === "admin"
   const [salvando, setSalvando] = useState(false)
+  const [fotoPerfil, setFotoPerfil] = useState(null)
+  const fileInputFotoRef = useRef(null)
+  const previewObjectUrlRef = useRef(null)
 
   const [formData, setFormData] = useState({
     id: "",
+    id_setor: "",
     nome: "",
     cpf: "",
     cargo: "",
@@ -125,23 +189,72 @@ function AccountSettings({ role }) {
     cpfRepresentante: ""
   })
 
+  function limparPreviewTemporario() {
+    if (previewObjectUrlRef.current) {
+      URL.revokeObjectURL(previewObjectUrlRef.current)
+      previewObjectUrlRef.current = null
+    }
+  }
+
+  useEffect(() => {
+    return () => limparPreviewTemporario()
+  }, [])
+
   useEffect(() => {
     async function buscarDados() {
       const dadosUsuario = await apiFetch("/api/auth/perfil")
+      const dadosPerfil = dadosUsuario.dados || {}
+      const usuarioAdm = dadosPerfil.usuarios?.[0]
+      const idUsuario = usuarioAdm?.id_usuario || dadosPerfil.id_usuario || ""
+      const idSetor = dadosPerfil.id_setor ?? dadosPerfil.setor?.id_setor ?? ""
+      const imagemPerfil = dadosPerfil.imagem_perfil || usuarioAdm?.imagem_perfil
+
       setFormData({
-        id: dadosUsuario.dados.usuarios?.[0]?.id_usuario || dadosUsuario.dados.id_usuario || "",
-        nome: dadosUsuario.dados.nome || "",
-        cpf: aplicarMascaraCPF(dadosUsuario.dados.cpf) || "",
-        cargo: dadosUsuario.dados.tipo || "",
-        email: dadosUsuario.dados.email || "",
-        emailEmpresa: dadosUsuario.dados.email || "",
-        telefoneEmpresa: aplicarMascaraTelefone(dadosUsuario.dados.telefone) || "",
-        enderecoEmpresa: dadosUsuario.dados.endereco || "",
-        cpfRepresentante: aplicarMascaraCPF(dadosUsuario.dados.cpf_representante) || ""
+        id: idUsuario,
+        id_setor: idSetor ? String(idSetor) : "",
+        nome: dadosPerfil.nome || "",
+        cpf: aplicarMascaraCPF(dadosPerfil.cpf) || "",
+        cargo: dadosPerfil.tipo || "",
+        email: dadosPerfil.email || "",
+        emailEmpresa: dadosPerfil.email || "",
+        telefoneEmpresa: aplicarMascaraTelefone(dadosPerfil.telefone) || "",
+        enderecoEmpresa: dadosPerfil.endereco || "",
+        cpfRepresentante: aplicarMascaraCPF(dadosPerfil.cpf_representante) || ""
       })
+
+      setFotoPerfil(
+        imagemPerfil
+          ? {
+            raw: null,
+            preview: resolverImagemPerfil(imagemPerfil),
+            nome: "Imagem atual"
+          }
+          : null
+      )
     }
     buscarDados()
   }, [])
+
+  function handleFotoChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione uma imagem valida.")
+      e.target.value = ""
+      return
+    }
+
+    limparPreviewTemporario()
+    const preview = URL.createObjectURL(file)
+    previewObjectUrlRef.current = preview
+
+    setFotoPerfil({
+      raw: file,
+      preview,
+      nome: file.name
+    })
+  }
 
   async function handleInputChange(e) {
     let { id, value } = e.target
@@ -151,6 +264,30 @@ function AccountSettings({ role }) {
       value = aplicarMascaraCPF(value)
     }
     setFormData((dadosAnteriores) => ({ ...dadosAnteriores, [id]: value }))
+  }
+
+  async function salvarFotoPerfilSelecionada() {
+    if (!formData.id || !fotoPerfil?.raw) return
+
+    const payload = new FormData()
+    payload.append("imagem_perfil", fotoPerfil.raw)
+    if (formData.id_setor) payload.append("id_setor", formData.id_setor)
+
+    const response = await usuariosCrudService.update(formData.id, payload)
+    const imagemAtualizada = response?.dados?.imagem_perfil
+
+    if (imagemAtualizada) {
+      limparPreviewTemporario()
+      setFotoPerfil({
+        raw: null,
+        preview: resolverImagemPerfil(imagemAtualizada),
+        nome: "Imagem atual"
+      })
+    } else {
+      setFotoPerfil((fotoAtual) => fotoAtual ? { ...fotoAtual, raw: null, nome: "Imagem atual" } : fotoAtual)
+    }
+
+    if (fileInputFotoRef.current) fileInputFotoRef.current.value = ""
   }
 
   const fields = isAdmin ? adminAccountFields : userAccountFields
@@ -183,6 +320,12 @@ function AccountSettings({ role }) {
     e.preventDefault()
     setSalvando(true)
     try {
+      if (!isAdmin) {
+        await salvarFotoPerfilSelecionada()
+        toast.success("Alterações salvas com sucesso!")
+        return
+      }
+
       const dadosParaEnviar = {
         email: formData.emailEmpresa,
         telefone: String(formData.telefoneEmpresa || "").replace(/\D/g, ""),
@@ -195,7 +338,6 @@ function AccountSettings({ role }) {
         body: JSON.stringify(dadosParaEnviar)
       })
       if (response.sucesso) {
-        toast.success("Informações da empresa atualizadas com sucesso!")
         if (response.dados) {
           setFormData((dadosAnteriores) => ({
             ...dadosAnteriores,
@@ -205,6 +347,8 @@ function AccountSettings({ role }) {
             cpfRepresentante: aplicarMascaraCPF(response.dados.cpf_representante) || aplicarMascaraCPF(dadosAnteriores.cpfRepresentante),
           }))
         }
+        await salvarFotoPerfilSelecionada()
+        toast.success("Alterações salvas com sucesso!")
       } else {
         toast.error(response.mensagem || "Erro ao atualizar dados. Verifique os campos.")
       }
@@ -217,7 +361,8 @@ function AccountSettings({ role }) {
   }
 
   return (
-    <div className="max-w-sm space-y-4">
+    <div className="flex w-full max-w-3xl flex-col gap-6 lg:flex-row lg:items-stretch lg:justify-between">
+      <div className="w-full max-w-sm space-y-4">
       <SectionTitle
         title="Informações da Conta"
         description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
@@ -242,13 +387,20 @@ function AccountSettings({ role }) {
             </div>
           )
         })}
-        {isAdmin && (
+        {(isAdmin || fotoPerfil?.raw) && (
           <Button type="submit" disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
             <Save className="size-4" />
             {salvando ? "Salvando..." : "Salvar Alterações"}
           </Button>
         )}
       </form>
+      </div>
+
+      <ProfilePhotoSelector
+        fotoPerfil={fotoPerfil}
+        inputRef={fileInputFotoRef}
+        onSelect={handleFotoChange}
+      />
     </div>
   )
 }

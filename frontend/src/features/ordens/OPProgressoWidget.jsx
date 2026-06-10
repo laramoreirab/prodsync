@@ -24,13 +24,14 @@ export function OPProgressoWidget({ opId }) {
   return (
     <div>
       <p className="text-sm font-semibold text-black">Progresso até término da OP</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1">*Atualizado em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       <div className="mt-2 flex justify-center">
         <CustomPieChart
           data={chartData}
           config={progressoConfig}
           dataKey="value"
           nameKey="name"
+          showLegend
         />
       </div>
     </div>

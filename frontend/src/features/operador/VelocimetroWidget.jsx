@@ -15,7 +15,7 @@ export function VelocimetroWidget({ operadorId }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <p className="text-sm font-semibold text-black self-start">Velocímetro</p>
-      <p className="text-xs text-gray-400 font-semibold mt-1 self-start">*Atualizado em tempo real</p>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5 justify-start">Atualizado em tempo real</p>
       <GaugeSemicircular
         data={[{ value: pct, fill: "#00357a" }]}
         size="lg"

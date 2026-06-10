@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, RefreshCw, X } from "lucide-react";
+import { CheckCircle2, CloudBackup, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
@@ -121,10 +121,10 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       const resp = await maquinaSyncService.iniciarSincronizacaoPlaca(maquinaId);
       aplicarStatus(resp, { notificarConexao: resp?.status === "Concluida" });
       if (resp?.status !== "Concluida") {
-        toast.success("Sessao de sincronizacao iniciada. Pressione o botao Setup da placa por 3 segundos.");
+        toast.success("Sessão de sincronização iniciada. Pressione o botão Setup da placa por 3 segundos.");
       }
     } catch (e) {
-      toast.error(e?.message || "Nao foi possivel iniciar a sincronizacao.");
+      toast.error(e?.message || "Não foi possível iniciar a sincronização.");
     } finally {
       setLoading(false);
     }
@@ -135,9 +135,9 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       setParando(true);
       await maquinaSyncService.pararSincronizacaoPlaca(maquinaId);
       limparStatusLocal();
-      toast.success("Sincronizacao cancelada.");
+      toast.success("Sincronização cancelada.");
     } catch (e) {
-      toast.error(e?.message || "Nao foi possivel cancelar a sincronizacao.");
+      toast.error(e?.message || "Não foi possível cancelar a sincronização.");
     } finally {
       setParando(false);
     }
@@ -151,7 +151,7 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
       setOpen(false);
       toast.success("Placa desconectada da maquina.");
     } catch (e) {
-      toast.error(e?.message || "Nao foi possivel desconectar a placa.");
+      toast.error(e?.message || "Não foi possível desconectar a placa.");
     } finally {
       setDesconectando(false);
     }
@@ -160,16 +160,16 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
-        className={conectado ? "text-[var(--trash)] cursor-pointer" : "text-[var(--pencil)] cursor-pointer"}
+        className={conectado ? "text-[#2d6645] cursor-pointer" : "text-[#2d6645] cursor-pointer"}
         aria-label={conectado ? "Desconectar placa" : "Sincronizar placa"}
       >
-        {conectado ? <X size={iconSize} /> : <RefreshCw size={iconSize} />}
+        {conectado ? <X size={iconSize} /> : <CloudBackup size={iconSize} />}
       </DialogTrigger>
 
       <DialogContent>
         {conectado ? (
           <div className="flex flex-col gap-4">
-            <div className="text-xl font-semibold text-blue-900">Desconectar placa</div>
+            <div className="text-4xl font-semibold text-blue-900">Desconectar placa</div>
 
             <div className="flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-900">
               <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
@@ -180,7 +180,7 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
             </div>
 
             <div className="text-sm text-gray-700">
-              Ao desconectar, esta placa deixa de registrar eventos nesta maquina ate ser sincronizada novamente.
+              Ao desconectar, esta placa deixa de registrar eventos nesta maquina até ser sincronizada novamente.
             </div>
 
             <div className="flex justify-end gap-2">
@@ -194,39 +194,48 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            <div className="text-xl font-semibold text-blue-900">
-              {emProgresso ? "Sincronizacao em progresso" : "Sincronizar placa"}
+            <div className="flex text-3xl font-semibold text-blue-900">
+              <CloudBackup size={34} className="mr-2" />
+              {emProgresso ? "Sincronização Em Progresso" : "Sincronizar Placa"}
             </div>
 
-            <div className="text-sm text-gray-700">
-              <div className="mb-2 font-semibold">Como fazer</div>
-              <ol className="list-decimal space-y-1 pl-5">
-                <li>Pressione o botao <span className="font-semibold">Setup</span> da placa por 3 segundos.</li>
-                <li>Clique em <span className="font-semibold">Iniciar sincronizacao</span> nesta maquina.</li>
-                <li>As duas etapas podem ser feitas em qualquer ordem dentro de poucos minutos.</li>
-              </ol>
+            <div className="px-8 py-2 mb-6">
+              <div className="text-lg text-gray-700">
+                <div className="mb-2 font-bold text-black">Como sincronizar</div>
+                <ol className="list-decimal space-y-1 pl-5 marker:font-bold  marker:text-black font-medium ">
+                  <li>Pressione o botão <span className="font-bold">Setup</span> da placa por 3 segundos.</li>
+                  <li>Clique em <span className="font-bold">Iniciar sincronização</span> nesta máquina.</li>
+                  <li>As duas etapas podem ser feitas em qualquer ordem dentro de poucos minutos.</li>
+                </ol>
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-3">
+                <Button
+                  variant={emProgresso ? "destructive" : "default"}
+                  disabled={loading || parando}
+                  onClick={emProgresso ? parar : iniciar}
+                  className={`gap-2 transition-all mt-6 ${!emProgresso
+                    ? "cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-lg py-2 px-5 h-auto"
+                    : "cursor-pointer text-lg py-2 px-5 h-auto hover:scale-105 h-auto transition-all"
+                    }`}
+                >
+                  {loading ? "Iniciando Sincronização..." : parando ? "Parando Sincronização..." : emProgresso ? "Parar sincronização" : "Iniciar sincronização"}
+                </Button>
+
+                {codigo ? (
+                  <div className="flex flex-col text-center">
+                    <div className="text-sm text-gray-600">Aguardando placa</div>
+                    <div className="text-2xl font-bold tracking-widest text-blue-900">{placaUid ?? codigo}</div>
+                    {expiraLabel ? (
+                      <div className="text-xs text-gray-500">Expira às {expiraLabel}</div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button
-                variant={emProgresso ? "destructive" : "default"}
-                disabled={loading || parando}
-                onClick={emProgresso ? parar : iniciar}
-                className="gap-2"
-              >
-                {loading ? "Iniciando..." : parando ? "Parando..." : emProgresso ? "Parar sincronizacao" : "Iniciar sincronizacao"}
-              </Button>
 
-              {codigo ? (
-                <div className="flex flex-col">
-                  <div className="text-sm text-gray-600">Aguardando placa</div>
-                  <div className="text-2xl font-bold tracking-widest text-blue-900">{placaUid ?? codigo}</div>
-                  {expiraLabel ? (
-                    <div className="text-xs text-gray-500">Expira as {expiraLabel}</div>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
+
           </div>
         )}
       </DialogContent>

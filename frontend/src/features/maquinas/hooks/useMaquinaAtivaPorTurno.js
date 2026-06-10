@@ -3,6 +3,6 @@
 import { useChartData } from "@/hooks/useChartData";
 import { maquinaAtivaPorTurnoService } from "@services/maquinaService";
 
-export function useMaquinaAtivaPorTurno() {
-  return useChartData(maquinaAtivaPorTurnoService.getMaquinaAtivaPorTurnoService);
+export function useMaquinaAtivaPorTurno(setorId = null) {
+  return useChartData(maquinaAtivaPorTurnoService.getMaquinaAtivaPorTurnoService, setorId);
 }

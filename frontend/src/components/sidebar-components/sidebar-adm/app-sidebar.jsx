@@ -1,11 +1,14 @@
 "use client"
 
+import { useRef } from "react"
 import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main"
+import { ProductionSetupTour } from "@/components/sidebar-components/sidebar-adm/production-setup-tour"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import ProfileDropdown from "@/components/shadcn-space/blocks/topbar/dropdown-profile"
 import NotificationDropdown from "@/components/shadcn-space/blocks/topbar/notification-dropdown"
@@ -63,6 +66,24 @@ const data = {
 export function AppSidebar({
   ...props
 }) {
+  const { isMobile, open, setOpen } = useSidebar()
+  const estavaAbertaRef = useRef(null)
+
+  const handleNotificationOpenChange = (aberto) => {
+    if (isMobile) return
+
+    if (aberto) {
+      estavaAbertaRef.current = open
+      if (!open) setOpen(true)
+      return
+    }
+
+    if (estavaAbertaRef.current === false) {
+      setOpen(false)
+    }
+    estavaAbertaRef.current = null
+  }
+
   return (
     <Sidebar
       collapsible="icon"
@@ -88,17 +109,19 @@ export function AppSidebar({
 
       <SidebarContent className="px-1 py-2">
         <NavMain items={data.navMain} />
+        <ProductionSetupTour />
       </SidebarContent>
 
       <SidebarFooter className="p-3 pt-2 group-data-[collapsible=icon]:px-2">
         <NotificationDropdown
           align="end"
+          onOpenChange={handleNotificationOpenChange}
           trigger={
             <div
               className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg px-2 text-left text-[#ffffff] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
             >
               <BellRing className="size-4 shrink-0" />
-              <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificações</span>
+              <span className="text-sm font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificações</span>
             </div>
           }
         />
@@ -106,10 +129,17 @@ export function AppSidebar({
           align="end"
           trigger={({ avatarSrc }) => (
             <div
-              className="flex h-10 w-full items-center gap-2 overflow-hidden  rounded-lg px-2 text-left text-[#FFFFFF] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff]  group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
+              className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg px-2 text-left text-[#FFFFFF] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff]  group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2"
             >
-              <img src={avatarSrc} alt="Usuario" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-              <span className="truncate text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Minha conta</span>
+              <img
+                src={avatarSrc}
+                alt="Usuario"
+                className="h-6 w-6 shrink-0 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/userdefault.svg";
+                }}
+              />
+              <span className="text-sm font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Minha conta</span>
             </div>
           )}
         />

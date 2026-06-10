@@ -24,9 +24,20 @@ import {
 } from "@/components/DetailComponents";
 
 const statusConfig = {
-  Produzindo: "bg-green-500/15 text-green-600",
-  Setup: "bg-amber-100 text-amber-900",
-  Parada: "bg-red-100 text-red-700",
+  Produzindo: "bg-green-500/15 text-green-600 text-sm font-semibold border-none dark:!bg-green-300/20 dark:!text-green-100",
+  Setup: "font-semibold text-sm bg-[#fffbea] text-amarelo dark:!bg-amber-300/20 dark:!text-amber-100",
+  Parada: "font-semibold text-sm bg-vermelho-vivido/10 text-vermelho-vivido dark:!bg-red-500/20 dark:!text-red-100",
+};
+
+const resolverImagemMaquina = (imagem) => {
+  if (!imagem) return "/demo_maq.png";
+  if (imagem.startsWith("http")) return imagem;
+
+  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+  const nomeArquivo = imagem.replaceAll("\\", "/").split("/").pop();
+  return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
 };
 
 export default function MaquinaDetalhePage({ params }) {
@@ -49,7 +60,7 @@ export default function MaquinaDetalhePage({ params }) {
   }
 
   const nome = maquina?.nome || `Máquina #${id}`;
-  const imagem = maquina?.imagem || "/demo_maq.png";
+  const imagem = resolverImagemMaquina(maquina?.imagem);
   const status = maquina?.status_atual || maquina?.status || "-";
   const statusClass = statusConfig[status] || "bg-gray-100 text-gray-700";
 

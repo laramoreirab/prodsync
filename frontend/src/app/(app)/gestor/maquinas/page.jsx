@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EyeIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
-import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard } from "@/components/AnimatedComponents";
+import { ContentGrid, FadeUpItem, KPIGrid, PageHeader, PageLayout, SectionDivider, WidgetCard, LoadingState } from "@/components/AnimatedComponents";
 import { FilterRow } from "@/components/AnimatedComponents";
 import { EmptyState } from "@/components/AnimatedComponents";
 import { SearchBar } from "@/components/AnimatedComponents";
@@ -88,6 +88,17 @@ function normalizarMaquina(maquina) {
   };
 }
 
+function formatarNomeSetor(setorNome) {
+  if (!setorNome) return "Desconhecido";
+
+  const nomeLimpo = setorNome.replace(/^setor\s+/i, "").trim();
+
+  return nomeLimpo
+    .split(/\s+/)
+    .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+    .join(" ");
+}
+
 export default function MaquinasGestor() {
   const { setorId, setorNome } = usePerfil();
   const { maquinas, loading, refresh, excluirMaquina } = useMaquinas();
@@ -148,10 +159,12 @@ export default function MaquinasGestor() {
     return <LoadingState message="Carregando máquinas do setor..." />;
   }
 
+  const nomeSetorFormatado = formatarNomeSetor(setorNome);
+
   return (
     <PageLayout>
       <PageHeader
-        title={`Máquinas do Setor ${setorNome || "Desconhecido"}`}
+        title={`Máquinas do Setor ${nomeSetorFormatado}`}
         action={
           <Dialog>
             <DialogTrigger className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer">
@@ -168,7 +181,7 @@ export default function MaquinasGestor() {
 
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-        <WidgetCard>
+        <WidgetCard className="h-80">
           <MaquinaStatusDonutWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
@@ -184,13 +197,13 @@ export default function MaquinasGestor() {
           <ProducaoDefeitosWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
-          <MaquinasPorTurnoWidget />
+          <MaquinasPorTurnoWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
 
       <FadeUpItem className="mt-8">
         <div className="rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
-          <ProducaoTotalWidget />
+          <ProducaoTotalWidget setorId={setorId} />
         </div>
       </FadeUpItem>
 
@@ -213,7 +226,6 @@ export default function MaquinasGestor() {
               options={opcoesOrdenacao}
               onSortChange={setOrdenacao}
             />
-            {/* CORREÇÃO DO ERRO AQUI: Passando maquinasFilter no lugar da função */}
             <FilterDropdown
               filtersConfig={maquinasFilter}
               onApply={setFiltrosAtivos}

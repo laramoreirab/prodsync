@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_maquinas"
+        android:title="Máquinas"
+        android:icon="@drawable/ic_ferramenta" />
+    <item
+        android:id="@+id/nav_ops"
+        android:title="OPs"
+        android:icon="@drawable/ic_ops" />
+    <item
+        android:id="@+id/nav_usuarios"
+        android:title="Usuários"
+        android:icon="@drawable/ic_users" />
+</menu>

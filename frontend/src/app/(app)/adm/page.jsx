@@ -18,7 +18,7 @@ export default function DashboardGeralPage() {
   return (
     <PageLayout className="pb-12">
       <PageHeader
-        title="Dashboard Geral da Empresa"
+        title="Dashboard Geral"
 
         action={
           <a href="/adm/relatorios" title="Personalizar e exportar relatório em PDF">

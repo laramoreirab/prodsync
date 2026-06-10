@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import ProfileDropdown from "@/components/shadcn-space/blocks/topbar/dropdown-profile";
 import NotificationDropdown from "@/components/shadcn-space/blocks/topbar/notification-dropdown";
@@ -21,6 +22,13 @@ import { ListBulletsIcon } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/api";
 import { getUserFromToken } from "@/lib/auth";
 
+const usuario = getUserFromToken();
+const idOperador = usuario?.id_usuario;
+const resposta = await apiFetch(
+          `/api/maquinas/obter-maquina-operador/${idOperador}`,
+        );
+const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
+
 const data = {
   navMain: [
     {
@@ -30,7 +38,7 @@ const data = {
     },
     {
       title: "Máquinas",
-      url: "/operador/maquinas",
+      url: `/operador/maquinas/${idMaquina}`,
       icon: <Wrench />,
     },
     {
@@ -52,7 +60,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }) {
-  const [maquinaUrl, setMaquinaUrl] = useState("/operador/maquinas");
+   const [maquinaUrl, setMaquinaUrl] = useState('');
 
   useEffect(() => {
     let ativo = true;
@@ -134,10 +142,11 @@ export function AppSidebar({ ...props }) {
       <SidebarFooter className="p-3 pt-2 group-data-[collapsible=icon]:px-3">
         <NotificationDropdown
           align="end"
+          onOpenChange={handleNotificationOpenChange}
           trigger={
             <div className="flex h-10 w-full items-center gap-2 overflow-hidden rounded-lg px-2 text-left text-[#ffffff] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff] group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2">
               <BellRing className="size-4 shrink-0" />
-              <span className="text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificações</span>
+              <span className="text-sm font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">Notificações</span>
             </div>
           }
         />
@@ -149,8 +158,11 @@ export function AppSidebar({ ...props }) {
                 src={avatarSrc}
                 alt="Usuario"
                 className="h-6 w-6 shrink-0 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/userdefault.svg";
+                }}
               />
-              <span className="truncate text-xs font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">
+              <span className="truncate text-sm font-semibold group-data-[state=collapsed]/sidebar:hidden group-data-[state=collapsed]/sidebar:group-hover/sidebar:inline">
                 Minha conta
               </span>
             </div>

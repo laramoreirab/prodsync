@@ -9,6 +9,17 @@ import { maquinaCrudService } from '@/services/maquinaCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 
+const resolverImagemMaquina = (imagem) => {
+    if (!imagem) return null;
+    if (imagem.startsWith("http")) return imagem;
+
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+    const nomeArquivo = imagem.replaceAll("\\", "/").split("/").pop();
+    return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+};
+
 export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
     const [arquivo, setArquivo] = useState(null);
     const fileInputRef = useRef(null);
@@ -114,7 +125,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 if (dados.imagem) {
                     setArquivo({
                         nome: 'Imagem atual',
-                        preview: dados.imagem,
+                        preview: resolverImagemMaquina(dados.imagem),
                         raw: null
                     });
                 }
@@ -158,6 +169,10 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
             if (onEdicaoSucesso) {
                 onEdicaoSucesso();
             }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
             console.error("Erro ao atualizar máquina:", error);
             toast.error("Erro ao atualizar os dados.");
@@ -324,7 +339,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                     </div>
 
                     <div className="flex flex-col gap-1 col-span-2">
-                        <label className="text-md text-cinza-escuro">Operador</label>
+                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Operador</label>
                         <select
                                 id="operador"
                                 className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
@@ -346,7 +361,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <button type="submit" className="bg-[#002866] text-xl text-white font-semibold py-3 px-10 rounded-lg">
+                    <button type="submit" className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-10 rounded-lg">
                         Editar
                     </button>
                 </div>

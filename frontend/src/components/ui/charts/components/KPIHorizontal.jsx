@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-export function KPIHorizontal({ title, value, type = "number", subtitle = "*Atualizado em tempo real" }) {
+export function KPIHorizontal({ title, value, type = "number", subtitle = "Atualizado em tempo real" }) {
     const [displayValue, setDisplayValue] = useState(0);
     const prevValueRef = useRef(0);
     const animationRef = useRef(null);
@@ -60,10 +60,10 @@ export function KPIHorizontal({ title, value, type = "number", subtitle = "*Atua
         <div className="w-full flex flex-row items-center justify-between">
 
             <div className="flex flex-col items-start pl-3 py-2 flex-1">
-                <p className="text-base font-bold text-black tracking-tight leading-snug uppercase">
+                <p className="text-base font-semibold text-foreground tracking-tight leading-snug uppercase">
                     {title}
                 </p>
-                <p className="text-[11px] text-gray-400 font-medium mt-0.5 self-start">
+                <p className="text-[11px] text-muted-foreground font-medium mt-0.5 self-start">
                     {subtitle}
                 </p>
             </div>

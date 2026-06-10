@@ -25,15 +25,17 @@ export const producaoService = {
 };
 
 export const pecasPorMinutosService = {
-  async getPecasPorMinuto() {
-    const data = await apiFetch("/api/maquinas/dashboard/obter-pecas-por-minuto");
+  async getPecasPorMinuto(setorId = null) {
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/maquinas/dashboard/obter-pecas-por-minuto${query}`);
     return PecasPorMinutoSchema.parse(data.dados);
   },
 };
 
 export const producaoPorTurnoLotesService = {
-  async getProducaoPorTurnoLotes() {
-    const data = await apiFetch("/api/turnos/kpis/turno-atual");
+  async getProducaoPorTurnoLotes(setorId = null) {
+    const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
+    const data = await apiFetch(`/api/turnos/kpis/turno-atual${query}`);
     return ProducaoPorTurnoLotesSchema.parse(data.dados.cards.producaoLotes);
   },
 };

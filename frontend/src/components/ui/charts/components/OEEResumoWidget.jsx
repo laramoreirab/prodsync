@@ -24,8 +24,8 @@ export function OeeResumoWidget({ data }) {
       
       {/* Cabeçalho do Card */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-950">Resumo OEE geral da Fábrica</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Atualizando em tempo real</p>
+        <h3 className="text-sm font-semibold text-foreground">Resumo OEE geral da Fábrica</h3>
+        <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
 
       {/* Seção Central: O Gauge Semicircular Customizado */}

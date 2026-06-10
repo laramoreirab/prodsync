@@ -30,9 +30,14 @@ export function BarHorizontal({
   const gradientId = `barGradient-${dataKey}`; // ID único para o gradiente baseado na chave
 
   return (
-    <div>
-      {title && <h3 className="text-sm font-medium mb-3">{title}</h3>}
-      <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full`}>
+    <div className="relative">
+      {title && (
+        <div className="absolute top-0 left-0 z-10 text-left">
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+        </div>
+      )}
+      <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full pt-16`}>
         <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
           {/* Definição do Gradiente SVG */}
           <defs>
