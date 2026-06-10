@@ -1,108 +1,267 @@
-clearWatch();
-clearInterval();
-
 var wifi = require("Wifi");
-var mqtt = require("tinyMQTT");
+var MQTT = require("tinyMQTT");
 
+// --- Configuracoes de Rede ---
+var ssid = "Wokwi-GUEST";
+var password = "";
+var mqtt_server = "broker.hivemq.com";
+
+// --- Definicao dos Pinos ---
 var PIN_VERDE = D32;
 var PIN_AMARELO = D33;
 var PIN_VERMELHO = D25;
 var PIN_LED_PAREAMENTO = D27;
 
+// --- Constantes do Sistema ---
 var EMPRESA_ID = 10;
-var BOARD_UID = typeof getSerial === "function" ? "esp32-" + getSerial() : "esp32-prodsync-001";
 var FIRMWARE_VERSION = "wifi-1.1.0";
+var BOARD_UID = "";
 
-var statusAtual = null;
-var clienteMQTT = null;
-var setupHoldTimer = null;
-var setupLongPressTriggered = false;
-var emParejamento = false;
-var ledPiscandoTimer = null;
-
-var TOPICO_STATUS = "phietro/fabrica/" + BOARD_UID + "/status";
+// --- Topicos MQTT ---
+var TOPICO_STATUS = "";
 var TOPICO_PAREAMENTO = "phietro/fabrica/pareamento";
+var TOPICO_CONTROLE = "";
 
-function obterMac() {
+// --- Estado ---
+var ultimoStatusRegistrado = "";
+var emParejamento = false;
+var ledLigado = false;
+var blinkTimer;
+var mqtt;
+var mqttConnected = false;
+var mqttConnecting = false;
+var mqttReconnectTimer;
+var wifiConnecting = false;
+var wifiReady = false;
+
+// --- Botao amarelo ---
+var amareloIsPressed = false;
+var setupLongPressTriggered = false;
+var amareloLongPressTimer;
+
+// --- Watch handlers ---
+var watchIds = [];
+var DEBOUNCE_DELAY = 50;
+
+function makeClientId() {
+  return BOARD_UID + "-" + Math.random().toString(16).substr(2, 8);
+}
+
+function getMac() {
+  var ip = wifi.getIP();
+  return ip && ip.mac ? ip.mac : "00:00:00:00:00:00";
+}
+
+function initBoardUidAndTopics() {
+  if (BOARD_UID) return;
+
+  var mac = getMac();
+  BOARD_UID = "esp32-" + mac.toLowerCase().replace(/:/g, "");
+
+  TOPICO_STATUS = "phietro/fabrica/" + BOARD_UID + "/status";
+  TOPICO_CONTROLE = "phietro/fabrica/" + BOARD_UID + "/controle";
+
+  console.log("ESP32 iniciado. Board UID: " + BOARD_UID);
+}
+
+function isWiFiConnected() {
+  var status = wifi.getStatus();
+  return status && status.station === "connected";
+}
+
+function setupWiFi() {
+  if (wifiConnecting || isWiFiConnected()) return;
+
+  wifiConnecting = true;
+  console.log("Tentando conectar ao Wi-Fi: " + ssid);
+
+  wifi.connect(ssid, password ? { password: password } : {}, function(err) {
+    wifiConnecting = false;
+
+    if (err) {
+      console.log("Falha ao conectar Wi-Fi: " + err);
+      setTimeout(setupWiFi, 5000);
+      return;
+    }
+
+    onWiFiReady();
+  });
+
+  setTimeout(function() {
+    if (!isWiFiConnected()) {
+      wifiConnecting = false;
+      console.log("Falha ao conectar. Tentando novamente no proximo ciclo.");
+      setTimeout(setupWiFi, 5000);
+    }
+  }, 10000);
+}
+
+function onWiFiReady() {
+  var ip = wifi.getIP();
+
+  if (!wifiReady) {
+    console.log("Wi-Fi conectado.");
+    console.log("IP: " + (ip && ip.ip ? ip.ip : "desconhecido"));
+  }
+
+  wifiReady = true;
+  initBoardUidAndTopics();
+  connectMqtt();
+}
+
+function scheduleMqttReconnect() {
+  if (mqttReconnectTimer) return;
+
+  mqttReconnectTimer = setTimeout(function() {
+    mqttReconnectTimer = undefined;
+    connectMqtt();
+  }, 5000);
+}
+
+function connectMqtt() {
+  if (!BOARD_UID || !isWiFiConnected() || mqttConnected || mqttConnecting) return;
+
+  mqttConnecting = true;
+  console.log("Conectando ao broker MQTT...");
+
+  mqtt = MQTT.create(mqtt_server, {
+    client_id: makeClientId(),
+    port: 1883,
+    clean_session: true,
+    keep_alive: 60
+  });
+
+  mqtt.on("connected", function() {
+    mqttConnecting = false;
+    mqttConnected = true;
+
+    console.log("Conectado ao Broker HiveMQ.");
+    mqtt.subscribe(TOPICO_CONTROLE);
+
+    if (emParejamento) {
+      console.log("Reenviando pedido de pareamento apos reconexao MQTT...");
+      publicarPedidoPareamento();
+    }
+  });
+
+  mqtt.on("publish", function(pub) {
+    callback(pub.topic, pub.message);
+  });
+
+  mqtt.on("disconnected", function() {
+    mqttConnecting = false;
+    mqttConnected = false;
+    console.log("MQTT desconectado. Tentando reconectar em 5 segundos...");
+    scheduleMqttReconnect();
+  });
+
+  mqtt.on("error", function(err) {
+    mqttConnecting = false;
+    mqttConnected = false;
+    console.log("Erro MQTT: " + err);
+    scheduleMqttReconnect();
+  });
+
+  mqtt.connect();
+}
+
+function callback(topic, message) {
+  console.log("Mensagem recebida no topico [" + topic + "]: " + message);
+
+  var doc;
   try {
-    var detalhes = wifi.getDetails ? wifi.getDetails() : null;
-    return detalhes && detalhes.mac ? detalhes.mac : null;
+    doc = JSON.parse(message);
   } catch (e) {
-    return null;
+    console.log("Erro ao processar mensagem JSON: " + e);
+    return;
+  }
+
+  var tipo = doc.tipo;
+
+  if (tipo === "PARAR_PAREAMENTO") {
+    console.log("Recebido comando para parar emparelhamento");
+    pararPareamento();
+  } else if (tipo === "PAREAMENTO_CONCLUIDO") {
+    console.log("Pareamento concluido com a maquina " + (doc.id_maquina || 0));
+    pararPareamento();
+  } else if (tipo === "STATUS_REGISTRADO") {
+    if (doc.status) {
+      ultimoStatusRegistrado = doc.status;
+      console.log("Status confirmado pelo backend: " + ultimoStatusRegistrado);
+    }
+  } else if (tipo === "STATUS_REJEITADO") {
+    console.log(
+      "Backend rejeitou o status " +
+      (doc.status || "") +
+      ": " +
+      (doc.mensagem || "sem detalhes")
+    );
   }
 }
 
-function publicaJson(topico, dados) {
-  if (!clienteMQTT) {
+function publicaJson(topico, doc) {
+  if (!mqttConnected || !mqtt) {
     console.log("Aguarde, MQTT ainda nao conectou...");
     return;
   }
 
-  var payload = JSON.stringify(dados);
-  clienteMQTT.publish(topico, payload);
-  console.log("Publicado MQTT:", topico, payload);
+  var payload = JSON.stringify(doc);
+  mqtt.publish(topico, payload);
+
+  console.log("Publicado MQTT: " + topico + " -> " + payload);
 }
 
-function conectaWifi() {
-  console.log("Limpando conexoes antigas...");
-  wifi.disconnect();
+function enviaStatus(novoStatus) {
+  if (ultimoStatusRegistrado === novoStatus) {
+    console.log(
+      "Status " +
+      novoStatus +
+      " ja foi confirmado pelo backend. Publicacao ignorada."
+    );
+    return;
+  }
 
-  setTimeout(function() {
-    console.log("Tentando conectar ao Wi-Fi: Phietro...");
-    wifi.connect("Phietro", { password: "123" }, function(err) {
-      if (err) {
-        console.log("Erro no Wi-Fi. Tentando em 10s...");
-        setTimeout(conectaWifi, 10000);
-        return;
-      }
-      console.log("Wi-Fi conectado. IP:", wifi.getIP().ip);
-      conectaBroker();
-    });
-  }, 1000);
+  publicaJson(TOPICO_STATUS, {
+    board_uid: BOARD_UID,
+    status: novoStatus
+  });
 }
 
-function conectaBroker() {
-  console.log("Conectando ao broker MQTT...");
-  clienteMQTT = mqtt.create("broker.hivemq.com");
+function iniciarBlinkPareamento() {
+  if (blinkTimer) return;
 
-  clienteMQTT.on("connected", function() {
-    console.log("Conectado ao Broker HiveMQ.");
-    // Inscrever no canal de controle para receber comandos de parada
-    clienteMQTT.subscribe("phietro/fabrica/" + BOARD_UID + "/controle");
-  });
+  ledLigado = false;
+  blinkTimer = setInterval(function() {
+    ledLigado = !ledLigado;
+    digitalWrite(PIN_LED_PAREAMENTO, ledLigado ? 1 : 0);
+  }, 250);
+}
 
-  clienteMQTT.on("disconnected", function() {
-    console.log("Desconectado do Broker. Tentando reconectar...");
-    setTimeout(conectaBroker, 5000);
-  });
+function pararBlinkPareamento() {
+  if (blinkTimer) {
+    clearInterval(blinkTimer);
+    blinkTimer = undefined;
+  }
 
-  clienteMQTT.on("message", function(topic, msg) {
-    try {
-      var dados = JSON.parse(msg);
-      if (dados.tipo === "PARAR_PAREAMENTO") {
-        console.log("Recebido comando para parar emparelhamento");
-        pararPareamento();
-      }
-    } catch (e) {
-      console.log("Erro ao processar mensagem MQTT:", e);
-    }
-  });
-
-  clienteMQTT.connect();
+  ledLigado = false;
+  digitalWrite(PIN_LED_PAREAMENTO, 0);
 }
 
 function solicitarPareamento() {
   emParejamento = true;
   console.log("Iniciando modo de emparelhamento...");
-  
-  // Começar a piscar o LED
-  piscarLedPareamento();
-  
+  iniciarBlinkPareamento();
+  publicarPedidoPareamento();
+}
+
+function publicarPedidoPareamento() {
+  var mac = getMac();
+
   publicaJson(TOPICO_PAREAMENTO, {
     tipo: "PAIRING_REQUEST",
     id_empresa: EMPRESA_ID,
     board_uid: BOARD_UID,
-    mac: obterMac(),
+    mac: mac.toUpperCase(),
     firmware_version: FIRMWARE_VERSION
   });
 }
@@ -110,76 +269,86 @@ function solicitarPareamento() {
 function pararPareamento() {
   emParejamento = false;
   console.log("Parando modo de emparelhamento...");
-  
-  // Parar de piscar
-  if (ledPiscandoTimer) {
-    clearInterval(ledPiscandoTimer);
-    ledPiscandoTimer = null;
-  }
-  digitalWrite(PIN_LED_PAREAMENTO, 0); // Desligar LED
+  pararBlinkPareamento();
 }
 
-function piscarLedPareamento() {
-  // Piscar a cada 500ms (250ms on, 250ms off)
-  var ledLigado = false;
-  
-  ledPiscandoTimer = setInterval(function() {
-    if (emParejamento) {
-      ledLigado = !ledLigado;
-      digitalWrite(PIN_LED_PAREAMENTO, ledLigado ? 1 : 0);
-    } else {
-      clearInterval(ledPiscandoTimer);
-      ledPiscandoTimer = null;
-    }
-  }, 250);
-}
+function setupPins() {
+  for (var i = 0; i < watchIds.length; i++) clearWatch(watchIds[i]);
+  watchIds = [];
 
-function enviaStatus(novoStatus) {
-  if (statusAtual === novoStatus) return;
-  statusAtual = novoStatus;
-
-  publicaJson(TOPICO_STATUS, {
-    board_uid: BOARD_UID,
-    status: statusAtual
-  });
-}
-
-function configuraBotoes() {
   pinMode(PIN_VERDE, "input_pullup");
   pinMode(PIN_AMARELO, "input_pullup");
   pinMode(PIN_VERMELHO, "input_pullup");
   pinMode(PIN_LED_PAREAMENTO, "output");
-  digitalWrite(PIN_LED_PAREAMENTO, 0); // Desligar LED inicialmente
 
-  setWatch(function() {
-    setTimeout(function() { enviaStatus("Produzindo"); }, 10);
-  }, PIN_VERDE, { repeat: true, edge: "falling", debounce: 50 });
+  digitalWrite(PIN_LED_PAREAMENTO, 0);
 
-  setWatch(function() {
-    setupLongPressTriggered = false;
-    setupHoldTimer = setTimeout(function() {
-      setupLongPressTriggered = true;
-      solicitarPareamento();
-    }, 3000);
-  }, PIN_AMARELO, { repeat: true, edge: "falling", debounce: 50 });
+  watchIds.push(setWatch(function() {
+    enviaStatus("Produzindo");
+  }, PIN_VERDE, {
+    repeat: true,
+    edge: "falling",
+    debounce: DEBOUNCE_DELAY
+  }));
 
-  setWatch(function() {
-    if (setupHoldTimer) clearTimeout(setupHoldTimer);
-    if (!setupLongPressTriggered) {
-      // Se estiver em emparelhamento, para
-      if (emParejamento) {
-        pararPareamento();
-      } else {
-        setTimeout(function() { enviaStatus("Setup"); }, 10);
+  watchIds.push(setWatch(function() {
+    enviaStatus("Parada");
+  }, PIN_VERMELHO, {
+    repeat: true,
+    edge: "falling",
+    debounce: DEBOUNCE_DELAY
+  }));
+
+  watchIds.push(setWatch(function() {
+    var pressed = !digitalRead(PIN_AMARELO);
+
+    if (pressed && !amareloIsPressed) {
+      amareloIsPressed = true;
+      setupLongPressTriggered = false;
+
+      amareloLongPressTimer = setTimeout(function() {
+        if (amareloIsPressed && !setupLongPressTriggered) {
+          setupLongPressTriggered = true;
+          solicitarPareamento();
+        }
+      }, 3000);
+    }
+
+    if (!pressed && amareloIsPressed) {
+      amareloIsPressed = false;
+
+      if (amareloLongPressTimer) {
+        clearTimeout(amareloLongPressTimer);
+        amareloLongPressTimer = undefined;
+      }
+
+      if (!setupLongPressTriggered) {
+        if (emParejamento) pararPareamento();
+        else enviaStatus("Setup");
       }
     }
-  }, PIN_AMARELO, { repeat: true, edge: "rising", debounce: 50 });
-
-  setWatch(function() {
-    setTimeout(function() { enviaStatus("Parada"); }, 10);
-  }, PIN_VERMELHO, { repeat: true, edge: "falling", debounce: 50 });
+  }, PIN_AMARELO, {
+    repeat: true,
+    edge: "both",
+    debounce: DEBOUNCE_DELAY
+  }));
 }
 
-console.log("ESP32 iniciado. Board UID:", BOARD_UID);
-configuraBotoes();
-conectaWifi();
+wifi.on("connected", function() {
+  onWiFiReady();
+});
+
+wifi.on("disconnected", function(details) {
+  wifiReady = false;
+  mqttConnected = false;
+
+  console.log("Wi-Fi desconectado: " + JSON.stringify(details || {}));
+  setTimeout(setupWiFi, 5000);
+});
+
+function onInit() {
+  setupPins();
+  setupWiFi();
+}
+
+onInit();
