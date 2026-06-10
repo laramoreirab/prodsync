@@ -12,7 +12,7 @@ import { MediaParadasDiaWidget } from "@/features/paradas/MediaParadasDiaWidget"
 import { PecasPorMinutoWidget } from "@/features/producao/PecasPorMinutoWidget";
 import { MaquinaAtivaPorTurnoWidget } from "@/features/maquinas/MaquinaAtivaPorTurnoWidget";
 import { ProducaoPorTurnoLotesWidget } from "@/features/producao/ProducaoPorTurnoLotesWidget";
-import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider, LoadingState, AsymmetricGrid } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, WidgetCard, KPIGrid, ContentGrid, SectionDivider, LoadingState, AsymmetricGrid, KPICardDecorated } from "@/components/AnimatedComponents";
 import { usePerfil } from "@/hooks/usePerfil";
 import { ArrowUpFromLine } from "lucide-react";
 
@@ -96,18 +96,18 @@ export default function DashboardGeralGestor() {
 
       <SectionDivider title="Indicadores rápidos" className="mt-6" />
       <KPIGrid cols={4} className="mt-2">
-        <WidgetCard>
+        <KPICardDecorated>
           <MediaParadasDiaWidget setorId={setorId} />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <PecasPorMinutoWidget setorId={setorId} />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <MaquinaAtivaPorTurnoWidget setorId={setorId} />
-        </WidgetCard>
-        <WidgetCard>
+        </KPICardDecorated>
+        <KPICardDecorated>
           <ProducaoPorTurnoLotesWidget setorId={setorId} />
-        </WidgetCard>
+        </KPICardDecorated>
       </KPIGrid>
     </PageLayout>
   );
