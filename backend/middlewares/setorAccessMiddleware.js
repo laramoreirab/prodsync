@@ -137,6 +137,8 @@ function autorizarUsuarioParam(nomeParam = 'id') {
             const setores = await obterSetoresGeridos(req);
             const idUsuario = Number(req.params[nomeParam] ?? req.body[nomeParam] ?? req.query[nomeParam]);
 
+            if (idUsuario === Number(req.user.id_usuario)) return next();
+
             const operador = Number.isInteger(idUsuario)
                 ? await prisma.escalaTrabalho.findFirst({
                     where: {
