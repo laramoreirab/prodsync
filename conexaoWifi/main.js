@@ -1,9 +1,12 @@
-clearWatch();
-clearInterval();
-
 var wifi = require("Wifi");
 var net = require("net");
 
+// --- Configuracoes de Rede ---
+var ssid = "Wokwi-GUEST";
+var password = "";
+var mqtt_server = "broker.hivemq.com";
+
+// --- Definicao dos Pinos ---
 var PIN_VERDE = D32;
 var PIN_AMARELO = D33;
 var PIN_VERMELHO = D25;
@@ -11,8 +14,8 @@ var PIN_LED = D27;
 var LED_LIGADO = 1;
 var LED_DESLIGADO = 0;
 
+// --- Constantes do Sistema ---
 var EMPRESA_ID = 10;
-var BOARD_UID = typeof getSerial === "function" ? "esp32-" + getSerial() : "esp32-prodsync-001";
 var FIRMWARE_VERSION = "wifi-1.1.0";
 
 var statusAtual = null;
@@ -42,7 +45,30 @@ function obterMac() {
     var detalhes = wifi.getDetails ? wifi.getDetails() : null;
     return detalhes && detalhes.mac ? detalhes.mac : null;
   } catch (e) {
-    return null;
+    console.log("Erro ao processar mensagem JSON: " + e);
+    return;
+  }
+
+  var tipo = doc.tipo;
+
+  if (tipo === "PARAR_PAREAMENTO") {
+    console.log("Recebido comando para parar emparelhamento");
+    pararPareamento();
+  } else if (tipo === "PAREAMENTO_CONCLUIDO") {
+    console.log("Pareamento concluido com a maquina " + (doc.id_maquina || 0));
+    pararPareamento();
+  } else if (tipo === "STATUS_REGISTRADO") {
+    if (doc.status) {
+      ultimoStatusRegistrado = doc.status;
+      console.log("Status confirmado pelo backend: " + ultimoStatusRegistrado);
+    }
+  } else if (tipo === "STATUS_REJEITADO") {
+    console.log(
+      "Backend rejeitou o status " +
+      (doc.status || "") +
+      ": " +
+      (doc.mensagem || "sem detalhes")
+    );
   }
 }
 
@@ -309,7 +335,7 @@ function solicitarPareamento() {
     tipo: "PAIRING_REQUEST",
     id_empresa: EMPRESA_ID,
     board_uid: BOARD_UID,
-    mac: obterMac(),
+    mac: mac.toUpperCase(),
     firmware_version: FIRMWARE_VERSION
   });
 }
