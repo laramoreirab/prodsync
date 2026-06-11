@@ -8,11 +8,13 @@ const FIRMWARE_VERSION = "serial-1.1.0";
 const PIN_PRODUZINDO = D25;
 const PIN_SETUP = D26;
 const PIN_PARADA = D27;
+const PIN_LED = D27;
 
 let isLocked = false;
 let alarmeSeguranca;
 let setupHoldTimer;
 let setupLongPressTriggered = false;
+let ledPiscanteInterval = null;
 
 function enviarPareamento() {
     const payload = {
@@ -43,9 +45,24 @@ function dispararEvento(status) {
     print("DATA:" + JSON.stringify(payload));
 }
 
+function piscarLed() {
+    if (ledPiscanteInterval) {
+        clearInterval(ledPiscanteInterval);
+    }
+    
+    let estado = true;
+    ledPiscanteInterval = setInterval(() => {
+        digitalWrite(PIN_LED, estado ? 1 : 0);
+        estado = !estado;
+    }, 500);
+    
+    print("LOG: LED iniciado piscando na porta D27");
+}
+
 pinMode(PIN_PRODUZINDO, "input_pullup");
 pinMode(PIN_SETUP, "input_pullup");
 pinMode(PIN_PARADA, "input_pullup");
+pinMode(PIN_LED, "output");
 
 setWatch(() => {
     dispararEvento("Produzindo");
@@ -56,6 +73,7 @@ setWatch(() => {
     setupHoldTimer = setTimeout(() => {
         setupLongPressTriggered = true;
         enviarPareamento();
+        piscarLed();
     }, 3000);
 }, PIN_SETUP, { repeat: true, edge: "falling", debounce: 50 });
 
