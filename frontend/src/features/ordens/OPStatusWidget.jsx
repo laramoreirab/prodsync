@@ -30,26 +30,26 @@ const opStatusChartConfig = {
   ...opStatusConfig,
   Finalizada: {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
   Finalizadas: {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
   "Concluída": {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
   "Concluídas": {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
 };
 
 export function OPStatusWidget({ setorId = null }) {
   const { data, loading, error } = useOPStatus(setorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar status.</p>;
   if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;
@@ -85,6 +85,7 @@ export function OPStatusWidget({ setorId = null }) {
           dataKey="value"
           nameKey="status" 
           showLegend
+          outerLabelLayout="fixed-elbows"
         />
       </div>
     </div>

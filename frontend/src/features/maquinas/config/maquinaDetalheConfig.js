@@ -5,7 +5,7 @@ export const motivoRefugoConfig = {
 };
  
 export const motivoSetupConfig = {
-  minutos: { label: "Duração (min):", color: "var(--chart2" },
+  minutos: { label: "Duração (min):", color: "var(--chart2)" },
 };
  
 export const oeeEvolucaoConfig = {
@@ -18,8 +18,8 @@ export const velocidadeConfig = {
  
 export const oeeMetricasMaquinaConfig = [
   { key: "disponibilidade", label: "Disponibilidade:", color: "var(--chart1)" },
-  { key: "performance",     label: "Performance:",     color: "var(--chart2)" },
-  { key: "qualidade",       label: "Qualidade:",       color: "var(--chart3)" },
-  { key: "oee",             label: "OEE Geral Consolidado:", color: "var(--chart4)" },
+  { key: "performance",     label: "Performance:",     color: "var(--chart1)" },
+  { key: "qualidade",       label: "Qualidade:",       color: "var(--chart1)" },
+  { key: "oee",             label: "OEE Geral Consolidado:", color: "var(--chart1)" },
 ];
  

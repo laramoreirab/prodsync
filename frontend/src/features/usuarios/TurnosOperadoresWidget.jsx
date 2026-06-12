@@ -9,11 +9,22 @@ import {
 import { useTurnosOperadores } from "./hooks/useTurnosOperadores";
 import { turnosOperadoresConfig } from "./config/usuarioChartConfig";
 
+const tonsAzuis = [
+  "#1d4ed8",
+  "#2563eb",
+  "#3b82f6",
+  "#60a5fa",
+  "#93c5fd",
+  "#bfdbfe",
+  "#1e40af",
+  "#1e3a8a",
+];
+
 export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = false, cy = "50%" }) {
   const { data, loading, error } = useTurnosOperadores(setorId);
 
   // Estados de carregamento e erro
-  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
+  if (loading) return <p className="text-xs text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
   if (!data || (Array.isArray(data) && data.length === 0)) {
     return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
@@ -24,6 +35,23 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
   const dataKey = "value";
 
   const formatValue = (value) => (valueFormatter ? valueFormatter(value) : value);
+  const renderOuterLabel = (props) => {
+    const name = props?.[nameKey] ?? props?.name;
+    const value = props?.[dataKey] ?? props?.value;
+
+    return (
+      <text
+        x={props.x}
+        y={props.y}
+        textAnchor={props.textAnchor}
+        dominantBaseline="central"
+        className="fill-black font-medium dark:fill-white"
+        style={{ fontSize: "13px" }}
+      >
+        {`${name}: ${formatValue(value)}`}
+      </text>
+    );
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -73,14 +101,13 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
               label={
                 compact
                   ? false
-                  : ({ [nameKey]: name, [dataKey]: value }) =>
-                      `${name}: ${formatValue(value)}`
+                  : renderOuterLabel
               }
             >
-              {data.map((entry) => {
+              {data.map((entry, index) => {
                 const entryKey = entry[nameKey];
                 const fillColor =
-                  turnosOperadoresConfig?.[entryKey]?.color ?? `var(--color-${entryKey})`;
+                  turnosOperadoresConfig?.[entryKey]?.color ?? tonsAzuis[index % tonsAzuis.length];
                 
                 return <Cell key={entryKey} fill={fillColor} />;
               })}

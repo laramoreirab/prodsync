@@ -11,7 +11,7 @@ export default function RelatoriosGestorPage() {
   if (loading) {
     return (
       <PageLayout className="pb-12">
-        <PageHeader title="Relatórios" subtitle="Carregando perfil..." />
+        <PageHeader title="Relatórios" subtitle="Sincronizando perfil..." />
       </PageLayout>
     );
   }

@@ -24,6 +24,8 @@ export function DonutChart({
   valueFormatter,
   cy = "50%",
   showOuterLabels = !compact,
+  innerRadius = 45,
+  outerRadius = 70,
 }) {
   if (!data?.length) return null;
 
@@ -72,8 +74,8 @@ export function DonutChart({
           y={elbowY}
           textAnchor={textAnchor}
           dominantBaseline="central"
-          className="fill-current text-[11px] font-medium"
-          style={{ fill: color }}
+          className="fill-black font-medium dark:fill-white"
+          style={{ fontSize: "13px" }}
         >
           {`${getLabel(entryKey)}: ${formatValue(value)}`}
         </text>
@@ -133,8 +135,8 @@ export function DonutChart({
               nameKey={nameKey}
               cx="50%"
               cy={cy}
-              innerRadius={45}
-              outerRadius={70}
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
               labelLine={false}
               label={showOuterLabels && !singleOuterLabel ? renderOuterLabel : false}
             >
@@ -149,27 +151,25 @@ export function DonutChart({
         </ChartContainer>
 
         {singleOuterLabel && (
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-            viewBox="0 0 460 220"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M 280 62 L 298 44 L 318 44"
-              fill="none"
-              stroke={singleOuterLabel.color}
-              strokeWidth="1"
-            />
-            <text
-              x="324"
-              y="44"
-              dominantBaseline="central"
-              className="fill-current text-[11px] font-medium"
-              style={{ fill: singleOuterLabel.color }}
+          <div className="pointer-events-none absolute left-[calc(50%+42px)] top-[calc(50%-54px)] flex items-center">
+            <svg
+              className="h-7 w-12 shrink-0 overflow-visible"
+              viewBox="0 0 48 28"
+              aria-hidden="true"
+            >
+              <path
+                d="M 0 28 L 18 8 L 48 8"
+                fill="none"
+                stroke={singleOuterLabel.color}
+                strokeWidth="1"
+              />
+            </svg>
+            <span
+              className="-ml-1 -translate-y-[2px] whitespace-nowrap text-[13px] font-medium leading-none text-black dark:text-white"
             >
               {singleOuterLabel.text}
-            </text>
-          </svg>
+            </span>
+          </div>
         )}
       </div>
     </div>

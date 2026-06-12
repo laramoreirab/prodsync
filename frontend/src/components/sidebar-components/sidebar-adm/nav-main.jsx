@@ -21,15 +21,16 @@ function NavMainItem({
       ? pathname === item.url
       : pathname === item.url || pathname?.startsWith(`${item.url}/`)
     : false
+  const hasClickAction = typeof item.onClick === "function"
 
-  if (isRoute) {
+  if (isRoute && !hasClickAction) {
     return (
       <SidebarMenuButton
         asChild
         tooltip={item.title}
         isActive={isActive}
-        className="relative h-10 rounded-md border border-transparent bg-transparent px-3 text-sidebar-foreground/95 transition-all duration-300 before:absolute before:left-0 before:top-0 before:h-full before:w-px before:bg-white before:opacity-0 before:transition-opacity before:duration-200 group-hover/sidebar:h-11 group-hover/sidebar:px-4 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:group-hover/sidebar:h-11 group-data-[collapsible=icon]:group-hover/sidebar:w-full group-data-[collapsible=icon]:group-hover/sidebar:justify-start group-data-[collapsible=icon]:group-hover/sidebar:px-4 hover:bg-white/12 data-[active=true]:text-sidebar-foreground data-[active=true]:before:opacity-100 data-[active=true]:hover:bg-white/12">
-        <Link href={item.url}>
+        className="relative h-10 cursor-pointer rounded-md border border-transparent bg-transparent px-3 text-sidebar-foreground/95 transition-all duration-300 before:absolute before:left-0 before:top-0 before:h-full before:w-px before:bg-white before:opacity-0 before:transition-opacity before:duration-200 group-hover/sidebar:h-11 group-hover/sidebar:px-4 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:group-hover/sidebar:h-11 group-data-[collapsible=icon]:group-hover/sidebar:w-full group-data-[collapsible=icon]:group-hover/sidebar:justify-start group-data-[collapsible=icon]:group-hover/sidebar:px-4 hover:bg-white/12 data-[active=true]:text-sidebar-foreground data-[active=true]:before:opacity-100 data-[active=true]:hover:bg-white/12">
+        <Link href={item.url} className="cursor-pointer">
           <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground/90 transition-colors duration-300 [&_svg]:size-[1.1rem]">
             {item.icon}
           </div>
@@ -42,7 +43,10 @@ function NavMainItem({
   return (
     <SidebarMenuButton
       tooltip={item.title}
-      className="h-10 rounded-md bg-transparent px-3 text-sidebar-foreground/95 group-hover/sidebar:h-11 group-hover/sidebar:px-4 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:group-hover/sidebar:h-11 group-data-[collapsible=icon]:group-hover/sidebar:w-full group-data-[collapsible=icon]:group-hover/sidebar:justify-start group-data-[collapsible=icon]:group-hover/sidebar:px-4 hover:bg-white/12">
+      type="button"
+      onClick={item.onClick}
+      isActive={isActive}
+      className={`h-10 rounded-md bg-transparent px-3 text-sidebar-foreground/95 group-hover/sidebar:h-11 group-hover/sidebar:px-4 group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:group-hover/sidebar:h-11 group-data-[collapsible=icon]:group-hover/sidebar:w-full group-data-[collapsible=icon]:group-hover/sidebar:justify-start group-data-[collapsible=icon]:group-hover/sidebar:px-4 hover:bg-white/12 ${item.onClick ? "cursor-pointer" : "cursor-default"}`}>
       <div className="flex size-5 shrink-0 items-center justify-center text-sidebar-foreground [&_svg]:size-[1.1rem]">
         {item.icon}
       </div>

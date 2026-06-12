@@ -20,7 +20,7 @@ export default function DashboardGeralGestor() {
   const { loading, setorId } = usePerfil();
 
   if (loading) {
-    return <LoadingState message="Carregando dashboard..." />;
+    return <LoadingState message="Sincronizando dashboard..." />;
   }
 
   if (!setorId) {
@@ -94,7 +94,6 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <SectionDivider title="Indicadores rápidos" className="mt-6" />
       <KPIGrid cols={4} className="mt-2">
         <KPICardDecorated>
           <MediaParadasDiaWidget setorId={setorId} />

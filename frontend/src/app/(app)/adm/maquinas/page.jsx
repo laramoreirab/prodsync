@@ -177,7 +177,7 @@ export default function Maquinas() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return <LoadingState message="Carregando máquinas..." />;
+    return <LoadingState message="Sincronizando máquinas..." />;
   }
 
   return (

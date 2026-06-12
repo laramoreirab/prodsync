@@ -18,7 +18,7 @@ export default function LoginForm() {
     const [id, setId] = useState("");
     const [senha, setSenha] = useState("");
     const [lembrarDeMim, setLembrarDeMim] = useState(false);
-    const [carregando, setCarregando] = useState(false)
+    const [carregando, setSincronizando] = useState(false)
     const [erro, setErro] = useState("")
     const [showPassword, setShowPassword] = useState(false);
 
@@ -32,7 +32,7 @@ export default function LoginForm() {
     }, []);
 
     async function handleLogin() {
-        setCarregando(true)
+        setSincronizando(true)
         setErro("")
 
 
@@ -70,7 +70,7 @@ export default function LoginForm() {
         } catch (error) {
             setErro("Erro de conexão com o servidor")
         } finally {
-            setCarregando(false)
+            setSincronizando(false)
         }
     }
 

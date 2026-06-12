@@ -181,7 +181,7 @@ export default function HistoricoEventosGestor() {
   );
 
   if (loading) {
-    return <LoadingState message="Carregando eventos..." />;
+    return <LoadingState message="Sincronizando eventos..." />;
   }
 
   return (

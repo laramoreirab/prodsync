@@ -281,7 +281,7 @@ export default function OrdensDeProducao() {
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex items-center justify-center">
         <div className="flex flex-col items-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-900 mb-4" />
-          <p className="text-lg text-gray-600 font-medium">Carregando ordens de produção...</p>
+          <p className="text-lg text-gray-600 font-medium">Sincronizando ordens de produção...</p>
         </div>
       </main>
     );

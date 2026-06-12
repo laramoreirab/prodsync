@@ -44,6 +44,7 @@ export function AreaChartBase({
 }) {
   const { color } = useChart(config, yKey);
   const gradientId = `grad-${yKey}`;
+  const showEveryXAxisTick = data?.length <= 7;
 
   // Garante que o tamanho selecionado existe, senão usa o padrão 'medio'
   const heightClass = sizeVariants[size] || sizeVariants.medio;
@@ -64,7 +65,7 @@ export function AreaChartBase({
 
       {/* A classe de altura agora é dinâmica com base no 'size' */}
       <ChartContainer config={config} className={`${heightClass} w-full pt-12`}>
-        <AreaChart data={data}>
+        <AreaChart data={data} margin={{ top: 10, right: 28, bottom: 4, left: 28 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={color} stopOpacity={0.3} />
@@ -73,7 +74,12 @@ export function AreaChartBase({
           </defs>
 
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey={xKey} />
+          <XAxis
+            dataKey={xKey}
+            interval={showEveryXAxisTick ? 0 : "preserveEnd"}
+            padding={{ left: 8, right: 8 }}
+            tickMargin={8}
+          />
           <YAxis hide />
 
           <ChartTooltip content={<ChartTooltipContent />} />

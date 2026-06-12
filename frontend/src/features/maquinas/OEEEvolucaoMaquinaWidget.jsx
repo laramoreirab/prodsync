@@ -7,7 +7,7 @@ import { oeeEvolucaoConfig } from "./config/maquinaDetalheConfig";
 export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
   const { data, loading, error } = useOEEEvolucaoMaquina(maquinaId);
 
-  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando evolução...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Sincronizando evolução...</p>;
   if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar evolução.</p>;
   if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;
@@ -27,6 +27,7 @@ export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
           xKey="dia"
           yKey="oee"
           config={oeeEvolucaoConfig}
+          size="pequeno"
         />
       </div>
     </div>

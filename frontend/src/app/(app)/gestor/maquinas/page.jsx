@@ -156,7 +156,7 @@ export default function MaquinasGestor() {
   }, [maquinasDoSetor, busca, filtrosAtivos, ordenacao]);
 
   if (loading) {
-    return <LoadingState message="Carregando máquinas do setor..." />;
+    return <LoadingState message="Sincronizando máquinas do setor..." />;
   }
 
   const nomeSetorFormatado = formatarNomeSetor(setorNome);
