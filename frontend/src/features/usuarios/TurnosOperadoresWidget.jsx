@@ -9,6 +9,17 @@ import {
 import { useTurnosOperadores } from "./hooks/useTurnosOperadores";
 import { turnosOperadoresConfig } from "./config/usuarioChartConfig";
 
+const tonsAzuis = [
+  "#1d4ed8",
+  "#2563eb",
+  "#3b82f6",
+  "#60a5fa",
+  "#93c5fd",
+  "#bfdbfe",
+  "#1e40af",
+  "#1e3a8a",
+];
+
 export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = false, cy = "50%" }) {
   const { data, loading, error } = useTurnosOperadores(setorId);
 
@@ -93,10 +104,10 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
                   : renderOuterLabel
               }
             >
-              {data.map((entry) => {
+              {data.map((entry, index) => {
                 const entryKey = entry[nameKey];
                 const fillColor =
-                  turnosOperadoresConfig?.[entryKey]?.color ?? `var(--color-${entryKey})`;
+                  turnosOperadoresConfig?.[entryKey]?.color ?? tonsAzuis[index % tonsAzuis.length];
                 
                 return <Cell key={entryKey} fill={fillColor} />;
               })}

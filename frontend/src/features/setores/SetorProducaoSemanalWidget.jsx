@@ -24,6 +24,7 @@ export function SetorProducaoSemanalWidget({ setorId }) {
           xKey="dia"
           yKey="qtd" 
           config={setorProducaoSemanalConfig}
+          size="pequeno"
         />
       </div>
     </div>

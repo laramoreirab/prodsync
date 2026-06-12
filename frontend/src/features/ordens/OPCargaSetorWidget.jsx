@@ -23,6 +23,7 @@ export function OPCargaSetorWidget({ setorId = null }) {
         error={error}
         xKey="setor"
         yKey="carga"
+        heightClassName="h-[320px]"
       />
     </div>
   );

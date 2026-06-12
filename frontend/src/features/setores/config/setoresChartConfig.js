@@ -56,8 +56,8 @@ export const setorProducaoDiariaConfig = {
 };
 
 export const setorStatusDonutConfig = {
-  Produzindo: { label: "Produzindo", color: "#22c55e" },
-  Setup: { label: "Setup", color: "#f59e0b" },
-  Paradas: { label: "Paradas", color: "#ef4444" },
+  Produzindo: { label: "Produzindo", color: "var(--chart1)" },
+  Setup: { label: "Setup", color: "var(--chart2)" },
+  Paradas: { label: "Paradas", color: "var(--chart3)" },
 };
  

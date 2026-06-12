@@ -19,6 +19,7 @@ export function BarHorizontal({
   config,
   title,
   yKey = "setor",
+  yAxisWidth = 90,
   chartSize = "default",
   heightClassName,
   showValueLabels = false,
@@ -61,7 +62,7 @@ export function BarHorizontal({
             type="category"
             tickLine={false}
             axisLine={false}
-            width={90}
+            width={yAxisWidth}
             tick={{ fontSize: 12 }}
           />
           <XAxis type="number" hide domain={xDomain} />
