@@ -94,7 +94,6 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <SectionDivider title="Indicadores rápidos" className="mt-6" />
       <KPIGrid cols={4} className="mt-2">
         <KPICardDecorated>
           <MediaParadasDiaWidget setorId={setorId} />

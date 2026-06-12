@@ -24,6 +24,7 @@ export function BarVerticalBase({
   error,
   xKey,
   colorKey,
+  heightClassName,
 }) {
 
   if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
@@ -44,7 +45,7 @@ export function BarVerticalBase({
           )}
         </div>
       )}
-      <ChartContainer config={config} className="h-[200px] w-full pt-12">
+      <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full pt-12`}>
         <BarChart data={data} margin={{ top: 10 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis 

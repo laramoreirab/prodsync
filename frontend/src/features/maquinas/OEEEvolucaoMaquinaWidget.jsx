@@ -27,6 +27,7 @@ export function OEEEvolucaoMaquinaWidget({ maquinaId }) {
           xKey="dia"
           yKey="oee"
           config={oeeEvolucaoConfig}
+          size="pequeno"
         />
       </div>
     </div>
