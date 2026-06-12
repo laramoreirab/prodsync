@@ -18,7 +18,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
     const [funcaoSelecionada, setFuncaoSelecionada] = useState("");
     const [listaEquipe, setListaEquipe] = useState([]);
     const [equipeSelecionada, setEquipeSelecionada] = useState([]);
-    const [carregando, setCarregando] = useState(false);
+    const [carregando, setSincronizando] = useState(false);
     const submitEmAndamentoRef = useRef(false);
 
     const tipoUsuario = (usuario) => usuario?.tipo ?? usuario?.funcao;
@@ -100,7 +100,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
         e.preventDefault();
         if (submitEmAndamentoRef.current) return;
         submitEmAndamentoRef.current = true;
-        setCarregando(true);
+        setSincronizando(true);
 
         try {
             const novoSetor = await setorCrudService.create({
@@ -142,7 +142,7 @@ export default function FormCadastroSetor({ onCadastroSucesso }) {
             toast.error(error.message || "Erro ao criar setor.");
         } finally {
             submitEmAndamentoRef.current = false;
-            setCarregando(false);
+            setSincronizando(false);
         }
     };
 

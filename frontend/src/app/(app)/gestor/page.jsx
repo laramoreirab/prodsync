@@ -20,7 +20,7 @@ export default function DashboardGeralGestor() {
   const { loading, setorId } = usePerfil();
 
   if (loading) {
-    return <LoadingState message="Carregando dashboard..." />;
+    return <LoadingState message="Sincronizando dashboard..." />;
   }
 
   if (!setorId) {

@@ -29,10 +29,10 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     const [setores, setSetores] = useState([]);
     const [listaTurnos, setListaTurnos] = useState([])
     const [listaMaquinas, setListaMaquinas] = useState([])
-    const [carregandoTurnos, setCarregandoTurnos] = useState(false)
+    const [carregandoTurnos, setSincronizandoTurnos] = useState(false)
 
     // Estados para gerenciar os dados do formulário
-    const [carregando, setCarregando] = useState(true);
+    const [carregando, setSincronizando] = useState(true);
 
     // Estados dos campos (para serem controlados)
     const [formData, setFormData] = useState({
@@ -80,7 +80,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
     // Buscando os dados no banco assim que o modal abre
     useEffect(() => {
         const buscarDadosDoUsuario = async () => {
-            setCarregando(true);
+            setSincronizando(true);
             try {
                 const dados = await usuariosCrudService.getById(usuarioId);
 
@@ -108,7 +108,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                 console.error("Erro ao buscar detalhes do usuário:", error);
                 toast.error("Erro ao carregar os dados do usuário.");
             } finally {
-                setCarregando(false);
+                setSincronizando(false);
             }
         };
 
@@ -185,7 +185,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                 return;
             }
             try {
-                setCarregandoTurnos(true);
+                setSincronizandoTurnos(true);
                 const options = { method: "GET" }
                 const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
                 setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
@@ -193,7 +193,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                 console.log(error)
                 toast.error("Erro ao carregar turnos.");
             } finally {
-                setCarregandoTurnos(false);
+                setSincronizandoTurnos(false);
             }
 
         }
@@ -369,7 +369,7 @@ export default function FormEdicaoUsuario({ usuarioId, onEdicaoSucesso }) {
                                 {!formData.id_setor
                                     ? "Selecione um setor primeiro"
                                     : carregandoTurnos
-                                        ? "Carregando turnos..."
+                                        ? "Sincronizando turnos..."
                                     : listaTurnos.length === 0
                                         ? "Nenhum turno criado"
                                         : "Selecione..."}

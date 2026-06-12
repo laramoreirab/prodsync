@@ -490,7 +490,7 @@ export default function MaquinaDetalheGestor({ params }) {
   });
 
   if (loadingMaquina) {
-    return <LoadingState message="Carregando detalhes da máquina..." />;
+    return <LoadingState message="Sincronizando detalhes da máquina..." />;
   }
 
   return (

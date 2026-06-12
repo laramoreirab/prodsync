@@ -102,7 +102,7 @@ export default function MaquinaDetalhePage({ params }) {
   }, [maquinaId, router]);
 
   if (loading) {
-    return <LoadingState message="Carregando máquina..." />;
+    return <LoadingState message="Sincronizando máquina..." />;
   }
 
   const nome = maquina?.nome || `Máquina #${id}`;

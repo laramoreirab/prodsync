@@ -7,7 +7,7 @@ import { oeeMetricasConfig } from "./config/producaoChartConfig";
 export function OEEWidget() {
   const { data, loading, error } = useOEE();
 
-  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando OEE...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Sincronizando OEE...</p>;
   if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar OEE.</p>;
   if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;

@@ -9,11 +9,11 @@ import { toast } from "sonner";
 import { opCrudService } from '@/services/opCrudService';
 
 export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusaoSucesso }) {
-    const [carregando, setCarregando] = useState(false);
+    const [carregando, setSincronizando] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setCarregando(true);
+        setSincronizando(true);
 
         try {
             const ids = opId ? [opId] : opIds.filter(Boolean);
@@ -29,7 +29,7 @@ export default function FormExclusaoOp({ opId, opIds = [], idMaquina, onExclusao
             console.error("Erro ao excluir OP:", error);
             toast.error("Erro ao excluir ordem de produção.");
         } finally {
-            setCarregando(false);
+            setSincronizando(false);
         }
     };
 
