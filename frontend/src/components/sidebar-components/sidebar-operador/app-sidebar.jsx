@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main";
 import {
   Sidebar,
@@ -19,15 +19,6 @@ import {
   Wrench,
 } from "lucide-react";
 import { ListBulletsIcon } from "@phosphor-icons/react";
-import { apiFetch } from "@/lib/api";
-import { getUserFromToken } from "@/lib/auth";
-
-const usuario = getUserFromToken();
-const idOperador = usuario?.id_usuario;
-const resposta = await apiFetch(
-          `/api/maquinas/obter-maquina-operador/${idOperador}`,
-        );
-const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
 
 const data = {
   navMain: [
@@ -38,7 +29,7 @@ const data = {
     },
     {
       title: "Máquinas",
-      url: `/operador/maquinas/${idMaquina}`,
+      url: "/operador/maquinas",
       icon: <Wrench />,
     },
     {
@@ -60,45 +51,23 @@ const data = {
 };
 
 export function AppSidebar({ ...props }) {
-   const [maquinaUrl, setMaquinaUrl] = useState('');
+  const { isMobile, open, setOpen } = useSidebar();
+  const estavaAbertaRef = useRef(null);
 
-  useEffect(() => {
-    let ativo = true;
+  const handleNotificationOpenChange = (aberto) => {
+    if (isMobile) return;
 
-    async function carregarMaquinaOperador() {
-      const usuario = getUserFromToken();
-      const idOperador = usuario?.id_usuario;
-
-      if (!idOperador) return;
-
-      try {
-        const resposta = await apiFetch(
-          `/api/maquinas/obter-maquina-operador/${idOperador}`,
-        );
-        const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
-
-        if (ativo && idMaquina) {
-          setMaquinaUrl(`/operador/maquinas/${idMaquina}`);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar maquina do operador:", error);
-      }
+    if (aberto) {
+      estavaAbertaRef.current = open;
+      if (!open) setOpen(true);
+      return;
     }
 
-    carregarMaquinaOperador();
-
-    return () => {
-      ativo = false;
-    };
-  }, []);
-
-  const navMain = useMemo(
-    () =>
-      data.navMain.map((item) =>
-        item.title === "Maquinas" ? { ...item, url: maquinaUrl } : item,
-      ),
-    [maquinaUrl],
-  );
+    if (estavaAbertaRef.current === false) {
+      setOpen(false);
+    }
+    estavaAbertaRef.current = null;
+  };
 
   return (
     <Sidebar
@@ -136,7 +105,7 @@ export function AppSidebar({ ...props }) {
       </SidebarHeader>
 
       <SidebarContent className="px-1 py-2">
-        <NavMain items={navMain} />
+        <NavMain items={data.navMain} />
       </SidebarContent>
 
       <SidebarFooter className="p-3 pt-2 group-data-[collapsible=icon]:px-3">
@@ -152,6 +121,7 @@ export function AppSidebar({ ...props }) {
         />
         <ProfileDropdown
           align="end"
+          onOpenChange={handleNotificationOpenChange}
           trigger={({ avatarSrc }) => (
             <div className="flex h-10 w-full items-center gap-2 overflow-hidden  rounded-lg px-2 text-left text-[#FFFFFF] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff]  group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2">
               <img
