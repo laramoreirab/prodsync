@@ -1,7 +1,7 @@
 // Status Operacional (DonutChart/PieChart)
 export const maquinaStatusConfig = {
   produzindo:  { label: "Máquinas ativas:",     color: "var(--chart1)" },
-  parada: { label: "Máquinas paradas:",    color: "var(--chart2)" },
+  parada: { label: "Máquinas Paradas:",    color: "var(--chart2)" },
   setup:  { label: "Máquinas Setup:",       color:"var(--chart3)" },
   manutencao:  { label: "Máquinas em manutenção:",       color: "var(--chart4)" },
   

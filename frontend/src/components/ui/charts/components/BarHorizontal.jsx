@@ -29,6 +29,15 @@ export function BarHorizontal({
 
   const dataKey = Object.keys(config)[0]; // pega a primeira chave do config
   const gradientId = `barGradient-${dataKey}`; // ID único para o gradiente baseado na chave
+  const xDomain = showValueLabels
+    ? [
+        0,
+        (dataMax) => {
+          if (!Number.isFinite(dataMax) || dataMax <= 0) return 1;
+          return dataMax * 1.12;
+        },
+      ]
+    : undefined;
 
   return (
     <div className="relative">
@@ -39,7 +48,7 @@ export function BarHorizontal({
         </div>
       )}
       <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full pt-16`}>
-        <BarChart data={data} layout="vertical" margin={{ left: 10 }}>
+        <BarChart data={data} layout="vertical" margin={{ left: 10, right: showValueLabels ? 24 : 0 }}>
           {/* Definição do Gradiente SVG */}
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
@@ -56,7 +65,7 @@ export function BarHorizontal({
             width={yAxisWidth}
             tick={{ fontSize: 12 }}
           />
-          <XAxis type="number" hide />
+          <XAxis type="number" hide domain={xDomain} />
           <ChartTooltip content={<ChartTooltipContent />} />
           
           {/* Aplicação do gradiente no fill */}

@@ -85,6 +85,7 @@ export function OPStatusWidget({ setorId = null }) {
           dataKey="value"
           nameKey="status" 
           showLegend
+          outerLabelLayout="fixed-elbows"
         />
       </div>
     </div>

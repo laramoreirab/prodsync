@@ -25,8 +25,6 @@ class AuthController {
         try {
             const { id, senha, lembrarDeMim = false } = req.body;
 
-            console.log('Requisição chegando até aqui com o id:', id)
-
             if (!id || id.trim() == '') {
                 return res.status(400).json({
                     sucesso: false,

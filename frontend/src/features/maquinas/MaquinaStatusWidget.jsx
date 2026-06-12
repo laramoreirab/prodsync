@@ -20,6 +20,7 @@ export function MaquinaStatusWidget() {
         config={maquinaStatusConfig}
         dataKey="value"
         showLegend
+        outerLabelLayout="sides"
       />
     </div>
   );

@@ -35,7 +35,7 @@ export function QtdUsuariosAdmWidget() {
       </p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
-      <div className="mt-12 -ml-6">
+      <div className="mt-6 -ml-6">
         <BarHorizontal
           data={chartData}
           config={qtdUsuariosPerfilBarConfig}
