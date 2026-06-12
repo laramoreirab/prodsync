@@ -28,11 +28,12 @@ export function SetorOEEMedioWidget({ setorId }) {
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2">
       <div>
         <p className="text-sm font-semibold text-black">OEE médio do Setor</p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
+            <div className="flex items-center justify-center py-4">
 
       <div className="flex items-center justify-center">
         <GaugeSemicircular
@@ -41,6 +42,7 @@ export function SetorOEEMedioWidget({ setorId }) {
           size="xlg"
           config={oeeConfig}
         />
+      </div>
       </div>
     </div>
   );
