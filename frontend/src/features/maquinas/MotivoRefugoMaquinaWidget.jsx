@@ -2,11 +2,23 @@
 
 import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 import { useMotivoRefugoMaquina } from "./hooks/useMotivoRefugoMaquina";
+import { motivoRefugoConfig } from "./config/maquinaDetalheConfig";
 
-const motivoRefugoBarConfig = {
-  value: { label: "Refugos", color: "var(--chart1)" },
-};
-
+const tonsAzuis = [
+  "#1d4ed8",
+  "#2563eb",
+  "#3b82f6",
+  "#60a5fa",
+  "#93c5fd",
+  "#bfdbfe",
+  "#1e40af",
+  "#1e3a8a",
+  "#0f4c81",
+  "#0284c7",
+  "#38bdf8",
+  "#7dd3fc",
+];
+ 
 export function MotivoRefugoMaquinaWidget({ maquinaId }) {
   const { data, loading, error } = useMotivoRefugoMaquina(maquinaId);
 
@@ -30,14 +42,15 @@ export function MotivoRefugoMaquinaWidget({ maquinaId }) {
         Atualizado em tempo real
       </p>
       <div className="mt-2">
-        <BarHorizontal
-          data={chartData}
-          config={motivoRefugoBarConfig}
-          yKey="name"
-          yAxisWidth={160}
-          heightClassName={chartData.length > 4 ? "h-[250px]" : "h-[210px]"}
-          paddingTopClassName="pt-3"
-          showValueLabels
+        <CustomPieChart
+          data={data.map((item, index) => ({
+            ...item,
+            fill: item.fill || tonsAzuis[index % tonsAzuis.length],
+          }))}
+          config={motivoRefugoConfig}
+          dataKey="value"
+          nameKey="name"
+          showLegend
         />
       </div>
     </div>
