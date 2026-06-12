@@ -27,27 +27,12 @@ export function MetaProducaoWidget({ operadorId }) {
       </div>
       {/* Container central do gráfico */}
       <div className="flex flex-col items-center">
-        <CustomPieChart data={chartData} config={metaConfig}>
-          <div className="flex flex-col items-center pb-4">
+        <CustomPieChart data={chartData} config={metaConfig} showOuterLabels>
+          <div className="flex flex-col items-center pt-11">
             <span className="text-3xl font-bold text-black">{data.completo}%</span>
             <span className="text-xs text-gray-400 font-semibold">Completo</span>
           </div>
         </CustomPieChart>
-
-        {/* Legenda das cores */}
-        <div className="flex gap-4 mt-2">
-          {Object.entries(metaConfig).map(([key, item]) => (
-            <div key={key} className="flex items-center gap-1.5">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
-              <span className="text-xs font-medium text-gray-600">
-                {item.label}
-              </span>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

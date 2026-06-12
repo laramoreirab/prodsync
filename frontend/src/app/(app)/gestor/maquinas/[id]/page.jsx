@@ -11,8 +11,7 @@ import {
   Plus,
   Loader2,
   Search,
-  ChevronDown,
-  Pencil,
+  ChevronDown,Pencil,
   Trash2,
   EyeIcon,
   BellRing,
@@ -79,15 +78,8 @@ const colunasMaquina = [
     className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        Setup: {
-          variant: "secondary",
-          className:
-            "bg-[var(--amarelo-setup)] text-amarelo font-semibold text-sm ",
-        },
-        Parada: {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none",
-        },
+        Setup: { variant: "setup" },
+        Parada: { variant: "parada" },
       };
 
       const estilo = config[valor] || { variant: "outline", className: "" };
@@ -252,6 +244,7 @@ export default function MaquinaDetalheGestor({ params }) {
           .filter((item) => item.tipo === "Producao")
           .map((item) => ({
             ...item,
+            id_ordem: item.ordem_producao?.id_ordem,
             op:
               item.ordem_producao?.codigo_lote ||
               item.ordem_producao?.id_ordem ||
@@ -288,87 +281,6 @@ export default function MaquinaDetalheGestor({ params }) {
     return new Date(`2025-${mes}-${dia}`);
   };
 
-  const dadosApontamento = [
-    {
-      id: 1,
-      op: "0098",
-      data: "26/03 (08:00 - 09:00)",
-      duracao: "00:35",
-      produzido: "15",
-      refugo: "2",
-      observacao: "Troca de ferramenta",
-      inicio: "2025-03-26T08:00:00.000Z",
-      fim: null,
-    },
-    {
-      id: 2,
-      op: "1234",
-      data: "06/01 (09:30 - 10:15)",
-      duracao: "00:45",
-      produzido: "10",
-      refugo: "5",
-      observacao: "Manutenção corretiva",
-      inicio: "2025-03-26T08:00:00.000Z",
-      fim: null,
-    },
-    {
-      id: 3,
-      op: "5678",
-      inicio: "2025-09-13T10:15:00.000Z",
-      fim: "2025-09-13T10:35:00.000Z",
-      duracao: "00:20",
-      produzido: "20",
-      refugo: "1",
-      observacao: "Ajuste de parâmetros",
-    },
-    {
-      id: 4,
-      op: "9012",
-      inicio: "2025-09-13T10:15:00.000Z",
-      fim: "2025-09-13T10:35:00.000Z",
-      duracao: "01:00",
-      produzido: "5",
-      refugo: "8",
-      observacao: "Refugo elevado devido a falta de aquecimento",
-    },
-    {
-      id: 5,
-      op: "1223",
-      inicio: "2025-09-13T10:15:00.000Z",
-      fim: "2025-09-13T10:35:00.000Z",
-      duracao: "01:00",
-      produzido: "6",
-      refugo: "8",
-      observacao: "Retirada de amostras para o laboratório de qualidade",
-    },
-    {
-      id: 6,
-      op: "1206",
-      data: "30/07 (17:00 - 18:00)",
-      duracao: "01:00",
-      produzido: "13",
-      refugo: "6",
-      observacao: "Finalização de OP",
-    },
-    {
-      id: 7,
-      op: "8912",
-      data: "20/09 (16:00 - 19:00)",
-      duracao: "01:00",
-      produzido: "20",
-      refugo: "5",
-      observacao: "Falta de material",
-    },
-    {
-      id: 8,
-      op: "0607",
-      data: "20/09 (16:00 - 19:00)",
-      duracao: "01:00",
-      produzido: "20",
-      refugo: "5",
-      observacao: "Boa qualidade",
-    },
-  ];
   // -------------------------------------------------------------------------------------------------- Eventos --------------------------------------------------------------------------------------------------
   const opcoesOrdenacaoEventos = [
     { label: "ID Crescente", value: "id_asc" },
@@ -818,7 +730,7 @@ export default function MaquinaDetalheGestor({ params }) {
                 columns={colunasApontamento}
                 acoesDropdown={(apontamento) => (
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link href={`/adm/ordensDeProducao/${apontamento.op}`}>
+                    <Link href={`/gestor/ordensDeProducao/${apontamento.id_ordem || apontamento.op}`}>
                       <EyeIcon className="mr-2 h-4 w-4" />
                       Ver OP relacionada
                     </Link>

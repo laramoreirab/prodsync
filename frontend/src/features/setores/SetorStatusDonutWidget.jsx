@@ -48,6 +48,7 @@ export function SetorStatusDonutWidget({ setorId }) {
           config={setorStatusDonutConfig}
           showLabels
           compact={false}
+          showLegend
         />
       </div>
     </div>

@@ -9,6 +9,17 @@ import { maquinaCrudService } from '@/services/maquinaCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 
+const resolverImagemMaquina = (imagem) => {
+    if (!imagem) return null;
+    if (imagem.startsWith("http")) return imagem;
+
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+    if (imagem.startsWith("/uploads/")) return `${apiUrl}${imagem}`;
+
+    const nomeArquivo = imagem.replaceAll("\\", "/").split("/").pop();
+    return `${apiUrl}/uploads/imagens/${nomeArquivo}`;
+};
+
 export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
     const [arquivo, setArquivo] = useState(null);
     const fileInputRef = useRef(null);
@@ -114,7 +125,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 if (dados.imagem) {
                     setArquivo({
                         nome: 'Imagem atual',
-                        preview: dados.imagem,
+                        preview: resolverImagemMaquina(dados.imagem),
                         raw: null
                     });
                 }
@@ -158,6 +169,10 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
             if (onEdicaoSucesso) {
                 onEdicaoSucesso();
             }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
             console.error("Erro ao atualizar máquina:", error);
             toast.error("Erro ao atualizar os dados.");

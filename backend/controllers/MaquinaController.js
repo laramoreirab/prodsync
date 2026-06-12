@@ -1,5 +1,6 @@
 import MaquinaModel from '../models/MaquinaModel.js';
 import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
+import { removerImagemCloudinary, uploadImagemMaquina } from '../services/cloudinaryService.js';
 import Papa from 'papaparse'
 
 class MaquinaController {
@@ -144,6 +145,7 @@ class MaquinaController {
 
     // POST /maquinas - Criar nova máquina
     static async criarMaquina(req, res) {
+        let imagemUpload = null;
         try {
             const { id_setor, categoria, nome, serie, capacidade, status, status_atual = null, data_aquisicao, id_operador } = req.body;
             const id_empresa = req.user.id_empresa;
@@ -154,22 +156,28 @@ class MaquinaController {
 
             if (erros.length > 0) {
                 // Se deu erro, remover imagem que o multer salvou
-                if (req.file) removerArquivoAntigo(req.file.filename);
                 return res.status(400).json({ sucesso: false, erro: 'Dados inválidos', detalhes: erros });
             }
 
-            const imagem = req.file ? `/uploads/imagens/${req.file.filename}` : null;
+            if (req.file) {
+                imagemUpload = await uploadImagemMaquina(req.file.buffer, { id_empresa });
+            }
+
+            const imagem = imagemUpload?.secure_url ?? null;
+            const imagemPublicId = imagemUpload?.public_id ?? null;
 
             const maquina = await MaquinaModel.criarMaquina(
                 id_empresa, id_setor, categoria, nome.trim(), serie?.trim(),
-                capacidade?.trim(), (status_atual || status)?.trim(), data_aquisicao, id_operador, imagem
+                capacidade?.trim(), (status_atual || status)?.trim(), data_aquisicao, id_operador, imagem, imagemPublicId
             );
 
             res.status(201).json({ sucesso: true, mensagem: 'Máquina criada com sucesso!', dados: maquina });
 
         } catch (error) {
             console.error('Erro ao criar máquina:', error);
-            if (req.file) removerArquivoAntigo(req.file.filename);
+            if (imagemUpload?.public_id) {
+                await removerImagemCloudinary(imagemUpload.public_id);
+            }
             if (error.code === 'P2002') {
                 return res.status(409).json({
                     sucesso: false,
@@ -194,6 +202,7 @@ class MaquinaController {
 
     // PUT /maquinas/:id - Atualizar dados da máquina
     static async atualizarMaquina(req, res) {
+        let imagemUpload = null;
         try {
             const { id } = req.params;
             const { nome, serie, id_setor, categoria, capacidade, status, status_atual, data_aquisicao, id_operador } = req.body;
@@ -203,7 +212,6 @@ class MaquinaController {
 
             const maquinaExistente = await MaquinaModel.buscarMaquinaPorID(parseInt(id), id_empresa);
             if (!maquinaExistente) {
-                if (req.file) removerArquivoAntigo(req.file.filename);
                 return res.status(404).json({ sucesso: false, erro: 'Máquina não encontrada' });
             }
 
@@ -219,20 +227,26 @@ class MaquinaController {
             };
 
             if (req.file) {
-                dadosUpdate.imagem = `/uploads/imagens/${req.file.filename}`;
-                // Remover imagem antiga se existir
-                if (maquinaExistente.imagem) {
-                    removerArquivoAntigo(maquinaExistente.imagem);
-                }
+                imagemUpload = await uploadImagemMaquina(req.file.buffer, { id_empresa });
+                dadosUpdate.imagem = imagemUpload.secure_url;
+                dadosUpdate.imagem_public_id = imagemUpload.public_id;
             }
 
             await MaquinaModel.atualizarDados(parseInt(id), id_empresa, dadosUpdate);
+
+            if (req.file && maquinaExistente.imagem_public_id) {
+                await removerImagemCloudinary(maquinaExistente.imagem_public_id);
+            } else if (req.file && maquinaExistente.imagem) {
+                await removerArquivoAntigo(maquinaExistente.imagem);
+            }
 
             res.status(200).json({ sucesso: true, mensagem: 'Máquina atualizada com sucesso!' });
 
         } catch (error) {
             console.error('Erro ao atualizar máquina:', error);
-            if (req.file) removerArquivoAntigo(req.file.filename);
+            if (imagemUpload?.public_id) {
+                await removerImagemCloudinary(imagemUpload.public_id);
+            }
             if (error.message?.includes('Maquina ja vinculada')) {
                 return res.status(400).json({ sucesso: false, erro: error.message });
             }
@@ -252,6 +266,12 @@ class MaquinaController {
             if (!maquinaExistente) return res.status(404).json({ sucesso: false, erro: 'Máquina não encontrada' });
 
             await MaquinaModel.deletarMaquina(parseInt(id), id_empresa);
+
+            if (maquinaExistente.imagem_public_id) {
+                await removerImagemCloudinary(maquinaExistente.imagem_public_id);
+            } else if (maquinaExistente.imagem) {
+                await removerArquivoAntigo(maquinaExistente.imagem);
+            }
 
             res.status(200).json({ sucesso: true, mensagem: 'Máquina desativada com sucesso!' });
 

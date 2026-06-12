@@ -36,8 +36,8 @@ export default function RootLayout({ children }) {
         </Script>
       </head>
 
-      {/* h-full + overflow-hidden: o body ocupa exatamente a viewport e não rola */}
-      <body className="h-full flex flex-col">
+      {/* min-h-screen: permite que a página role naturalmente quando o conteúdo passa da viewport */}
+      <body className="min-h-screen flex flex-col">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" />
       </body>

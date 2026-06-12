@@ -50,15 +50,8 @@ const colunasEventos = [
     className: "text-center justify-center",
     icone: (valor) => {
       const config = {
-        Setup: {
-          variant: "outline",
-          className:
-            "!border-amber-300 !bg-amber-100 !text-amber-900 font-semibold text-sm dark:!border-amber-300/45 dark:!bg-amber-300/20 dark:!text-amber-100",
-        },
-        Parada: {
-          variant: "destructive",
-          className: "font-semibold text-sm border-none",
-        },
+        Setup: { variant: "setup" },
+        Parada: { variant: "parada" },
       };
       const estilo = config[valor] || { variant: "outline", className: "" };
       return (

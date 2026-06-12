@@ -1,99 +1,42 @@
-"use client";
+import RegisterForm from "@/components/ui/formCadastro";
+import LeftCards from "@/components/ui/leftCadastro";
+import Header from "@/components/ui/headerHome";
 
-import { Cell, Pie, PieChart } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-
-export function DonutChart({
-  data,
-  config,
-  title,
-  dataKey,
-  nameKey,
-  description,
-  compact = false,
-  valueFormatter,
-  cy = "50%",
-}) {
-  if (!data?.length) return null;
-
-  const formatValue = (value) =>
-    valueFormatter ? valueFormatter(value) : value;
+export default function RegisterPage() {
+  const navigationData = [
+    {
+      title: "Home",
+      href: "/",
+      isActive: true,
+    },
+    {
+      title: "Sobre nós",
+      href: "#about-us",
+    },
+    {
+      title: "Serviços",
+      href: "#servicos",
+    },
+    {
+      title: "FAQs",
+      href: "#faqs",
+    },
+  ];
 
   return (
-    <div className="flex flex-col w-full h-full">
-      {/* ── Header ── */}
-      {(title || description) && (
-        <div className="shrink-0 text-left mb-2">
-          {title && (
-            <h3 className="text-sm font-semibold text-foreground leading-tight">
-              {title}
-            </h3>
-          )}
-          {title && (
-            <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
-              Atualizado em tempo real
-            </p>
-          )}
-          {description && (
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
-          )}
+    <>
+      <Header navigationData={navigationData} />
+      <main className="h-[calc(100vh-80px)] min-h-0 grid grid-cols-1 md:grid-cols-[55%_45%] bg-gray-100 overflow-hidden">
+        <div className="hidden min-h-0 md:flex items-center justify-end pr-4 lg:pr-8 relative overflow-hidden">
+          <LeftCards />
         </div>
-      )}
 
-
-      <div className="flex-1 min-h-[400px] w-full">
-        <ChartContainer config={config} className="w-full h-full min-h-[400px]">
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name, item) => {
-                    const label =
-                      config?.[item?.payload?.[nameKey]]?.label ?? name;
-
-                    return (
-                      <div className="flex w-full items-center justify-between gap-3">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span className="font-mono font-medium text-foreground tabular-nums">
-                          {formatValue(value)}
-                        </span>
-                      </div>
-                    );
-                  }}
-                />
-              }
-            />
-            <Pie
-              data={data}
-              dataKey={dataKey}
-              nameKey={nameKey}
-              cx="50%"
-              cy={cy}
-              innerRadius={45}
-              outerRadius={70}
-              label={
-                compact
-                  ? false
-                  : ({ [nameKey]: name, [dataKey]: value }) =>
-                      `${name}: ${formatValue(value)}`
-              }
-            >
-              {data.map((entry) => {
-                const entryKey = entry[nameKey];
-                const fillColor =
-                  config?.[entryKey]?.color ?? `var(--color-${entryKey})`;
-                return <Cell key={entryKey} fill={fillColor} />;
-              })}
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-      </div>
-    </div>
+        <div className="flex min-h-0 items-center justify-start pl-4 lg:pl-10 p-8 overflow-hidden">
+          <div className="w-full max-w-md">
+            <RegisterForm />
+          </div>
+        </div>
+      </main>
+    </>
   );
 }

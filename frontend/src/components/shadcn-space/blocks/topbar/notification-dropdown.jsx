@@ -59,7 +59,7 @@ function obterRotaNotificacao(tipoUsuario, notificacao) {
   return null;
 }
 
-const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem }) => {
+const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, onOpenChange }) => {
   const router = useRouter();
   const [aberto, setAberto] = useState(defaultOpen ?? false);
   const { notificacoes, loading, marcarComoLida, marcarTodasComoLidas, excluir } =
@@ -73,7 +73,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
 
     const rota = obterRotaNotificacao(tipoUsuario, notificacao);
     if (rota) {
-      setAberto(false);
+      handleOpenChange(false);
       router.push(rota);
     }
   };
@@ -89,6 +89,11 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
   const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
   const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
+  const handleOpenChange = (open) => {
+    setAberto(open);
+    onOpenChange?.(open);
+  };
+
   return (
     <div className={cn("relative flex items-center justify-center", triggerIsFullWidth && "w-full")}>
       {badgeContagem > 0 && (
@@ -97,7 +102,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem })
         </span>
       )}
 
-      <DropdownMenu open={aberto} onOpenChange={setAberto}>
+      <DropdownMenu open={aberto} onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
