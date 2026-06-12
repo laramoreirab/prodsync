@@ -30,19 +30,19 @@ const opStatusChartConfig = {
   ...opStatusConfig,
   Finalizada: {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
   Finalizadas: {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
   "Concluída": {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
   "Concluídas": {
     label: "Finalizadas",
-    color: "#d9d9d9",
+    color: "#1d4ed8",
   },
 };
 
