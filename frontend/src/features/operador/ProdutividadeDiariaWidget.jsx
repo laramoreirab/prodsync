@@ -32,6 +32,8 @@ export function ProdutividadeDiariaWidget({ operadorId }) {
           config={produtividadeDiariaConfig}
           dataKey="value"
           nameKey="name"
+          innerRadius={55}
+          outerRadius={80}
         />
       </div>
     </div>

@@ -24,6 +24,23 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
   const dataKey = "value";
 
   const formatValue = (value) => (valueFormatter ? valueFormatter(value) : value);
+  const renderOuterLabel = (props) => {
+    const name = props?.[nameKey] ?? props?.name;
+    const value = props?.[dataKey] ?? props?.value;
+
+    return (
+      <text
+        x={props.x}
+        y={props.y}
+        textAnchor={props.textAnchor}
+        dominantBaseline="central"
+        className="fill-black font-medium dark:fill-white"
+        style={{ fontSize: "13px" }}
+      >
+        {`${name}: ${formatValue(value)}`}
+      </text>
+    );
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -73,8 +90,7 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
               label={
                 compact
                   ? false
-                  : ({ [nameKey]: name, [dataKey]: value }) =>
-                      `${name}: ${formatValue(value)}`
+                  : renderOuterLabel
               }
             >
               {data.map((entry) => {

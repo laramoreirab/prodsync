@@ -19,7 +19,7 @@ export function OPProgressoWidget({ opId }) {
   const chartData = [
     { name: "produzidos", value: data.produzidos },
     { name: "aProduzir", value: data.aProduzir },
-  ];
+  ].filter((item) => item.value > 0);
 
   return (
     <div>
