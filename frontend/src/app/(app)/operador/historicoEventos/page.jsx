@@ -229,7 +229,7 @@ export default function HistoricoEventos() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return <LoadingState message="Carregando eventos..." />;
+    return <LoadingState message="Sincronizando eventos..." />;
   }
 
   return (

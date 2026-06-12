@@ -6,7 +6,7 @@ import { tempoParadoTempoProduzindoOperadorConfig } from "@/features/operador/co
 export function TempoParadoTempoProduzindoOperadorWidget({ operadorId }) {
   const { data, loading, error } = useTempoParadoTempoProduzindoOperador(operadorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;

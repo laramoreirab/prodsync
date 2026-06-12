@@ -57,7 +57,7 @@ export function EventosMaquinasSection({ ativo, periodoDias, setorId = null }) {
       titulo={`Eventos das máquinas — ${periodoLabel}`}
     >
       {loading ? (
-        <p className="text-sm text-muted-foreground">Carregando eventos...</p>
+        <p className="text-sm text-muted-foreground">Sincronizando eventos...</p>
       ) : eventos.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nenhum evento no período selecionado.</p>
       ) : (

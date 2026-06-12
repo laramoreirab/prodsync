@@ -262,7 +262,7 @@ export default function OPDetalhePage({ params }) {
   );
 
   if (loading) {
-    return <LoadingState message="Carregando ordem de produção..." />;
+    return <LoadingState message="Sincronizando ordem de produção..." />;
   }
 
   if (!op) {

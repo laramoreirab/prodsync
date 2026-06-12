@@ -22,7 +22,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [listaSetores, setListaSetores] = useState([])
     const [listaTurnos, setListaTurnos] = useState([])
     const [listaMaquinas, setListaMaquinas] = useState([])
-    const [carregandoTurnos, setCarregandoTurnos] = useState(false)
+    const [carregandoTurnos, setSincronizandoTurnos] = useState(false)
 
     useEffect(() => {
         async function carregarSetores() {
@@ -184,7 +184,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                 return;
             }
             try {
-                setCarregandoTurnos(true);
+                setSincronizandoTurnos(true);
                 const options = { method: "GET" }
                 const dados = await apiFetch(`/api/turnos/listarTurnos?id_setor=${formData.id_setor}`, options)
                 setListaTurnos(deduplicarTurnosParaSelect(dados.dados || []));
@@ -192,7 +192,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                 console.log(error)
                 toast.error("Erro ao carregar turnos.");
             } finally {
-                setCarregandoTurnos(false);
+                setSincronizandoTurnos(false);
             }
 
         }
@@ -420,7 +420,7 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                                 {!formData.id_setor
                                     ? "Selecione..."
                                     : carregandoTurnos
-                                        ? "Carregando turnos..."
+                                        ? "Sincronizando turnos..."
                                     : listaTurnos.length === 0
                                         ? "Nenhum turno criado"
                                         : "Selecione..."}

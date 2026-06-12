@@ -149,7 +149,7 @@ export default function Usuarios() {
 
   // //tela de carregamento enquanto busca os dados da API
   // if (loading) {
-  //   return <LoadingState message="Carregando usuários..." />;
+  //   return <LoadingState message="Sincronizando usuários..." />;
   // }
 
   return (

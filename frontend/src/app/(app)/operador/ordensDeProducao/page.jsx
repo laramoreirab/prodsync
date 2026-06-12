@@ -270,7 +270,7 @@ export default function OrdensDeProducao() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return <LoadingState message="Carregando ordens de produção..." />;
+    return <LoadingState message="Sincronizando ordens de produção..." />;
   }
 
   return (

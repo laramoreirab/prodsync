@@ -145,7 +145,7 @@ export default function UsuariosGestor() {
 
   if (loading) {
     return (
-      <LoadingState message="Carregando usuários..." />
+      <LoadingState message="Sincronizando usuários..." />
     );
   }
 

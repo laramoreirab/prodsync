@@ -22,6 +22,7 @@ export function BarHorizontal({
   yAxisWidth = 90,
   chartSize = "default",
   heightClassName,
+  paddingTopClassName = "pt-16",
   showValueLabels = false,
   colorKey,
 }) {
@@ -47,7 +48,7 @@ export function BarHorizontal({
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
         </div>
       )}
-      <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full pt-16`}>
+      <ChartContainer config={config} className={`${heightClassName || "h-[200px]"} w-full ${paddingTopClassName}`}>
         <BarChart data={data} layout="vertical" margin={{ left: 10, right: showValueLabels ? 24 : 0 }}>
           {/* Definição do Gradiente SVG */}
           <defs>

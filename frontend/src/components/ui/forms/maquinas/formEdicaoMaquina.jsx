@@ -26,7 +26,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
 
     // Estados para gerenciar os dados do formulário
     const [maquinaCompleta, setMaquinaCompleta] = useState(null);
-    const [carregando, setCarregando] = useState(true);
+    const [carregando, setSincronizando] = useState(true);
 
     // Estados dos campos (para serem controlados)
     // campos que o backend aceita no update:
@@ -104,7 +104,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
     // Buscando os dados no banco assim que o modal abre
     useEffect(() => {
         const buscarDadosDaMaquina = async () => {
-            setCarregando(true);
+            setSincronizando(true);
             try {
                 const resposta = await maquinaCrudService.getById(maquinaId);
                 const dados = resposta.dados || resposta;
@@ -134,7 +134,7 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 console.error("Erro ao buscar detalhes da máquina:", error);
                 toast.error("Erro ao carregar os dados da máquina.");
             } finally {
-                setCarregando(false);
+                setSincronizando(false);
             }
         };
 

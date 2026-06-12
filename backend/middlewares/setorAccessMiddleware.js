@@ -28,6 +28,14 @@ function negarSetor(res) {
     });
 }
 
+function negarOperador(res) {
+    return res.status(403).json({
+        sucesso: false,
+        erro: 'Acesso negado',
+        mensagem: 'Operador sem permissao para acessar dados desta maquina'
+    });
+}
+
 async function aplicarEscopoGestor(req, res, next) {
     try {
         if (req.user.tipo !== 'Gestor') return next();
@@ -71,6 +79,24 @@ function autorizarSetorParam(nomeParam = 'id_setor') {
 function autorizarMaquinaParam(nomeParam = 'id') {
     return async (req, res, next) => {
         try {
+            if (req.user.tipo === 'Operador') {
+                const idMaquina = Number(req.params[nomeParam] ?? req.body[nomeParam] ?? req.query[nomeParam]);
+
+                const escala = Number.isInteger(idMaquina)
+                    ? await prisma.escalaTrabalho.findFirst({
+                        where: {
+                            id_empresa: Number(req.user.id_empresa),
+                            id_operador: Number(req.user.id_usuario),
+                            id_maquina: idMaquina
+                        },
+                        select: { id_maquina: true }
+                    })
+                    : null;
+
+                if (!escala) return negarOperador(res);
+                return next();
+            }
+
             if (req.user.tipo !== 'Gestor') return next();
 
             const setores = await obterSetoresGeridos(req);
@@ -132,6 +158,13 @@ function autorizarOrdemParam(nomeParam = 'id_ordem') {
 function autorizarUsuarioParam(nomeParam = 'id') {
     return async (req, res, next) => {
         try {
+            if (req.user.tipo === 'Operador') {
+                const idUsuario = Number(req.params[nomeParam] ?? req.body[nomeParam] ?? req.query[nomeParam]);
+                return idUsuario === Number(req.user.id_usuario)
+                    ? next()
+                    : negarOperador(res);
+            }
+
             if (req.user.tipo !== 'Gestor') return next();
 
             const setores = await obterSetoresGeridos(req);

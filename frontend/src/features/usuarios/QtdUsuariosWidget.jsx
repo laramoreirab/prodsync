@@ -8,7 +8,7 @@ export function QtdUsuariosWidget({ setorId = null }) {
   const { data, loading, error } = useQtdUsuariosPorPerfil(setorId);
 
   if (loading)
-    return <p className="text-sm text-muted-foreground">Carregando...</p>;
+    return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error)
     return <p className="text-sm text-destructive">Erro ao carregar status.</p>;
   if (!data)
