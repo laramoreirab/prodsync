@@ -14,7 +14,7 @@ export function MotivoRefugoMaquinaWidget({ maquinaId }) {
  
   return (
     <div>
-      <p className="text-sm font-semibold text-black">Principais Motivos de Refugo</p>
+      <p className="text-sm font-semibold text-foreground">Principais Motivos de Refugo</p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       <div className="mt-2">
         <CustomPieChart
@@ -23,6 +23,7 @@ export function MotivoRefugoMaquinaWidget({ maquinaId }) {
           dataKey="value"
           nameKey="name"
           showLegend
+          outerLabelLayout="sides"
         />
       </div>
     </div>
