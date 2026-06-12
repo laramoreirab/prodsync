@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { NavMain } from "@/components/sidebar-components/sidebar-adm/nav-main";
 import {
   Sidebar,
@@ -22,13 +23,6 @@ import { ListBulletsIcon } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/api";
 import { getUserFromToken } from "@/lib/auth";
 
-const usuario = getUserFromToken();
-const idOperador = usuario?.id_usuario;
-const resposta = await apiFetch(
-          `/api/maquinas/obter-maquina-operador/${idOperador}`,
-        );
-const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
-
 const data = {
   navMain: [
     {
@@ -38,7 +32,8 @@ const data = {
     },
     {
       title: "Máquinas",
-      url: `/operador/maquinas/${idMaquina}`,
+      key: "maquinas",
+      url: "",
       icon: <Wrench />,
     },
     {
@@ -60,28 +55,53 @@ const data = {
 };
 
 export function AppSidebar({ ...props }) {
-   const [maquinaUrl, setMaquinaUrl] = useState('');
+  const router = useRouter();
+  const { isMobile, open, setOpen } = useSidebar();
+  const estavaAbertaRef = useRef(null);
+  const [maquinaUrl, setMaquinaUrl] = useState("");
+
+  const handleNotificationOpenChange = (aberto) => {
+    if (isMobile) return;
+
+    if (aberto) {
+      estavaAbertaRef.current = open;
+      if (!open) setOpen(true);
+      return;
+    }
+
+    if (estavaAbertaRef.current === false) {
+      setOpen(false);
+    }
+    estavaAbertaRef.current = null;
+  };
+
+  const obterUrlMaquinaOperador = useCallback(async () => {
+    const usuario = getUserFromToken();
+    const idOperador = usuario?.id_usuario;
+
+    if (!idOperador) return "";
+
+    try {
+      const resposta = await apiFetch(
+        `/api/maquinas/obter-maquina-operador/${idOperador}`,
+      );
+      const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
+
+      return idMaquina ? `/operador/maquinas/${idMaquina}` : "";
+    } catch (error) {
+      console.error("Erro ao carregar maquina do operador:", error);
+      return "";
+    }
+  }, []);
 
   useEffect(() => {
     let ativo = true;
 
     async function carregarMaquinaOperador() {
-      const usuario = getUserFromToken();
-      const idOperador = usuario?.id_usuario;
+      const url = await obterUrlMaquinaOperador();
 
-      if (!idOperador) return;
-
-      try {
-        const resposta = await apiFetch(
-          `/api/maquinas/obter-maquina-operador/${idOperador}`,
-        );
-        const idMaquina = resposta?.id_maquina ?? resposta?.dados?.id_maquina;
-
-        if (ativo && idMaquina) {
-          setMaquinaUrl(`/operador/maquinas/${idMaquina}`);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar maquina do operador:", error);
+      if (ativo && url) {
+        setMaquinaUrl(url);
       }
     }
 
@@ -90,14 +110,25 @@ export function AppSidebar({ ...props }) {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [obterUrlMaquinaOperador]);
+
+  const handleMaquinasClick = useCallback(async () => {
+    const url = maquinaUrl || await obterUrlMaquinaOperador();
+
+    if (!url) return;
+
+    setMaquinaUrl(url);
+    router.push(url);
+  }, [maquinaUrl, obterUrlMaquinaOperador, router]);
 
   const navMain = useMemo(
     () =>
       data.navMain.map((item) =>
-        item.title === "Maquinas" ? { ...item, url: maquinaUrl } : item,
+        item.key === "maquinas"
+          ? { ...item, url: maquinaUrl, onClick: handleMaquinasClick }
+          : item,
       ),
-    [maquinaUrl],
+    [handleMaquinasClick, maquinaUrl],
   );
 
   return (
@@ -152,6 +183,7 @@ export function AppSidebar({ ...props }) {
         />
         <ProfileDropdown
           align="end"
+          onOpenChange={handleNotificationOpenChange}
           trigger={({ avatarSrc }) => (
             <div className="flex h-10 w-full items-center gap-2 overflow-hidden  rounded-lg px-2 text-left text-[#FFFFFF] transition-all duration-300 hover:text-[#0f3d84] hover:bg-[#f5f8ff]  group-data-[state=collapsed]/sidebar:size-10 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 group-data-[state=collapsed]/sidebar:group-hover/sidebar:h-10 group-data-[state=collapsed]/sidebar:group-hover/sidebar:w-full group-data-[state=collapsed]/sidebar:group-hover/sidebar:justify-start group-data-[state=collapsed]/sidebar:group-hover/sidebar:px-2">
               <img

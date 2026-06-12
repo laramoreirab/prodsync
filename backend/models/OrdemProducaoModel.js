@@ -290,7 +290,8 @@ class OrdemProducaoModel {
                 where: {
                     id_empresa: id_empresa,
                     ...(setorId ? { id_setor: Number(setorId) } : {}),
-                    status_op: { in: ['Parada', 'Setup'] }
+                    data_fim: { lt: new Date() },
+                    status_op: { not: 'Finalizada' }
                 }
             })
             return res
