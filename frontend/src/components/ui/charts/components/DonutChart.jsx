@@ -47,6 +47,10 @@ export function DonutChart({
         };
       })
     : [];
+  const hasLegend = legendItems.length > 0;
+  const chartMargin = hasLegend
+    ? { top: 4, right: 16, bottom: 4, left: 16 }
+    : { top: 14, right: 16, bottom: 8, left: 16 };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -72,7 +76,7 @@ export function DonutChart({
       <div className="relative flex min-h-0 flex-1 flex-col w-full">
         <div className="min-h-0 flex-1 w-full">
           <ChartContainer config={config} className="w-full h-full">
-            <PieChart margin={{ top: 14, right: 16, bottom: 8, left: 16 }}>
+            <PieChart margin={chartMargin}>
               <ChartTooltip
                 cursor={false}
                 content={
@@ -125,7 +129,7 @@ export function DonutChart({
           </ChartContainer>
         </div>
 
-        <DonutLegend items={legendItems} className="mt-2" />
+        <DonutLegend items={legendItems} className="mt-1" />
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ export function DonutLegend({ items, className }) {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-2 text-[13px] font-medium leading-tight text-foreground",
+        "flex w-full shrink-0 flex-wrap items-center justify-center gap-x-5 gap-y-1 px-2 text-xs font-medium leading-tight text-foreground",
         className
       )}
     >
@@ -18,7 +18,7 @@ export function DonutLegend({ items, className }) {
           className="flex min-w-0 max-w-full items-center gap-2"
         >
           <span
-            className="h-3.5 w-3.5 shrink-0 rounded-[2px]"
+            className="h-3 w-3 shrink-0 rounded-[2px]"
             style={{ backgroundColor: item.color }}
             aria-hidden="true"
           />
