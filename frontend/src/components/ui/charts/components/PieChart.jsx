@@ -38,6 +38,12 @@ export function CustomPieChart({
           };
         })
     : [];
+  const hasLegend = legendItems.length > 0;
+  const chartHeightClass = hasLegend && !title ? "h-[178px]" : "h-[220px]";
+  const chartPaddingClass = title ? "pt-10" : "pt-0";
+  const chartMargin = hasLegend
+    ? { top: 4, right: 16, bottom: 4, left: 16 }
+    : { top: 14, right: 16, bottom: 8, left: 16 };
 
   return (
     <div className="relative flex flex-col items-center justify-center w-full">
@@ -49,11 +55,11 @@ export function CustomPieChart({
       )}
       
       {/* Relative wrapper holding both the chart and the absolute center text */}
-      <div className="relative flex h-[220px] w-full max-w-[520px] items-center justify-center pt-10">
+      <div className={`relative box-border flex ${chartHeightClass} w-full max-w-[520px] items-center justify-center ${chartPaddingClass}`}>
         <ChartContainer config={config} className="h-full w-full">
           <RechartsPieChart
             className="overflow-visible"
-            margin={{ top: 14, right: 16, bottom: 8, left: 16 }}
+            margin={chartMargin}
           >
             <ChartTooltip
               content={
@@ -110,7 +116,7 @@ export function CustomPieChart({
         )}
       </div>
 
-      <DonutLegend items={legendItems} className="mt-2" />
+      <DonutLegend items={legendItems} className="mt-1" />
     </div>
   );
 }

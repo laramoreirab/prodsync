@@ -47,6 +47,10 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
           color: getColor(entry, index),
           label: turnosOperadoresConfig?.[entry[nameKey]]?.label ?? entry[nameKey],
         }));
+  const chartHeightClass = legendItems.length > 0 ? "h-[144px]" : "h-[160px]";
+  const chartMargin = legendItems.length > 0
+    ? { top: 4, right: 8, bottom: 4, left: 8 }
+    : { top: 8, right: 8, bottom: 8, left: 8 };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -62,9 +66,9 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
 
       {/* ── Renderização do Gráfico (Donut) ── */}
       <div className="flex-1 min-h-0 w-full">
-        <div className="h-[160px] max-h-full w-full">
+        <div className={`${chartHeightClass} max-h-full w-full`}>
           <ChartContainer config={turnosOperadoresConfig} className="w-full h-full">
-            <PieChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+            <PieChart margin={chartMargin}>
               <ChartTooltip
                 cursor={false}
                 content={
@@ -116,7 +120,7 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
           </ChartContainer>
         </div>
 
-        <DonutLegend items={legendItems} className="mt-2" />
+        <DonutLegend items={legendItems} className="mt-1" />
       </div>
     </div>
   );

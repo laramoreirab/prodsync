@@ -24,6 +24,7 @@ export function BarHorizontal({
   heightClassName,
   paddingTopClassName = "pt-16",
   showValueLabels = false,
+  hideTooltipLabel = false,
   colorKey,
 }) {
   if (!data?.length) return null;
@@ -67,7 +68,7 @@ export function BarHorizontal({
             tick={{ fontSize: 12 }}
           />
           <XAxis type="number" hide domain={xDomain} />
-          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartTooltip content={<ChartTooltipContent hideLabel={hideTooltipLabel} />} />
           
           {/* Aplicação do gradiente no fill */}
           <Bar

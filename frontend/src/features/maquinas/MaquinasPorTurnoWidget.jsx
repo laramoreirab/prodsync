@@ -52,7 +52,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
       color: maquinasTurnoConfig.paradas?.color || "currentColor",
     },
     manutencaoPct: {
-      label: maquinasTurnoConfig.manutencao?.label || "Manutenção",
+      label: maquinasTurnoConfig.manutencao?.label || "Setup",
       color: maquinasTurnoConfig.manutencao?.color || "currentColor",
     },
   };
@@ -116,7 +116,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
               />
             </Bar>
 
-            <Bar dataKey="manutencaoPct" name="Manutenção" stackId="turno" fill="var(--color-manutencaoPct)" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="manutencaoPct" name="Setup" stackId="turno" fill="var(--color-manutencaoPct)" radius={[4, 4, 0, 0]}>
               <LabelList
                 dataKey="manutencaoPct"
                 position="center"

@@ -68,7 +68,7 @@ const maquinasFilter = [
     id: "status",
     label: "Status",
     type: "checkbox",
-    options: ["Produzindo", "Setup", "Parada", "Manutencao", "Aguardando"],
+    options: ["Produzindo", "Setup", "Parada", "Aguardando"],
   },
 ];
 
