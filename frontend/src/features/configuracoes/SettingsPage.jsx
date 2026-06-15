@@ -459,7 +459,7 @@ function SecuritySettings({ role }) {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
-  const [carregando, setCarregando] = useState(false)
+  const [carregando, setSincronizando] = useState(false)
   const [deletando, setDeletando] = useState(false)
   const [confirmCNPJ, setConfirmCNPJ] = useState("")
   const [confirmPasswordDelete, setConfirmPasswordDelete] = useState("")
@@ -470,7 +470,7 @@ function SecuritySettings({ role }) {
   async function handleSubmit(e) {
     e.preventDefault()
     if (senhasNaoBatem) { toast("As senhas digitadas não estão iguais!"); return }
-    setCarregando(true)
+    setSincronizando(true)
     try {
       const response = await apiFetch('/api/auth/trocarSenha', {
         method: 'POST',
@@ -487,7 +487,7 @@ function SecuritySettings({ role }) {
       console.error("Erro ao trocar senha:", error)
       toast("Ocorreu um erro ao tentar alterar a senha.")
     } finally {
-      setCarregando(false)
+      setSincronizando(false)
     }
   }
 

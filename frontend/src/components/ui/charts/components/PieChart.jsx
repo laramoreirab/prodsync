@@ -2,8 +2,7 @@
 
 import { Cell, Pie, PieChart as RechartsPieChart } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-
-const RADIAN = Math.PI / 180;
+import { DonutLegend } from "./DonutLegend";
 
 export function CustomPieChart({
   data,
@@ -14,62 +13,37 @@ export function CustomPieChart({
   children,
   showLegend,
   showOuterLabels = Boolean(showLegend),
+  startAngle = 90,
+  endAngle = -270,
 }) {
   if (!data?.length) return null;
 
   const getLabel = (key) =>
     String(config?.[key]?.label ?? key).replace(/:\s*$/, "");
 
-  const singleOuterLabel = showOuterLabels && data.length === 1
-    ? (() => {
-        const entry = data[0];
-        const entryKey = entry[nameKey];
-
-        return {
-          color: config?.[entryKey]?.color || entry.fill || "#7d95c6",
-          text: `${getLabel(entryKey)}: ${entry[dataKey]}`,
-        };
-      })()
-    : null;
-
   const formatValue = (value) =>
     typeof value === "number" ? value.toLocaleString("pt-BR") : value;
 
-  const renderOuterLabel = (props) => {
-    const { cx, cy, midAngle, outerRadius, payload, value } = props;
-    const entryKey = payload?.[nameKey] ?? props?.[nameKey] ?? props?.name;
-    const color = config?.[entryKey]?.color || payload?.fill || "#7d95c6";
-    const angle = -midAngle * RADIAN;
-    const direction = Math.cos(angle) >= 0 ? 1 : -1;
-    const startX = cx + (outerRadius + 2) * Math.cos(angle);
-    const startY = cy + (outerRadius + 2) * Math.sin(angle);
-    const elbowX = cx + (outerRadius + 16) * Math.cos(angle);
-    const elbowY = cy + (outerRadius + 16) * Math.sin(angle);
-    const endX = elbowX + direction * 18;
-    const textX = endX + direction * 6;
-    const textAnchor = direction > 0 ? "start" : "end";
+  const positiveData = data.filter((entry) => Number(entry[dataKey]) > 0);
 
-    return (
-      <g>
-        <path
-          d={`M ${startX} ${startY} L ${elbowX} ${elbowY} L ${endX} ${elbowY}`}
-          fill="none"
-          stroke={color}
-          strokeWidth={1}
-        />
-        <text
-          x={textX}
-          y={elbowY}
-          textAnchor={textAnchor}
-          dominantBaseline="central"
-          className="fill-current text-[11px] font-medium"
-          style={{ fill: color }}
-        >
-          {`${getLabel(entryKey)}: ${formatValue(value)}`}
-        </text>
-      </g>
-    );
-  };
+  const legendItems = (showLegend || showOuterLabels)
+    ? positiveData
+        .map((entry, index) => {
+          const entryKey = entry[nameKey];
+
+          return {
+            key: `${entryKey}-${index}`,
+            color: config?.[entryKey]?.color || entry.fill || "#7d95c6",
+            label: getLabel(entryKey),
+          };
+        })
+    : [];
+  const hasLegend = legendItems.length > 0;
+  const chartHeightClass = hasLegend && !title ? "h-[178px]" : "h-[220px]";
+  const chartPaddingClass = title ? "pt-10" : "pt-0";
+  const chartMargin = hasLegend
+    ? { top: 4, right: 16, bottom: 4, left: 16 }
+    : { top: 14, right: 16, bottom: 8, left: 16 };
 
   return (
     <div className="relative flex flex-col items-center justify-center w-full">
@@ -81,9 +55,12 @@ export function CustomPieChart({
       )}
       
       {/* Relative wrapper holding both the chart and the absolute center text */}
-      <div className="relative flex h-[220px] w-full max-w-[460px] items-center justify-center pt-10">
+      <div className={`relative box-border flex ${chartHeightClass} w-full max-w-[520px] items-center justify-center ${chartPaddingClass}`}>
         <ChartContainer config={config} className="h-full w-full">
-          <RechartsPieChart margin={{ top: 14, right: 80, bottom: 18, left: 80 }}>
+          <RechartsPieChart
+            className="overflow-visible"
+            margin={chartMargin}
+          >
             <ChartTooltip
               content={
                 <ChartTooltipContent
@@ -115,46 +92,22 @@ export function CustomPieChart({
               cy="50%"
               innerRadius={55} 
               outerRadius={80}
-              startAngle={90}
-              endAngle={-270}
+              startAngle={startAngle}
+              endAngle={endAngle}
               strokeWidth={0}
               className="stroke-background"
               labelLine={false}
-              label={showOuterLabels && !singleOuterLabel ? renderOuterLabel : false}
+              label={false}
             >
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={config[entry[nameKey]]?.color || entry.fill || "#ccc"} 
+                  fill={config?.[entry[nameKey]]?.color || entry.fill || "#ccc"} 
                 />
               ))}
             </Pie>
           </RechartsPieChart>
         </ChartContainer>
-
-        {singleOuterLabel && (
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-            viewBox="0 0 460 220"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M 288 54 L 308 34 L 328 34"
-              fill="none"
-              stroke={singleOuterLabel.color}
-              strokeWidth="1"
-            />
-            <text
-              x="334"
-              y="34"
-              dominantBaseline="central"
-              className="fill-current text-[11px] font-medium"
-              style={{ fill: singleOuterLabel.color }}
-            >
-              {singleOuterLabel.text}
-            </text>
-          </svg>
-        )}
 
         {children && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -162,6 +115,8 @@ export function CustomPieChart({
           </div>
         )}
       </div>
+
+      <DonutLegend items={legendItems} className="mt-1" />
     </div>
   );
 }

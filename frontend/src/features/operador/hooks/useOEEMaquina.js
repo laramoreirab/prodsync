@@ -4,7 +4,7 @@ import { useChartData } from "@/hooks/useChartData";
 import { oeeMaquinaService } from "@services/operadorService";
 
 export function useOEEMaquina(operadorId) {  
-// if (loading) return <p>Carregando...</p>;
+// if (loading) return <p>Sincronizando...</p>;
 // if (error)  
 //   return 
 //    <p>Erro.</p>;

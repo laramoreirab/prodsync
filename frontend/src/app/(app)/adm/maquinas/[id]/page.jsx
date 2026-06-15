@@ -209,7 +209,7 @@ export default function MaquinaDetalhePage({ params }) {
           .filter((item) => item.tipo !== "Producao")
           .map((item) => ({
             ...item,
-            tipoEvento: item.tipo,
+            tipoEvento: item.tipo === "Setup" ? "Setup" : "Parada",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
             motivo: item.motivo || "-",
@@ -435,11 +435,11 @@ export default function MaquinaDetalhePage({ params }) {
         {/* Seção Produção */}
         <DetailSectionTitle title="Produção" />
 
-        <AsymmetricGrid>
-          <DetailWidgetCard className="flex justify-center items-center">
+        <AsymmetricGrid className="items-stretch">
+          <DetailWidgetCard className="flex h-full justify-center items-center">
             <OEEEvolucaoMaquinaWidget maquinaId={maquinaId} />
           </DetailWidgetCard>
-          <SectionHighlight>
+          <SectionHighlight className="h-full flex">
             <OEEMaquinaWidget maquinaId={maquinaId} />
           </SectionHighlight>
 

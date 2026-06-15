@@ -149,7 +149,7 @@ export default function PageSetores() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return <LoadingState message="Carregando setores..." />;
+    return <LoadingState message="Sincronizando setores..." />;
   }
 
   return (

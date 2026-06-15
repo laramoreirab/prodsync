@@ -320,9 +320,13 @@ class TurnoModel {
     // Busca a soma total de lotes produzidos em um turno específico (para KPI)
     static async buscarProducaoTurnoLotes(id_turno, id_empresa = null, dataInicio = null, dataFim = null, setorId = null) {
         try {
+            const filtroTurno = Array.isArray(id_turno)
+                ? { in: id_turno.map(Number) }
+                : Number(id_turno);
+
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
-                    id_turno: Number(id_turno),
+                    id_turno: filtroTurno,
                     id_ordemProducao: {
                         not: 0
                     },
@@ -350,9 +354,13 @@ class TurnoModel {
     // Busca a quantidade de máquinas únicas ativas em um turno específico (para KPI)
     static async buscarMaquinasAtivasTurno(id_turno, id_empresa = null, dataInicio = null, dataFim = null, setorId = null) {
         try {
+            const filtroTurno = Array.isArray(id_turno)
+                ? { in: id_turno.map(Number) }
+                : Number(id_turno);
+
             const result = await prisma.apontamento.findMany({
                 where: {
-                    id_turno: Number(id_turno),
+                    id_turno: filtroTurno,
                     ...(id_empresa ? { id_empresa } : {}),
                     ...(setorId ? { maquina: { id_setor: Number(setorId) } } : {}),
                     ...(dataInicio || dataFim ? {
@@ -387,9 +395,23 @@ class TurnoModel {
             }
 
             const periodo = this.obterPeriodoTurno(turno, dataReferencia);
+            const turnosDoPeriodo = setorId
+                ? [turno.id_turno]
+                : (await prisma.turno.findMany({
+                    where: {
+                        id_empresa: Number(id_empresa),
+                        dia_semana: turno.dia_semana,
+                        nome_turno: turno.nome_turno
+                    },
+                    select: {
+                        id_turno: true
+                    }
+                })).map(item => item.id_turno);
+            const idsTurnos = turnosDoPeriodo.length > 0 ? turnosDoPeriodo : [turno.id_turno];
+
             const [maquinasAtivas, producaoLotes] = await Promise.all([
-                this.buscarMaquinasAtivasTurno(turno.id_turno, id_empresa, periodo.inicio, periodo.fim, setorId),
-                this.buscarProducaoTurnoLotes(turno.id_turno, id_empresa, periodo.inicio, periodo.fim, setorId)
+                this.buscarMaquinasAtivasTurno(idsTurnos, id_empresa, periodo.inicio, periodo.fim, setorId),
+                this.buscarProducaoTurnoLotes(idsTurnos, id_empresa, periodo.inicio, periodo.fim, setorId)
             ]);
 
             return {

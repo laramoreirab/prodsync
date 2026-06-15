@@ -11,7 +11,7 @@ import { useMaquinas } from '@/hooks/useMaquinas';
 
 export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
 
-    const [carregando, setCarregando] = useState(true);
+    const [carregando, setSincronizando] = useState(true);
 
     // estados dos campos do form
     const [prioridade, setPrioridade] = useState('');            // backend: prioridade
@@ -41,7 +41,7 @@ export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
     // Buscando os dados no banco assim que o modal abre
     useEffect(() => {
         const buscarDadosDaOp = async () => {
-            setCarregando(true);
+            setSincronizando(true);
             try {
                 const dados = await opCrudService.getById(opId);
 
@@ -67,7 +67,7 @@ export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
                 console.error("Erro ao buscar dados da OP:", error);
                 toast.error("Erro ao carregar os dados da OP.");
             } finally {
-                setCarregando(false);
+                setSincronizando(false);
             }
         };
 

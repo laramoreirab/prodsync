@@ -22,7 +22,7 @@ import {
 export function MaquinasPorTurnoWidget({ setorId }) {
   const { data, loading, error } = useMaquinasPorTurno(setorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
@@ -52,7 +52,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
       color: maquinasTurnoConfig.paradas?.color || "currentColor",
     },
     manutencaoPct: {
-      label: maquinasTurnoConfig.manutencao?.label || "Manutenção",
+      label: maquinasTurnoConfig.manutencao?.label || "Setup",
       color: maquinasTurnoConfig.manutencao?.color || "currentColor",
     },
   };
@@ -116,7 +116,7 @@ export function MaquinasPorTurnoWidget({ setorId }) {
               />
             </Bar>
 
-            <Bar dataKey="manutencaoPct" name="Manutenção" stackId="turno" fill="var(--color-manutencaoPct)" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="manutencaoPct" name="Setup" stackId="turno" fill="var(--color-manutencaoPct)" radius={[4, 4, 0, 0]}>
               <LabelList
                 dataKey="manutencaoPct"
                 position="center"

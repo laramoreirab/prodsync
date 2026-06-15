@@ -7,7 +7,7 @@ import { taxaRefugoUsuarioConfig } from "./config/usuarioChartConfig";
 export function UsuarioTaxaRefugoWidget({ setorId }) {
   const { data, loading, error } = useUsuarioTaxaRefugo(setorId);
 
-  if (loading) return <p className="text-xs text-muted-foreground">Carregando...</p>;
+  if (loading) return <p className="text-xs text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-xs text-red-500">Erro ao carregar dados.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
@@ -22,6 +22,9 @@ export function UsuarioTaxaRefugoWidget({ setorId }) {
           data={data}
           config={taxaRefugoUsuarioConfig}
           yKey="operador"
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
         />
       </div>
     </div>

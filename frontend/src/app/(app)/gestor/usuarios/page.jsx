@@ -23,7 +23,7 @@ import { ProducaoMediaUsuarioSetorWidget } from "@/features/usuarios/ProducaoMed
 import { UsuarioTaxaRefugoWidget } from "@/features/usuarios/UsuarioTaxaRefugoWidget";
 
 // Layout geral
-import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid, LoadingState } from "@/components/AnimatedComponents";
+import { PageLayout, PageHeader, SectionDivider, FadeUpItem, SearchBar, FilterRow, EmptyState, KPIGrid, WidgetCard, ContentGrid, LoadingState, KPICardDecorated } from "@/components/AnimatedComponents";
 
 // Componentes de detalhe
 import {
@@ -145,7 +145,7 @@ export default function UsuariosGestor() {
 
   if (loading) {
     return (
-      <LoadingState message="Carregando usuários..." />
+      <LoadingState message="Sincronizando usuários..." />
     );
   }
 
@@ -169,7 +169,7 @@ export default function UsuariosGestor() {
 
       {/* Gráficos */}
       <KPIGrid cols={3} className="mt-4">
-        <WidgetCard><QtdUsuariosWidget setorId={setorId} /></WidgetCard>
+        <KPICardDecorated><QtdUsuariosWidget setorId={setorId} /></KPICardDecorated>
         <WidgetCard><TurnosOperadoresWidget setorId={setorId} /></WidgetCard>
         <WidgetCard><TopOperadoresWidget setorId={setorId}/></WidgetCard>
       </KPIGrid>

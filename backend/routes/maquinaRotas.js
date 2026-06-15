@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import MaquinaController from '../controllers/MaquinaController.js';
 import { authMiddleware, adminMiddleware, gestorOuAdminMiddleware } from '../middlewares/authMiddleware.js';
-import { aplicarEscopoGestor, autorizarMaquinaParam, autorizarSetorParam, autorizarUsuarioParam } from '../middlewares/setorAccessMiddleware.js';
+import { aplicarEscopoGestor, autorizarMaquinaParam, autorizarSetorParam, autorizarUsuarioParam, validarBodySetorGestor } from '../middlewares/setorAccessMiddleware.js';
 import { paginacaoMiddleware } from '../middlewares/paginacaoMiddleware.js';
 import { uploadImagensCloudinary, handleUploadError } from '../middlewares/uploadMiddleware.js';
 import multer from 'multer';
@@ -13,7 +13,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.use(authMiddleware);
 
 router.get('/', aplicarEscopoGestor, paginacaoMiddleware, MaquinaController.listarMaquinas);
-router.post('/criarMaquina', adminMiddleware, uploadImagensCloudinary.single('imagem'), handleUploadError, MaquinaController.criarMaquina);
+router.post('/criarMaquina', gestorOuAdminMiddleware, uploadImagensCloudinary.single('imagem'), handleUploadError, validarBodySetorGestor('id_setor'), MaquinaController.criarMaquina);
 
 router.get('/dashboard/status-geral', aplicarEscopoGestor, MaquinaController.obterStatusGeralMaquinas);
 router.get('/dashboard/taxa-cumprimento-meta-setor', aplicarEscopoGestor, MaquinaController.taxaCumprimentoMetaPorSetor);

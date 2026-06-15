@@ -42,7 +42,7 @@ export function AndonBoardPage({ scope = "factory" }) {
       <PageLayout>
         <PageHeader title={content.pageTitle} action={<AndonRelogioWidget />} />
         <FadeUpItem className="mt-6 rounded-lg border border-slate-200 bg-white-50 p-6 text-sm text-black-700">
-          Carregando setor...
+          Sincronizando setor...
         </FadeUpItem>
       </PageLayout>
     );
@@ -78,7 +78,7 @@ export function AndonBoardPage({ scope = "factory" }) {
 
       {loading ? (
         <FadeUpItem className="mt-6 rounded-lg p-6 text-sm text-black-700">
-          Carregando visão do Andon...
+          Sincronizando visão do Andon...
         </FadeUpItem>
       ) : null}
 

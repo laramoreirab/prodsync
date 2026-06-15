@@ -20,6 +20,7 @@ const prioridadeParaTela = {
 
 const statusParaTela = {
   Em_Andamento: "Produzindo",
+  Aguardando: "Produzindo",
   Parada: "Parada",
   Setup: "Setup",
   Finalizada: "Concluída",

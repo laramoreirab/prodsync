@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
 export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSucesso }) {
-    const [carregando, setCarregando] = useState(false);
+    const [carregando, setSincronizando] = useState(false);
     const [excluido, setExcluido] = useState(false);
     const closeRef = useRef(null);
     const idCongelado = useState(() => maquinaId)[0];
@@ -23,7 +23,7 @@ export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSu
         e.preventDefault();
         if (carregando || excluido || idCongelado == null) return;
 
-        setCarregando(true);
+        setSincronizando(true);
 
         try {
             await onExcluir(idCongelado);
@@ -35,7 +35,7 @@ export default function FormExclusaoMaquina({ maquinaId, onExcluir, onExclusaoSu
             console.error("Erro ao excluir máquina:", error);
             toast.error(error?.message || "Erro ao excluir a máquina.");
         } finally {
-            setCarregando(false);
+            setSincronizando(false);
         }
     };
 

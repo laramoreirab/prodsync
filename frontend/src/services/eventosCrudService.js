@@ -41,6 +41,9 @@ const formatarDataEvento = (inicio, fim) => {
   return `${data} (${horaInicio} - ${horaFim})`;
 };
 
+const normalizarTipoEvento = (tipo) => (tipo === "Setup" ? "Setup" : "Parada");
+const normalizarStatusMaquinaEvento = (status) => (status === "Manutencao" ? "Parada" : status);
+
 const normalizarEvento = (evento) => {
   if (!evento) return null;
 
@@ -49,14 +52,16 @@ const normalizarEvento = (evento) => {
     typeof evento.maquina === "object"
       ? evento.maquina?.nome ?? evento.maquina?.serie
       : evento.maquina;
-  const tipo = evento.tipo ?? (evento.status_atual === "Setup" ? "Setup" : "Parada");
+  const statusBase = evento.status_maquina ?? evento.status_atual;
+  const tipo = normalizarTipoEvento(evento.tipo ?? statusBase);
+  const statusMaquina = normalizarStatusMaquinaEvento(statusBase ?? tipo);
 
   return {
     ...evento,
     id: evento.id ?? evento.id_evento,
     tipo,
-    status: evento.status ?? tipo,
-    status_maquina: evento.status_maquina ?? evento.status_atual,
+    status: normalizarStatusMaquinaEvento(evento.status ?? tipo),
+    status_maquina: statusMaquina,
     maquina: evento.maquina ?? maquinaNome ?? "-",
     maquina_nome: maquinaNome ?? "-",
     nome: evento.nome ?? maquinaNome ?? "-",

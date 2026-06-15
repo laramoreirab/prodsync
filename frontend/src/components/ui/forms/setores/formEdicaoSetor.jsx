@@ -9,7 +9,7 @@ import { setorCrudService } from "@/services/setorCrudService";
 import { apiFetch } from "@/lib/api";
 
 export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
-    const [carregando, setCarregando] = useState(true);
+    const [carregando, setSincronizando] = useState(true);
 
     // estados das informações básicas
     const [nomeSetor, setNomeSetor] = useState("");          // backend: nome_setor
@@ -34,7 +34,7 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     // buscando os dados no banco assim que o modal abre
     useEffect(() => {
         const buscarDadosDoSetor = async () => {
-            setCarregando(true);
+            setSincronizando(true);
             try {
                 const resposta = await setorCrudService.getById(setorId);
                 const dados = resposta.dados || resposta;
@@ -51,7 +51,7 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                 console.error("Erro ao buscar dados do setor:", error);
                 toast.error("Erro ao carregar os dados do setor.");
             } finally {
-                setCarregando(false);
+                setSincronizando(false);
             }
         };
 

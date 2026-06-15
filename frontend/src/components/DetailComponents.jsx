@@ -309,7 +309,7 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
       {filterRow && <div>{filterRow}</div>}
 
       {/* Conteúdo (tabela ou empty state) */}
-      <div className="rounded-2xl bg-transparent p-2 sm:p-3">{children}</div>
+      <div className="rounded-2xl bg-transparent pt-2 sm:pt-3">{children}</div>
     </motion.section>
   );
 }
@@ -466,7 +466,7 @@ export function UserProfileCard({
   );
 }
 export function StatusBadge({ status, className }) {
-  const normalizedStatus = status || "-";
+  const normalizedStatus = status === "Manutencao" ? "Parada" : (status || "-");
   const statusClass = {
     Produzindo: "bg-green-500/15 text-green-600 border-green-500/20 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/30",
     Setup: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30",

@@ -7,7 +7,7 @@ import { opTopRefugoConfig } from "./config/ordensChartConfig";
 export function OPTopRefugoWidget({ setorId = null }) {
   const { data, loading, error } = useOPTopRefugo(setorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar dados.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
@@ -20,8 +20,8 @@ export function OPTopRefugoWidget({ setorId = null }) {
   }));
 
   return (
-    <div className="p-5 h-full">
-      <header>
+    <div className="flex h-full flex-col p-5">
+      <header className="shrink-0">
         <p className="text-sm font-semibold text-black">
           Top 3 OPs com maior Refugo
         </p>
@@ -29,10 +29,14 @@ export function OPTopRefugoWidget({ setorId = null }) {
 
       </header>
 
-      <div className="mt-2">
+      <div className="mt-3 min-h-0 flex-1">
         <BarHorizontal
           data={formattedData}
           config={opTopRefugoConfig}
+          yAxisWidth={118}
+          heightClassName="h-full min-h-[220px]"
+          paddingTopClassName="pt-2"
+          barSize={36}
         />
       </div>
     </div>

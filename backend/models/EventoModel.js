@@ -57,7 +57,7 @@ class EventoModel {
             return 'Setup';
         }
         if (['MANUTENCAO', 'MAINTENANCE'].includes(valor)) {
-            return 'Manutencao';
+            return 'Parada';
         }
         if (['AGUARDANDO', 'WAITING', 'IDLE'].includes(valor)) {
             return 'Aguardando';
@@ -454,6 +454,7 @@ class EventoModel {
                 if (!texto) return '';
                 return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
             }
+            const statusNormalizado = this.normalizarStatusMaquina(status_maquina) ?? capitalizar(status_maquina);
             const inicioConvertido = this.converterTimestamp(inicio)
             const fimConvertido = this.converterTimestamp(fim)
             const duracao = this.calcularDuracao(inicio, fim)
@@ -501,7 +502,7 @@ class EventoModel {
                     id_maquina,
                     id_ordemProducao: ordem?.id_ordem ?? null,
                     id_turno: turno.id_turno,
-                    status_atual: capitalizar(status_maquina),
+                    status_atual: statusNormalizado,
                     setor_afetado: Number.isInteger(setorNumerico)
                         ? setorNumerico
                         : (setorPorMaquina.get(id_maquina) ?? 0),
@@ -517,7 +518,7 @@ class EventoModel {
 
             await prisma.maquinas.updateMany({
                 where: { id_empresa, id_maquina: { in: idsMaquinas } },
-                data: { status_atual: status_maquina }
+                data: { status_atual: statusNormalizado }
             })
 
             return eventosData
@@ -542,7 +543,9 @@ class EventoModel {
             const idMaquina = Number(dados.id_maquina ?? dados.maquinas?.[0] ?? eventoAtual.id_maquina);
             const setorInformado = Number(dados.setor_afetado);
             const dataUpdate = {
-                status_atual: dados.status_maquina ?? eventoAtual.status_atual,
+                status_atual: dados.status_maquina
+                    ? (this.normalizarStatusMaquina(dados.status_maquina) ?? dados.status_maquina)
+                    : eventoAtual.status_atual,
                 id_maquina: Number.isInteger(idMaquina) && idMaquina > 0 ? idMaquina : eventoAtual.id_maquina,
                 inicio,
                 termino,
@@ -979,17 +982,51 @@ class EventoModel {
         }
     }
 
-    static async obterTopMotivosTempo(id_empresa, limite = 5, setorId = null) {
+    static async obterTopMotivosTempo(id_empresa, limite = 3, setorId = null) {
         try {
-            const motivos = await this.obterMotivosParadaFrequentes(id_empresa, limite, setorId);
+            const agrupados = await prisma.historico_Eventos.groupBy({
+                by: ['id_motivo_parada'],
+                where: {
+                    id_empresa: Number(id_empresa),
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
+                    id_motivo_parada: {
+                        not: null
+                    },
+                    status_atual: {
+                        in: ['Parada', 'Manutencao']
+                    }
+                },
+                _sum: {
+                    duracao: true
+                },
+                orderBy: {
+                    _sum: {
+                        duracao: 'desc'
+                    }
+                },
+                take: limite
+            });
 
-            return motivos
-                .sort((a, b) => b.duracao_total_minutos - a.duracao_total_minutos)
-                .slice(0, limite)
+            const motivos = await prisma.motivos_Parada.findMany({
+                where: {
+                    id_empresa: Number(id_empresa),
+                    id_motivo: {
+                        in: agrupados.map(item => item.id_motivo_parada)
+                    }
+                },
+                select: {
+                    id_motivo: true,
+                    descricao: true
+                }
+            });
+
+            const motivosPorId = new Map(motivos.map(motivo => [motivo.id_motivo, motivo]));
+
+            return agrupados
                 .map(item => ({
-                    motivo: item.motivo,
-                    tempo: this.formatarTempo(item.duracao_total_minutos),
-                    minutos: item.duracao_total_minutos
+                    motivo: motivosPorId.get(item.id_motivo_parada)?.descricao ?? 'Sem motivo informado',
+                    tempo: this.formatarTempo(item._sum.duracao ?? 0),
+                    minutos: item._sum.duracao ?? 0
                 }));
         } catch (error) {
             console.error('Erro ao obter top motivos por tempo:', error);

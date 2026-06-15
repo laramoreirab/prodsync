@@ -22,7 +22,7 @@ export function normalizeOrdemStatus(status) {
     return "Concluída";
   }
   if (["aguardando inicio", "aguardando", "em espera"].includes(value)) {
-    return "Aguardando Início";
+    return "Produzindo";
   }
   if (["parada", "pausadas", "atrasadas", "atrasada"].includes(value)) {
     return "Parada";
@@ -39,7 +39,6 @@ export function getOrdemStatusBadgeClass(status) {
     Setup: "bg-amber-500/15 text-amber-900 border-amber-500/20",
     Parada: "bg-rose-500/15 text-rose-700 border-rose-500/20",
     "Concluída": "bg-sky-500/15 text-sky-700 border-sky-500/20",
-    "Aguardando Início": "bg-slate-500/15 text-slate-700 border-slate-500/20",
   };
 
   return styles[normalized] || "bg-slate-100 text-slate-700 border-slate-200";

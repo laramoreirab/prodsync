@@ -9,11 +9,11 @@ import { toast } from "sonner";
 import { usuariosCrudService } from '@/services/usuariosCrudService';
 
 export default function FormExclusaoUsuario({ usuarioId, onExclusaoSucesso }) {
-    const [carregando, setCarregando] = useState(false);
+    const [carregando, setSincronizando] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setCarregando(true);
+        setSincronizando(true);
 
         try {
             await usuariosCrudService.delete(usuarioId);
@@ -23,7 +23,7 @@ export default function FormExclusaoUsuario({ usuarioId, onExclusaoSucesso }) {
             console.error("Erro ao excluir usuário:", error);
             toast.error("Erro ao excluir o usuário.");
         } finally {
-            setCarregando(false);
+            setSincronizando(false);
         }
     };
 

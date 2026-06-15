@@ -7,7 +7,7 @@ import { qtdUsuariosPerfilBarConfig, qtdUsuariosPerfilConfig } from "./config/us
 export function QtdUsuariosAdmWidget() {
   const { data, loading, error } = useQtdUsuariosPorPerfil();
 
-  if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar status.</p>;
   if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponivel.</p>;
@@ -35,7 +35,7 @@ export function QtdUsuariosAdmWidget() {
       </p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
-      <div className="mt-12 -ml-6">
+      <div className="mt-6 -ml-6">
         <BarHorizontal
           data={chartData}
           config={qtdUsuariosPerfilBarConfig}

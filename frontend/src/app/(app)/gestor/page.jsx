@@ -20,7 +20,7 @@ export default function DashboardGeralGestor() {
   const { loading, setorId } = usePerfil();
 
   if (loading) {
-    return <LoadingState message="Carregando dashboard..." />;
+    return <LoadingState message="Sincronizando dashboard..." />;
   }
 
   if (!setorId) {
@@ -68,7 +68,7 @@ export default function DashboardGeralGestor() {
       </AsymmetricGrid>
 
       <ContentGrid cols={2} className="mt-6">
-        <WidgetCard centered>
+        <WidgetCard >
           <SetorOEEEvolucaoWidget setorId={setorId} />
         </WidgetCard>
         <WidgetCard>
@@ -80,7 +80,7 @@ export default function DashboardGeralGestor() {
         <WidgetCard>
           <SetorProducaoMaquinaWidget setorId={setorId} />
         </WidgetCard>
-        <WidgetCard className="h-120">
+        <WidgetCard >
           <SetorStatusDonutWidget setorId={setorId} />
         </WidgetCard>
       </ContentGrid>
@@ -94,7 +94,6 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <SectionDivider title="Indicadores rápidos" className="mt-6" />
       <KPIGrid cols={4} className="mt-2">
         <KPICardDecorated>
           <MediaParadasDiaWidget setorId={setorId} />

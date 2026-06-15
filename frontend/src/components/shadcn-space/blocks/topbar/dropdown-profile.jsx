@@ -49,6 +49,7 @@ const ProfileDropdown = ({
   trigger,
   defaultOpen,
   align = "end",
+  onOpenChange,
 }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -85,7 +86,7 @@ const ProfileDropdown = ({
   }, [])
 
   return (
-    <DropdownMenu defaultOpen={defaultOpen}>
+    <DropdownMenu defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         {typeof trigger === "function" ? trigger({ avatarSrc, nomeUsuario }) : trigger}
       </DropdownMenuTrigger>

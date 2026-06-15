@@ -6,8 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const RADIAN = Math.PI / 180;
+import { DonutLegend } from "./DonutLegend";
 
 // ============================================================
 // DONUT CHART
@@ -24,6 +23,9 @@ export function DonutChart({
   valueFormatter,
   cy = "50%",
   showOuterLabels = !compact,
+  showLegend = showOuterLabels,
+  innerRadius = 45,
+  outerRadius = 70,
 }) {
   if (!data?.length) return null;
 
@@ -33,56 +35,24 @@ export function DonutChart({
   const getLabel = (key) =>
     String(config?.[key]?.label ?? key).replace(/:\s*$/, "");
 
-  const singleOuterLabel = showOuterLabels && data.length === 1
-    ? (() => {
-        const entry = data[0];
+  const positiveData = data.filter((entry) => Number(entry[dataKey]) > 0);
+  const legendItems = showLegend
+    ? positiveData.map((entry, index) => {
         const entryKey = entry[nameKey];
 
         return {
-          color: config?.[entryKey]?.color ?? `var(--color-${entryKey})`,
-          text: `${getLabel(entryKey)}: ${formatValue(entry[dataKey])}`,
+          key: `${entryKey}-${index}`,
+          color: config?.[entryKey]?.color ?? entry.fill ?? `var(--color-${entryKey})`,
+          label: getLabel(entryKey),
         };
-      })()
-    : null;
-
-  const renderOuterLabel = (props) => {
-    const { cx, cy, midAngle, outerRadius, payload, value } = props;
-    const entryKey = payload?.[nameKey] ?? props?.[nameKey] ?? props?.name;
-    const color = config?.[entryKey]?.color ?? `var(--color-${entryKey})`;
-    const angle = -midAngle * RADIAN;
-    const direction = Math.cos(angle) >= 0 ? 1 : -1;
-    const startX = cx + (outerRadius + 2) * Math.cos(angle);
-    const startY = cy + (outerRadius + 2) * Math.sin(angle);
-    const elbowX = cx + (outerRadius + 16) * Math.cos(angle);
-    const elbowY = cy + (outerRadius + 16) * Math.sin(angle);
-    const endX = elbowX + direction * 18;
-    const textX = endX + direction * 6;
-    const textAnchor = direction > 0 ? "start" : "end";
-
-    return (
-      <g>
-        <path
-          d={`M ${startX} ${startY} L ${elbowX} ${elbowY} L ${endX} ${elbowY}`}
-          fill="none"
-          stroke={color}
-          strokeWidth={1}
-        />
-        <text
-          x={textX}
-          y={elbowY}
-          textAnchor={textAnchor}
-          dominantBaseline="central"
-          className="fill-current text-[11px] font-medium"
-          style={{ fill: color }}
-        >
-          {`${getLabel(entryKey)}: ${formatValue(value)}`}
-        </text>
-      </g>
-    );
-  };
+      })
+    : [];
+  const hasLegend = legendItems.length > 0;
+  const chartMargin = hasLegend
+    ? { top: 4, right: 16, bottom: 4, left: 16 }
+    : { top: 14, right: 16, bottom: 8, left: 16 };
 
   return (
-
     <div className="flex flex-col w-full h-full">
       {/* ── Header ── */}
       {(title || description) && (
@@ -103,74 +73,63 @@ export function DonutChart({
         </div>
       )}
 
-      <div className="relative flex-1 min-h-0 w-full">
-        <ChartContainer config={config} className="w-full h-full">
-          <PieChart margin={{ top: 14, right: 80, bottom: 18, left: 80 }}>
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name, item) => {
-                    const label =
-                      config?.[item?.payload?.[nameKey]]?.label ?? name;
+      <div className="relative flex min-h-0 flex-1 flex-col w-full">
+        <div className="min-h-0 flex-1 w-full">
+          <ChartContainer config={config} className="w-full h-full">
+            <PieChart margin={chartMargin}>
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    formatter={(value, name, item) => {
+                      const entryKey = item?.payload?.[nameKey] ?? name;
+                      const label = getLabel(entryKey);
+                      const color =
+                        config?.[entryKey]?.color ?? item?.payload?.fill ?? `var(--color-${entryKey})`;
 
-                    return (
-                      <div className="flex w-full items-center justify-between gap-3">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span className="font-mono font-medium text-foreground tabular-nums">
-                          {formatValue(value)}
-                        </span>
-                      </div>
-                    );
-                  }}
-                />
-              }
-            />
-            <Pie
-              data={data}
-              dataKey={dataKey}
-              nameKey={nameKey}
-              cx="50%"
-              cy={cy}
-              innerRadius={45}
-              outerRadius={70}
-              labelLine={false}
-              label={showOuterLabels && !singleOuterLabel ? renderOuterLabel : false}
-            >
-              {data.map((entry) => {
-                const entryKey = entry[nameKey];
-                const fillColor =
-                  config?.[entryKey]?.color ?? `var(--color-${entryKey})`;
-                return <Cell key={entryKey} fill={fillColor} />;
-              })}
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+                      return (
+                        <div className="flex w-full items-center justify-between gap-3">
+                          <span className="flex items-center gap-1.5 text-muted-foreground">
+                            <span
+                              className="h-2 w-2 rounded-[2px]"
+                              style={{ backgroundColor: color }}
+                              aria-hidden="true"
+                            />
+                            {label}
+                          </span>
+                          <span className="font-mono font-medium text-foreground tabular-nums">
+                            {formatValue(value)}
+                          </span>
+                        </div>
+                      );
+                    }}
+                  />
+                }
+              />
+              <Pie
+                data={data}
+                dataKey={dataKey}
+                nameKey={nameKey}
+                cx="50%"
+                cy={cy}
+                innerRadius={innerRadius}
+                outerRadius={outerRadius}
+                labelLine={false}
+                label={false}
+              >
+                {data.map((entry) => {
+                  const entryKey = entry[nameKey];
+                  const fillColor =
+                    config?.[entryKey]?.color ?? `var(--color-${entryKey})`;
+                  return <Cell key={entryKey} fill={fillColor} />;
+                })}
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        </div>
 
-        {singleOuterLabel && (
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-            viewBox="0 0 460 220"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M 280 62 L 298 44 L 318 44"
-              fill="none"
-              stroke={singleOuterLabel.color}
-              strokeWidth="1"
-            />
-            <text
-              x="324"
-              y="44"
-              dominantBaseline="central"
-              className="fill-current text-[11px] font-medium"
-              style={{ fill: singleOuterLabel.color }}
-            >
-              {singleOuterLabel.text}
-            </text>
-          </svg>
-        )}
+        <DonutLegend items={legendItems} className="mt-1" />
       </div>
     </div>
   );

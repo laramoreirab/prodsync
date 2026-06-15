@@ -17,7 +17,7 @@ class EventoController {
                 maquina: evento.maquina?.nome ?? '',
                 id_maquina: evento.id_maquina,
                 tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
-                status_maquina: evento.status_atual,
+                status_maquina: evento.status_atual === 'Manutencao' ? 'Parada' : evento.status_atual,
                 setor_afetado: evento.setor_afetado,
                 inicio: evento.inicio ? new Date(evento.inicio).toISOString() : null,
                 fim: evento.termino ? new Date(evento.termino).toISOString() : null,
@@ -341,7 +341,10 @@ class EventoController {
 
     static async obterTopMotivosTempo(req, res) {
         try {
-            const limite = req.query.limite ? Number(req.query.limite) : 5;
+            const limiteParam = Number(req.query.limite ?? 3);
+            const limite = Number.isFinite(limiteParam) && limiteParam > 0
+                ? Math.min(Math.trunc(limiteParam), 10)
+                : 3;
             const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
@@ -401,7 +404,7 @@ class EventoController {
                 maquina: evento.maquina?.nome ?? '',
                 id_maquina: evento.id_maquina,
                 tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
-                status_maquina: evento.status_atual,
+                status_maquina: evento.status_atual === 'Manutencao' ? 'Parada' : evento.status_atual,
                 setor_afetado: evento.setor_afetado,
                 maquinas: [evento.id_maquina],
                 inicio: evento.inicio ? evento.inicio.toISOString() : null,
