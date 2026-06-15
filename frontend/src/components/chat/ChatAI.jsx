@@ -18,7 +18,7 @@ const ChatAI = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [historico, setHistorico] = useState([]);
-  const [carregando, setCarregando] = useState(false);
+  const [carregando, setSincronizando] = useState(false);
   const [arquivosSelecionados, setArquivosSelecionados] = useState([]);
   const { perfil } = usePerfil();
   const scrollRef = useRef(null);
@@ -58,7 +58,7 @@ const ChatAI = () => {
     setHistorico(novoHistorico);
     setMensagem("");
     setArquivosSelecionados([]);
-    setCarregando(true);
+    setSincronizando(true);
 
     try {
       let data;
@@ -85,7 +85,7 @@ const ChatAI = () => {
       const mensagemErro = error.message || "Ops! Tive um problema técnico. Tente novamente.";
       setHistorico([...novoHistorico, { role: "assistant", content: mensagemErro }]);
     } finally {
-      setCarregando(false);
+      setSincronizando(false);
       setArquivosSelecionados([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }

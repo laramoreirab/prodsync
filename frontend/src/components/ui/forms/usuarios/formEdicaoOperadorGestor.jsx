@@ -27,7 +27,7 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
     const fileInputFotoRef = useRef(null);
 
     // Estado de carregamento
-    const [carregando, setCarregando] = useState(true);
+    const [carregando, setSincronizando] = useState(true);
     const [listaTurnos, setListaTurnos] = useState([])
     const [listaMaquinas, setListaMaquinas] = useState([])
     const [setores, setSetores] = useState([]);
@@ -60,7 +60,7 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
     // Buscando os dados no banco assim que o modal abre
     useEffect(() => {
         const buscarDadosDoOperador = async () => {
-            setCarregando(true);
+            setSincronizando(true);
             try {
                 const dados = await usuariosCrudService.getById(operadorId);
 
@@ -87,7 +87,7 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                 console.error("Erro ao buscar detalhes do operador:", error);
                 toast.error("Erro ao carregar os dados do operador.");
             } finally {
-                setCarregando(false);
+                setSincronizando(false);
             }
         };
 

@@ -16,10 +16,6 @@ const opStatusConfig = {
     label: "Pausadas",
     color: "var(--chart3)",
   },
-  "Aguardando Início": {
-    label: "Aguardando Início",
-    color: "var(--chart4)",
-  },
   "Concluída": {
     label: "Concluída",
     color: "var(--chart5)",
@@ -49,7 +45,7 @@ const opStatusChartConfig = {
 export function OPStatusWidget({ setorId = null }) {
   const { data, loading, error } = useOPStatus(setorId);
 
-  if (loading) return <p className="text-sm text-muted-foreground p-4">Carregando...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar status.</p>;
   if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;

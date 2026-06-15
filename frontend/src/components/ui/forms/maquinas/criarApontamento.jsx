@@ -149,7 +149,7 @@ export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onS
                             className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none pr-10 text-gray-700 font-medium disabled:opacity-50"
                         >
                             <option value="" disabled>
-                                {loadingOrdens ? 'Carregando...' : 'Selecione a Ordem'}
+                                {loadingOrdens ? 'Sincronizando...' : 'Selecione a Ordem'}
                             </option>
                             {ordens.map(op => (
                                 <option key={op.id ?? op.id_ordem} value={op.id ?? op.id_ordem}>
@@ -174,7 +174,7 @@ export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onS
                             className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none text-gray-700 pr-10 font-medium disabled:opacity-50"
                         >
                             <option value="" disabled>
-                                {loadingTurnos ? 'Carregando...' : 'Selecione o Turno'}
+                                {loadingTurnos ? 'Sincronizando...' : 'Selecione o Turno'}
                             </option>
                             {turnos.map(t => (
                                 <option key={t.id_turno} value={t.id_turno}>

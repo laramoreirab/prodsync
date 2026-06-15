@@ -50,7 +50,7 @@ const opsFilter = [
     id: "status_op",
     label: "Status",
     type: "checkbox",
-    options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"],
+    options: ["Concluída", "Produzindo", "Parada", "Setup"],
   },
   {
     id: "prioridade",
@@ -68,15 +68,15 @@ function contarOpsPorStatus(lista) {
 
       if (status === "Concluída") {
         acc.concluidas += 1;
-      } else if (status === "Aguardando Início" || status === "Setup") {
-        acc.aguardando += 1;
+      } else if (status === "Setup") {
+        acc.setup += 1;
       } else if (["Produzindo", "Parada"].includes(status)) {
         acc.emAndamento += 1;
       }
 
       return acc;
     },
-    { aguardando: 0, emAndamento: 0, concluidas: 0 },
+    { setup: 0, emAndamento: 0, concluidas: 0 },
   );
 }
 
@@ -152,10 +152,6 @@ export default function OrdensDeProducao() {
           "Concluída": {
             variant: "concluida",
             label: "Concluída"
-          },
-          "Aguardando": {
-            variant: "aguardando",
-            label: "Aguardando Início"
           }
         };
 
@@ -270,7 +266,7 @@ export default function OrdensDeProducao() {
 
   //tela de carregamento enquanto busca os dados da API
   if (loading) {
-    return <LoadingState message="Carregando ordens de produção..." />;
+    return <LoadingState message="Sincronizando ordens de produção..." />;
   }
 
   return (
@@ -279,11 +275,11 @@ export default function OrdensDeProducao() {
 
       <StaggerWrapper className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full items-stretch">
 
-        {/* Aguardando Início */}
+        {/* Setup */}
         <FadeUpItem className="col-span-1 bg-zinc-100 dark:bg-zinc-900 p-5 rounded-lg shadow-sm aspect-square flex flex-col transition-colors duration-200">
           <KPI
-            title="Aguardando Início"
-            value={resumoOps.aguardando}
+            title="Em Setup"
+            value={resumoOps.setup}
             titleClass="text-zinc-600 dark:text-zinc-400 text-base lg:text-lg text-center"
           />
         </FadeUpItem>

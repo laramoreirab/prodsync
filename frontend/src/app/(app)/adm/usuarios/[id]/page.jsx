@@ -144,7 +144,7 @@ export default function UsuarioDetalhePage({ params }) {
   const operadorId = Number(id);
 
   const [usuario, setUsuario] = useState(null);
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setSincronizando] = useState(true);
 
   const [dadosEventos, setDadosEventos] = useState([]);
   const [todosEventos, setTodosEventos] = useState([]);
@@ -164,7 +164,7 @@ export default function UsuarioDetalhePage({ params }) {
   };
 
   const carregarDados = useCallback(async () => {
-    setCarregando(true);
+    setSincronizando(true);
     try {
       const [usuarioDados, historicoResp, apontamentosResp] = await Promise.all([
         usuariosCrudService.getById(operadorId),
@@ -195,7 +195,7 @@ export default function UsuarioDetalhePage({ params }) {
     } catch (error) {
       console.error("Erro ao carregar usuário:", error);
     } finally {
-      setCarregando(false);
+      setSincronizando(false);
     }
   }, [operadorId]);
 
@@ -338,7 +338,7 @@ export default function UsuarioDetalhePage({ params }) {
   if (carregando) {
     return (
       <PageLayout>
-        <LoadingState message="Carregando usuário..." />
+        <LoadingState message="Sincronizando usuário..." />
       </PageLayout>
     );
   }

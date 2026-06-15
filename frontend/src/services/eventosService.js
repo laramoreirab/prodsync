@@ -23,8 +23,8 @@ export const eventosService = {
 export const topMotivosTempoService = {
   async getTopMotivosTempo(setorId = null) {
     const url = setorId
-      ? `/api/eventos/top_motivos_tempo?setorId=${encodeURIComponent(setorId)}`
-      : "/api/eventos/top_motivos_tempo";
+      ? `/api/eventos/top_motivos_tempo?limite=3&setorId=${encodeURIComponent(setorId)}`
+      : "/api/eventos/top_motivos_tempo?limite=3";
     const data = await apiFetch(url);
     return MotivoTempoArraySchema.parse(data.dados || data);
   },

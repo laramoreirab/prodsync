@@ -214,7 +214,7 @@ export default function HistoricoEventos() {
   );
 
   if (loading) {
-    return <LoadingState message="Carregando eventos..." />;
+    return <LoadingState message="Sincronizando eventos..." />;
   }
 
   return (

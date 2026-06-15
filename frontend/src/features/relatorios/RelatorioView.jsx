@@ -48,7 +48,7 @@ export function RelatorioView({ variant, setorId = null, setorNome = null, dashb
   } = useRelatorioSelecao(variant);
 
   const [empresa, setEmpresa] = useState(null);
-  const [carregandoEmpresa, setCarregandoEmpresa] = useState(true);
+  const [carregandoEmpresa, setSincronizandoEmpresa] = useState(true);
 
   useEffect(() => {
     let ativo = true;
@@ -60,7 +60,7 @@ export function RelatorioView({ variant, setorId = null, setorNome = null, dashb
         if (ativo) setEmpresa(null);
       })
       .finally(() => {
-        if (ativo) setCarregandoEmpresa(false);
+        if (ativo) setSincronizandoEmpresa(false);
       });
     return () => {
       ativo = false;
@@ -125,7 +125,7 @@ export function RelatorioView({ variant, setorId = null, setorNome = null, dashb
           </div>
 
           {carregandoEmpresa ? (
-            <p className="text-sm text-muted-foreground">Carregando dados da empresa...</p>
+            <p className="text-sm text-muted-foreground">Sincronizando dados da empresa...</p>
           ) : (
             <EmpresaInfoSection
               ativo={estaAtivo("empresa-info")}

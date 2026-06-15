@@ -7,7 +7,7 @@ import { BarHorizontal } from "@/components/ui/charts/components";
 export function SetorMotivosParadaWidget({ setorId }) {
   const { data, loading, error } = useSetorMotivosParada(setorId);
   
-   if (loading) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar status.</p>;
    if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
   if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
@@ -21,7 +21,11 @@ export function SetorMotivosParadaWidget({ setorId }) {
       <div className="mt-2">
         <BarHorizontal
           data={data}
-          xKey="motivo"
+          yKey="motivo"
+          yAxisWidth={140}
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
           config={setorMotivosParadaConfig}
           loading={loading}
           error={error}

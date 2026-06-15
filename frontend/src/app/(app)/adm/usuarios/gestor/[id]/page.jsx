@@ -28,16 +28,16 @@ export default function GestorDetalhePage({ params }) {
   const { id } = use(params);
   const gestorId = Number(id);
   const [gestor, setGestor] = useState(null);
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setSincronizando] = useState(true);
   const setorId = gestor?.id_setor;
 
   const carregarDados = useCallback(() => {
-    setCarregando(true);
+    setSincronizando(true);
     return usuariosCrudService
       .getById(gestorId)
       .then(setGestor)
       .catch((error) => console.error("Erro ao carregar gestor:", error))
-      .finally(() => setCarregando(false));
+      .finally(() => setSincronizando(false));
   }, [gestorId]);
 
   useEffect(() => {

@@ -34,7 +34,7 @@ export function SetoresResumoSection({ ativo }) {
   return (
     <RelatorioSection id="setores-resumo" ativo titulo="Panorama por setores">
       {loading ? (
-        <p className="text-sm text-muted-foreground">Carregando setores...</p>
+        <p className="text-sm text-muted-foreground">Sincronizando setores...</p>
       ) : setores.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nenhum setor cadastrado.</p>
       ) : (

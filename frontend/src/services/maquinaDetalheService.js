@@ -61,7 +61,7 @@ export const velocidadeMaquinaService = {
   async getVelocidade(maquinaId) {
     const data = await apiFetch(`/api/maquinas/${maquinaId}/velocidade`);
     return VelocidadeArraySchema.parse([
-      { tipo: "Velocidade Padrão", valor: data.dados.velocidade_padrao || 0 },
+      { tipo: "Capacidade Normal", valor: data.dados.velocidade_padrao || 0 },
       { tipo: "Velocidade Atual", valor: data.dados.velocidade_atual || 0 },
     ]);
   },

@@ -343,6 +343,22 @@ class MaquinaModel {
         return Number.isFinite(duracao) && duracao > 0 ? duracao : 0;
     }
 
+    static extrairNumeroCapacidade(capacidade) {
+        if (capacidade === null || capacidade === undefined) return 0;
+
+        const texto = String(capacidade).replace(',', '.');
+        const match = texto.match(/\d+(\.\d+)?/);
+        const valor = match ? Number(match[0]) : Number(texto);
+
+        return Number.isFinite(valor) && valor > 0 ? valor : 0;
+    }
+
+    static calcularVelocidadePecasHora(pecas, minutos) {
+        return minutos > 0
+            ? Number(((pecas / minutos) * 60).toFixed(2))
+            : 0;
+    }
+
     static inicioDoDia(data) {
         const inicio = new Date(data);
         inicio.setHours(0, 0, 0, 0);
@@ -404,8 +420,9 @@ class MaquinaModel {
     // Cria uma nova máquina
     static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem, imagem_public_id = null) {
         try {
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
-            const statusNormalizado = statusValidos.includes(status) ? status : 'Parada';
+            const statusValidos = ['Produzindo', 'Parada', 'Setup', 'Aguardando'];
+            const statusRecebido = status === 'Manutencao' ? 'Parada' : status;
+            const statusNormalizado = statusValidos.includes(statusRecebido) ? statusRecebido : 'Parada';
             const idSetorNormalizado = id_setor ? Number(id_setor) : null;
             const idOperadorNormalizado = id_operador ? Number(id_operador) : null;
             const maquina = await prisma.maquinas.create({
@@ -480,14 +497,15 @@ class MaquinaModel {
                 }
             }
 
+            const statusRecebido = dados.status === 'Manutencao' ? 'Parada' : dados.status;
             const dataUpdate = {
                 nome: dados.nome,
                 serie: dados.serie,
                 id_setor: dados.id_setor ? parseInt(dados.id_setor) : undefined,
                 categoria: dados.categoria,
                 capacidade: dados.capacidade,
-                status: dados.status,
-                status_atual: dados.status || undefined,
+                status: statusRecebido,
+                status_atual: statusRecebido || undefined,
                 data_aquisicao: dados.data_aquisicao ? new Date(dados.data_aquisicao) : undefined,
                 id_operador: dados.id_operador ? parseInt(dados.id_operador) : undefined,
             };
@@ -1156,12 +1174,18 @@ class MaquinaModel {
                 }
             });
 
-            return statusAgrupados.map(status => ({
-                name: status.status_atual,
-                value: status._count.status_atual,
+            const totaisPorStatus = statusAgrupados.reduce((acc, status) => {
+                const statusNormalizado = status.status_atual === 'Manutencao' ? 'Parada' : status.status_atual;
+                acc[statusNormalizado] = (acc[statusNormalizado] ?? 0) + status._count.status_atual;
+                return acc;
+            }, {});
+
+            return Object.entries(totaisPorStatus).map(([status, total]) => ({
+                name: status,
+                value: total,
                 setorId: setorId ? Number(setorId) : undefined,
-                status: status.status_atual,
-                total: status._count.status_atual
+                status,
+                total
             }));
         } catch (error) {
             console.error('Erro ao obter status geral das maquinas:', error);
@@ -1324,14 +1348,15 @@ class MaquinaModel {
 
     static async obterVelocidadeMaquina(id_maquina, id_empresa) {
         try {
-            const [apontamentoAtual, ordemAtual] = await Promise.all([
-                prisma.apontamento.findFirst({
+            const [maquina, ordemAtiva] = await Promise.all([
+                prisma.maquinas.findFirst({
                     where: {
                         id_maquina,
-                        id_empresa
+                        id_empresa,
+                        ativo: true
                     },
-                    orderBy: {
-                        data_hora_fim: 'desc'
+                    select: {
+                        capacidade: true
                     }
                 }),
                 prisma.ordemProducao.findFirst({
@@ -1339,41 +1364,64 @@ class MaquinaModel {
                         id_maquina,
                         id_empresa,
                         status_op: {
-                            in: ['Em_Andamento', 'Setup', 'Parada', 'Finalizada']
+                            in: ['Em_Andamento', 'Setup', 'Parada']
                         }
                     },
-                    orderBy: {
-                        data_inicio: 'desc'
+                    orderBy: [
+                        { data_inicio: 'desc' },
+                        { id_ordem: 'desc' }
+                    ],
+                    select: {
+                        id_ordem: true
                     }
                 })
             ]);
 
-            const tempoAtualMinutos = this.calcularDuracaoMinutos(
-                apontamentoAtual?.data_hora_inicio,
-                apontamentoAtual?.data_hora_fim
-            );
-            const pecasAtuais = (apontamentoAtual?.qtd_boa ?? 0) + (apontamentoAtual?.qtd_refugo ?? 0);
-            const velocidadeAtual = tempoAtualMinutos > 0
-                ? Number((pecasAtuais / tempoAtualMinutos).toFixed(2))
-                : 0;
+            const inicioPeriodoRecente = this.inicioDoDia(new Date());
+            inicioPeriodoRecente.setDate(inicioPeriodoRecente.getDate() - 6);
 
-            const tempoPadraoMinutos = this.calcularDuracaoMinutos(
-                ordemAtual?.data_inicio,
-                ordemAtual?.data_fim
-            );
-            const velocidadePadrao = tempoPadraoMinutos > 0
-                ? Number(((ordemAtual?.qtd_planejada ?? 0) / tempoPadraoMinutos).toFixed(2))
-                : 0;
+            const apontamentos = await prisma.apontamento.findMany({
+                where: {
+                    id_maquina,
+                    id_empresa,
+                    ...(ordemAtiva?.id_ordem
+                        ? { id_ordemProducao: ordemAtiva.id_ordem }
+                        : { data_hora_fim: { gte: inicioPeriodoRecente } })
+                },
+                orderBy: {
+                    data_hora_fim: 'desc'
+                },
+                select: {
+                    id_apontamento: true,
+                    qtd_boa: true,
+                    qtd_refugo: true,
+                    data_hora_inicio: true,
+                    data_hora_fim: true
+                }
+            });
+
+            const totais = apontamentos.reduce((acc, apontamento) => {
+                acc.pecas += (apontamento.qtd_boa ?? 0) + (apontamento.qtd_refugo ?? 0);
+                acc.minutos += this.calcularDuracaoMinutos(
+                    apontamento.data_hora_inicio,
+                    apontamento.data_hora_fim
+                );
+                return acc;
+            }, { pecas: 0, minutos: 0 });
+
+            const velocidadeAtual = this.calcularVelocidadePecasHora(totais.pecas, totais.minutos);
+            const velocidadePadrao = this.extrairNumeroCapacidade(maquina?.capacidade);
 
             return {
                 velocidade_atual: velocidadeAtual,
                 velocidade_padrao: velocidadePadrao,
-                unidade: 'pecas/minuto',
+                unidade: 'pecas/hora',
                 percentual: velocidadePadrao > 0
                     ? Number(((velocidadeAtual / velocidadePadrao) * 100).toFixed(1))
                     : 0,
-                referencia_apontamento: apontamentoAtual?.id_apontamento ?? null,
-                referencia_ordem: ordemAtual?.id_ordem ?? null
+                referencia_apontamento: apontamentos[0]?.id_apontamento ?? null,
+                referencia_ordem: ordemAtiva?.id_ordem ?? null,
+                periodo_base: ordemAtiva?.id_ordem ? 'ordem_ativa' : 'ultimos_7_dias'
             };
         } catch (error) {
             console.error('Erro ao obter velocidade da maquina:', error);
@@ -1562,7 +1610,7 @@ class MaquinaModel {
             const historicoEventos = eventos.map(evento => ({
                 id: evento.id_evento,
                 id_evento: evento.id_evento,
-                tipo: evento.status_atual,
+                tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
                 data: evento.inicio,
                 inicio: evento.inicio,
                 fim: evento.termino,

@@ -8,11 +8,11 @@ import { toast } from "sonner";
 import { setorCrudService } from "@/services/setorCrudService";
 
 export default function FormExclusaoSetor({ setorId, setorIds = [], onExclusaoSucesso }) {
-    const [carregando, setCarregando] = useState(false);
+    const [carregando, setSincronizando] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setCarregando(true);
+        setSincronizando(true);
 
         try {
             // id vai na URL — backend: deletarSetor
@@ -29,7 +29,7 @@ export default function FormExclusaoSetor({ setorId, setorIds = [], onExclusaoSu
             console.error("Erro ao excluir setor:", error);
             toast.error(error?.message || "Erro ao excluir setor.");
         } finally {
-            setCarregando(false);
+            setSincronizando(false);
         }
     };
 

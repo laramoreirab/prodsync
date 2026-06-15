@@ -209,7 +209,7 @@ export default function MaquinaDetalhePage({ params }) {
           .filter((item) => item.tipo !== "Producao")
           .map((item) => ({
             ...item,
-            tipoEvento: item.tipo,
+            tipoEvento: item.tipo === "Setup" ? "Setup" : "Parada",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
             motivo: item.motivo || "-",

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -191,10 +191,9 @@ const statusBadge = (status) => {
     Setup: "bg-amber-500/15 text-amber-900",
     Concluída: "bg-sky-500/15 text-sky-700",
     Finalizada: "bg-sky-500/15 text-sky-700",
-    "Aguardando Início": "bg-slate-500/15 text-slate-700",
   };
   const label =
-    status === "Em_Andamento" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";
+    status === "Em_Andamento" || status === "Aguardando" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";
   return (
     <Badge variant="outline" className={`text-sm font-semibold border-none ml-2 ${config[label] || ""}`}>
       {label}
@@ -212,7 +211,7 @@ export default function OPDetalhePage({ params }) {
   const [activeListTab, setActiveListTab] = useState("eventos");
 
   const [op, setOp] = useState(null);
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setSincronizando] = useState(true);
 
   const [dadosEventos, setDadosEventos] = useState([]);
   const [todosEventos, setTodosEventos] = useState([]);
@@ -224,7 +223,7 @@ export default function OPDetalhePage({ params }) {
 
   const carregarDados = useCallback(async () => {
     if (!opId || Number.isNaN(opId)) return;
-    setCarregando(true);
+    setSincronizando(true);
     try {
       const [opDados, eventosRaw, apontamentosRaw] = await Promise.all([
         opCrudService.getById(opId),
@@ -253,7 +252,7 @@ export default function OPDetalhePage({ params }) {
     } catch (error) {
       console.error("Erro ao carregar OP:", error);
     } finally {
-      setCarregando(false);
+      setSincronizando(false);
     }
   }, [opId]);
 
@@ -428,7 +427,7 @@ export default function OPDetalhePage({ params }) {
     return (
       <main className="min-h-screen bg-[url('/bg_app.svg')] bg-cover bg-fixed bg-center bg-no-repeat flex flex-col items-center justify-center p-20">
         <Loader2 className="w-10 h-10 animate-spin text-blue-900 mb-4" />
-        <p className="text-lg text-gray-600 font-medium">Carregando ordem de produção...</p>
+        <p className="text-lg text-gray-600 font-medium">Sincronizando ordem de produção...</p>
       </main>
     );
   }

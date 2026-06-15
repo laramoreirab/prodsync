@@ -9,9 +9,12 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import FormCriarApontamento from "@/components/ui/forms/maquinas/criarApontamento";
 import { Plus, ChevronDown } from "lucide-react";
 import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { maquinaCrudService } from "@/services/maquinaCrudService";
+import { apiFetch } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import {
   FadeUpItem,
@@ -42,21 +45,64 @@ const resolverImagemMaquina = (imagem) => {
 
 export default function MaquinaDetalhePage({ params }) {
   const { id } = use(params);
+  const router = useRouter();
   const maquinaId = Number(id);
   const [maquina, setMaquina] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!maquinaId) return;
-    maquinaCrudService
-      .getById(maquinaId)
-      .then((resp) => setMaquina(resp?.dados || resp))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [maquinaId]);
+    let ativo = true;
+
+    async function carregarMaquinaAutorizada() {
+      setLoading(true);
+
+      if (!Number.isInteger(maquinaId) || maquinaId <= 0) {
+        router.replace("/operador/maquinas");
+        return;
+      }
+
+      try {
+        const usuario = getUserFromToken();
+
+        if (usuario?.tipo === "Operador") {
+          const resposta = await apiFetch(
+            `/api/maquinas/obter-maquina-operador/${usuario.id_usuario}`,
+          );
+          const idMaquinaAutorizada = Number(
+            resposta?.id_maquina ?? resposta?.dados?.id_maquina,
+          );
+
+          if (!idMaquinaAutorizada) {
+            router.replace("/operador/maquinas");
+            return;
+          }
+
+          if (idMaquinaAutorizada !== maquinaId) {
+            router.replace(`/operador/maquinas/${idMaquinaAutorizada}`);
+            return;
+          }
+        }
+
+        const resp = await maquinaCrudService.getById(maquinaId);
+        if (ativo) setMaquina(resp?.dados || resp);
+      } catch (error) {
+        console.error(error);
+        router.replace("/operador/maquinas");
+        return;
+      }
+
+      if (ativo) setLoading(false);
+    }
+
+    carregarMaquinaAutorizada();
+
+    return () => {
+      ativo = false;
+    };
+  }, [maquinaId, router]);
 
   if (loading) {
-    return <LoadingState message="Carregando máquina..." />;
+    return <LoadingState message="Sincronizando máquina..." />;
   }
 
   const nome = maquina?.nome || `Máquina #${id}`;
