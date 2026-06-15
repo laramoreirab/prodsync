@@ -26,6 +26,7 @@ export function BarHorizontal({
   showValueLabels = false,
   hideTooltipLabel = false,
   colorKey,
+  barSize,
 }) {
   if (!data?.length) return null;
 
@@ -75,6 +76,7 @@ export function BarHorizontal({
             dataKey={dataKey}
             fill={colorKey ? undefined : `url(#${gradientId})`}
             radius={[0, 4, 4, 0]}
+            barSize={barSize}
           >
             {colorKey && data.map((entry, index) => (
               <Cell
