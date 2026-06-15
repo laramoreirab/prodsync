@@ -22,7 +22,7 @@ export function OPProgressoWidget({ opId }) {
   ].filter((item) => item.value > 0);
 
   return (
-    <div>
+    <div className="p-2">
       <p className="text-sm font-semibold text-black">Progresso até término da OP</p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       <div className="mt-2 flex justify-center">

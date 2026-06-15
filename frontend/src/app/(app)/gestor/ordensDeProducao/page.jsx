@@ -153,7 +153,7 @@ const opcoesOrdenacao = [
 
 const filtrosOps = [
   { id: "status_op", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "Concluída"] },
-  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Media", "Média", "Alta", "Critica", "Crí­tica"] },
+  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Média", "Alta", "Crí­tica"] },
 ];
 
 export default function OrdensDeProducaoGestor() {

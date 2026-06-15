@@ -22,7 +22,7 @@ export function TopMotivosTempoWidget({ setorId = null }) {
         <p className="text-sm font-semibold text-black">
           Top 3 Motivos de Parada (Tempo)
         </p>
-          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+        <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
       </header>
 
@@ -30,6 +30,9 @@ export function TopMotivosTempoWidget({ setorId = null }) {
         <BarHorizontal
           data={formattedData}
           config={topMotivosTempoConfig}
+          paddingTopClassName="pt-0.5"
+          heightClassName="h-[250px]"
+          yAxisWidth={140}
         />
       </div>
     </div>
