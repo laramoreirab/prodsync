@@ -37,10 +37,13 @@ var TOPICO_STATUS = "phietro/fabrica/" + BOARD_UID + "/status";
 var TOPICO_PAREAMENTO = "phietro/fabrica/pareamento";
 var TOPICO_CONTROLE = "phietro/fabrica/" + BOARD_UID + "/controle";
 var DEBOUNCE_SEGUNDOS = 0.08;
+var INTERVALO_STATUS_REPETIDO_SEGUNDOS = 1.2;
 
 var botaoVerde = {};
 var botaoAmarelo = {};
 var botaoVermelho = {};
+var ultimoStatusEnviado = null;
+var ultimoStatusEnviadoEm = 0;
 
 function obterMac() {
   try {
@@ -194,6 +197,9 @@ function processaMensagemMqtt(topico, mensagem) {
         ": " +
         (resposta.mensagem || "sem detalhes")
       );
+      if (resposta.status && statusAtual === resposta.status) {
+        statusAtual = null;
+      }
     }
   }
 }
@@ -335,13 +341,25 @@ function solicitarPareamento() {
 }
 
 function enviaStatus(novoStatus) {
-  if (statusAtual === novoStatus) return;
-  statusAtual = novoStatus;
+  var agora = getTime();
 
-  publicaJson(TOPICO_STATUS, {
+  if (statusAtual === novoStatus) return;
+  if (
+    ultimoStatusEnviado === novoStatus &&
+    agora - ultimoStatusEnviadoEm < INTERVALO_STATUS_REPETIDO_SEGUNDOS
+  ) {
+    console.log("Status repetido ignorado: " + novoStatus);
+    return;
+  }
+
+  if (publicaJson(TOPICO_STATUS, {
     board_uid: BOARD_UID,
-    status: statusAtual
-  });
+    status: novoStatus
+  })) {
+    statusAtual = novoStatus;
+    ultimoStatusEnviado = novoStatus;
+    ultimoStatusEnviadoEm = agora;
+  }
 }
 
 function piscarLed() {
