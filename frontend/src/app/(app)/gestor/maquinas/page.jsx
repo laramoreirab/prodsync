@@ -46,6 +46,7 @@ const colunasMaquinas = [
         Produzindo: { variant: "produzindo" },
         Setup: { variant: "setup" },
         Parada: { variant: "parada" },
+        Aguardando:{ variant: "aguardando"}
       };
       const estilo = config[valor] || { variant: "outline", className: "" };
 

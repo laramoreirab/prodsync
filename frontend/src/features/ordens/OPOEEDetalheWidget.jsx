@@ -17,7 +17,7 @@ export function OPOEEDetalheWidget({ opId, maquinaId }) {
   const metricasSecundarias = oeeMetricasConfig.filter((m) => m.key !== "oee");
 
   return (
-    <div className="flex flex-col gap-6 w-full p-4 h-full justify-between">
+    <div className="flex flex-col gap-6 w-full p-2 h-full justify-between">
       {/* Cabeçalho */}
       <div className="text-left w-full">
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
@@ -44,7 +44,7 @@ export function OPOEEDetalheWidget({ opId, maquinaId }) {
         )}
 
         {/* Sub-indicadores Lineares (Disponibilidade, Performance, Qualidade) */}
-        <div className="w-1/2 space-y-3.5 px-2">
+        <div className="w-1/2 space-y-3.5 pr-2">
           {metricasSecundarias.map(({ key, label, color }) => {
             const rawValue = data[key];
             const value = Number(rawValue);
