@@ -1,7 +1,6 @@
 clearWatch();
 clearInterval();
 
-const EMPRESA_ID = 10;
 const BOARD_UID = typeof getSerial === "function" ? "esp32-" + getSerial() : "esp32-prodsync-001";
 const FIRMWARE_VERSION = "serial-1.1.0";
 
@@ -18,7 +17,6 @@ let ledPiscanteInterval = null;
 
 function enviarPareamento() {
     const payload = {
-        id_empresa: EMPRESA_ID,
         board_uid: BOARD_UID,
         firmware_version: FIRMWARE_VERSION
     };

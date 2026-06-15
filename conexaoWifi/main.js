@@ -2,8 +2,8 @@ var wifi = require("Wifi");
 var net = require("net");
 
 // --- Configuracoes de Rede ---
-var ssid = "Wokwi-GUEST";
-var password = "";
+var ssid = "Phietro";
+var password = "qpjf3874";
 var mqtt_server = "broker.hivemq.com";
 
 // --- Definicao dos Pinos ---
@@ -15,10 +15,12 @@ var LED_LIGADO = 1;
 var LED_DESLIGADO = 0;
 
 // --- Constantes do Sistema ---
-var EMPRESA_ID = 10;
 var FIRMWARE_VERSION = "wifi-1.1.0";
+var BOARD_UID = typeof getSerial === "function" ? "esp32-" + getSerial() : "esp32-prodsync-001";
+var mac = null;
 
 var statusAtual = null;
+var ultimoStatusRegistrado = null;
 var clienteMQTT = null;
 var mqttConectado = false;
 var mqttBuffer = "";
@@ -45,30 +47,8 @@ function obterMac() {
     var detalhes = wifi.getDetails ? wifi.getDetails() : null;
     return detalhes && detalhes.mac ? detalhes.mac : null;
   } catch (e) {
-    console.log("Erro ao processar mensagem JSON: " + e);
+    console.log("Erro ao obter MAC: " + e);
     return;
-  }
-
-  var tipo = doc.tipo;
-
-  if (tipo === "PARAR_PAREAMENTO") {
-    console.log("Recebido comando para parar emparelhamento");
-    pararPareamento();
-  } else if (tipo === "PAREAMENTO_CONCLUIDO") {
-    console.log("Pareamento concluido com a maquina " + (doc.id_maquina || 0));
-    pararPareamento();
-  } else if (tipo === "STATUS_REGISTRADO") {
-    if (doc.status) {
-      ultimoStatusRegistrado = doc.status;
-      console.log("Status confirmado pelo backend: " + ultimoStatusRegistrado);
-    }
-  } else if (tipo === "STATUS_REJEITADO") {
-    console.log(
-      "Backend rejeitou o status " +
-      (doc.status || "") +
-      ": " +
-      (doc.mensagem || "sem detalhes")
-    );
   }
 }
 
@@ -97,6 +77,7 @@ function conectaWifi() {
         return;
       }
       console.log("Wi-Fi conectado. IP:", wifi.getIP().ip);
+      mac = obterMac();
       conectaBroker();
     });
   }, 1000);
@@ -201,6 +182,18 @@ function processaMensagemMqtt(topico, mensagem) {
       pareado = false;
       pararPiscarLed();
       console.log("LOG: Pareamento cancelado. LED parado.");
+    } else if (resposta.tipo === "STATUS_REGISTRADO") {
+      if (resposta.status) {
+        ultimoStatusRegistrado = resposta.status;
+        console.log("Status confirmado pelo backend: " + ultimoStatusRegistrado);
+      }
+    } else if (resposta.tipo === "STATUS_REJEITADO") {
+      console.log(
+        "Backend rejeitou o status " +
+        (resposta.status || "") +
+        ": " +
+        (resposta.mensagem || "sem detalhes")
+      );
     }
   }
 }
@@ -331,11 +324,12 @@ function conectaBroker() {
 }
 
 function solicitarPareamento() {
+  mac = obterMac() || mac;
+
   return publicaJson(TOPICO_PAREAMENTO, {
     tipo: "PAIRING_REQUEST",
-    id_empresa: EMPRESA_ID,
     board_uid: BOARD_UID,
-    mac: mac.toUpperCase(),
+    mac: mac ? mac.toUpperCase() : "",
     firmware_version: FIRMWARE_VERSION
   });
 }
