@@ -420,8 +420,9 @@ class MaquinaModel {
     // Cria uma nova máquina
     static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem, imagem_public_id = null) {
         try {
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
-            const statusNormalizado = statusValidos.includes(status) ? status : 'Parada';
+            const statusValidos = ['Produzindo', 'Parada', 'Setup', 'Aguardando'];
+            const statusRecebido = status === 'Manutencao' ? 'Parada' : status;
+            const statusNormalizado = statusValidos.includes(statusRecebido) ? statusRecebido : 'Parada';
             const idSetorNormalizado = id_setor ? Number(id_setor) : null;
             const idOperadorNormalizado = id_operador ? Number(id_operador) : null;
             const maquina = await prisma.maquinas.create({
@@ -496,14 +497,15 @@ class MaquinaModel {
                 }
             }
 
+            const statusRecebido = dados.status === 'Manutencao' ? 'Parada' : dados.status;
             const dataUpdate = {
                 nome: dados.nome,
                 serie: dados.serie,
                 id_setor: dados.id_setor ? parseInt(dados.id_setor) : undefined,
                 categoria: dados.categoria,
                 capacidade: dados.capacidade,
-                status: dados.status,
-                status_atual: dados.status || undefined,
+                status: statusRecebido,
+                status_atual: statusRecebido || undefined,
                 data_aquisicao: dados.data_aquisicao ? new Date(dados.data_aquisicao) : undefined,
                 id_operador: dados.id_operador ? parseInt(dados.id_operador) : undefined,
             };
@@ -1172,12 +1174,18 @@ class MaquinaModel {
                 }
             });
 
-            return statusAgrupados.map(status => ({
-                name: status.status_atual,
-                value: status._count.status_atual,
+            const totaisPorStatus = statusAgrupados.reduce((acc, status) => {
+                const statusNormalizado = status.status_atual === 'Manutencao' ? 'Parada' : status.status_atual;
+                acc[statusNormalizado] = (acc[statusNormalizado] ?? 0) + status._count.status_atual;
+                return acc;
+            }, {});
+
+            return Object.entries(totaisPorStatus).map(([status, total]) => ({
+                name: status,
+                value: total,
                 setorId: setorId ? Number(setorId) : undefined,
-                status: status.status_atual,
-                total: status._count.status_atual
+                status,
+                total
             }));
         } catch (error) {
             console.error('Erro ao obter status geral das maquinas:', error);
@@ -1602,7 +1610,7 @@ class MaquinaModel {
             const historicoEventos = eventos.map(evento => ({
                 id: evento.id_evento,
                 id_evento: evento.id_evento,
-                tipo: evento.status_atual,
+                tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
                 data: evento.inicio,
                 inicio: evento.inicio,
                 fim: evento.termino,

@@ -6,6 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { DonutLegend } from "@/components/ui/charts/components/DonutLegend";
 import { useTurnosOperadores } from "./hooks/useTurnosOperadores";
 import { turnosOperadoresConfig } from "./config/usuarioChartConfig";
 
@@ -35,23 +36,21 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
   const dataKey = "value";
 
   const formatValue = (value) => (valueFormatter ? valueFormatter(value) : value);
-  const renderOuterLabel = (props) => {
-    const name = props?.[nameKey] ?? props?.name;
-    const value = props?.[dataKey] ?? props?.value;
-
-    return (
-      <text
-        x={props.x}
-        y={props.y}
-        textAnchor={props.textAnchor}
-        dominantBaseline="central"
-        className="fill-black font-medium dark:fill-white"
-        style={{ fontSize: "13px" }}
-      >
-        {`${name}: ${formatValue(value)}`}
-      </text>
-    );
-  };
+  const getColor = (entry, index) =>
+    turnosOperadoresConfig?.[entry[nameKey]]?.color ?? tonsAzuis[index % tonsAzuis.length];
+  const legendItems = compact
+    ? []
+    : data
+        .filter((entry) => Number(entry[dataKey]) > 0)
+        .map((entry, index) => ({
+          key: `${entry[nameKey]}-${index}`,
+          color: getColor(entry, index),
+          label: turnosOperadoresConfig?.[entry[nameKey]]?.label ?? entry[nameKey],
+        }));
+  const chartHeightClass = legendItems.length > 0 ? "h-[144px]" : "h-[160px]";
+  const chartMargin = legendItems.length > 0
+    ? { top: 4, right: 8, bottom: 4, left: 8 }
+    : { top: 8, right: 8, bottom: 8, left: 8 };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -66,54 +65,62 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
       </div>
 
       {/* ── Renderização do Gráfico (Donut) ── */}
-      <div className="flex-1 min-h-0 w-full max-h-[160px]">
-        <ChartContainer config={turnosOperadoresConfig} className="w-full h-full">
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name, item) => {
-                    const label =
-                      turnosOperadoresConfig?.[item?.payload?.[nameKey]]?.label ?? name;
+      <div className="flex-1 min-h-0 w-full">
+        <div className={`${chartHeightClass} max-h-full w-full`}>
+          <ChartContainer config={turnosOperadoresConfig} className="w-full h-full">
+            <PieChart margin={chartMargin}>
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    formatter={(value, name, item) => {
+                      const entryKey = item?.payload?.[nameKey] ?? name;
+                      const color = item?.payload?.fill ?? turnosOperadoresConfig?.[entryKey]?.color;
+                      const label = turnosOperadoresConfig?.[entryKey]?.label ?? entryKey;
 
-                    return (
-                      <div className="flex w-full items-center justify-between gap-3">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span className="font-mono font-medium text-foreground tabular-nums">
-                          {formatValue(value)}
-                        </span>
-                      </div>
-                    );
-                  }}
-                />
-              }
-            />
-            <Pie
-              data={data}
-              dataKey={dataKey}
-              nameKey={nameKey}
-              cx="50%"
-              cy={cy}
-              innerRadius={45}
-              outerRadius={70}
-              label={
-                compact
-                  ? false
-                  : renderOuterLabel
-              }
-            >
-              {data.map((entry, index) => {
-                const entryKey = entry[nameKey];
-                const fillColor =
-                  turnosOperadoresConfig?.[entryKey]?.color ?? tonsAzuis[index % tonsAzuis.length];
-                
-                return <Cell key={entryKey} fill={fillColor} />;
-              })}
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+                      return (
+                        <div className="flex w-full items-center justify-between gap-3">
+                          <span className="flex items-center gap-1.5 text-muted-foreground">
+                            <span
+                              className="h-2 w-2 rounded-[2px]"
+                              style={{ backgroundColor: color }}
+                              aria-hidden="true"
+                            />
+                            {label}
+                          </span>
+                          <span className="font-mono font-medium text-foreground tabular-nums">
+                            {formatValue(value)}
+                          </span>
+                        </div>
+                      );
+                    }}
+                  />
+                }
+              />
+              <Pie
+                data={data}
+                dataKey={dataKey}
+                nameKey={nameKey}
+                cx="50%"
+                cy={cy}
+                innerRadius={45}
+                outerRadius={70}
+                labelLine={false}
+                label={false}
+              >
+                {data.map((entry, index) => {
+                  const entryKey = entry[nameKey];
+                  const fillColor = getColor(entry, index);
+                  
+                  return <Cell key={entryKey} fill={fillColor} />;
+                })}
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        </div>
+
+        <DonutLegend items={legendItems} className="mt-1" />
       </div>
     </div>
   );

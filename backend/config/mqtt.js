@@ -27,14 +27,6 @@ function publicarControlePlaca(board_uid, payload) {
 
 function normalizarStatus(status) {
   return EventoModel.normalizarStatusMaquina(status) ?? status;
-
-  const valor = String(status ?? '').trim().toUpperCase();
-  if (valor === 'PRODUZINDO') return 'Produzindo';
-  if (valor === 'SETUP' || valor === 'SETUP/AJUSTE') return 'Setup';
-  if (valor === 'PARADA') return 'Parada';
-  if (valor === 'MANUTENCAO' || valor === 'MANUTENÇÃO') return 'Manutencao';
-  if (valor === 'AGUARDANDO') return 'Aguardando';
-  return status;
 }
 
 function publicarStatusRegistrado(dados, status, id_empresa, id_maquina, evento) {

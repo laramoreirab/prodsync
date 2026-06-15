@@ -57,7 +57,7 @@ class NotificacaoModel {
             if (!deveReceber) continue;
 
             const tipo = this.tipoPorStatus(evento.status_atual);
-            const statusLabel = evento.status_atual === 'Manutencao' ? 'Manutenção' : evento.status_atual;
+            const statusLabel = evento.status_atual === 'Manutencao' ? 'Parada' : evento.status_atual;
             const nomeMaquina = evento.maquina?.nome ?? `Máquina ${evento.id_maquina}`;
 
             const existente = await prisma.notificacoes.findFirst({

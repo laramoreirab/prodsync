@@ -3,6 +3,7 @@ export * from "./LineChart";
 export * from "./GaugeSemicircular";
 export * from "./BarHorizontal";
 export * from "./PieChart";
+export * from "./DonutLegend";
 export * from "./BarVertical";
 export * from "./BarStackedHorizontal";
 export * from "./BarStackedVertical";
