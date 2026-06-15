@@ -84,7 +84,7 @@ function normalizarMaquina(maquina) {
     ...maquina,
     status: maquina.status_atual || maquina.status || "",
     operador: maquina.operador?.nome || maquina.operador || "Sem operador",
-    oee_atual: maquina.oee_atual || "-",
+    oee_atual: maquina.oee_atual || "0%",
   };
 }
 

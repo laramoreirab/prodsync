@@ -6,9 +6,9 @@ import { motivoRefugoConfig } from "./config/maquinaDetalheConfig";
 
 const tonsAzuis = [
   "#1d4ed8",
-  "#2563eb",
+  "#8dabeb",
   "#3b82f6",
-  "#60a5fa",
+  "#094288",
   "#93c5fd",
   "#bfdbfe",
   "#1e40af",
