@@ -982,17 +982,51 @@ class EventoModel {
         }
     }
 
-    static async obterTopMotivosTempo(id_empresa, limite = 5, setorId = null) {
+    static async obterTopMotivosTempo(id_empresa, limite = 3, setorId = null) {
         try {
-            const motivos = await this.obterMotivosParadaFrequentes(id_empresa, limite, setorId);
+            const agrupados = await prisma.historico_Eventos.groupBy({
+                by: ['id_motivo_parada'],
+                where: {
+                    id_empresa: Number(id_empresa),
+                    ...(setorId ? { setor_afetado: Number(setorId) } : {}),
+                    id_motivo_parada: {
+                        not: null
+                    },
+                    status_atual: {
+                        in: ['Parada', 'Manutencao']
+                    }
+                },
+                _sum: {
+                    duracao: true
+                },
+                orderBy: {
+                    _sum: {
+                        duracao: 'desc'
+                    }
+                },
+                take: limite
+            });
 
-            return motivos
-                .sort((a, b) => b.duracao_total_minutos - a.duracao_total_minutos)
-                .slice(0, limite)
+            const motivos = await prisma.motivos_Parada.findMany({
+                where: {
+                    id_empresa: Number(id_empresa),
+                    id_motivo: {
+                        in: agrupados.map(item => item.id_motivo_parada)
+                    }
+                },
+                select: {
+                    id_motivo: true,
+                    descricao: true
+                }
+            });
+
+            const motivosPorId = new Map(motivos.map(motivo => [motivo.id_motivo, motivo]));
+
+            return agrupados
                 .map(item => ({
-                    motivo: item.motivo,
-                    tempo: this.formatarTempo(item.duracao_total_minutos),
-                    minutos: item.duracao_total_minutos
+                    motivo: motivosPorId.get(item.id_motivo_parada)?.descricao ?? 'Sem motivo informado',
+                    tempo: this.formatarTempo(item._sum.duracao ?? 0),
+                    minutos: item._sum.duracao ?? 0
                 }));
         } catch (error) {
             console.error('Erro ao obter top motivos por tempo:', error);

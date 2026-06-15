@@ -52,7 +52,7 @@ import {
 
 const opsFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
-  { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Concluída", "Produzindo", "Parada", "Setup"] },
   { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Crítica", "Alta", "Média", "Baixa"] },
   { id: "progresso", label: "Progresso", type: "number-range" }
 ];
@@ -138,10 +138,6 @@ const colunasOrdemProd = [
         "Concluída": {
           variant: "concluida",
           label: "Concluída"
-        },
-        "Aguardando": {
-          variant: "aguardando",
-          label: "Aguardando Início"
         }
       };
 

@@ -45,7 +45,7 @@ async function getMachinesStatus(id_empresa, args) {
 
 async function getProductionSummary(id_empresa, args) {
     const ordens = await prisma.ordemProducao.findMany({
-        where: { id_empresa, status_op: { in: ['Em_Andamento', 'Aguardando', 'Setup'] } },
+        where: { id_empresa, status_op: { in: ['Em_Andamento', 'Parada', 'Setup'] } },
         include: {
             maquina: { select: { nome: true } }
         }

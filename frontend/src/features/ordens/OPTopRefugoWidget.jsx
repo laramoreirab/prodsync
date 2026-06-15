@@ -20,8 +20,8 @@ export function OPTopRefugoWidget({ setorId = null }) {
   }));
 
   return (
-    <div className="p-1 h-full">
-      <header>
+    <div className="flex h-full flex-col p-5">
+      <header className="shrink-0">
         <p className="text-sm font-semibold text-black">
           Top 3 OPs com maior Refugo
         </p>
@@ -29,13 +29,14 @@ export function OPTopRefugoWidget({ setorId = null }) {
 
       </header>
 
-      <div className="mt-2">
+      <div className="mt-3 min-h-0 flex-1">
         <BarHorizontal
           data={formattedData}
           config={opTopRefugoConfig}
-          paddingTopClassName="pt-0.5"
-          heightClassName="h-[250px]"
-          yAxisWidth={140}
+          yAxisWidth={118}
+          heightClassName="h-full min-h-[220px]"
+          paddingTopClassName="pt-2"
+          barSize={36}
         />
       </div>
     </div>

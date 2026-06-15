@@ -29,6 +29,9 @@ export function SetorMotivosParadaWidget({ setorId }) {
           config={setorMotivosParadaConfig}
           loading={loading}
           error={error}
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
         />
       </div>
     </div>

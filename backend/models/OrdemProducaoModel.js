@@ -511,7 +511,11 @@ class OrdemProducaoModel {
         try {
             const resultado = await prisma.ordemProducao.groupBy({
                 by: ['status_op'],
-                where: { id_empresa, ...(setorId ? { id_setor: Number(setorId) } : {}) },
+                where: {
+                    id_empresa,
+                    ...(setorId ? { id_setor: Number(setorId) } : {}),
+                    status_op: { in: ['Em_Andamento', 'Parada', 'Setup', 'Finalizada'] }
+                },
                 _count: { status_op: true }
             })
 
@@ -520,7 +524,7 @@ class OrdemProducaoModel {
                 Em_Andamento: 'Em Produção',
                 Parada: 'Pausadas',
                 Setup: 'Pausadas (Setup)',
-                Aguardando: 'Aguardando Início'
+                Finalizada: 'Concluída'
             }
 
             return resultado.map(r => ({

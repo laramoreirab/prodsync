@@ -53,7 +53,6 @@ function publicarStatusRejeitado(dados, status, mensagem) {
 
 async function processarPareamento(dados, topic) {
   const resultado = await MaquinaModel.registrarSolicitacaoPareamentoPlaca({
-    id_empresa: dados.id_empresa,
     board_uid: dados.board_uid,
     mac: dados.mac,
     firmware_version: dados.firmware_version,

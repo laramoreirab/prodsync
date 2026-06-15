@@ -116,10 +116,6 @@ const colunasOrdemProd = [
         "Concluída": {
           variant: "concluida",
           label: "Concluída"
-        },
-        "Aguardando": {
-          variant: "aguardando",
-          label: "Aguardando Início"
         }
       };
 
@@ -149,6 +145,11 @@ const opcoesOrdenacao = [
   { label: "ID Decrescente", value: "id_desc" },
   { label: "Prioridade", value: "prioridade" },
   { label: "Status", value: "status" },
+];
+
+const filtrosOpsAplicaveis = [
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "Concluída"] },
+  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Media", "Média", "Alta", "Critica", "Crítica"] },
 ];
 
 const filtrosOps = [
@@ -285,7 +286,7 @@ export default function OrdensDeProducaoGestor() {
         actions={
           <>
             <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
-            <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
+            <FilterDropdown filtersConfig={filtrosOpsAplicaveis} onApply={aplicarFiltros} />
           </>
         }
       />

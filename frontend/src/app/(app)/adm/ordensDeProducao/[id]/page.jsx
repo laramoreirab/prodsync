@@ -189,10 +189,9 @@ const statusBadge = (status) => {
     Setup: "bg-amber-500/15 text-amber-900",
     Concluída: "bg-sky-500/15 text-sky-700",
     Finalizada: "bg-sky-500/15 text-sky-700",
-    "Aguardando Início": "bg-slate-500/15 text-slate-700",
   };
   const label =
-    status === "Em_Andamento" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";
+    status === "Em_Andamento" || status === "Aguardando" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";
   return (
     <Badge variant="outline" className={`text-sm font-semibold border-none ml-2 ${config[label] || ""}`}>
       {label}
