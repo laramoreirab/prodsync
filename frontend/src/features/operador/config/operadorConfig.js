@@ -31,6 +31,6 @@ export const producaoPorHoraConfig = {
 };
 
 export const produtividadeDiariaConfig = {
-  produzido: { label: "Produzido:", color: "var(--chart1)" },
+  produzido: { label: "Produzido:", color: "var(--chart2)" },
   meta:      { label: "Sua Meta:", color: "#b0bfd8" },
 };
