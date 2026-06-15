@@ -24,6 +24,7 @@ export function SetorOEEEvolucaoWidget({ setorId }) {
           xKey="dia"
           yKey="oee" 
           config={setorOEEEvolucaoConfig}
+          size="pequeno"
         />
       </div>
     </div>
