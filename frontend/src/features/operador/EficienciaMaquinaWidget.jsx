@@ -27,6 +27,9 @@ export function EficienciaMaquinaWidget({ operadorId }) {
       <BarHorizontal
         data={formattedData}
         config={eficienciaConfig}
+        paddingTopClassName="pt-0"
+        showValueLabels
+        hideTooltipLabel
       />
     </div>
   );

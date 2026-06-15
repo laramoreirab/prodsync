@@ -22,6 +22,9 @@ export function UsuarioTaxaRefugoWidget({ setorId }) {
           data={data}
           config={taxaRefugoUsuarioConfig}
           yKey="operador"
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
         />
       </div>
     </div>
