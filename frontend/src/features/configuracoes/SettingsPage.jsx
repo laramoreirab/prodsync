@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { KeyRound, LockKeyhole, Palette, Save, Trash2, Upload, UserRound } from "lucide-react"
+import { KeyRound, LockKeyhole, Palette, Save, Trash2, Upload, UserRound, EyeOff, Eye, CircleX, CircleCheck } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -106,8 +106,8 @@ function SettingsSidebar({ activeTab, onTabChange, tabs }) {
 function SectionTitle({ title, description }) {
   return (
     <div className="space-y-0.5">
-      <h2 className="text-base font-bold text-zinc-950 dark:text-zinc-100">{title}</h2>
-      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{description}</p>
+      <h2 className="text-xl font-bold text-zinc-950 dark:text-zinc-100">{title}</h2>
+      <p className="text-md font-medium text-zinc-500 dark:text-zinc-400">{description}</p>
     </div>
   )
 }
@@ -117,7 +117,7 @@ function SettingsInput(props) {
     <Input
       {...props}
       className={cn(
-        "h-7 rounded-md border-zinc-100 bg-white text-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100",
+        "h-8 rounded-md border-zinc-100 shadow-sm bg-white text-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100",
         props.className
       )}
     />
@@ -128,7 +128,7 @@ function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
   const hasPreview = Boolean(fotoPerfil?.preview)
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4 py-8 sm:min-h-64 lg:min-h-full lg:flex-1 lg:translate-y-7 lg:py-0">
+    <div className="flex w-full flex-col items-center justify-center py-8 sm:min-h-64 lg:min-h-full lg:flex-1 lg:translate-y-7 lg:py-0">
       <input
         type="file"
         ref={inputRef}
@@ -146,11 +146,6 @@ function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
           "hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:text-zinc-400 dark:hover:text-zinc-100"
         )}
       >
-        <span className="absolute left-0 top-0 h-14 w-14 rounded-tl-xl border-l-2 border-t-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
-        <span className="absolute right-0 top-0 h-14 w-14 rounded-tr-xl border-r-2 border-t-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
-        <span className="absolute bottom-0 left-0 h-14 w-14 rounded-bl-xl border-b-2 border-l-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
-        <span className="absolute bottom-0 right-0 h-14 w-14 rounded-br-xl border-b-2 border-r-2 border-zinc-300 transition-colors group-hover:border-zinc-500 dark:border-zinc-600 dark:group-hover:border-zinc-300" />
-
         {hasPreview ? (
           <img
             src={fotoPerfil.preview}
@@ -365,15 +360,21 @@ function AccountSettings({ role }) {
       <div className="w-full max-w-sm space-y-4">
         <SectionTitle
           title="Informações da Conta"
-          description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
+          description={isAdmin ? "Atualize suas informações pessoais" : "Visualize os dados do seu perfil"}
         />
+
         <form className="space-y-3" onSubmit={handleSubmitPerfil}>
+          <ProfilePhotoSelector
+            fotoPerfil={fotoPerfil}
+            inputRef={fileInputFotoRef}
+            onSelect={handleFotoChange}
+          />
           {fields.map(({ id, label, type = "text", readOnly }) => {
             const isDisabled = !isAdmin || readOnly
             const valorDoInput = formData[id] || ""
             return (
               <div key={id} className="space-y-1">
-                <label htmlFor={id} className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                <label htmlFor={id} className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
                   {label}
                 </label>
                 <SettingsInput
@@ -388,19 +389,15 @@ function AccountSettings({ role }) {
             )
           })}
           {(isAdmin || fotoPerfil?.raw) && (
-            <Button type="submit" disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
-              <Save className="size-4" />
+            <Button type="submit" disabled={salvando} className="cursor-pointer mt-4 h-10 rounded-lg bg-[#23304c] px-5 text-lg font-bold transition-all hover:scale-[1.02] shadow-md">
+              <Save className="size-5" />
               {salvando ? "Salvando..." : "Salvar Alterações"}
             </Button>
           )}
         </form>
       </div>
 
-      <ProfilePhotoSelector
-        fotoPerfil={fotoPerfil}
-        inputRef={fileInputFotoRef}
-        onSelect={handleFotoChange}
-      />
+
     </div>
   )
 }
@@ -409,10 +406,10 @@ function AppearanceSettings({ darkMode, onDarkModeChange }) {
   return (
     <div className="max-w-xl space-y-3">
       <SectionTitle title="Aparência" description="Personalize o visual do seu espaço." />
-      <div className="flex min-h-14 items-center justify-between gap-4 rounded-lg border border-zinc-300 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-950">
-        <div className="space-y-1">
-          <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Modo Escuro</h3>
-          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+      <div className="flex min-h-20 items-center justify-between gap-6 rounded-2xl border border-zinc-200 bg-white px-3 py-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="space-y-1.5">
+          <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-100">Modo Escuro</h3>
+          <p className="text-md font-medium text-zinc-500 dark:text-zinc-400">
             Alterne entre os temas claro e escuro.
           </p>
         </div>
@@ -420,7 +417,7 @@ function AppearanceSettings({ darkMode, onDarkModeChange }) {
           checked={darkMode}
           onCheckedChange={onDarkModeChange}
           aria-label="Ativar modo escuro"
-          className="data-checked:bg-(--status-neutral-text) data-unchecked:bg-[#c3c7c8] dark:data-checked:bg-[#7d95c6] dark:data-unchecked:bg-[#636f87]"
+          className="cursor-pointer scale-125 data-checked:bg-(--status-neutral-text) data-unchecked:bg-[#c3c7c8] dark:data-checked:bg-[#7d95c6] dark:data-unchecked:bg-[#636f87]"
         />
       </div>
     </div>
@@ -429,25 +426,26 @@ function AppearanceSettings({ darkMode, onDarkModeChange }) {
 
 const passwordRulesList = [
   { label: "Pelo menos 1 caractere especial (como !#$%@)", test: (v) => /[!@#$%^&*(),.?":{}|<>_\-=\[\];'\\/]/.test(v) },
-  { label: "Pelo menos 1 letra maiúscula (A-Z)", test: (v) => /[A-Z]/.test(v) },
+  { label: "Pelo menos 1 letra maiúscula.", test: (v) => /[A-Z]/.test(v) },
   { label: "No mínimo 8 caracteres", test: (v) => v.length >= 8 },
 ]
 
 function PasswordRuleList({ password }) {
   const hasPassword = password.length > 0
   return (
-    <ul className="space-y-0.5 pt-1 text-[10px] font-medium">
+    <ul className="space-y-1.5 pt-2 text-sm font-medium">
       {passwordRulesList.map(({ label, test }) => {
         const isValid = test(password)
         return (
           <li
             key={label}
             className={cn(
-              "text-zinc-500 dark:text-zinc-400",
+              "flex items-center gap-2 text-zinc-500 dark:text-zinc-400",
               hasPassword && (isValid ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")
             )}
           >
-            {isValid ? "✓" : "○"} {label}
+            <span >{isValid ? <CircleCheck className="h-4 w-5" /> : <CircleX className="h-4 w-5" />}</span>
+            {label}
           </li>
         )
       })}
@@ -459,6 +457,9 @@ function SecuritySettings({ role }) {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
+  const [showNew, setShowNew] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [carregando, setSincronizando] = useState(false)
   const [deletando, setDeletando] = useState(false)
   const [confirmCNPJ, setConfirmCNPJ] = useState("")
@@ -528,70 +529,100 @@ function SecuritySettings({ role }) {
   return (
     <div className="max-w-2xl space-y-5">
       <SectionTitle title="Segurança" description="Proteja sua conta com credenciais robustas." />
+
       <form className="space-y-3" onSubmit={handleSubmit}>
         <div className="space-y-1">
-          <label htmlFor="senhaAtual" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">Senha Atual</label>
+          <label htmlFor="senhaAtual" className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Senha Atual</label>
           <div className="relative max-w-sm">
             <LockKeyhole className="pointer-events-none absolute left-2 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-            <SettingsInput id="senhaAtual" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="pl-8" />
+            <SettingsInput id="senhaAtual" type={showCurrent ? "text" : "password"} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="pl-8 pr-12" />
+            <button
+              type="button"
+              onClick={() => setShowCurrent(!showCurrent)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+            >
+              {showCurrent ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
         </div>
         <div className="grid max-w-xl gap-3 sm:grid-cols-2">
           <div className="space-y-1">
-            <label htmlFor="novaSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">Nova Senha</label>
-            <SettingsInput id="novaSenha" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            <label htmlFor="novaSenha" className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Nova Senha</label>
+            <div className="relative">
+              <SettingsInput id="novaSenha" type={showNew ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="pr-12" />
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+              >
+                {showNew ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+
           </div>
           <div className="space-y-1">
-            <label htmlFor="confirmarSenha" className="text-xs font-bold text-zinc-950 dark:text-zinc-100">Confirmar Nova Senha</label>
-            <SettingsInput id="confirmarSenha" value={confirmPassword} type="password" onChange={(e) => setConfirmPassword(e.target.value)} />
+            <label htmlFor="confirmarSenha" className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Confirmar Nova Senha</label>
+            <div className="relative">
+              <SettingsInput id="confirmarSenha" value={confirmPassword} type={showConfirm ? "text" : "password"} onChange={(e) => setConfirmPassword(e.target.value)} className="pr-12" />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+              >
+                {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+
+            </div>
           </div>
         </div>
-        <PasswordRuleList password={newPassword} />
-        <Button type="submit" className="h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold" disabled={carregando || senhasNaoBatem}>
-          <Save className="size-4" />
-          {carregando ? "Salvando..." : "Salvar Senha"}
+        <div className="bg-zinc-50 dark:bg-zinc-900/40 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 max-w-2xl">
+          <h4 className="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2 uppercase tracking-wider">Requisitos da Senha</h4>
+          <PasswordRuleList password={newPassword} />
+        </div>
+        <Button type="submit" className=" flex items-center h-10 cursor-pointer rounded-lg bg-[#23304c] px-6 text-lg font-bold transition-all hover:scale-[1.02] shadow-md" disabled={carregando || senhasNaoBatem}>
+          <Save className="size-5" />
+          {carregando ? "Salvando..." : "Atualizar Senha"}
         </Button>
       </form>
 
       {showDeleteAccount && (
         <div className="border-t border-zinc-100 pt-4 dark:border-zinc-800">
-          <section className="rounded-lg border border-red-400 bg-red-50 px-4 py-4 dark:border-red-500/70 dark:bg-red-950/30">
-            <div className="flex items-center gap-2 text-red-600 dark:text-red-300">
-              <Trash2 className="size-4" />
-              <h3 className="text-sm font-bold">Deletar Conta da Empresa</h3>
+          <section className="rounded-2xl border border-red-200 bg-red-50 px-5 py-6 dark:border-red-500/70 dark:bg-red-950/30">
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <Trash2 className="size-5 -translate-y-0.5" />
+              <h3 className="text-xl font-bold leading-none">Deletar Conta</h3>
             </div>
-            <p className="mt-2 max-w-lg text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              Excluir permanentemente sua conta de Administrador e todos os dados da empresa. Esta ação é irreversível.
-            </p>
+            <p className="mt-2 max-w-2xl text-sm font-medium text-zinc-600 dark:text-zinc-300">
+              Excluir permanentemente sua conta de Administrador e todos os dados da empresa. Esta ação é irreversível e todos os dados de funcionários e máquinas serão perdidos.</p>
             {!mostrarConfirmacao ? (
               <Button type="button" variant="destructive" size="sm" onClick={() => setMostrarConfirmacao(true)}
-                className="mt-4 h-8 rounded-md bg-red-100 px-4 text-xs font-bold text-red-600 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-200 dark:hover:bg-red-500/30">
-                Excluir Conta
+                className="cursor-pointer mt-6 h-9 rounded-lg bg-red-600 px-6 text-base font-bold text-white hover:bg-red-700 shadow-sm transition-all">
+                Deletar Conta da Empresa
               </Button>
             ) : (
               <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-xs font-bold text-red-600 dark:text-red-400">Para confirmar, preencha os dados abaixo:</p>
+                <p className="text-base font-semibold text-red-700 dark:text-red-400">Para confirmar a exclusão permanente, preencha os dados abaixo:</p>
                 <div className="mt-3 grid max-w-md gap-3 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <label htmlFor="deleteCnpj" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">CNPJ da Empresa</label>
-                    <SettingsInput id="deleteCnpj" placeholder="00.000.000/0000-00" value={confirmCNPJ} className="placeholder:text-xs text-xs"
+                  <div className="space-y-2">
+                    <label htmlFor="deleteCnpj" className="text-sm font-bold text-zinc-600 dark:text-zinc-100">CNPJ da Empresa</label>
+                    <SettingsInput id="deleteCnpj" placeholder="00.000.000/0000-00" value={confirmCNPJ}
                       onChange={(e) => setConfirmCNPJ(aplicarMascaraCNPJ(e.target.value))} />
                   </div>
-                  <div className="space-y-1">
-                    <label htmlFor="deletePassword" className="text-xs font-bold text-zinc-600 dark:text-zinc-100">Senha de Administrador</label>
-                    <SettingsInput id="deletePassword" type="password" placeholder="Digite sua senha" className="placeholder:text-xs text-xs"
+                  <div className="space-y-2">
+                    <label htmlFor="deletePassword" className="text-sm font-bold text-zinc-600 dark:text-zinc-100">Senha de Administrador</label>
+                    <SettingsInput id="deletePassword" type="password" placeholder="Digite sua senha"
                       value={confirmPasswordDelete} onChange={(e) => setConfirmPasswordDelete(e.target.value)} />
                   </div>
                 </div>
-                <div className="mt-4 flex gap-3">
+                <div className="mt-6 flex flex-wrap gap-3">
                   <Button type="button" variant="destructive" onClick={handleDeletarContar} size="sm"
                     disabled={deletando || !confirmCNPJ || !confirmPasswordDelete}
-                    className="h-8 rounded-md bg-red-600 px-4 text-xs font-bold text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700">
+                    className="cursor-pointer h-8 rounded-md bg-red-600 px-4 text-sm font-bold text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700">
                     {deletando ? "Excluindo..." : "Confirmar Exclusão"}
                   </Button>
                   <Button type="button" variant="outline" size="sm" disabled={deletando}
                     onClick={() => { setMostrarConfirmacao(false); setConfirmCNPJ(""); setConfirmPasswordDelete("") }}
-                    className="h-8 rounded-md px-4 text-xs font-bold">
+                    className="cursor-pointer h-8 rounded-md px-4 text-base font-bold shadow-sm hover:bg-zinc-100 transition-all">
                     Cancelar
                   </Button>
                 </div>
@@ -625,9 +656,9 @@ export default function SettingsPage({ role = "operator" }) {
           title="Configurações"
           subtitle="Gerencie suas informações da conta e preferências."
         />
-      
 
-        <section className="flex min-h-87.5 overflow-hidden rounded-xl border border-zinc-100 bg-white/75 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+
+        <section className="flex min-h-87.5 overflow-hidden rounded-xl border border-zinc-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
           <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
           <div className="flex-1 p-4 sm:p-6">
             {activeTab === "conta" && <AccountSettings role={role} />}
