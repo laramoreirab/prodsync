@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
+import Lenis from 'lenis';
 import { Input } from "@/components/ui/input";
 import { enviarMensagemChat, analisarArquivoIA } from "@/services/aiService";
 import { Send, X, Loader2, Expand, Shrink, Paperclip } from "lucide-react";

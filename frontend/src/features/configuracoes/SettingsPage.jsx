@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
 import { toast } from "sonner"
-import { PageLayout } from "@/components/AnimatedComponents"
+import { PageLayout, PageHeader } from "@/components/AnimatedComponents"
 import { usuariosCrudService } from "@/services/usuariosCrudService"
 
 const adminTabs = [
@@ -363,37 +363,37 @@ function AccountSettings({ role }) {
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6 lg:flex-row lg:items-stretch lg:justify-between">
       <div className="w-full max-w-sm space-y-4">
-      <SectionTitle
-        title="Informações da Conta"
-        description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
-      />
-      <form className="space-y-3" onSubmit={handleSubmitPerfil}>
-        {fields.map(({ id, label, type = "text", readOnly }) => {
-          const isDisabled = !isAdmin || readOnly
-          const valorDoInput = formData[id] || ""
-          return (
-            <div key={id} className="space-y-1">
-              <label htmlFor={id} className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
-                {label}
-              </label>
-              <SettingsInput
-                id={id}
-                type={type}
-                disabled={isDisabled}
-                value={valorDoInput}
-                onChange={isDisabled ? undefined : handleInputChange}
-                className={cn(isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500")}
-              />
-            </div>
-          )
-        })}
-        {(isAdmin || fotoPerfil?.raw) && (
-          <Button type="submit" disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
-            <Save className="size-4" />
-            {salvando ? "Salvando..." : "Salvar Alterações"}
-          </Button>
-        )}
-      </form>
+        <SectionTitle
+          title="Informações da Conta"
+          description={isAdmin ? "Atualize suas informações pessoais" : "Visualização dos dados do seu perfil"}
+        />
+        <form className="space-y-3" onSubmit={handleSubmitPerfil}>
+          {fields.map(({ id, label, type = "text", readOnly }) => {
+            const isDisabled = !isAdmin || readOnly
+            const valorDoInput = formData[id] || ""
+            return (
+              <div key={id} className="space-y-1">
+                <label htmlFor={id} className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                  {label}
+                </label>
+                <SettingsInput
+                  id={id}
+                  type={type}
+                  disabled={isDisabled}
+                  value={valorDoInput}
+                  onChange={isDisabled ? undefined : handleInputChange}
+                  className={cn(isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500")}
+                />
+              </div>
+            )
+          })}
+          {(isAdmin || fotoPerfil?.raw) && (
+            <Button type="submit" disabled={salvando} className="mt-1 h-8 rounded-md bg-[#23304c] px-3 text-sm font-bold">
+              <Save className="size-4" />
+              {salvando ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          )}
+        </form>
       </div>
 
       <ProfilePhotoSelector
@@ -420,7 +420,7 @@ function AppearanceSettings({ darkMode, onDarkModeChange }) {
           checked={darkMode}
           onCheckedChange={onDarkModeChange}
           aria-label="Ativar modo escuro"
-          className="data-checked:bg-[var(--status-neutral-text)] data-unchecked:bg-[#c3c7c8] dark:data-checked:bg-[#7d95c6] dark:data-unchecked:bg-[#636f87]"
+          className="data-checked:bg-(--status-neutral-text) data-unchecked:bg-[#c3c7c8] dark:data-checked:bg-[#7d95c6] dark:data-unchecked:bg-[#636f87]"
         />
       </div>
     </div>
@@ -619,15 +619,15 @@ export default function SettingsPage({ role = "operator" }) {
 
   return (
     <PageLayout>
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-7 pb-10">
-        <header>
-          <h1 className="text-3xl font-bold text-zinc-950 dark:text-zinc-100">Configurações</h1>
-          <p className="text-base font-medium text-zinc-500 dark:text-zinc-400">
-            Gerencie suas informações da conta e preferências.
-          </p>
-        </header>
+      <div className="flex w-full flex-col gap-7 pb-10">
 
-        <section className="flex min-h-[350px] overflow-hidden rounded-xl border border-zinc-100 bg-white/75 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+        <PageHeader
+          title="Configurações"
+          subtitle="Gerencie suas informações da conta e preferências."
+        />
+      
+
+        <section className="flex min-h-87.5 overflow-hidden rounded-xl border border-zinc-100 bg-white/75 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
           <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
           <div className="flex-1 p-4 sm:p-6">
             {activeTab === "conta" && <AccountSettings role={role} />}
