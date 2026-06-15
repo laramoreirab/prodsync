@@ -14,7 +14,9 @@ export function TopMotivosTempoWidget({ setorId = null }) {
     return <p className="text-xs text-muted-foreground">Nenhum registro disponivel.</p>;
   }
 
-  const formattedData = data.map((item) => ({ ...item, setor: item.motivo }));
+  const formattedData = data
+    .slice(0, 3)
+    .map((item) => ({ ...item, setor: item.motivo }));
 
   return (
     <div className="p-5 h-full">
@@ -30,6 +32,10 @@ export function TopMotivosTempoWidget({ setorId = null }) {
         <BarHorizontal
           data={formattedData}
           config={topMotivosTempoConfig}
+          yAxisWidth={130}
+          heightClassName="h-[230px]"
+          paddingTopClassName="pt-4"
+          barSize={42}
         />
       </div>
     </div>

@@ -55,11 +55,11 @@ const dadosOriginais = [
   { id: 2, nome: 'Carlos Souza', prioridade: 'Crítica', setor: 'Gestor', status_op: 'Setup', progresso: '35%' },
   { id: 3, nome: 'Bruno Costa', prioridade: 'Alta', setor: 'Operador', status_op: 'Parada', progresso: '55%' },
   { id: 4, nome: 'Bia Gonçalves', prioridade: 'Média', setor: 'Gestor', status_op: 'Setup', progresso: '85%' },
-  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
-  { id: 6, nome: 'Carol Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
-  { id: 7, nome: 'Guilherme Santos', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+  { id: 5, nome: 'Julia Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Produzindo', progresso: '15%' },
+  { id: 6, nome: 'Carol Silva', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Parada', progresso: '15%' },
+  { id: 7, nome: 'Guilherme Santos', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Setup', progresso: '15%' },
   { id: 8, nome: 'Felipe Moraes', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Concluída', progresso: '15%' },
-  { id: 9, nome: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Aguardando Início', progresso: '15%' },
+  { id: 9, nome: 'Arthur Martins', prioridade: 'Baixa', setor: 'Gestor', status_op: 'Produzindo', progresso: '15%' },
 ];
 
 
@@ -67,7 +67,7 @@ const dadosOriginais = [
 
 const opsFilter = [
   { id: "setor", label: "Setor", type: "checkbox", options: ["Roscas", "Engrenagens"] },
-  { id: "status_op", label: "Status", type: "checkbox", options: ["Aguardando", "Concluída", "Produzindo", "Parada", "Setup"] },
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Concluída", "Produzindo", "Parada", "Setup"] },
   { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Crítica", "Alta", "Média", "Baixa"] },
   { id: "progresso", label: "Progresso", type: "number-range" }
 ];
@@ -153,10 +153,6 @@ const colunasOrdemProd = [
         "Concluída": {
           variant: "concluida",
           label: "Concluída"
-        },
-        "Aguardando": {
-          variant: "aguardando",
-          label: "Aguardando Início"
         }
       };
 

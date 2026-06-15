@@ -5,7 +5,7 @@ import TurnoModel from '../models/TurnoModel.js';
 import { fileURLToPath } from 'url';
 
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
-const STATUS_OP_ATIVOS = ['Em_Andamento', 'Parada', 'Setup', 'Aguardando'];
+const STATUS_OP_ATIVOS = ['Em_Andamento', 'Parada', 'Setup'];
 const STATUS_PARADA = ['Parada', 'Setup', 'Manutencao'];
 
 const config = {
@@ -234,7 +234,7 @@ async function getOrCreateOrdemAtiva(id_empresa, maquina) {
       data_fim: addDays(new Date(), randomInt(1, 5)),
       observacao_op: `OP criada automaticamente para simular producao real da maquina ${maquina.nome}.`,
       prioridade: sample(['Baixa', 'Media', 'Alta']),
-      status_op: 'Aguardando',
+      status_op: 'Em_Andamento',
       setores: { connect: [{ id_setor: maquina.id_setor_simulado }] },
     },
   });
