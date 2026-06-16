@@ -38,7 +38,7 @@ import {
   DetailActions,
 } from "@/components/DetailComponents";
 
-const turnoLabel = { 1: "Manhã", 2: "Tarde", 3: "Noite" };
+const turnoLabel = { 1: "Manhã", 2: "Tarde", 3: "Noite" }
 
 const opcoesOrdenacao = [
   { value: "nome", label: "Ordem Alfabética" },
@@ -55,13 +55,15 @@ const usuariosFilter = [
 const colunasUsuarios = [
   { id: "nome", key: "nome", label: "Nome", className: "w-1/5" },
   { id: "id", key: "id", label: "ID", className: "w-40" },
-  { id: "maquina", key: "maquina", label: "Maquina", className: "pl-16" }, // Ajustado pl-15 para pl-16 (padrão Tailwind)
+  { id: "oee_medio", key: "oee_medio", label: "OEE Médio", className: "w-45" },
+  { id: "maquina", key: "maquina", label: "Maquina", className: "pl-16" },
   {
-    id: "id_turno",
-    key: "id_turno",
+    id: "turno",
+    key: "turno",
     label: "Turno",
     icone: (valor) => turnoLabel[String(valor)] || valor || "-",
   },
+  
 ];
 
 // Função auxiliar para tratar o OEE (caso venha como string ex: "85%")
@@ -81,7 +83,7 @@ function normalizarOperador(usuario) {
 export default function UsuariosGestor() {
   const { usuarios, loading, refresh } = useUsuarios();
   const { setorId } = usePerfil();
-  
+
   // Estados apenas para os critérios de exibição
   const [busca, setBusca] = useState("");
   const [ordenacao, setOrdenacao] = useState("");
@@ -171,7 +173,7 @@ export default function UsuariosGestor() {
       <KPIGrid cols={3} className="mt-4">
         <KPICardDecorated><QtdUsuariosWidget setorId={setorId} /></KPICardDecorated>
         <WidgetCard><TurnosOperadoresWidget setorId={setorId} /></WidgetCard>
-        <WidgetCard><TopOperadoresWidget setorId={setorId}/></WidgetCard>
+        <WidgetCard><TopOperadoresWidget setorId={setorId} /></WidgetCard>
       </KPIGrid>
 
       <ContentGrid cols={2} className="mt-6">
