@@ -56,7 +56,7 @@ import {
 // ─── Colunas ───────────────────────────────────────────────────────────────
 
 const colunasMaquina = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'numero_evento', key: 'numero_evento', label: 'ID', className: 'w-20 text-center justify-center' },
   {
     id: 'tipo', key: 'tipoEvento', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
@@ -254,8 +254,8 @@ export default function MaquinaDetalhePage({ params }) {
   const handleSortEventos = (criterio) => {
     const copia = [...dados];
     copia.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'id_asc') return Number(a.numero_evento) - Number(b.numero_evento);
+      if (criterio === 'id_desc') return Number(b.numero_evento) - Number(a.numero_evento);
       if (criterio === 'data_asc') return parseData(a.data) - parseData(b.data);
       if (criterio === 'data_desc') return parseData(b.data) - parseData(a.data);
       if (criterio === 'duracao_asc') { const [hA, mA] = a.duracao.split(':').map(Number); const [hB, mB] = b.duracao.split(':').map(Number); return (hA * 60 + mA) - (hB * 60 + mB); }
@@ -315,6 +315,7 @@ export default function MaquinaDetalhePage({ params }) {
     return (
       (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
       (evento.motivo?.toLowerCase() || "").includes(termo) ||
+      evento.numero_evento?.toString().includes(termo) ||
       evento.id?.toString().includes(termo)
     );
   });

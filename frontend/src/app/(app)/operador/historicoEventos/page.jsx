@@ -180,6 +180,7 @@ export default function HistoricoEventos() {
     const termo = busca.toLowerCase();
     return (
       evento.tipo?.toLowerCase().includes(termo) ||
+      evento.numero_evento?.toString().includes(termo) ||
       evento.id?.toString().includes(termo) ||
       evento.motivo?.toLowerCase().includes(termo)
     );
