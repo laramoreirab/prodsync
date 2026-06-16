@@ -128,7 +128,7 @@ function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
   const hasPreview = Boolean(fotoPerfil?.preview)
 
   return (
-    <div className="flex w-full flex-col items-center justify-center py-8 sm:min-h-64 lg:min-h-full lg:flex-1 lg:translate-y-7 lg:py-0">
+    <div className="flex w-full flex-col sm:min-h-64 lg:min-h-full lg:flex-1 lg:py-0">
       <input
         type="file"
         ref={inputRef}
@@ -142,7 +142,7 @@ function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
         onClick={() => inputRef.current?.click()}
         aria-label="Selecionar foto de perfil"
         className={cn(
-          "group relative flex size-56 cursor-pointer items-center justify-center bg-transparent text-zinc-500 transition-colors",
+          "group relative flex size-35 mb-2 cursor-pointer items-center justify-center bg-transparent text-zinc-500 transition-colors",
           "hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:text-zinc-400 dark:hover:text-zinc-100"
         )}
       >
@@ -150,13 +150,13 @@ function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
           <img
             src={fotoPerfil.preview}
             alt="Foto de perfil"
-            className="size-40 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-700"
+            className="size-35 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-700"
             onError={(event) => {
               event.currentTarget.src = defaultAvatarSrc
             }}
           />
         ) : (
-          <Upload className="size-24 stroke-[1.7]" />
+          <img src="/userdefault.svg" alt="Foto de perfil padrão" className="size-30 rounded-full object-cover" />
         )}
       </button>
 
@@ -364,36 +364,44 @@ function AccountSettings({ role }) {
         />
 
         <form className="space-y-3" onSubmit={handleSubmitPerfil}>
-          <ProfilePhotoSelector
-            fotoPerfil={fotoPerfil}
-            inputRef={fileInputFotoRef}
-            onSelect={handleFotoChange}
-          />
-          {fields.map(({ id, label, type = "text", readOnly }) => {
-            const isDisabled = !isAdmin || readOnly
-            const valorDoInput = formData[id] || ""
-            return (
-              <div key={id} className="space-y-1">
-                <label htmlFor={id} className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                  {label}
-                </label>
-                <SettingsInput
-                  id={id}
-                  type={type}
-                  disabled={isDisabled}
-                  value={valorDoInput}
-                  onChange={isDisabled ? undefined : handleInputChange}
-                  className={cn(isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500")}
-                />
-              </div>
-            )
-          })}
-          {(isAdmin || fotoPerfil?.raw) && (
-            <Button type="submit" disabled={salvando} className="cursor-pointer mt-4 h-10 rounded-lg bg-[#23304c] px-5 text-lg font-bold transition-all hover:scale-[1.02] shadow-md">
-              <Save className="size-5" />
-              {salvando ? "Salvando..." : "Salvar Alterações"}
-            </Button>
-          )}
+          <div className="flex flex-col justify-start">
+            <div>
+              <ProfilePhotoSelector
+                fotoPerfil={fotoPerfil}
+                inputRef={fileInputFotoRef}
+                onSelect={handleFotoChange}
+              />
+            </div>
+            <div>
+              {fields.map(({ id, label, type = "text", readOnly }) => {
+                const isDisabled = !isAdmin || readOnly
+                const valorDoInput = formData[id] || ""
+                return (
+                  <div key={id} className="space-y-1">
+                    <label htmlFor={id} className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      {label}
+                    </label>
+                    <SettingsInput
+                      id={id}
+                      type={type}
+                      disabled={isDisabled}
+                      value={valorDoInput}
+                      onChange={isDisabled ? undefined : handleInputChange}
+                      className={cn(isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500")}
+                    />
+                  </div>
+                )
+              })}
+              {(isAdmin || fotoPerfil?.raw) && (
+                <Button type="submit" disabled={salvando} className="cursor-pointer mt-4 h-10 rounded-lg bg-[#23304c] px-5 text-lg font-bold transition-all hover:scale-[1.02] shadow-md">
+                  <Save className="size-5" />
+                  {salvando ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+              )}
+            </div>
+          </div>
+
+
         </form>
       </div>
 
