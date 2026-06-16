@@ -26,6 +26,7 @@ export default function DetalhesEvento({ eventoId }) {
     const [observacao, setObservacao] = useState('');
     const [inicioData, setInicioData] = useState('');
     const [inicioHora, setInicioHora] = useState('');
+    const [nomeMotivo, setNomeMotivo] = useState('');
     const [fimData, setFimData] = useState('');
     const [fimHora, setFimHora] = useState('');
 
@@ -38,6 +39,7 @@ export default function DetalhesEvento({ eventoId }) {
                 setMaquinasSelecionadas(dados.maquina ? [dados.maquina] : []);
                 setOpsSelecionadas(dados.op_afetada ? [dados.op_afetada] : []);
                 setIdMotivoPrincipal(dados.id_motivo_parada || '');
+                setNomeMotivo(dados.motivo || '');
                 setObservacao(dados.observacao || '');
                 setDadosEvento(dados);
                 // Nova função interna blindada
@@ -81,8 +83,6 @@ export default function DetalhesEvento({ eventoId }) {
         if (eventoId) buscarDados();
     }, [eventoId]);
 
-    // helpers de exibição
-    const nomeMotivo = OPCOES_MOTIVO.find(m => m.value === Number(idMotivoPrincipal))?.label;
 
     return (
         <>

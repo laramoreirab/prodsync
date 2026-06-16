@@ -68,7 +68,7 @@ const normalizarEvento = (evento) => {
     inicio: evento.inicio,
     fim,
     motivo: evento.motivo ?? evento.motivo_parada?.descricao ?? "Aguardando Justificativa",
-    observacao: evento.observacao || "-",
+    observacao: evento.observacao || "Sem observação",
     data: evento.data ?? formatarDataEvento(evento.inicio, fim),
     duracao: evento.duracao_formatada ?? formatarDuracao(evento.inicio, fim, evento.duracao),
     justificada: Boolean(evento.justificada ?? evento.id_motivo_parada),

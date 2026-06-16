@@ -177,11 +177,11 @@ export default function DetalhesEvento({ eventoId }) {
                             <span className="text-xl font-medium text-[#333333]">
                                 {nomeMotivo ? (
                                     <p className="text-[#333333] font-medium text-xl">
-                                    {nomeMotivo}
-                                </p>
+                                        {nomeMotivo}
+                                    </p>
                                 ) :
-                                (<span className="text-xl font-medium text-[#333333]">Não justificado</span>
-                            )}
+                                    (<span className="text-xl font-medium text-[#333333]">Não justificado</span>
+                                    )}
                             </span>
                         </div>
 

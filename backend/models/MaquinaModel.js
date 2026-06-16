@@ -1578,7 +1578,7 @@ class MaquinaModel {
                             select: {
                                 id_motivo: true,
                                 descricao: true,
-                                tipo: true
+                                tipo: true,
                             }
                         },
                         ordem_producao: {
@@ -1629,6 +1629,7 @@ class MaquinaModel {
                 inicio: evento.inicio,
                 fim: evento.termino,
                 duracao_minutos: evento.duracao ?? this.calcularDuracaoMinutos(evento.inicio, evento.termino),
+                observacao: evento.observacao === '' ? 'Sem observação' : evento.observacao,
                 motivo: evento.motivo_parada?.descricao ?? null,
                 produzido: 0,
                 refugo: 0,

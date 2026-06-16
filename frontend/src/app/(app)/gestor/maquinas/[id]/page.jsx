@@ -253,7 +253,7 @@ export default function MaquinaDetalheGestor({ params }) {
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
             refugo: String(item.refugo || 0),
-            observacao: item.motivo || "Não justificado",
+            observacao: item.observacao || "Sem observação",
           }));
 
         setTodosEventos(eventos);
