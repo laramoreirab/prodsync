@@ -88,9 +88,9 @@ const prioridadeBadge = (prioridade) => {
   const valor = prioridade || "";
   const config = {
     Média: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-sky-600" /> },
-    Alta: { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700", icon: <AlertTriangle className="text-amber-600" /> },
+    Alta: { className: "border border-[var(--amarelo)] bg-transparent", icon: <AlertTriangle className="text-amber-600" /> },
     Crítica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-rose-600" /> },
-    Baixa: { className: "border border-slate-400/30 bg-slate-100 text-slate-700", icon: <ArrowDown className="text-slate-400" /> },
+    Baixa: { className: "border border-gray-400 text-sm bg-transparent text-black", icon: <ArrowDown className="text-slate-400" /> },
   };
   const item = config[valor] || { icon: null, className: "" };
   const label = valor === "Critica" ? "Crítica" : valor === "Media" ? "Média" : valor;

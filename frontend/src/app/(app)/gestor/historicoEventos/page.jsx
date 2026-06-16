@@ -39,8 +39,8 @@ import {
 
 
 const colunasEventos = [
-  { id: "numero_evento", key: "numero_evento", label: "ID", className: "w-25 text-center justify-center" },
-  { id: "nome", key: "nome", label: "Nome" },
+  { id: "numero_evento", key: "numero_evento", label: "ID", className: "w-10 text-center justify-center" },
+  { id: "nome", key: "nome", label: "Nome", className: "w-1/9" },
   {
     id: "status",
     key: "status",
@@ -71,8 +71,8 @@ const colunasEventos = [
     label: "Duracao",
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
-  { id: "motivo", key: "motivo", label: "Motivo" },
-  { id: "observacao", key: "observacao", label: "Observacao" },
+  { id: "motivo", key: "motivo", label: "Motivo", className: "truncate max-w-[245px]" },
+  { id: "observacao", key: "observacao", label: "Observacao",className: "truncate max-w-[200px]" },
 ];
 
 const historicoEventosFilter = [
