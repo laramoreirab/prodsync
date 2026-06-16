@@ -3,7 +3,17 @@ import EventoModel from '../models/EventoModel.js';
 import MaquinaModel from '../models/MaquinaModel.js';
 
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
-const TOPICOS = ['phietro/fabrica/+/status', 'phietro/fabrica/pareamento'];
+const TOPICO_STATUS_FILTRO = 'phietro/fabrica/+/status';
+const TOPICO_PAREAMENTO = 'phietro/fabrica/pareamento';
+const MQTT_SHARED_GROUP = process.env.MQTT_SHARED_GROUP || 'prodsync-backend';
+const USAR_SHARED_SUBSCRIPTION = process.env.MQTT_SHARED_SUBSCRIPTIONS !== 'false';
+const montarTopicoAssinatura = (topico) => (
+  USAR_SHARED_SUBSCRIPTION ? `$share/${MQTT_SHARED_GROUP}/${topico}` : topico
+);
+const TOPICOS = [
+  montarTopicoAssinatura(TOPICO_STATUS_FILTRO),
+  montarTopicoAssinatura(TOPICO_PAREAMENTO)
+];
 
 function topicoControlePlaca(board_uid) {
   return `phietro/fabrica/${board_uid}/controle`;
@@ -100,7 +110,7 @@ clienteMQTT.on('message', async (topic, message) => {
   try {
     dados = JSON.parse(message.toString());
 
-    if (topic === 'phietro/fabrica/pareamento' || dados.tipo === 'PAIRING_REQUEST') {
+    if (topic === TOPICO_PAREAMENTO || dados.tipo === 'PAIRING_REQUEST') {
       await processarPareamento(dados, topic);
       return;
     }
