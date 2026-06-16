@@ -212,7 +212,7 @@ export default function MaquinaDetalhePage({ params }) {
             tipoEvento: item.tipo === "Setup" ? "Setup" : "Parada",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
-            motivo: item.motivo || "-",
+            motivo: item.motivo || "Não justificado",
           }));
         const apontamentos = historico
           .filter((item) => item.tipo === "Producao")
@@ -224,7 +224,7 @@ export default function MaquinaDetalhePage({ params }) {
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
             refugo: String(item.refugo || 0),
-            observacao: item.motivo || "-",
+            observacao: item.motivo || "Não justificada",
           }));
         setTodosEventos(eventos);
         setDados(eventos);

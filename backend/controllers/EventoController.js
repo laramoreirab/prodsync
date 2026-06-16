@@ -384,14 +384,7 @@ class EventoController {
                 return res.status(400).json({ sucesso: false, erro: 'ID do evento inválido' });
             }
 
-            const evento = await prisma.historico_Eventos.findFirst({
-                where: { id_evento, id_empresa },
-                include: {
-                    maquina: { select: { id_maquina: true, nome: true, serie: true } },
-                    motivo_parada: { select: { id_motivo: true, descricao: true, tipo: true } },
-                    turno: { select: { id_turno: true, nome_turno: true } }
-                }
-            });
+            const evento = await EventoModel.buscarPorId(id_evento, id_empresa)
 
             if (!evento) {
                 return res.status(404).json({ sucesso: false, erro: 'Evento não encontrado' });

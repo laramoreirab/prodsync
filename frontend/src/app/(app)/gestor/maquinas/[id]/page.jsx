@@ -238,7 +238,7 @@ export default function MaquinaDetalheGestor({ params }) {
             tipoEvento: item.tipo === "Setup" ? "Setup" : "Parada",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
-            motivo: item.motivo || "-",
+            motivo: item.motivo || "Não Justificado",
           }));
         const apontamentos = historico
           .filter((item) => item.tipo === "Producao")
@@ -253,7 +253,7 @@ export default function MaquinaDetalheGestor({ params }) {
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
             refugo: String(item.refugo || 0),
-            observacao: item.motivo || "-",
+            observacao: item.observacao || "Sem observação",
           }));
 
         setTodosEventos(eventos);

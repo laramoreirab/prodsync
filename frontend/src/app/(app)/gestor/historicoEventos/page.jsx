@@ -35,7 +35,7 @@ import {
   LoadingState,
   WidgetCard,
   ContentGrid,
-} from "@/components/AnimatedComponents";
+} from "@/components/AnimatedComponents"; 
 
 
 const colunasEventos = [

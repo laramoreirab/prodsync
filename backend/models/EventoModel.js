@@ -702,6 +702,25 @@ class EventoModel {
         }
     }
 
+    static async buscarPorId(id_evento, id_empresa){
+        try {
+              const resposta = await prisma.historico_Eventos.findFirst({
+                where: { id_evento, id_empresa },
+                include: {
+                    maquina: { select: { id_maquina: true, nome: true, serie: true } },
+                    motivo_parada: { select: { id_motivo: true, descricao: true, tipo: true } },
+                    turno: { select: { id_turno: true, nome_turno: true } }
+                }
+            });
+
+            return resposta
+            
+        } catch (error) {
+            console.error('Erro buscar evento por ID no banco de dados', error);
+            throw error;
+        }
+    }
+
     // -----------------------------------------------Dashboard de Eventos -------------------------------------------------------------------------------
 
     static async tempoParadoTempoProduzindoEvento(id_empresa, setorId = null) {
