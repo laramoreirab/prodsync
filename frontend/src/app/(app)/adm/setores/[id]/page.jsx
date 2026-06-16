@@ -172,10 +172,10 @@ export default function SetorEspecificoPage({ params }) {
 
   const normalizarMaquina = (maquina) => ({
     ...maquina,
-    oee_atual: maquina.oee_atual ?? "-",
-    operador: maquina.operador?.nome ?? maquina.operador ?? maquina.operador_atual ?? "-",
-    status: maquina.status_atual || maquina.status || "-",
-    ultima_parada: maquina.ultima_parada ?? maquina.ultimo_evento?.inicio ?? "-",
+    oee_atual: maquina.oee_atual ?? "0%",
+    operador: maquina.operador?.nome ?? maquina.operador ?? maquina.operador_atual ?? "Sem operador",
+    status: maquina.status_atual || maquina.status || "Parada",
+    ultima_parada: maquina.ultima_parada ?? maquina.ultimo_evento?.inicio ?? "Ativo",
   });
 
   const normalizarOperador = (usuario) => ({
@@ -184,8 +184,8 @@ export default function SetorEspecificoPage({ params }) {
     funcao: usuario.funcao ?? usuario.tipo ?? "Operador",
     turno: usuario.turnos?.length
       ? [...new Set(usuario.turnos.map((turno) => turno.nome_turno).filter(Boolean))].join(", ")
-      : usuario.turno?.nome_turno ?? usuario.turno ?? "-",
-    oee_medio: usuario.oee_medio ?? "-",
+      : usuario.turno?.nome_turno ?? usuario.turno ?? "Sem turno",
+    oee_medio: usuario.oee_medio ?? "0%",
   });
 
   const refresh = useCallback(async () => {
@@ -204,8 +204,8 @@ export default function SetorEspecificoPage({ params }) {
     const gestoresAtualizados = (setorAtual.gestores || []).map(({ gestor }) => ({
       ...gestor,
       funcao: "Gestor",
-      turno: "-",
-      oee_medio: "-",
+      turno: "Sem turno",
+      oee_medio: "0%",
     }));
     const usuariosAtualizados = [...gestoresAtualizados, ...operadoresAtualizados];
     const turnosAtualizados = turnosResp.dados || [];

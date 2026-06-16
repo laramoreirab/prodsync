@@ -38,13 +38,38 @@ export default function DetalhesEvento({ eventoId }) {
                 setIdMotivoPrincipal(dados.id_motivo_parada || '');
                 setObservacao(dados.observacao || '');
                 setDadosEvento(dados);
+               // Nova função interna blindada
+                const extrairEFormatar = (dataOriginal) => {
+                    if (!dataOriginal) return { data: '', hora: '' };
+                    
+                    // Separa a data da hora (aceita 'T' do padrão ISO ou espaço de SQL)
+                    const [dataParte, horaParte] = String(dataOriginal).trim().split(/[T ]/);
+                    
+                    let dataCerta = dataParte;
+                    // Se a data tem traço e começa com o ano (YYYY-MM-DD), inverte para DD/MM/YYYY
+                    if (dataParte && dataParte.includes('-')) {
+                        const [ano, mes, dia] = dataParte.split('-');
+                        if (ano.length === 4) {
+                            dataCerta = `${dia}/${mes}/${ano}`;
+                        }
+                    }
+
+                    return {
+                        data: dataCerta,
+                        hora: horaParte ? horaParte.slice(0, 5) : '' // Pega apenas HH:MM
+                    };
+                };
+
+                // Aplica a formatação ANTES de salvar no estado
                 if (dados.inicio) {
-                    setInicioData(dados.inicio.split('T')[0]);
-                    setInicioHora(dados.inicio.split('T')[1]?.slice(0, 5) || '');
+                    const formatado = extrairEFormatar(dados.inicio);
+                    setInicioData(formatado.data);
+                    setInicioHora(formatado.hora);
                 }
                 if (dados.fim) {
-                    setFimData(dados.fim.split('T')[0]);
-                    setFimHora(dados.fim.split('T')[1]?.slice(0, 5) || '');
+                    const formatado = extrairEFormatar(dados.fim);
+                    setFimData(formatado.data);
+                    setFimHora(formatado.hora);
                 }
             } catch (error) {
                 toast.error("Erro ao carregar dados do evento.");
@@ -85,7 +110,7 @@ export default function DetalhesEvento({ eventoId }) {
                                 className="px-3 text-lg" >
                                 {tipoEvento}
                             </Badge>
-                        </div>       
+                        </div>
 
                         {/* Ordens de Produção */}
                         <div className="flex flex-col gap-1.5">

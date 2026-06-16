@@ -1567,7 +1567,7 @@ class MaquinaModel {
 
     static async obterHistoricoEventosTabela(id_maquina, id_empresa, limite = 50) {
         try {
-            const [eventos, apontamentos] = await Promise.all([
+            const [eventos, idsEventosMaquina, apontamentos] = await Promise.all([
                 prisma.historico_Eventos.findMany({
                     where: {
                         id_maquina,
@@ -1578,7 +1578,7 @@ class MaquinaModel {
                             select: {
                                 id_motivo: true,
                                 descricao: true,
-                                tipo: true
+                                tipo: true,
                             }
                         },
                         ordem_producao: {
@@ -1589,10 +1589,19 @@ class MaquinaModel {
                             }
                         }
                     },
-                    orderBy: {
-                        inicio: 'desc'
-                    },
+                    orderBy: [
+                        { inicio: 'desc' },
+                        { id_evento: 'desc' }
+                    ],
                     take: limite
+                }),
+                prisma.historico_Eventos.findMany({
+                    where: {
+                        id_maquina,
+                        id_empresa
+                    },
+                    select: { id_evento: true },
+                    orderBy: { id_evento: 'asc' }
                 }),
                 prisma.apontamento.findMany({
                     where: {
@@ -1621,14 +1630,19 @@ class MaquinaModel {
                 })
             ]);
 
-            const historicoEventos = eventos.map(evento => ({
+            const numeroEventoMaquina = new Map(idsEventosMaquina.map((evento, index) => [evento.id_evento, index + 1]));
+
+            const historicoEventos = eventos.map((evento, index) => ({
                 id: evento.id_evento,
                 id_evento: evento.id_evento,
+                numero_evento: numeroEventoMaquina.get(evento.id_evento) ?? index + 1,
+                numero_evento_maquina: numeroEventoMaquina.get(evento.id_evento) ?? index + 1,
                 tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
                 data: evento.inicio,
                 inicio: evento.inicio,
                 fim: evento.termino,
                 duracao_minutos: evento.duracao ?? this.calcularDuracaoMinutos(evento.inicio, evento.termino),
+                observacao: evento.observacao === '' ? 'Sem observação' : evento.observacao,
                 motivo: evento.motivo_parada?.descricao ?? null,
                 produzido: 0,
                 refugo: 0,

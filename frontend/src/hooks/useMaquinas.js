@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { maquinaCrudService } from '@/services/maquinaCrudService';
 
-const normalizarStatusMaquina = (status) => (status === 'Manutencao' ? 'Parada' : status);
+const normalizarStatusMaquina = (status) => (status === 'Setup' ? 'Parada' : status);
 
 export function useMaquinas() {
   const [maquinas, setMaquinas] = useState([]);
@@ -87,3 +87,5 @@ export function useMaquinas() {
     excluirMaquina
   };
 }
+
+

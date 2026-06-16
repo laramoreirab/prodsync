@@ -69,6 +69,25 @@ export function AppSidebar({ ...props }) {
     estavaAbertaRef.current = null;
   };
 
+  const { isMobile, open, setOpen } = useSidebar()
+  const estavaAbertaRef = useRef(null)
+
+
+  const handleNotificationOpenChange = (aberto) => {
+    if (isMobile) return
+
+    if (aberto) {
+      estavaAbertaRef.current = open
+      if (!open) setOpen(true)
+      return
+    }
+
+    if (estavaAbertaRef.current === false) {
+      setOpen(false)
+    }
+    estavaAbertaRef.current = null
+  }
+
   return (
     <Sidebar
       collapsible="icon"

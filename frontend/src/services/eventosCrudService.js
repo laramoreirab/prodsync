@@ -59,6 +59,9 @@ const normalizarEvento = (evento) => {
   return {
     ...evento,
     id: evento.id ?? evento.id_evento,
+    numero_evento: evento.numero_evento ?? evento.numero_evento_empresa ?? evento.numero_evento_maquina ?? evento.id ?? evento.id_evento,
+    numero_evento_empresa: evento.numero_evento_empresa ?? evento.numero_evento,
+    numero_evento_maquina: evento.numero_evento_maquina ?? evento.numero_evento,
     tipo,
     status: normalizarStatusMaquinaEvento(evento.status ?? tipo),
     status_maquina: statusMaquina,
@@ -68,7 +71,7 @@ const normalizarEvento = (evento) => {
     inicio: evento.inicio,
     fim,
     motivo: evento.motivo ?? evento.motivo_parada?.descricao ?? "Aguardando Justificativa",
-    observacao: evento.observacao || "-",
+    observacao: evento.observacao || "Sem observação",
     data: evento.data ?? formatarDataEvento(evento.inicio, fim),
     duracao: evento.duracao_formatada ?? formatarDuracao(evento.inicio, fim, evento.duracao),
     justificada: Boolean(evento.justificada ?? evento.id_motivo_parada),
@@ -91,6 +94,31 @@ const apiService = {
   async getAll(pagina = 1, limite = 50) {
     const response = await apiFetch(`${API_URL}?pagina=${pagina}&limite=${limite}`);
     return normalizarListaResposta(response);
+  },
+
+  async getAllPages(limite = 100) {
+    const primeiraPagina = await this.getAll(1, limite);
+    const totalPaginas = Number(primeiraPagina?.meta?.totalPaginas) || 1;
+    const dados = [...(primeiraPagina?.dados ?? [])];
+
+    if (totalPaginas > 1) {
+      const paginasRestantes = await Promise.all(
+        Array.from({ length: totalPaginas - 1 }, (_, index) => this.getAll(index + 2, limite))
+      );
+
+      for (const pagina of paginasRestantes) {
+        dados.push(...(pagina?.dados ?? []));
+      }
+    }
+
+    const idsVistos = new Set();
+    return dados.filter((evento) => {
+      const id = evento?.id ?? evento?.id_evento;
+      if (!id) return true;
+      if (idsVistos.has(id)) return false;
+      idsVistos.add(id);
+      return true;
+    });
   },
 
   async getById(id) {

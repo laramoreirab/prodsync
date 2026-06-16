@@ -157,7 +157,10 @@ class EventoModel {
                         select: { id_turno: true, nome_turno: true, dia_semana: true }
                     }
                 },
-                orderBy: { id_evento: 'asc' }
+                orderBy: [
+                    { inicio: 'desc' },
+                    { id_evento: 'desc' }
+                ]
             };
 
             return await paginarPrisma(prisma.historico_Eventos, regrasDaBusca, paginacao);
@@ -698,6 +701,25 @@ class EventoModel {
             });
         } catch (error) {
             console.error('Erro salvar justificativa:', error);
+            throw error;
+        }
+    }
+
+    static async buscarPorId(id_evento, id_empresa){
+        try {
+              const resposta = await prisma.historico_Eventos.findFirst({
+                where: { id_evento, id_empresa },
+                include: {
+                    maquina: { select: { id_maquina: true, nome: true, serie: true } },
+                    motivo_parada: { select: { id_motivo: true, descricao: true, tipo: true } },
+                    turno: { select: { id_turno: true, nome_turno: true } }
+                }
+            });
+
+            return resposta
+            
+        } catch (error) {
+            console.error('Erro buscar evento por ID no banco de dados', error);
             throw error;
         }
     }
