@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
 import { toast } from "sonner"
-import { PageLayout, PageHeader } from "@/components/AnimatedComponents"
+import { PageLayout } from "@/components/AnimatedComponents"
 import { usuariosCrudService } from "@/services/usuariosCrudService"
 
 const adminTabs = [
@@ -78,7 +78,7 @@ function resolverImagemPerfil(imagem) {
 
 function SettingsSidebar({ activeTab, onTabChange, tabs }) {
   return (
-    <aside className="w-full border-b border-zinc-100 p-4 dark:border-zinc-800 sm:w-44 sm:border-b-0 sm:border-r">
+    <aside className="w-1/2 border-b border-zinc-100 py-4 px-4 dark:border-zinc-800 sm:w-60 sm:border-b-0 sm:border-r">
       <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:overflow-visible">
         {tabs.map(({ id, label, icon: Icon }) => {
           const isActive = activeTab === id
@@ -88,12 +88,12 @@ function SettingsSidebar({ activeTab, onTabChange, tabs }) {
               type="button"
               onClick={() => onTabChange(id)}
               className={cn(
-                "flex h-7 shrink-0 items-center gap-2 rounded-md px-3 text-left text-sm font-semibold text-zinc-950 transition-colors dark:text-zinc-100",
-                "hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:hover:bg-zinc-800",
+                "cursor-pointer flex h-8 shrink-0 items-center gap-2 rounded-md px-3 text-left text-md font-semibold text-zinc-950 transition-colors dark:text-zinc-100",
+                "hover:bg-zinc-100/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:hover:bg-zinc-800",
                 isActive && "bg-zinc-100 dark:bg-zinc-800"
               )}
             >
-              <Icon className="size-4 text-zinc-800 dark:text-zinc-200" />
+              <Icon className="size-6 text-zinc-800 dark:text-zinc-200" />
               <span>{label}</span>
             </button>
           )
@@ -658,13 +658,19 @@ export default function SettingsPage({ role = "operator" }) {
 
   return (
     <PageLayout>
-      <div className="flex w-full flex-col gap-7 pb-10">
+      <div className="flex w-full flex-col gap-7 py-10">
 
-        <PageHeader
-          title="Configurações"
-          subtitle="Gerencie suas informações da conta e preferências."
-        />
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <div className="relative w-fit pb-2">
+            <h1 className="mb-1 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-black dark:text-[#f4f8ff]">
+              Configurações
+            </h1>
+          </div>
 
+          <p className="text-base text-muted-foreground font-medium">
+            Gerencie suas informações da conta e preferências.
+          </p>
+        </div>
 
         <section className="flex min-h-87.5 overflow-hidden rounded-xl border border-zinc-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
           <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
