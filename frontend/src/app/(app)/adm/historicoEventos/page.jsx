@@ -62,7 +62,7 @@ import {
 
 
 const colunasEventos = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-25 text-center justify-center' },
+  { id: 'numero_evento', key: 'numero_evento', label: 'ID', className: 'w-25 text-center justify-center' },
   { id: 'maquina', key: 'maquina', label: 'Máquina' },
   {
     id: 'tipo', key: 'tipo', label: 'Tipo', className: 'text-center justify-center',
@@ -133,8 +133,8 @@ export default function HistoricoEventos() {
   const handleSort = (criterio) => {
     const copia = [...dados];
     copia.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'id_asc') return Number(a.numero_evento) - Number(b.numero_evento);
+      if (criterio === 'id_desc') return Number(b.numero_evento) - Number(a.numero_evento);
       if (criterio === 'maquina') return a.maquina.localeCompare(b.maquina);
       if (criterio === 'data_asc') return new Date(a.inicio) - new Date(b.inicio);
       if (criterio === 'data_desc') return new Date(b.inicio) - new Date(a.inicio);
@@ -145,10 +145,10 @@ export default function HistoricoEventos() {
     setDados(copia);
   };
 
-  const aplicarFiltros = (filtros) => {
-    let filtrados = [...eventos];
-    if (filtros.tipo?.length > 0) {
-      filtrados = filtrados.filter(e => filtros.tipo.includes(e.tipo));
+  const aplicarFiltros = (filtrosSelecionados) => {
+    let dadosFiltrados = [...eventos];
+    if (filtrosSelecionados.tipo?.length > 0) {
+      dadosFiltrados = dadosFiltrados.filter(e => filtrosSelecionados.tipo.includes(e.tipo));
     }
 
     dadosFiltrados = filtrarPorDataInicio(dadosFiltrados, filtrosSelecionados.data);
@@ -163,6 +163,7 @@ export default function HistoricoEventos() {
     const termo = busca.toLowerCase();
     return (
       evento.maquina.toLowerCase().includes(termo) ||
+      evento.numero_evento?.toString().includes(termo) ||
       evento.id.toString().includes(termo)
     );
   });

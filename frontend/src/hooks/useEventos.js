@@ -10,10 +10,8 @@ export function useEventos() {
   const fetchEventos = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await eventosCrudService.getAll();
-      // Backend retorna { sucesso, dados, meta } — extrai o array
-      const lista = Array.isArray(res) ? res : (res?.dados ?? []);
-      setEventos(lista);
+      const lista = await eventosCrudService.getAllPages();
+      setEventos(Array.isArray(lista) ? lista : []);
       setError(null);
     } catch (err) {
       setError('Falha ao carregar eventos');

@@ -66,8 +66,8 @@ import {
 
 const colunasMaquina = [
   {
-    id: "id",
-    key: "id",
+    id: "numero_evento",
+    key: "numero_evento",
     label: "ID",
     className: "w-20 text-center justify-center",
   } /* id da máquina */,
@@ -296,8 +296,8 @@ export default function MaquinaDetalheGestor({ params }) {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === "id_asc") return a.id - b.id;
-      if (criterio === "id_desc") return b.id - a.id;
+      if (criterio === "id_asc") return Number(a.numero_evento) - Number(b.numero_evento);
+      if (criterio === "id_desc") return Number(b.numero_evento) - Number(a.numero_evento);
 
       if (criterio === "data_asc") return parseData(a.data) - parseData(b.data);
       if (criterio === "data_desc")
@@ -381,6 +381,7 @@ export default function MaquinaDetalheGestor({ params }) {
     return (
       (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
       (evento.motivo?.toLowerCase() || "").includes(termo) ||
+      evento.numero_evento?.toString().includes(termo) ||
       evento.id?.toString().includes(termo)
     );
   });

@@ -157,7 +157,10 @@ class EventoModel {
                         select: { id_turno: true, nome_turno: true, dia_semana: true }
                     }
                 },
-                orderBy: { id_evento: 'asc' }
+                orderBy: [
+                    { inicio: 'desc' },
+                    { id_evento: 'desc' }
+                ]
             };
 
             return await paginarPrisma(prisma.historico_Eventos, regrasDaBusca, paginacao);
