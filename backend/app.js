@@ -25,9 +25,16 @@ app.use(helmet(
 ));
 
 app.use(cors({
-    origin: 'http://localhost:3000', // Permitir todas as origens. Ajuste conforme necessário. Ex.: 'http://meufrontend.com'
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(null, false);
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 200
 }));
