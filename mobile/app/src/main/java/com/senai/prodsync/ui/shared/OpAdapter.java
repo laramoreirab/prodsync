@@ -3,10 +3,12 @@ package com.senai.prodsync.ui.shared;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import com.senai.prodsync.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +51,18 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
         holder.tvMaquina.setText("Máquina: " + op.getMaquina());
         holder.tvPrioridade.setText("Prioridade: " + op.getPrioridade());
         holder.tvDataFinal.setText("Data Final: " + formatarData(op.getDataFinal()));
+
+        // Carrega a imagem da máquina relacionada à OP
+        if (op.getFotoMaquinaUrl() != null && !op.getFotoMaquinaUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(op.getFotoMaquinaUrl())
+                    .placeholder(R.drawable.ic_ferramenta)
+                    .error(R.drawable.ic_ferramenta)
+                    .centerCrop()
+                    .into(holder.ivMaquina);
+        } else {
+            holder.ivMaquina.setImageResource(R.drawable.ic_ferramenta);
+        }
 
         // Configuração do Badge de Status para OP
         String status = (op.getStatus() != null) ? op.getStatus().toLowerCase() : "";
@@ -116,6 +130,7 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
 
     static class OpViewHolder extends RecyclerView.ViewHolder {
         TextView tvId, tvMaquina, tvPrioridade, tvDataFinal, tvStatus;
+        ImageView ivMaquina;
 
         public OpViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -124,13 +139,13 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
             tvPrioridade = itemView.findViewById(R.id.tv_prioridade_op);
             tvDataFinal = itemView.findViewById(R.id.tv_data_final_op);
             tvStatus = itemView.findViewById(R.id.tv_status_op_badge);
+            ivMaquina = itemView.findViewById(R.id.iv_op_maquina);
         }
     }
 
     private String formatarData(String dataIso) {
         if (dataIso == null || dataIso.isEmpty()) return "S/D";
         try {
-            // Esperado: 2008-11-11T06:09:00.000Z
             String datePart = dataIso.substring(0, 10); // yyyy-MM-dd
             String timePart = dataIso.substring(11, 16); // HH:mm
 
@@ -139,7 +154,6 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
                 return p[2] + "/" + p[1] + "/" + p[0] + " às " + timePart;
             }
         } catch (Exception e) {
-            // Caso falhe, tenta pelo menos limpar o 'T' e o 'Z'
             return dataIso.replace("T", " ").replace("Z", "");
         }
         return dataIso;
