@@ -134,9 +134,9 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 sm:left-auto sm:right-0 top-12 w-80 bg-gray-100 dark:bg-slate-900 shadow-2xl rounded-lg p-4 border border-gray-200 dark:border-zinc-700 z-50">
+        <div className="absolute left-0 sm:left-auto sm:right-0 top-12 flex max-h-[calc(100vh-6rem)] w-80 flex-col overflow-hidden rounded-lg border border-gray-200 bg-gray-100 p-4 shadow-2xl dark:border-zinc-700 dark:bg-slate-900 z-50">
           {" "}
-          <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
             {filtersConfig.map((filter) => (
               <div
                 key={filter.id}
@@ -288,7 +288,8 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
             ))}
           </div>
           {activeTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-3">
+            <div className="max-h-24 shrink-0 overflow-y-auto pt-3">
+              <div className="flex flex-wrap gap-2">
               {activeTags.map((tag) => (
                 <span className="flex items-center gap-1 rounded-md bg-[#e2e2e2] dark:bg-zinc-700 px-2 py-1 text-sm font-semibold text-[#23304c] dark:text-slate-200">
                   {tag.label}
@@ -299,11 +300,12 @@ export default function FilterDropdown({ filtersConfig, onApply }) {
                   />
                 </span>
               ))}
+              </div>
             </div>
           )}
           <button
             onClick={handleApplyClick}
-            className="mt-4 min-h-10 w-full rounded-md bg-[#00357a] py-2 font-semibold text-[#f8f8f8] transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6]  dark:bg-stale-700 dark:text-white dark:hover:bg-slate-800"
+            className="mt-4 min-h-10 w-full shrink-0 rounded-md bg-[#00357a] py-2 font-semibold text-[#f8f8f8] transition-colors hover:bg-[#002866] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7d95c6]  dark:bg-stale-700 dark:text-white dark:hover:bg-slate-800"
       >
             Aplicar Filtros
           </button>

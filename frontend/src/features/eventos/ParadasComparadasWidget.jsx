@@ -38,14 +38,16 @@ export function ParadasComparadasWidget({ setorId = null }) {
         </p>
       </div>
 
-      <div className="flex-1 min-h-0 mt-4">
+      <div className="flex-1 min-h-0 mt-2">
         <DonutChart
           data={data}
           nameKey="name"
           dataKey="value"
           config={paradasComparadasConfig}
           valueFormatter={formatarMinutos}
-          cy="54%"
+          cy="50%"
+          innerRadius={62}
+          outerRadius={96}
         />
       </div>
     </div>

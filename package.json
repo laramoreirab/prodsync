@@ -6,7 +6,8 @@
   "scripts": {
     "dev:front": "cd frontend && npm run dev",
     "dev:back": "cd backend && npm start",
-    "dev": "concurrently -n \"FRONT,BACK\" -c \"magenta,blue\" \"npm run dev:front\" \"npm run dev:back\""
+    "dev": "concurrently -n \"FRONT,BACK\" -c \"magenta,blue\" \"npm run dev:front\" \"npm run dev:back\"",
+    "seed:demo": "cd backend && npm run seed:demo"
   },
   "keywords": [],
   "author": "",

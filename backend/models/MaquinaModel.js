@@ -201,25 +201,40 @@ class MaquinaModel {
     }
 
     static async registrarSolicitacaoPareamentoPlaca({ id_empresa, board_uid, mac = null, firmware_version = null, mqtt_topic = null }) {
-        const empresaId = Number(id_empresa);
+        const empresaIdInformado = Number(id_empresa);
         const boardUid = this.normalizarBoardUid(board_uid);
-
-        if (!Number.isInteger(empresaId) || empresaId <= 0) {
-            throw new Error('Empresa invalida');
-        }
 
         if (!boardUid) {
             throw new Error('Identificador da placa e obrigatorio');
         }
 
-        const empresa = await prisma.empresas.findUnique({
-            where: { id_empresa: empresaId },
-            select: { id_empresa: true }
-        });
-        if (!empresa) {
-            throw new Error('Empresa nao encontrada');
+        const empresaIdValido = Number.isInteger(empresaIdInformado) && empresaIdInformado > 0;
+        let empresa = null;
+        let sessao = null;
+
+        if (empresaIdValido) {
+            empresa = await prisma.empresas.findUnique({
+                where: { id_empresa: empresaIdInformado },
+                select: { id_empresa: true }
+            });
+
+            if (empresa) {
+                sessao = await this.buscarSessaoSincronizacaoPendente(empresa.id_empresa);
+            }
         }
 
+        if (!sessao) {
+            sessao = await this.buscarSessaoSincronizacaoPendenteGlobal();
+            if (sessao) {
+                console.log(`[PAREAMENTO PLACA] Usando sessao pendente unica da empresa ${sessao.id_empresa}, maquina ${sessao.id_maquina}.`);
+            }
+        }
+
+        const empresaId = sessao
+            ? Number(sessao.id_empresa)
+            : empresa
+                ? Number(empresa.id_empresa)
+                : null;
         const expires_at = new Date(Date.now() + this.TEMPO_EXPIRACAO_PAREAMENTO_MS);
         const agora = new Date();
 
@@ -233,17 +248,16 @@ class MaquinaModel {
             created_at: agora
         };
 
-        this._placasAguardandoPareamento.set(this.criarChaveEmpresa(empresaId), pareamento);
-        this._placasAguardandoPareamentoPorUid.set(boardUid, pareamento);
-        console.log(`[PAREAMENTO PLACA] Pedido da placa ${boardUid} para empresa ${empresaId}.`);
-
-        let sessao = await this.buscarSessaoSincronizacaoPendente(empresaId);
-        if (!sessao) {
-            sessao = await this.buscarSessaoSincronizacaoPendenteGlobal();
-            if (sessao) {
-                console.log(`[PAREAMENTO PLACA] Usando sessao pendente unica da empresa ${sessao.id_empresa}, maquina ${sessao.id_maquina}.`);
-            }
+        if (empresaId) {
+            this._placasAguardandoPareamento.set(this.criarChaveEmpresa(empresaId), pareamento);
         }
+        this._placasAguardandoPareamentoPorUid.set(boardUid, pareamento);
+        console.log(
+            empresaId
+                ? `[PAREAMENTO PLACA] Pedido da placa ${boardUid} associado a empresa ${empresaId}.`
+                : `[PAREAMENTO PLACA] Pedido da placa ${boardUid} aguardando sessao aberta pelo site.`
+        );
+
         if (sessao) {
             return this.concluirSincronizacaoPlaca(sessao, pareamento);
         }

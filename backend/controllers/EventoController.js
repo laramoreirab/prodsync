@@ -341,7 +341,10 @@ class EventoController {
 
     static async obterTopMotivosTempo(req, res) {
         try {
-            const limite = req.query.limite ? Number(req.query.limite) : 5;
+            const limiteParam = Number(req.query.limite ?? 3);
+            const limite = Number.isFinite(limiteParam) && limiteParam > 0
+                ? Math.min(Math.trunc(limiteParam), 10)
+                : 3;
             const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
