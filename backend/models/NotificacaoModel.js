@@ -219,7 +219,7 @@ class NotificacaoModel {
             const idMaquina = id_maquina ? Number(id_maquina) : null;
             const lockKey = `notificacao:${id_empresa}:${idDestinatario}:${idEvento}:${tipo}`;
 
-            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
+            await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
             const existente = await tx.notificacoes.findFirst({
                 where: {
