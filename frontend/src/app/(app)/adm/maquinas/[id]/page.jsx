@@ -123,10 +123,11 @@ const formatarPeriodo = (inicio, fim) => {
   return `${data} (${hi} - ${hf})`;
 };
 const formatarDuracao = (minutos) => {
-  const total = Number(minutos) || 0;
-  const h = Math.floor(total / 60);
-  const m = Math.round(total % 60);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+  const h = Math.floor(totalSegundos / 3600);
+  const m = Math.floor((totalSegundos % 3600) / 60);
+  const s = totalSegundos % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 const parseData = (dataStr) => {
   const [dataParte] = dataStr.split(" ");

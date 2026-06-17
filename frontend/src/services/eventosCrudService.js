@@ -4,27 +4,33 @@ const API_URL = "/api/eventos";
 
 const extrairDados = (resposta) => resposta?.dados ?? resposta ?? [];
 
+const formatarSegundos = (totalSegundos) => {
+  const segundosValidos = Math.max(0, Math.floor(Number(totalSegundos) || 0));
+  const horas = Math.floor(segundosValidos / 3600);
+  const minutos = Math.floor((segundosValidos % 3600) / 60);
+  const segundos = segundosValidos % 60;
+
+  return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
+};
+
 const formatarDuracao = (inicio, fim, duracaoMinutos) => {
   if (typeof duracaoMinutos === "string" && duracaoMinutos.includes(":")) {
-    return duracaoMinutos;
+    const partes = duracaoMinutos.split(":");
+    return partes.length === 2 ? `${duracaoMinutos}:00` : duracaoMinutos;
   }
 
   const duracaoNumero = Number(duracaoMinutos);
   if (Number.isFinite(duracaoNumero)) {
-    const horas = Math.floor(duracaoNumero / 60);
-    const minutos = duracaoNumero % 60;
-    return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+    return formatarSegundos(duracaoNumero * 60);
   }
 
   if (!inicio) return "-";
 
-  const totalMinutos = Math.max(
+  const totalSegundos = Math.max(
     0,
-    Math.round((new Date(fim ?? Date.now()) - new Date(inicio)) / 1000 / 60)
+    Math.floor((new Date(fim ?? Date.now()) - new Date(inicio)) / 1000)
   );
-  const horas = Math.floor(totalMinutos / 60);
-  const minutos = totalMinutos % 60;
-  return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+  return formatarSegundos(totalSegundos);
 };
 
 const formatarDataEvento = (inicio, fim) => {

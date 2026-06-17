@@ -66,10 +66,11 @@ const formatarPeriodo = (inicio, fim) => {
 };
 
 const formatarDuracao = (minutos) => {
-  const total = Number(minutos) || 0;
-  const horas = Math.floor(total / 60);
-  const mins = Math.round(total % 60);
-  return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+  const horas = Math.floor(totalSegundos / 3600);
+  const mins = Math.floor((totalSegundos % 3600) / 60);
+  const segs = totalSegundos % 60;
+  return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(segs).padStart(2, "0")}`;
 };
 
 const formatarDataHora = (valor) => {
