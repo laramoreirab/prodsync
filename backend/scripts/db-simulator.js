@@ -541,16 +541,14 @@ function intersectarPeriodos(...periodos) {
   return inicio < fim ? { inicio, fim } : null;
 }
 
-function criarHorariosProducaoHoje(periodoHoje, agora, devePreencherHistorico) {
-  if (!devePreencherHistorico) {
-    return [new Date(agora)];
-  }
-
+function criarHorariosProducaoHoje(periodoHoje, agora, horasComProducao) {
   const horarios = [];
   const horaInicial = periodoHoje.inicio.getHours();
   const horaAtual = agora.getHours();
 
-  for (let hora = horaInicial; hora <= horaAtual; hora += 1) {
+  for (let hora = horaInicial; hora < horaAtual; hora += 1) {
+    if (horasComProducao.has(hora)) continue;
+
     const fim = new Date(agora);
     fim.setHours(hora, randomInt(8, 52), 0, 0);
 
@@ -564,6 +562,8 @@ function criarHorariosProducaoHoje(periodoHoje, agora, devePreencherHistorico) {
 
     horarios.push(new Date(fim));
   }
+
+  horarios.push(new Date(agora));
 
   return horarios.sort((a, b) => a - b);
 }
@@ -581,7 +581,7 @@ async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, 
   const stats = { apontamentos: 0, ops_criadas: 0 };
   if (maquinas.length === 0 || agora <= periodoHoje.inicio) return stats;
 
-  const producaoAntesDeAgora = await prisma.apontamento.count({
+  const producoesHoje = await prisma.apontamento.findMany({
     where: {
       id_empresa,
       qtd_boa: { gt: 0 },
@@ -590,10 +590,14 @@ async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, 
         lt: agora,
       },
     },
+    select: { data_hora_fim: true },
   });
 
-  const devePreencherHistorico = producaoAntesDeAgora === 0;
-  const horarios = criarHorariosProducaoHoje(periodoHoje, agora, devePreencherHistorico);
+  const horasComProducao = new Set(
+    producoesHoje.map((producao) => producao.data_hora_fim.getHours()),
+  );
+  const horarios = criarHorariosProducaoHoje(periodoHoje, agora, horasComProducao);
+  const horasPreenchidas = horarios.filter((horario) => horario.getHours() !== agora.getHours()).length;
 
   for (const [index, fim] of horarios.entries()) {
     const maquina = maquinas[index % maquinas.length];
@@ -618,10 +622,10 @@ async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, 
     stats.apontamentos += result.apontamentos;
   }
 
-  if (devePreencherHistorico && stats.apontamentos > 0) {
+  if (horasPreenchidas > 0) {
     console.log(
       `[cron-producao] empresa=${id_empresa} producao_hoje_preenchida ate=${agora.toTimeString().slice(0, 5)} ` +
-      `apontamentos=${stats.apontamentos}`,
+      `horas=${horasPreenchidas} apontamentos=${stats.apontamentos}`,
     );
   }
 
