@@ -20,6 +20,10 @@ export function SetorProducaoMaquinaWidget({ setorId }) {
         <BarHorizontal
           data={data}
           config={setorProducaoMaquinaConfig}
+          yKey="maquina"
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
         />
       </div>
     </div>

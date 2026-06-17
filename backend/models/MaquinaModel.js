@@ -201,25 +201,40 @@ class MaquinaModel {
     }
 
     static async registrarSolicitacaoPareamentoPlaca({ id_empresa, board_uid, mac = null, firmware_version = null, mqtt_topic = null }) {
-        const empresaId = Number(id_empresa);
+        const empresaIdInformado = Number(id_empresa);
         const boardUid = this.normalizarBoardUid(board_uid);
-
-        if (!Number.isInteger(empresaId) || empresaId <= 0) {
-            throw new Error('Empresa invalida');
-        }
 
         if (!boardUid) {
             throw new Error('Identificador da placa e obrigatorio');
         }
 
-        const empresa = await prisma.empresas.findUnique({
-            where: { id_empresa: empresaId },
-            select: { id_empresa: true }
-        });
-        if (!empresa) {
-            throw new Error('Empresa nao encontrada');
+        const empresaIdValido = Number.isInteger(empresaIdInformado) && empresaIdInformado > 0;
+        let empresa = null;
+        let sessao = null;
+
+        if (empresaIdValido) {
+            empresa = await prisma.empresas.findUnique({
+                where: { id_empresa: empresaIdInformado },
+                select: { id_empresa: true }
+            });
+
+            if (empresa) {
+                sessao = await this.buscarSessaoSincronizacaoPendente(empresa.id_empresa);
+            }
         }
 
+        if (!sessao) {
+            sessao = await this.buscarSessaoSincronizacaoPendenteGlobal();
+            if (sessao) {
+                console.log(`[PAREAMENTO PLACA] Usando sessao pendente unica da empresa ${sessao.id_empresa}, maquina ${sessao.id_maquina}.`);
+            }
+        }
+
+        const empresaId = sessao
+            ? Number(sessao.id_empresa)
+            : empresa
+                ? Number(empresa.id_empresa)
+                : null;
         const expires_at = new Date(Date.now() + this.TEMPO_EXPIRACAO_PAREAMENTO_MS);
         const agora = new Date();
 
@@ -233,17 +248,16 @@ class MaquinaModel {
             created_at: agora
         };
 
-        this._placasAguardandoPareamento.set(this.criarChaveEmpresa(empresaId), pareamento);
-        this._placasAguardandoPareamentoPorUid.set(boardUid, pareamento);
-        console.log(`[PAREAMENTO PLACA] Pedido da placa ${boardUid} para empresa ${empresaId}.`);
-
-        let sessao = await this.buscarSessaoSincronizacaoPendente(empresaId);
-        if (!sessao) {
-            sessao = await this.buscarSessaoSincronizacaoPendenteGlobal();
-            if (sessao) {
-                console.log(`[PAREAMENTO PLACA] Usando sessao pendente unica da empresa ${sessao.id_empresa}, maquina ${sessao.id_maquina}.`);
-            }
+        if (empresaId) {
+            this._placasAguardandoPareamento.set(this.criarChaveEmpresa(empresaId), pareamento);
         }
+        this._placasAguardandoPareamentoPorUid.set(boardUid, pareamento);
+        console.log(
+            empresaId
+                ? `[PAREAMENTO PLACA] Pedido da placa ${boardUid} associado a empresa ${empresaId}.`
+                : `[PAREAMENTO PLACA] Pedido da placa ${boardUid} aguardando sessao aberta pelo site.`
+        );
+
         if (sessao) {
             return this.concluirSincronizacaoPlaca(sessao, pareamento);
         }
@@ -420,8 +434,9 @@ class MaquinaModel {
     // Cria uma nova máquina
     static async criarMaquina(id_empresa, id_setor, categoria, nome, serie, capacidade, status, data_aquisicao, id_operador, imagem, imagem_public_id = null) {
         try {
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
-            const statusNormalizado = statusValidos.includes(status) ? status : 'Parada';
+            const statusValidos = ['Produzindo', 'Parada', 'Setup', 'Aguardando'];
+            const statusRecebido = status === 'Manutencao' ? 'Parada' : status;
+            const statusNormalizado = statusValidos.includes(statusRecebido) ? statusRecebido : 'Parada';
             const idSetorNormalizado = id_setor ? Number(id_setor) : null;
             const idOperadorNormalizado = id_operador ? Number(id_operador) : null;
             const maquina = await prisma.maquinas.create({
@@ -496,14 +511,15 @@ class MaquinaModel {
                 }
             }
 
+            const statusRecebido = dados.status === 'Manutencao' ? 'Parada' : dados.status;
             const dataUpdate = {
                 nome: dados.nome,
                 serie: dados.serie,
                 id_setor: dados.id_setor ? parseInt(dados.id_setor) : undefined,
                 categoria: dados.categoria,
                 capacidade: dados.capacidade,
-                status: dados.status,
-                status_atual: dados.status || undefined,
+                status: statusRecebido,
+                status_atual: statusRecebido || undefined,
                 data_aquisicao: dados.data_aquisicao ? new Date(dados.data_aquisicao) : undefined,
                 id_operador: dados.id_operador ? parseInt(dados.id_operador) : undefined,
             };
@@ -1172,12 +1188,18 @@ class MaquinaModel {
                 }
             });
 
-            return statusAgrupados.map(status => ({
-                name: status.status_atual,
-                value: status._count.status_atual,
+            const totaisPorStatus = statusAgrupados.reduce((acc, status) => {
+                const statusNormalizado = status.status_atual === 'Manutencao' ? 'Parada' : status.status_atual;
+                acc[statusNormalizado] = (acc[statusNormalizado] ?? 0) + status._count.status_atual;
+                return acc;
+            }, {});
+
+            return Object.entries(totaisPorStatus).map(([status, total]) => ({
+                name: status,
+                value: total,
                 setorId: setorId ? Number(setorId) : undefined,
-                status: status.status_atual,
-                total: status._count.status_atual
+                status,
+                total
             }));
         } catch (error) {
             console.error('Erro ao obter status geral das maquinas:', error);
@@ -1545,7 +1567,7 @@ class MaquinaModel {
 
     static async obterHistoricoEventosTabela(id_maquina, id_empresa, limite = 50) {
         try {
-            const [eventos, apontamentos] = await Promise.all([
+            const [eventos, idsEventosMaquina, apontamentos] = await Promise.all([
                 prisma.historico_Eventos.findMany({
                     where: {
                         id_maquina,
@@ -1556,7 +1578,7 @@ class MaquinaModel {
                             select: {
                                 id_motivo: true,
                                 descricao: true,
-                                tipo: true
+                                tipo: true,
                             }
                         },
                         ordem_producao: {
@@ -1567,10 +1589,19 @@ class MaquinaModel {
                             }
                         }
                     },
-                    orderBy: {
-                        inicio: 'desc'
-                    },
+                    orderBy: [
+                        { inicio: 'desc' },
+                        { id_evento: 'desc' }
+                    ],
                     take: limite
+                }),
+                prisma.historico_Eventos.findMany({
+                    where: {
+                        id_maquina,
+                        id_empresa
+                    },
+                    select: { id_evento: true },
+                    orderBy: { id_evento: 'asc' }
                 }),
                 prisma.apontamento.findMany({
                     where: {
@@ -1599,14 +1630,19 @@ class MaquinaModel {
                 })
             ]);
 
-            const historicoEventos = eventos.map(evento => ({
+            const numeroEventoMaquina = new Map(idsEventosMaquina.map((evento, index) => [evento.id_evento, index + 1]));
+
+            const historicoEventos = eventos.map((evento, index) => ({
                 id: evento.id_evento,
                 id_evento: evento.id_evento,
-                tipo: evento.status_atual,
+                numero_evento: numeroEventoMaquina.get(evento.id_evento) ?? index + 1,
+                numero_evento_maquina: numeroEventoMaquina.get(evento.id_evento) ?? index + 1,
+                tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
                 data: evento.inicio,
                 inicio: evento.inicio,
                 fim: evento.termino,
                 duracao_minutos: evento.duracao ?? this.calcularDuracaoMinutos(evento.inicio, evento.termino),
+                observacao: evento.observacao === '' ? 'Sem observação' : evento.observacao,
                 motivo: evento.motivo_parada?.descricao ?? null,
                 produzido: 0,
                 refugo: 0,

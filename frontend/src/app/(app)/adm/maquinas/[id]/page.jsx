@@ -56,7 +56,7 @@ import {
 // ─── Colunas ───────────────────────────────────────────────────────────────
 
 const colunasMaquina = [
-  { id: 'id', key: 'id', label: 'ID', className: 'w-20 text-center justify-center' },
+  { id: 'numero_evento', key: 'numero_evento', label: 'ID', className: 'w-20 text-center justify-center' },
   {
     id: 'tipo', key: 'tipoEvento', label: 'Tipo', className: 'text-center justify-center',
     icone: (valor) => {
@@ -123,10 +123,11 @@ const formatarPeriodo = (inicio, fim) => {
   return `${data} (${hi} - ${hf})`;
 };
 const formatarDuracao = (minutos) => {
-  const total = Number(minutos) || 0;
-  const h = Math.floor(total / 60);
-  const m = Math.round(total % 60);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+  const h = Math.floor(totalSegundos / 3600);
+  const m = Math.floor((totalSegundos % 3600) / 60);
+  const s = totalSegundos % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 const parseData = (dataStr) => {
   const [dataParte] = dataStr.split(" ");
@@ -209,10 +210,10 @@ export default function MaquinaDetalhePage({ params }) {
           .filter((item) => item.tipo !== "Producao")
           .map((item) => ({
             ...item,
-            tipoEvento: item.tipo,
+            tipoEvento: item.tipo === "Setup" ? "Setup" : "Parada",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
-            motivo: item.motivo || "-",
+            motivo: item.motivo || "Não justificado",
           }));
         const apontamentos = historico
           .filter((item) => item.tipo === "Producao")
@@ -224,7 +225,7 @@ export default function MaquinaDetalhePage({ params }) {
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
             refugo: String(item.refugo || 0),
-            observacao: item.motivo || "-",
+            observacao: item.motivo || "Não justificada",
           }));
         setTodosEventos(eventos);
         setDados(eventos);
@@ -254,8 +255,8 @@ export default function MaquinaDetalhePage({ params }) {
   const handleSortEventos = (criterio) => {
     const copia = [...dados];
     copia.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'id_asc') return Number(a.numero_evento) - Number(b.numero_evento);
+      if (criterio === 'id_desc') return Number(b.numero_evento) - Number(a.numero_evento);
       if (criterio === 'data_asc') return parseData(a.data) - parseData(b.data);
       if (criterio === 'data_desc') return parseData(b.data) - parseData(a.data);
       if (criterio === 'duracao_asc') { const [hA, mA] = a.duracao.split(':').map(Number); const [hB, mB] = b.duracao.split(':').map(Number); return (hA * 60 + mA) - (hB * 60 + mB); }
@@ -315,6 +316,7 @@ export default function MaquinaDetalhePage({ params }) {
     return (
       (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
       (evento.motivo?.toLowerCase() || "").includes(termo) ||
+      evento.numero_evento?.toString().includes(termo) ||
       evento.id?.toString().includes(termo)
     );
   });

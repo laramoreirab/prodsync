@@ -385,7 +385,7 @@ export const mockOPStatus = [
   { name: "Em Produção", value: 35 },
   { name: "Pausadas (Setup)", value: 25 },
   { name: "Pausadas", value: 13 },
-  { name: "Aguardando Início", value: 27 },
+  { name: "Concluída", value: 27 },
 ];
 
 export const mockOPConcluidasDia = [

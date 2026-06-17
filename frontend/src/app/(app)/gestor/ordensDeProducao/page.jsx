@@ -57,7 +57,7 @@ import {
 
 const colunasOrdemProd = [
   { id: "id", key: "id", label: "ID", className: "w-1/7" },
-  { id: "codigo_lote", key: "codigo_lote", label: "Lote", className: "w-1/5" },
+  { id: "codigo_lote", key: "codigo_lote", label: "Lote", className: "w-1/7" },
   { id: "produto", key: "produto", label: "Produto", className: "w-1/5" },
   {
     id: "prioridade",
@@ -94,7 +94,6 @@ const colunasOrdemProd = [
       );
     }
   },
-  { id: "setor", key: "setor", label: "Setor", className: "w-1/5" },
   {
     id: "status_op",
     key: "status_op",
@@ -117,10 +116,6 @@ const colunasOrdemProd = [
         "Concluída": {
           variant: "concluida",
           label: "Concluída"
-        },
-        "Aguardando": {
-          variant: "aguardando",
-          label: "Aguardando Início"
         }
       };
 
@@ -152,9 +147,14 @@ const opcoesOrdenacao = [
   { label: "Status", value: "status" },
 ];
 
+const filtrosOpsAplicaveis = [
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "Concluída"] },
+  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Media", "Média", "Alta", "Critica", "Crítica"] },
+];
+
 const filtrosOps = [
-  { id: "status_op", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "ConcluÃ­da"] },
-  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Media", "MÃ©dia", "Alta", "Critica", "CrÃ­tica"] },
+  { id: "status_op", label: "Status", type: "checkbox", options: ["Produzindo", "Setup", "Parada", "Concluída"] },
+  { id: "prioridade", label: "Prioridade", type: "checkbox", options: ["Baixa", "Média", "Alta", "Crí­tica"] },
 ];
 
 export default function OrdensDeProducaoGestor() {
@@ -286,7 +286,7 @@ export default function OrdensDeProducaoGestor() {
         actions={
           <>
             <OrdenarDropdown label="Ordenar por" options={opcoesOrdenacao} onSortChange={handleSort} />
-            <FilterDropdown filtersConfig={filtrosOps} onApply={aplicarFiltros} />
+            <FilterDropdown filtersConfig={filtrosOpsAplicaveis} onApply={aplicarFiltros} />
           </>
         }
       />

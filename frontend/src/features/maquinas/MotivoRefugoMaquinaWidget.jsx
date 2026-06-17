@@ -1,15 +1,15 @@
 "use client";
 
-import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
+import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useMotivoRefugoMaquina } from "./hooks/useMotivoRefugoMaquina";
 import { motivoRefugoConfig } from "./config/maquinaDetalheConfig";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 
 const tonsAzuis = [
   "#1d4ed8",
-  "#2563eb",
+  "#8dabeb",
   "#3b82f6",
-  "#60a5fa",
+  "#094288",
   "#93c5fd",
   "#bfdbfe",
   "#1e40af",
@@ -29,10 +29,6 @@ export function MotivoRefugoMaquinaWidget({ maquinaId }) {
   if (Array.isArray(data) && data.length === 0) {
     return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
   }
-
-  const chartData = [...data]
-    .sort((a, b) => Number(b.value) - Number(a.value))
-    .slice(0, 6);
 
   return (
     <div>

@@ -10,7 +10,8 @@
     "simulate": "node scripts/db-simulator.js",
     "simulate:once": "node scripts/db-simulator.js --once",
     "simulate:seed": "node scripts/db-simulator.js --seed-only",
-    "simulate:backfill": "node scripts/db-simulator.js --backfill"
+    "simulate:backfill": "node scripts/db-simulator.js --backfill",
+    "seed:demo": "node scripts/seed-demo-presentation.js"
   },
   "author": "",
   "license": "ISC",

@@ -78,7 +78,7 @@ class SetorController {
         ]);
 
         const mapaOEE = Object.fromEntries(
-            (dadosOEE || []).map(oee => [oee.id_setor, oee.media ? `${oee.media}%` : "-"])
+            (dadosOEE || []).map(oee => [oee.id_setor, oee.media ? `${oee.media}%` : "0%"])
         );
         
         const dadosFormatados = setores.map(setor => ({
@@ -89,7 +89,7 @@ class SetorController {
             qtd_de_maquinas: setor._count.maquinas,
             qtd_de_operadores: setor._count.escalas,
             // Busca o OEE correspondente ao ID do setor no mapa que criamos
-            oee_medio: mapaOEE[setor.id_setor] ?? "-"
+            oee_medio: mapaOEE[setor.id_setor] ?? "0%"
         }));
 
         return res.status(200).json({ sucesso: true, dados: dadosFormatados });

@@ -15,7 +15,7 @@ export function ProducaoDiaWidget() {
 
   return (
     <AreaChartBase
-      title="Produção por hora"
+      title="Produção De Hoje"
       data={data}
       size="grande"
       xKey="hora"

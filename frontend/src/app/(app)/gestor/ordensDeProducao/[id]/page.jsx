@@ -67,10 +67,11 @@ const formatarPeriodo = (inicio, fim) => {
 };
 
 const formatarDuracao = (minutos) => {
-  const total = Number(minutos) || 0;
-  const horas = Math.floor(total / 60);
-  const mins = Math.round(total % 60);
-  return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+  const horas = Math.floor(totalSegundos / 3600);
+  const mins = Math.floor((totalSegundos % 3600) / 60);
+  const segs = totalSegundos % 60;
+  return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(segs).padStart(2, "0")}`;
 };
 
 const formatarDataHora = (valor) => {
@@ -88,9 +89,9 @@ const prioridadeBadge = (prioridade) => {
   const valor = prioridade || "";
   const config = {
     Média: { className: "border border-[var(--azul-cobalto)]", icon: <MoveHorizontal className="text-sky-600" /> },
-    Alta: { className: "border border-amber-500/30 bg-amber-500/10 text-amber-700", icon: <AlertTriangle className="text-amber-600" /> },
+    Alta: { className: "border border-[var(--amarelo)] bg-transparent", icon: <AlertTriangle className="text-amber-600" /> },
     Crítica: { className: "border border-[var(--vermelho-vivido)] bg-transparent text-black", icon: <Flame className="text-rose-600" /> },
-    Baixa: { className: "border border-slate-400/30 bg-slate-100 text-slate-700", icon: <ArrowDown className="text-slate-400" /> },
+    Baixa: { className: "border border-gray-400 text-sm bg-transparent text-black", icon: <ArrowDown className="text-slate-400" /> },
   };
   const item = config[valor] || { icon: null, className: "" };
   const label = valor === "Critica" ? "Crítica" : valor === "Media" ? "Média" : valor;
@@ -109,10 +110,9 @@ const statusBadge = (status) => {
     Setup: "bg-amber-500/15 text-amber-900",
     Concluída: "bg-sky-500/15 text-sky-700",
     Finalizada: "bg-sky-500/15 text-sky-700",
-    "Aguardando Início": "bg-slate-500/15 text-slate-700",
   };
   const label =
-    status === "Em_Andamento" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";
+    status === "Em_Andamento" || status === "Aguardando" ? "Produzindo" : status === "Finalizada" ? "Concluída" : status || "-";
   return (
     <Badge variant="outline" className={`text-sm font-semibold border-none ml-2 ${config[label] || ""}`}>
       {label}

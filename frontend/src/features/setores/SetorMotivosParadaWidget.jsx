@@ -21,10 +21,17 @@ export function SetorMotivosParadaWidget({ setorId }) {
       <div className="mt-2">
         <BarHorizontal
           data={data}
-          xKey="motivo"
+          yKey="motivo"
+          yAxisWidth={140}
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
           config={setorMotivosParadaConfig}
           loading={loading}
           error={error}
+          paddingTopClassName="pt-0"
+          showValueLabels
+          hideTooltipLabel
         />
       </div>
     </div>

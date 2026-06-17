@@ -58,15 +58,24 @@ public class OrdemProducao {
         return (maquinaInfo != null && maquinaInfo.operador != null) ? maquinaInfo.operador.nome : "Nenhum";
     }
 
+    public String getFotoMaquinaUrl() {
+        if (maquinaInfo != null) {
+            String imagem = maquinaInfo.imagem;
+            if (imagem != null && !imagem.startsWith("http") && !imagem.isEmpty()) {
+                return "https://prodsync-backend.onrender.com/uploads/imagens/" + imagem;
+            }
+            return imagem;
+        }
+        return null;
+    }
+
     public String getDataInicio() { return dataInicio; }
     public String getDataFinal() { return dataFinal != null ? dataFinal : "S/D"; }
     
     public String getSetor() { 
-        // 1. Tenta extrair do root da OP (se a API retornar direto)
         String nome = extractString(setor, "nome_setor", null);
         if (nome == null) nome = extractString(setor, "nome", null);
         
-        // 2. Se não achou, tenta buscar dentro do objeto maquina (conforme o Model do backend)
         if (nome == null && maquinaInfo != null) {
             nome = extractString(maquinaInfo.setor, "nome_setor", null);
             if (nome == null) nome = extractString(maquinaInfo.setor, "nome", null);
@@ -89,6 +98,7 @@ public class OrdemProducao {
 
     public static class MaquinaInfo {
         public String nome;
+        public String imagem;
         public OperadorInfo operador;
         @SerializedName("setor")
         public JsonElement setor;

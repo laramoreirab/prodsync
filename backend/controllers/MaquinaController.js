@@ -291,7 +291,7 @@ class MaquinaController {
             if (!id || isNaN(id)) return res.status(400).json({ sucesso: false, erro: 'ID inválido' });
 
             // NOVO: Validação do Enum do Prisma
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
+            const statusValidos = ['Produzindo', 'Parada', 'Setup', 'Aguardando'];
             if (!statusValidos.includes(status_atual)) {
                 return res.status(400).json({
                     sucesso: false,
@@ -320,7 +320,7 @@ class MaquinaController {
             const id_empresa = req.user.id_empresa;
 
             // ADICIONADO: Validação do Enum para evitar erro 500 do Prisma
-            const statusValidos = ['Produzindo', 'Parada', 'Manutencao', 'Setup', 'Aguardando'];
+            const statusValidos = ['Produzindo', 'Parada', 'Setup', 'Aguardando'];
 
             if (!status || !statusValidos.includes(status.trim())) {
                 return res.status(400).json({

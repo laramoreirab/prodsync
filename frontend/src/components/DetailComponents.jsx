@@ -404,7 +404,7 @@ export function EntityProfileCard({
             className={cn(
               "flex-shrink-0 border-4 border-slate-50 dark:border-[#1e294b] shadow-inner overflow-hidden relative group bg-slate-100 dark:bg-[#0f172a]",
               isSquare
-                ? "w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-2xl"
+                ? "w-40 h-40 sm:w-48 sm:h-48 lg:w-35 lg:h-35 rounded-2xl"
                 : "w-28 h-28 sm:w-32 sm:h-32 rounded-full"
             )}
           >
@@ -419,7 +419,7 @@ export function EntityProfileCard({
           </div>
 
           {/* Grid de Informações */}
-          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 md:mt-2">
+          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 md:mt-2 text-3xl">
             {fieldsLeft.length > 0 && (
               <div className="flex flex-col gap-3.5">
                 {fieldsLeft.map((f, i) => (
@@ -466,7 +466,7 @@ export function UserProfileCard({
   );
 }
 export function StatusBadge({ status, className }) {
-  const normalizedStatus = status || "-";
+  const normalizedStatus = status === "Manutencao" ? "Parada" : (status || "-");
   const statusClass = {
     Produzindo: "bg-green-500/15 text-green-600 border-green-500/20 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/30",
     Setup: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30",

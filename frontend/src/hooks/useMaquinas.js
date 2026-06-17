@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { maquinaCrudService } from '@/services/maquinaCrudService';
 
+const normalizarStatusMaquina = (status) => (status === 'Setup' ? 'Parada' : status);
+
 export function useMaquinas() {
   const [maquinas, setMaquinas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +17,8 @@ export function useMaquinas() {
 
       const maquinasNormalizadas = (data.dados || []).map((maquina) => ({
         ...maquina,
-        status: maquina.status_atual || maquina.status || '',
+        status: normalizarStatusMaquina(maquina.status_atual || maquina.status || ''),
+        status_atual: normalizarStatusMaquina(maquina.status_atual),
       }));
       setMaquinas(maquinasNormalizadas);
       setError(null);
@@ -84,3 +87,5 @@ export function useMaquinas() {
     excluirMaquina
   };
 }
+
+

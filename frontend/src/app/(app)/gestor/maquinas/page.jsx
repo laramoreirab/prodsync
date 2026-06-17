@@ -46,6 +46,7 @@ const colunasMaquinas = [
         Produzindo: { variant: "produzindo" },
         Setup: { variant: "setup" },
         Parada: { variant: "parada" },
+        Aguardando:{ variant: "aguardando"}
       };
       const estilo = config[valor] || { variant: "outline", className: "" };
 
@@ -68,7 +69,7 @@ const maquinasFilter = [
     id: "status",
     label: "Status",
     type: "checkbox",
-    options: ["Produzindo", "Setup", "Parada", "Manutencao", "Aguardando"],
+    options: ["Produzindo", "Setup", "Parada", "Aguardando"],
   },
 ];
 
@@ -84,7 +85,7 @@ function normalizarMaquina(maquina) {
     ...maquina,
     status: maquina.status_atual || maquina.status || "",
     operador: maquina.operador?.nome || maquina.operador || "Sem operador",
-    oee_atual: maquina.oee_atual || "-",
+    oee_atual: maquina.oee_atual || "0%",
   };
 }
 

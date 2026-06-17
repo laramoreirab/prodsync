@@ -24,7 +24,11 @@ export function BarHorizontal({
   heightClassName,
   paddingTopClassName = "pt-16",
   showValueLabels = false,
+  hideTooltipLabel = false,
   colorKey,
+  barSize,
+  yAxisTickFontSize = 12,
+  valueLabelFontSize = 12,
 }) {
   if (!data?.length) return null;
 
@@ -64,16 +68,17 @@ export function BarHorizontal({
             tickLine={false}
             axisLine={false}
             width={yAxisWidth}
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: yAxisTickFontSize }}
           />
           <XAxis type="number" hide domain={xDomain} />
-          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartTooltip content={<ChartTooltipContent hideLabel={hideTooltipLabel} />} />
           
           {/* Aplicação do gradiente no fill */}
           <Bar
             dataKey={dataKey}
             fill={colorKey ? undefined : `url(#${gradientId})`}
             radius={[0, 4, 4, 0]}
+            barSize={barSize}
           >
             {colorKey && data.map((entry, index) => (
               <Cell
@@ -86,7 +91,8 @@ export function BarHorizontal({
               <LabelList
                 dataKey={dataKey}
                 position="right"
-                className="fill-gray-700 text-xs font-semibold"
+                className="fill-gray-700 font-semibold"
+                style={{ fontSize: valueLabelFontSize }}
               />
             )}
           </Bar>

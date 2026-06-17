@@ -16,10 +16,6 @@ const opStatusConfig = {
     label: "Pausadas",
     color: "var(--chart3)",
   },
-  "Aguardando Início": {
-    label: "Aguardando Início",
-    color: "var(--chart4)",
-  },
   "Concluída": {
     label: "Concluída",
     color: "var(--chart5)",
@@ -69,13 +65,13 @@ export function OPStatusWidget({ setorId = null }) {
     : [];
 
   return (
-    <div className="flex flex-col gap-6 w-full p-4 h-full justify-between">
+    <div className="flex flex-col gap-2 w-full p-2 h-full justify-between">
       {/* Cabeçalho Padronizado */}
       <div className="text-left w-full">
         <h2 className="text-sm font-semibold tracking-tight text-foreground">
           Status das OPs
         </h2>
-        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
+        <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizando em tempo real</p>
       </div>
 
       <div className="flex items-center justify-center flex-1 w-full min-h-[200px]">

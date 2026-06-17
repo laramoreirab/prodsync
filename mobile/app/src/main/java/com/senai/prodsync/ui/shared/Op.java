@@ -11,8 +11,9 @@ public class Op {
     private String status;
     private String operador;
     private String dataInicio;
+    private String fotoMaquinaUrl;
 
-    public Op(String id, String maquina, String prioridade, String dataFinal, String setor, String produto, int quantidade, String status, String operador, String dataInicio) {
+    public Op(String id, String maquina, String prioridade, String dataFinal, String setor, String produto, int quantidade, String status, String operador, String dataInicio, String fotoMaquinaUrl) {
         this.id = id;
         this.maquina = maquina;
         this.prioridade = prioridade;
@@ -23,6 +24,7 @@ public class Op {
         this.status = status;
         this.operador = operador;
         this.dataInicio = dataInicio;
+        this.fotoMaquinaUrl = fotoMaquinaUrl;
     }
 
     public String getId() { return id; }
@@ -35,4 +37,5 @@ public class Op {
     public String getStatus() { return status; }
     public String getOperador() { return operador; }
     public String getDataInicio() { return dataInicio; }
+    public String getFotoMaquinaUrl() { return fotoMaquinaUrl; }
 }

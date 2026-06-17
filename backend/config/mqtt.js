@@ -3,7 +3,17 @@ import EventoModel from '../models/EventoModel.js';
 import MaquinaModel from '../models/MaquinaModel.js';
 
 const clienteMQTT = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
-const TOPICOS = ['phietro/fabrica/+/status', 'phietro/fabrica/pareamento'];
+const TOPICO_STATUS_FILTRO = 'phietro/fabrica/+/status';
+const TOPICO_PAREAMENTO = 'phietro/fabrica/pareamento';
+const MQTT_SHARED_GROUP = process.env.MQTT_SHARED_GROUP || 'prodsync-backend';
+const USAR_SHARED_SUBSCRIPTION = process.env.MQTT_SHARED_SUBSCRIPTIONS !== 'false';
+const montarTopicoAssinatura = (topico) => (
+  USAR_SHARED_SUBSCRIPTION ? `$share/${MQTT_SHARED_GROUP}/${topico}` : topico
+);
+const TOPICOS = [
+  montarTopicoAssinatura(TOPICO_STATUS_FILTRO),
+  montarTopicoAssinatura(TOPICO_PAREAMENTO)
+];
 
 function topicoControlePlaca(board_uid) {
   return `phietro/fabrica/${board_uid}/controle`;
@@ -27,14 +37,6 @@ function publicarControlePlaca(board_uid, payload) {
 
 function normalizarStatus(status) {
   return EventoModel.normalizarStatusMaquina(status) ?? status;
-
-  const valor = String(status ?? '').trim().toUpperCase();
-  if (valor === 'PRODUZINDO') return 'Produzindo';
-  if (valor === 'SETUP' || valor === 'SETUP/AJUSTE') return 'Setup';
-  if (valor === 'PARADA') return 'Parada';
-  if (valor === 'MANUTENCAO' || valor === 'MANUTENÇÃO') return 'Manutencao';
-  if (valor === 'AGUARDANDO') return 'Aguardando';
-  return status;
 }
 
 function publicarStatusRegistrado(dados, status, id_empresa, id_maquina, evento) {
@@ -61,7 +63,6 @@ function publicarStatusRejeitado(dados, status, mensagem) {
 
 async function processarPareamento(dados, topic) {
   const resultado = await MaquinaModel.registrarSolicitacaoPareamentoPlaca({
-    id_empresa: dados.id_empresa,
     board_uid: dados.board_uid,
     mac: dados.mac,
     firmware_version: dados.firmware_version,
@@ -109,7 +110,7 @@ clienteMQTT.on('message', async (topic, message) => {
   try {
     dados = JSON.parse(message.toString());
 
-    if (topic === 'phietro/fabrica/pareamento' || dados.tipo === 'PAIRING_REQUEST') {
+    if (topic === TOPICO_PAREAMENTO || dados.tipo === 'PAIRING_REQUEST') {
       await processarPareamento(dados, topic);
       return;
     }

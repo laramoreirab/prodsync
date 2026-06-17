@@ -1,6 +1,15 @@
 import EventoModel from '../models/EventoModel.js';
 import prisma from '../config/prisma.js';
 
+function formatarDuracaoComSegundos(minutos) {
+    const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+    const horas = Math.floor(totalSegundos / 3600);
+    const mins = Math.floor((totalSegundos % 3600) / 60);
+    const segs = totalSegundos % 60;
+
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}`;
+}
+
 class EventoController {
     static async listarTodos(req, res) {
         try {
@@ -10,24 +19,48 @@ class EventoController {
                 ? await EventoModel.listarPorOperador(id_empresa, req.user.id_usuario, paginacao)
                 : await EventoModel.listarTodos(id_empresa, paginacao, req.query.setorId);
 
+            const eventos = resultado.dados || [];
+            const idsOrdenados = eventos.length > 0
+                ? await prisma.historico_Eventos.findMany({
+                    where: {
+                        id_empresa,
+                        ...(req.user.tipo === 'Operador'
+                            ? { id_maquina: eventos[0].id_maquina }
+                            : req.query.setorId
+                                ? { setor_afetado: Number(req.query.setorId) }
+                                : {})
+                    },
+                    select: { id_evento: true },
+                    orderBy: { id_evento: 'asc' }
+                })
+                : [];
+            const numeroPorEvento = new Map(idsOrdenados.map((evento, index) => [evento.id_evento, index + 1]));
+
             // Normaliza para o formato esperado pelo frontend
-            const dadosNormalizados = (resultado.dados || []).map(evento => ({
-                id: evento.id_evento,
-                id_evento: evento.id_evento,
-                maquina: evento.maquina?.nome ?? '',
-                id_maquina: evento.id_maquina,
-                tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
-                status_maquina: evento.status_atual,
-                setor_afetado: evento.setor_afetado,
-                inicio: evento.inicio ? new Date(evento.inicio).toISOString() : null,
-                fim: evento.termino ? new Date(evento.termino).toISOString() : null,
-                duracao: evento.duracao ? `${Math.floor(evento.duracao / 60)}:${String(evento.duracao % 60).padStart(2, '0')}` : null,
-                id_motivo_parada: evento.id_motivo_parada,
-                motivo: evento.motivo_parada?.descricao ?? null,
-                observacao: evento.observacao,
-                justificada: !!evento.id_motivo_parada,
-                inicio_formatado: evento.inicio ? new Date(evento.inicio).toLocaleString('pt-BR') : null,
-            }));
+            const dadosNormalizados = eventos.map((evento) => {
+                const numeroEvento = numeroPorEvento.get(evento.id_evento) ?? evento.id_evento;
+
+                return {
+                    id: evento.id_evento,
+                    id_evento: evento.id_evento,
+                    numero_evento: numeroEvento,
+                    numero_evento_empresa: numeroEvento,
+                    numero_evento_maquina: numeroEvento,
+                    maquina: evento.maquina?.nome ?? '',
+                    id_maquina: evento.id_maquina,
+                    tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
+                    status_maquina: evento.status_atual === 'Manutencao' ? 'Parada' : evento.status_atual,
+                    setor_afetado: evento.setor_afetado,
+                    inicio: evento.inicio ? new Date(evento.inicio).toISOString() : null,
+                    fim: evento.termino ? new Date(evento.termino).toISOString() : null,
+                    duracao: evento.duracao ? formatarDuracaoComSegundos(evento.duracao) : null,
+                    id_motivo_parada: evento.id_motivo_parada,
+                    motivo: evento.motivo_parada?.descricao ?? null,
+                    observacao: evento.observacao,
+                    justificada: !!evento.id_motivo_parada,
+                    inicio_formatado: evento.inicio ? new Date(evento.inicio).toLocaleString('pt-BR') : null,
+                };
+            });
 
             return res.status(200).json({
                 sucesso: true,
@@ -341,7 +374,10 @@ class EventoController {
 
     static async obterTopMotivosTempo(req, res) {
         try {
-            const limite = req.query.limite ? Number(req.query.limite) : 5;
+            const limiteParam = Number(req.query.limite ?? 3);
+            const limite = Number.isFinite(limiteParam) && limiteParam > 0
+                ? Math.min(Math.trunc(limiteParam), 10)
+                : 3;
             const dados = await EventoModel.obterTopMotivosTempo(req.user.id_empresa, limite, req.query.setorId);
 
             return res.status(200).json({ sucesso: true, dados });
@@ -381,14 +417,7 @@ class EventoController {
                 return res.status(400).json({ sucesso: false, erro: 'ID do evento inválido' });
             }
 
-            const evento = await prisma.historico_Eventos.findFirst({
-                where: { id_evento, id_empresa },
-                include: {
-                    maquina: { select: { id_maquina: true, nome: true, serie: true } },
-                    motivo_parada: { select: { id_motivo: true, descricao: true, tipo: true } },
-                    turno: { select: { id_turno: true, nome_turno: true } }
-                }
-            });
+            const evento = await EventoModel.buscarPorId(id_evento, id_empresa)
 
             if (!evento) {
                 return res.status(404).json({ sucesso: false, erro: 'Evento não encontrado' });
@@ -401,12 +430,12 @@ class EventoController {
                 maquina: evento.maquina?.nome ?? '',
                 id_maquina: evento.id_maquina,
                 tipo: evento.status_atual === 'Setup' ? 'Setup' : 'Parada',
-                status_maquina: evento.status_atual,
+                status_maquina: evento.status_atual === 'Manutencao' ? 'Parada' : evento.status_atual,
                 setor_afetado: evento.setor_afetado,
                 maquinas: [evento.id_maquina],
                 inicio: evento.inicio ? evento.inicio.toISOString() : null,
                 fim: evento.termino ? evento.termino.toISOString() : null,
-                duracao: evento.duracao ? `${Math.floor(evento.duracao / 60)}:${String(evento.duracao % 60).padStart(2, '0')}` : null,
+                duracao: evento.duracao ? formatarDuracaoComSegundos(evento.duracao) : null,
                 id_motivo_parada: evento.id_motivo_parada,
                 motivo: evento.motivo_parada?.descricao ?? null,
                 observacao: evento.observacao,
@@ -472,7 +501,7 @@ class EventoController {
             }
 
             const duracao = evento.duracao
-                ? `${Math.floor(evento.duracao / 60)}h ${evento.duracao % 60}m`
+                ? formatarDuracaoComSegundos(evento.duracao)
                 : 'Em andamento';
 
             return res.status(200).json({

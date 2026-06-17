@@ -10,9 +10,9 @@ export function useSetores() {
     ...setor,
     id: setor.id ?? setor.id_setor,
     // Pega o nome do primeiro gestor vinculado, se houver
-    gestor: setor.gestor ?? setor.gestores?.[0]?.gestor?.nome ?? "-",
+    gestor: setor.gestor ?? setor.gestores?.[0]?.gestor?.nome ?? "Não atribuído",
     // Como esses campos já vêm calculados do backend, apenas garantimos um valor padrão
-    oee_medio: setor.oee_medio ?? "-",
+    oee_medio: setor.oee_medio ?? "0%",
     qtd_de_maquinas: setor.qtd_de_maquinas ?? 0,
     qtd_de_operadores: setor.qtd_de_operadores ?? 0,
   });

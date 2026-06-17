@@ -29,8 +29,8 @@ public class Machine {
     @SerializedName("data_aquisicao")
     private String dataAquisicao;
 
-    @SerializedName("foto")
-    private String fotoUrl;
+    @SerializedName(value = "imagem", alternate = {"foto", "foto_url"})
+    private String imagem;
     
     @SerializedName("setor")
     private SetorInfo setorInfo;
@@ -55,7 +55,14 @@ public class Machine {
         if (dataAquisicao == null || dataAquisicao.isEmpty() || dataAquisicao.equals("null")) return "Não Informado.";
         return dataAquisicao; 
     }
-    public String getFotoUrl() { return fotoUrl; }
+    
+    public String getFotoUrl() { 
+        if (imagem != null && !imagem.startsWith("http") && !imagem.isEmpty()) {
+            // Fallback para imagens locais do backend antigo, se ainda existirem
+            return "https://prodsync-backend.onrender.com/uploads/imagens/" + imagem;
+        }
+        return imagem; 
+    }
     
     public String getSetor() { 
         if (setorInfo != null) {

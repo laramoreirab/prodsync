@@ -35,12 +35,12 @@ import {
   LoadingState,
   WidgetCard,
   ContentGrid,
-} from "@/components/AnimatedComponents";
+} from "@/components/AnimatedComponents"; 
 
 
 const colunasEventos = [
-  { id: "id", key: "id", label: "ID", className: "w-25 text-center justify-center" },
-  { id: "nome", key: "nome", label: "Nome" },
+  { id: "numero_evento", key: "numero_evento", label: "ID", className: "w-10 text-center justify-center" },
+  { id: "nome", key: "nome", label: "Nome", className: "w-1/9" },
   {
     id: "status",
     key: "status",
@@ -71,8 +71,8 @@ const colunasEventos = [
     label: "Duracao",
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
-  { id: "motivo", key: "motivo", label: "Motivo" },
-  { id: "observacao", key: "observacao", label: "Observacao" },
+  { id: "motivo", key: "motivo", label: "Motivo", className: "truncate max-w-[245px]" },
+  { id: "observacao", key: "observacao", label: "Observacao",className: "truncate max-w-[200px]" },
 ];
 
 const historicoEventosFilter = [
@@ -104,8 +104,8 @@ export default function HistoricoEventosGestor() {
 
   const handleSort = (criterio) => {
     const ordenado = [...dados].sort((a, b) => {
-      if (criterio === "id_asc") return Number(a.id) - Number(b.id);
-      if (criterio === "id_desc") return Number(b.id) - Number(a.id);
+      if (criterio === "id_asc") return Number(a.numero_evento) - Number(b.numero_evento);
+      if (criterio === "id_desc") return Number(b.numero_evento) - Number(a.numero_evento);
       if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
       if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
       return 0;
@@ -133,7 +133,7 @@ export default function HistoricoEventosGestor() {
 
   const dadosExibidos = dados.filter((evento) => {
     const termo = busca.toLowerCase();
-    return evento.nome?.toLowerCase().includes(termo) || String(evento.id).includes(termo);
+    return evento.nome?.toLowerCase().includes(termo) || String(evento.numero_evento).includes(termo) || String(evento.id).includes(termo);
   });
 
   const paradasJustificadas = useMemo(

@@ -66,8 +66,8 @@ import {
 
 const colunasMaquina = [
   {
-    id: "id",
-    key: "id",
+    id: "numero_evento",
+    key: "numero_evento",
     label: "ID",
     className: "w-20 text-center justify-center",
   } /* id da máquina */,
@@ -214,10 +214,11 @@ export default function MaquinaDetalheGestor({ params }) {
   };
 
   const formatarDuracao = (minutos) => {
-    const total = Number(minutos) || 0;
-    const horas = Math.floor(total / 60);
-    const mins = Math.round(total % 60);
-    return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+    const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+    const horas = Math.floor(totalSegundos / 3600);
+    const mins = Math.floor((totalSegundos % 3600) / 60);
+    const segs = totalSegundos % 60;
+    return `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(segs).padStart(2, "0")}`;
   };
 
   useEffect(() => {
@@ -235,10 +236,10 @@ export default function MaquinaDetalheGestor({ params }) {
           .filter((item) => item.tipo !== "Producao")
           .map((item) => ({
             ...item,
-            tipoEvento: item.tipo,
+            tipoEvento: item.tipo === "Setup" ? "Setup" : "Parada",
             data: formatarPeriodo(item.inicio, item.fim),
             duracao: formatarDuracao(item.duracao_minutos),
-            motivo: item.motivo || "-",
+            motivo: item.motivo || "Não Justificado",
           }));
         const apontamentos = historico
           .filter((item) => item.tipo === "Producao")
@@ -253,7 +254,7 @@ export default function MaquinaDetalheGestor({ params }) {
             duracao: formatarDuracao(item.duracao_minutos),
             produzido: String(item.produzido || 0),
             refugo: String(item.refugo || 0),
-            observacao: item.motivo || "-",
+            observacao: item.observacao || "Sem observação",
           }));
 
         setTodosEventos(eventos);
@@ -296,8 +297,8 @@ export default function MaquinaDetalheGestor({ params }) {
     const dadosCopiados = [...dados];
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === "id_asc") return a.id - b.id;
-      if (criterio === "id_desc") return b.id - a.id;
+      if (criterio === "id_asc") return Number(a.numero_evento) - Number(b.numero_evento);
+      if (criterio === "id_desc") return Number(b.numero_evento) - Number(a.numero_evento);
 
       if (criterio === "data_asc") return parseData(a.data) - parseData(b.data);
       if (criterio === "data_desc")
@@ -381,6 +382,7 @@ export default function MaquinaDetalheGestor({ params }) {
     return (
       (evento.tipoEvento?.toLowerCase() || "").includes(termo) ||
       (evento.motivo?.toLowerCase() || "").includes(termo) ||
+      evento.numero_evento?.toString().includes(termo) ||
       evento.id?.toString().includes(termo)
     );
   });

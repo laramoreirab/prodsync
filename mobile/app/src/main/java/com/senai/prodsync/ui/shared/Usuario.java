@@ -9,9 +9,9 @@ public class Usuario {
     private String turno;
     private String cpf;
     private String maquinaResponsavel; // Nome/ID da máquina
-    private int fotoRes;
+    private String fotoUrl;
 
-    public Usuario(String nome, String id, String funcao, String setor, String email, String turno, String cpf, String maquinaResponsavel, int fotoRes) {
+    public Usuario(String nome, String id, String funcao, String setor, String email, String turno, String cpf, String maquinaResponsavel, String fotoUrl) {
         this.nome = nome;
         this.id = id;
         this.funcao = funcao;
@@ -20,7 +20,7 @@ public class Usuario {
         this.turno = turno;
         this.cpf = cpf;
         this.maquinaResponsavel = maquinaResponsavel;
-        this.fotoRes = fotoRes;
+        this.fotoUrl = fotoUrl;
     }
 
     public String getNome() { return nome; }
@@ -31,5 +31,5 @@ public class Usuario {
     public String getTurno() { return turno; }
     public String getCpf() { return cpf; }
     public String getMaquinaResponsavel() { return maquinaResponsavel; }
-    public int getFotoRes() { return fotoRes; }
+    public String getFotoUrl() { return fotoUrl; }
 }

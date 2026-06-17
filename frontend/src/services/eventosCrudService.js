@@ -4,27 +4,33 @@ const API_URL = "/api/eventos";
 
 const extrairDados = (resposta) => resposta?.dados ?? resposta ?? [];
 
+const formatarSegundos = (totalSegundos) => {
+  const segundosValidos = Math.max(0, Math.floor(Number(totalSegundos) || 0));
+  const horas = Math.floor(segundosValidos / 3600);
+  const minutos = Math.floor((segundosValidos % 3600) / 60);
+  const segundos = segundosValidos % 60;
+
+  return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
+};
+
 const formatarDuracao = (inicio, fim, duracaoMinutos) => {
   if (typeof duracaoMinutos === "string" && duracaoMinutos.includes(":")) {
-    return duracaoMinutos;
+    const partes = duracaoMinutos.split(":");
+    return partes.length === 2 ? `${duracaoMinutos}:00` : duracaoMinutos;
   }
 
   const duracaoNumero = Number(duracaoMinutos);
   if (Number.isFinite(duracaoNumero)) {
-    const horas = Math.floor(duracaoNumero / 60);
-    const minutos = duracaoNumero % 60;
-    return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+    return formatarSegundos(duracaoNumero * 60);
   }
 
   if (!inicio) return "-";
 
-  const totalMinutos = Math.max(
+  const totalSegundos = Math.max(
     0,
-    Math.round((new Date(fim ?? Date.now()) - new Date(inicio)) / 1000 / 60)
+    Math.floor((new Date(fim ?? Date.now()) - new Date(inicio)) / 1000)
   );
-  const horas = Math.floor(totalMinutos / 60);
-  const minutos = totalMinutos % 60;
-  return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+  return formatarSegundos(totalSegundos);
 };
 
 const formatarDataEvento = (inicio, fim) => {
@@ -41,6 +47,9 @@ const formatarDataEvento = (inicio, fim) => {
   return `${data} (${horaInicio} - ${horaFim})`;
 };
 
+const normalizarTipoEvento = (tipo) => (tipo === "Setup" ? "Setup" : "Parada");
+const normalizarStatusMaquinaEvento = (status) => (status === "Manutencao" ? "Parada" : status);
+
 const normalizarEvento = (evento) => {
   if (!evento) return null;
 
@@ -49,21 +58,26 @@ const normalizarEvento = (evento) => {
     typeof evento.maquina === "object"
       ? evento.maquina?.nome ?? evento.maquina?.serie
       : evento.maquina;
-  const tipo = evento.tipo ?? (evento.status_atual === "Setup" ? "Setup" : "Parada");
+  const statusBase = evento.status_maquina ?? evento.status_atual;
+  const tipo = normalizarTipoEvento(evento.tipo ?? statusBase);
+  const statusMaquina = normalizarStatusMaquinaEvento(statusBase ?? tipo);
 
   return {
     ...evento,
     id: evento.id ?? evento.id_evento,
+    numero_evento: evento.numero_evento ?? evento.numero_evento_empresa ?? evento.numero_evento_maquina ?? evento.id ?? evento.id_evento,
+    numero_evento_empresa: evento.numero_evento_empresa ?? evento.numero_evento,
+    numero_evento_maquina: evento.numero_evento_maquina ?? evento.numero_evento,
     tipo,
-    status: evento.status ?? tipo,
-    status_maquina: evento.status_maquina ?? evento.status_atual,
+    status: normalizarStatusMaquinaEvento(evento.status ?? tipo),
+    status_maquina: statusMaquina,
     maquina: evento.maquina ?? maquinaNome ?? "-",
     maquina_nome: maquinaNome ?? "-",
     nome: evento.nome ?? maquinaNome ?? "-",
     inicio: evento.inicio,
     fim,
     motivo: evento.motivo ?? evento.motivo_parada?.descricao ?? "Aguardando Justificativa",
-    observacao: evento.observacao || "-",
+    observacao: evento.observacao || "Sem observação",
     data: evento.data ?? formatarDataEvento(evento.inicio, fim),
     duracao: evento.duracao_formatada ?? formatarDuracao(evento.inicio, fim, evento.duracao),
     justificada: Boolean(evento.justificada ?? evento.id_motivo_parada),
@@ -86,6 +100,31 @@ const apiService = {
   async getAll(pagina = 1, limite = 50) {
     const response = await apiFetch(`${API_URL}?pagina=${pagina}&limite=${limite}`);
     return normalizarListaResposta(response);
+  },
+
+  async getAllPages(limite = 100) {
+    const primeiraPagina = await this.getAll(1, limite);
+    const totalPaginas = Number(primeiraPagina?.meta?.totalPaginas) || 1;
+    const dados = [...(primeiraPagina?.dados ?? [])];
+
+    if (totalPaginas > 1) {
+      const paginasRestantes = await Promise.all(
+        Array.from({ length: totalPaginas - 1 }, (_, index) => this.getAll(index + 2, limite))
+      );
+
+      for (const pagina of paginasRestantes) {
+        dados.push(...(pagina?.dados ?? []));
+      }
+    }
+
+    const idsVistos = new Set();
+    return dados.filter((evento) => {
+      const id = evento?.id ?? evento?.id_evento;
+      if (!id) return true;
+      if (idsVistos.has(id)) return false;
+      idsVistos.add(id);
+      return true;
+    });
   },
 
   async getById(id) {
