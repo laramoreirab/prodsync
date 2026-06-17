@@ -8,6 +8,10 @@ class TurnoController {
             const id_empresa = req.user.id_empresa;
             const { nome_turno, hora_inicio, hora_fim, dias_semana, id_setor } = req.body;
 
+            if (!id_setor || isNaN(Number(id_setor))) {
+                return res.status(400).json({ sucesso: false, erro: 'Vincule o turno a um setor.' });
+            }
+
             if (!nome_turno || !hora_inicio || !hora_fim || !dias_semana) {
                 return res.status(400).json({ sucesso: false, erro: 'Preencha todos os campos obrigatórios.' });
             }
@@ -33,7 +37,7 @@ class TurnoController {
                     hora_fim: dataFim,
                     dia_semana: diaNormalizado,
                     id_empresa,
-                    id_setor: id_setor ? parseInt(id_setor) : null
+                    id_setor: parseInt(id_setor)
                 };
                 resultados.push(await TurnoModel.criarTurno(dadosTurno));
             }

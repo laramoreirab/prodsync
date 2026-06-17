@@ -82,4 +82,26 @@ export const setorCrudService = {
       method: "GET",
     });
   },
+
+  listarTurnos: async (id_setor) => {
+    return await apiFetch(`${API_URL}/${id_setor}/turnos`, {
+      method: "GET",
+    });
+  },
+
+  sincronizarTurnos: async (id_setor, ids_turnos) => {
+    return await apiFetch(`${API_URL}/${id_setor}/turnos`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids_turnos }),
+    });
+  },
+
+  atualizarGrupoTurno: async (id_setor, dados) => {
+    return await apiFetch(`${API_URL}/${id_setor}/turnos/grupo`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados),
+    });
+  },
 };

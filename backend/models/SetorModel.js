@@ -159,12 +159,250 @@ class SetorModel {
                                 select: { id_usuario: true, nome: true, email: true }
                             }
                         }
+                    },
+                    turnos: {
+                        orderBy: [
+                            { hora_inicio: 'asc' },
+                            { nome_turno: 'asc' }
+                        ]
                     }
                 }
             });
             return setor || null;
         } catch (error) {
             console.error('Erro ao obter setor por ID:', error);
+            throw error;
+        }
+    }
+
+    static chaveTurno(turno) {
+        return [
+            turno.nome_turno,
+            new Date(turno.hora_inicio).getTime(),
+            new Date(turno.hora_fim).getTime(),
+            turno.dia_semana
+        ].join('|');
+    }
+
+    static normalizarDiaSemana(dia) {
+        return String(dia || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/-feira|_feira/gi, '')
+            .replace('Terca', 'Terca')
+            .replace('Sabado', 'Sabado');
+    }
+
+    static criarDataHorario(horario) {
+        if (horario instanceof Date) return horario;
+        if (typeof horario !== 'string' || !/^\d{1,2}:\d{2}$/.test(horario)) {
+            throw new Error('Horario invalido');
+        }
+
+        const [hora, minuto] = horario.split(':');
+        const data = new Date();
+        data.setHours(Number(hora), Number(minuto), 0, 0);
+        return data;
+    }
+
+    static async removerTurnoDoSetor(tx, turno) {
+        const [apontamentos, eventos, escalas] = await Promise.all([
+            tx.apontamento.count({ where: { id_turno: turno.id_turno } }),
+            tx.historico_Eventos.count({ where: { id_turno: turno.id_turno } }),
+            tx.escalaTrabalho.count({ where: { id_turno: turno.id_turno } })
+        ]);
+
+        if (apontamentos === 0 && eventos === 0 && escalas === 0) {
+            await tx.turno.delete({ where: { id_turno: turno.id_turno } });
+            return;
+        }
+
+        await tx.turno.update({
+            where: { id_turno: turno.id_turno },
+            data: { id_setor: null }
+        });
+    }
+
+    static async listarTurnosDoSetor(id_setor, id_empresa) {
+        try {
+            return await prisma.turno.findMany({
+                where: {
+                    id_setor,
+                    id_empresa
+                },
+                orderBy: [
+                    { hora_inicio: 'asc' },
+                    { nome_turno: 'asc' }
+                ]
+            });
+        } catch (error) {
+            console.error('Erro ao listar turnos do setor:', error);
+            throw error;
+        }
+    }
+
+    static async sincronizarTurnos(id_setor, id_empresa, ids_turnos) {
+        try {
+            const ids = ids_turnos.map(Number).filter((id) => Number.isInteger(id) && id > 0);
+            if (ids.length !== ids_turnos.length) {
+                throw new Error('IDs de turnos invalidos');
+            }
+
+            return await prisma.$transaction(async (tx) => {
+                const setor = await tx.setores.findFirst({
+                    where: { id_setor, id_empresa },
+                    select: { id_setor: true }
+                });
+
+                if (!setor) {
+                    throw new Error('Setor nao encontrado ou nao pertence a empresa');
+                }
+
+                const turnosSelecionados = ids.length > 0
+                    ? await tx.turno.findMany({
+                        where: {
+                            id_empresa,
+                            id_turno: { in: ids }
+                        }
+                    })
+                    : [];
+
+                if (turnosSelecionados.length !== ids.length) {
+                    throw new Error('Um ou mais turnos nao pertencem a empresa');
+                }
+
+                const turnosAtuais = await tx.turno.findMany({
+                    where: { id_setor, id_empresa }
+                });
+
+                const chavesDesejadas = new Set(turnosSelecionados.map((turno) => this.chaveTurno(turno)));
+                const chavesAtuais = new Map(turnosAtuais.map((turno) => [this.chaveTurno(turno), turno]));
+
+                for (const turno of turnosSelecionados) {
+                    const chave = this.chaveTurno(turno);
+                    if (chavesAtuais.has(chave)) continue;
+
+                    await tx.turno.create({
+                        data: {
+                            nome_turno: turno.nome_turno,
+                            hora_inicio: turno.hora_inicio,
+                            hora_fim: turno.hora_fim,
+                            dia_semana: turno.dia_semana,
+                            id_empresa,
+                            id_setor
+                        }
+                    });
+                }
+
+                const turnosRemovidos = turnosAtuais.filter((turno) => !chavesDesejadas.has(this.chaveTurno(turno)));
+
+                for (const turno of turnosRemovidos) {
+                    await this.removerTurnoDoSetor(tx, turno);
+                }
+
+                await tx.turno.deleteMany({
+                    where: {
+                        id_empresa,
+                        id_setor: null,
+                        apontamentos: { none: {} },
+                        escalas: { none: {} },
+                        historico_eventos: { none: {} }
+                    }
+                });
+
+                return tx.turno.findMany({
+                    where: { id_setor, id_empresa },
+                    orderBy: [
+                        { hora_inicio: 'asc' },
+                        { nome_turno: 'asc' }
+                    ]
+                });
+            });
+        } catch (error) {
+            console.error('Erro ao sincronizar turnos do setor:', error);
+            throw error;
+        }
+    }
+
+    static async atualizarGrupoTurno(id_setor, id_empresa, dados) {
+        try {
+            const ids = (dados.ids_turnos || []).map(Number).filter((id) => Number.isInteger(id) && id > 0);
+            const dias = (dados.dias_semana || []).map((dia) => this.normalizarDiaSemana(dia));
+            const diasUnicos = [...new Set(dias)].filter(Boolean);
+            const horaInicio = this.criarDataHorario(dados.hora_inicio);
+            const horaFim = this.criarDataHorario(dados.hora_fim);
+
+            if (ids.length === 0) throw new Error('IDs de turnos invalidos');
+            if (diasUnicos.length === 0) throw new Error('Selecione ao menos um dia da semana');
+
+            return await prisma.$transaction(async (tx) => {
+                const turnosAtuais = await tx.turno.findMany({
+                    where: {
+                        id_empresa,
+                        id_setor,
+                        id_turno: { in: ids }
+                    },
+                    orderBy: { id_turno: 'asc' }
+                });
+
+                if (turnosAtuais.length === 0) {
+                    throw new Error('Turno nao encontrado ou nao pertence ao setor');
+                }
+
+                const nomeTurno = turnosAtuais[0].nome_turno;
+                const turnosPorDia = new Map(turnosAtuais.map((turno) => [turno.dia_semana, turno]));
+
+                for (const dia of diasUnicos) {
+                    const existente = turnosPorDia.get(dia);
+                    if (existente) {
+                        await tx.turno.update({
+                            where: { id_turno: existente.id_turno },
+                            data: {
+                                hora_inicio: horaInicio,
+                                hora_fim: horaFim
+                            }
+                        });
+                        continue;
+                    }
+
+                    await tx.turno.create({
+                        data: {
+                            nome_turno: nomeTurno,
+                            hora_inicio: horaInicio,
+                            hora_fim: horaFim,
+                            dia_semana: dia,
+                            id_empresa,
+                            id_setor
+                        }
+                    });
+                }
+
+                const diasDesejados = new Set(diasUnicos);
+                const turnosRemovidos = turnosAtuais.filter((turno) => !diasDesejados.has(turno.dia_semana));
+                for (const turno of turnosRemovidos) {
+                    await this.removerTurnoDoSetor(tx, turno);
+                }
+
+                await tx.turno.deleteMany({
+                    where: {
+                        id_empresa,
+                        id_setor: null,
+                        apontamentos: { none: {} },
+                        escalas: { none: {} },
+                        historico_eventos: { none: {} }
+                    }
+                });
+
+                return tx.turno.findMany({
+                    where: { id_setor, id_empresa },
+                    orderBy: [
+                        { hora_inicio: 'asc' },
+                        { nome_turno: 'asc' }
+                    ]
+                });
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar grupo de turnos do setor:', error);
             throw error;
         }
     }
