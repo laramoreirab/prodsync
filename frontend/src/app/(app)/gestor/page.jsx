@@ -94,7 +94,7 @@ export default function DashboardGeralGestor() {
         </WidgetCard>
       </ContentGrid>
 
-      <KPIGrid cols={4} className="mt-2">
+      <KPIGrid cols={4} className="mt-6">
         <KPICardDecorated>
           <MediaParadasDiaWidget setorId={setorId} />
         </KPICardDecorated>

@@ -14,22 +14,25 @@ export function OPConcluidasDiaWidget({ setorId = null }) {
 
 
   return (
-    <div className="p-5 h-full">
-      <header>
+<div className="flex h-full w-full flex-col">
+      <div className="shrink-0">
         <p className="text-sm font-semibold text-black">
           OPs Concluídas
         </p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
-      </header>
+      </div>
 
-      <div className="mt-2">
+      <div className="min-h-0 flex-1 flex flex-col justify-center items-center w-full">
+        <div className="w-full flex justify-center flex-col">
         <AreaChartBase
           data={data}
           xKey="dia"
           yKey="total"
           config={opConcluidasConfig}
+          size="AA"
         />
+      </div>
       </div>
     </div>
   );
