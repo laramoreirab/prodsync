@@ -85,7 +85,7 @@ export function ProducaoTotalWidget({ setorId }) {
   
       {/* Gráfico */}
       <div className="w-full overflow-x-auto">
-        <AreaChartBase data={dadosGrafico} xKey="data" yKey="total" config={producaoTotalConfig} />
+        <AreaChartBase data={dadosGrafico} xKey="data" yKey="total" config={producaoTotalConfig} size="medio" />
       </div>
     </div>
   );

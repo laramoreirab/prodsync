@@ -18,11 +18,11 @@ export function ProducaoPorHoraOperadorWidget({ operadorId }) {
   return (
     <AreaChartBase
       title="Produção por Hora"
-      description="Volume de peças produzidas por intervalo"
       data={data}
       config={producaoPorHoraConfig}
       xKey="hora"
       yKey="qtd"
+      size="AA" 
     />
   );
 }
