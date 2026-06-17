@@ -18,6 +18,9 @@ router.get('/totalSetores', aplicarEscopoGestor, SetorController.totalDeSetores)
 
 router.post('/criarSetor', adminMiddleware, SetorController.criarSetor)
 router.post('/:id_setor/maquinas', adminMiddleware, SetorController.associarMaquinas)
+router.get('/:id_setor/turnos', autorizarSetorParam('id_setor'), SetorController.listarTurnosDoSetor)
+router.put('/:id_setor/turnos/grupo', adminMiddleware, SetorController.atualizarGrupoTurno)
+router.put('/:id_setor/turnos', adminMiddleware, SetorController.sincronizarTurnos)
 
 router.get('/gestor', gestorMiddleware, SetorController.listarMeusSetores)
 router.get('/empresa', aplicarEscopoGestor, SetorController.listarSetores)

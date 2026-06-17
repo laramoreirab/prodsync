@@ -20,6 +20,16 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     const [listaMaquinas, setListaMaquinas] = useState([]);
     const [maquinasDisponiveis, setMaquinasDisponiveis] = useState([]);
 
+    // estados dos turnos
+    const [turnoSelecionado, setTurnoSelecionado] = useState("");
+    const [listaTurnos, setListaTurnos] = useState([]);
+    const [turnosDisponiveis, setTurnosDisponiveis] = useState([]);
+    const [turnoEditandoKey, setTurnoEditandoKey] = useState(null);
+    const [diasTurnoEditando, setDiasTurnoEditando] = useState([]);
+    const [inicioTurnoEditando, setInicioTurnoEditando] = useState("");
+    const [fimTurnoEditando, setFimTurnoEditando] = useState("");
+    const [salvandoTurno, setSalvandoTurno] = useState(false);
+
     // estados da equipe
     const [usuarioSelecionado, setUsuarioSelecionado] = useState("");
     const [funcaoSelecionada, setFuncaoSelecionada] = useState("");
@@ -30,6 +40,121 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     const usuariosFiltrados = funcaoSelecionada
         ? usuariosDisponiveis.filter((usuario) => tipoUsuario(usuario) === funcaoSelecionada)
         : usuariosDisponiveis;
+
+    const formatarHorario = (valor) => {
+        if (!valor) return "--:--";
+        return new Date(valor).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    };
+
+    const diasSemanaOrdem = {
+        Segunda: 1,
+        Segunda_feira: 1,
+        Terca: 2,
+        Terça: 2,
+        Terca_feira: 2,
+        Quarta: 3,
+        Quarta_feira: 3,
+        Quinta: 4,
+        Quinta_feira: 4,
+        Sexta: 5,
+        Sexta_feira: 5,
+        Sabado: 6,
+        Sábado: 6,
+        Domingo: 7,
+    };
+
+    const diasSemanaAbreviados = {
+        Segunda: "Seg",
+        Segunda_feira: "Seg",
+        Terca: "Ter",
+        Terça: "Ter",
+        Terca_feira: "Ter",
+        Quarta: "Qua",
+        Quarta_feira: "Qua",
+        Quinta: "Qui",
+        Quinta_feira: "Qui",
+        Sexta: "Sex",
+        Sexta_feira: "Sex",
+        Sabado: "Sáb",
+        Sábado: "Sáb",
+        Domingo: "Dom",
+    };
+
+    const diasSemanaEdicao = [
+        { valor: "Segunda", label: "Seg" },
+        { valor: "Terca", label: "Ter" },
+        { valor: "Quarta", label: "Qua" },
+        { valor: "Quinta", label: "Qui" },
+        { valor: "Sexta", label: "Sex" },
+        { valor: "Sabado", label: "Sáb" },
+        { valor: "Domingo", label: "Dom" },
+    ];
+
+    const extrairHoraInput = (valor) => {
+        if (!valor) return "";
+        const data = new Date(valor);
+        if (Number.isNaN(data.getTime())) return "";
+        return data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    };
+
+    const getTurnoGrupoKey = (turno) => [
+        turno?.nome_turno,
+        turno?.hora_inicio,
+        turno?.hora_fim,
+    ].join("|");
+
+    const getTurnoKey = (turno) => [
+        turno?.nome_turno,
+        turno?.hora_inicio,
+        turno?.hora_fim,
+        turno?.dia_semana,
+    ].join("|");
+
+    const agruparTurnosPorHorario = (turnos) => {
+        const grupos = new Map();
+
+        for (const turno of turnos) {
+            const key = getTurnoGrupoKey(turno);
+            const grupo = grupos.get(key) ?? {
+                key,
+                nome_turno: turno.nome_turno,
+                hora_inicio: turno.hora_inicio,
+                hora_fim: turno.hora_fim,
+                ids: [],
+                dias: [],
+            };
+
+            if (!grupo.dias.some((dia) => dia.valor === turno.dia_semana)) {
+                grupo.dias.push({
+                    valor: turno.dia_semana,
+                    label: diasSemanaAbreviados[turno.dia_semana] ?? String(turno.dia_semana || ""),
+                    ordem: diasSemanaOrdem[turno.dia_semana] ?? 99,
+                });
+            }
+
+            if (!grupo.ids.includes(String(turno.id_turno))) {
+                grupo.ids.push(String(turno.id_turno));
+            }
+
+            grupos.set(key, grupo);
+        }
+
+        return Array.from(grupos.values()).map((grupo) => {
+            const dias = grupo.dias
+                .sort((a, b) => a.ordem - b.ordem)
+                .map((dia) => dia.label);
+            const horario = `${formatarHorario(grupo.hora_inicio)} - ${formatarHorario(grupo.hora_fim)}`;
+
+            return {
+                ...grupo,
+                label: `${grupo.nome_turno || "Turno"} - ${dias.join(", ")} (${horario})`,
+            };
+        });
+    };
+
+    const turnosDisponiveisAgrupados = agruparTurnosPorHorario(
+        Array.from(new Map(turnosDisponiveis.map((turno) => [getTurnoKey(turno), turno])).values())
+    );
 
     // buscando os dados no banco assim que o modal abre
     useEffect(() => {
@@ -46,6 +171,7 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                     label: maquina.nome,
                     value: String(maquina.id_maquina)
                 })));
+                setListaTurnos(agruparTurnosPorHorario(dados.turnos || []));
 
             } catch (error) {
                 console.error("Erro ao buscar dados do setor:", error);
@@ -69,6 +195,19 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
             }
         }
         carregarMaquinas();
+    }, []);
+
+    useEffect(() => {
+        async function carregarTurnos() {
+            try {
+                const dados = await apiFetch(`/api/turnos/listarTurnos`, { method: "GET" });
+                setTurnosDisponiveis(dados.dados || []);
+            } catch (error) {
+                console.log(error);
+                toast.error("Erro ao carregar turnos.");
+            }
+        }
+        carregarTurnos();
     }, []);
 
     useEffect(() => {
@@ -106,6 +245,85 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     };
     const removerMaquina = (value) => {
         setListaMaquinas(listaMaquinas.filter((m) => m.value !== value));
+    };
+
+    const adicionarTurno = (e) => {
+        e.preventDefault();
+        if (!turnoSelecionado) return;
+
+        const grupo = turnosDisponiveisAgrupados.find((item) => item.key === turnoSelecionado);
+        if (!grupo) return;
+
+        if (listaTurnos.some((item) => item.key === grupo.key)) {
+            setTurnoSelecionado("");
+            return;
+        }
+
+        setListaTurnos([...listaTurnos, grupo]);
+        setTurnoSelecionado("");
+    };
+
+    const removerTurno = (key) => {
+        setListaTurnos(listaTurnos.filter((turno) => turno.key !== key));
+    };
+
+    const abrirEditorTurno = (turno) => {
+        if (turnoEditandoKey === turno.key) {
+            setTurnoEditandoKey(null);
+            return;
+        }
+
+        setTurnoEditandoKey(turno.key);
+        setDiasTurnoEditando(turno.dias.map((dia) => dia.valor));
+        setInicioTurnoEditando(extrairHoraInput(turno.hora_inicio));
+        setFimTurnoEditando(extrairHoraInput(turno.hora_fim));
+    };
+
+    const alternarDiaTurno = (dia) => {
+        setDiasTurnoEditando((diasAtuais) => (
+            diasAtuais.includes(dia)
+                ? diasAtuais.filter((item) => item !== dia)
+                : [...diasAtuais, dia]
+        ));
+    };
+
+    const salvarEdicaoTurno = async (e, turno) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (diasTurnoEditando.length === 0) {
+            toast.error("Selecione pelo menos um dia para o turno.");
+            return;
+        }
+
+        if (!inicioTurnoEditando || !fimTurnoEditando) {
+            toast.error("Informe os horários de início e fim.");
+            return;
+        }
+
+        setSalvandoTurno(true);
+        try {
+            const resposta = await setorCrudService.atualizarGrupoTurno(setorId, {
+                ids_turnos: turno.ids.map(Number),
+                dias_semana: diasTurnoEditando,
+                hora_inicio: inicioTurnoEditando,
+                hora_fim: fimTurnoEditando,
+            });
+
+            const turnos = resposta.dados || [];
+            setListaTurnos(agruparTurnosPorHorario(turnos));
+
+            const turnosAtualizados = await apiFetch(`/api/turnos/listarTurnos`, { method: "GET" });
+            setTurnosDisponiveis(turnosAtualizados.dados || []);
+
+            setTurnoEditandoKey(null);
+            toast.success("Turno atualizado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao atualizar turno:", error);
+            toast.error(error.message || "Erro ao atualizar turno.");
+        } finally {
+            setSalvandoTurno(false);
+        }
     };
 
     // funções para adicionar e remover colaboradores
@@ -155,6 +373,12 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                     listaMaquinas.map(m => Number(m.value))
                 );
             }
+
+            // sincronizar turnos do setor — ids_turnos (array), id do setor na URL
+            await setorCrudService.sincronizarTurnos(
+                setorId,
+                listaTurnos.flatMap((turno) => turno.ids.map(Number))
+            );
 
             // associar gestor se houver — id_gestor no body, id do setor na URL
             const gestor = listaEquipe.find(m => m.funcao === "Gestor");
@@ -220,9 +444,130 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
 
                 <Separator className="bg-gray-200" />
 
+                {/* turnos do setor */}
+                <div>
+                    <h2 className="text-2xl font-semibold text-black">2. Turnos</h2>
+                    <p className="text-xl text-[#545454] font-medium mb-4">Vincule os turnos que operarão nesse setor.</p>
+
+                    <div className="flex items-center gap-3">
+                        <div className="relative w-full max-w-md">
+                            <select
+                                value={turnoSelecionado}
+                                onChange={(e) => setTurnoSelecionado(e.target.value)}
+                                className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
+                            >
+                                <option value="" disabled>Selecione</option>
+                                {turnosDisponiveisAgrupados
+                                    .filter((turno) => !listaTurnos.some((item) => item.key === turno.key))
+                                    .map((turno) => (
+                                        <option key={turno.key} value={turno.key}>
+                                            {turno.label}
+                                        </option>
+                                    ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                <ChevronDown className="h-4 w-4" />
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={adicionarTurno}
+                            className="bg-[#002C6A] hover:bg-[#001f4d] text-white rounded-full w-9 h-9 flex items-center justify-center focus:outline-none transition-colors shrink-0"
+                        >
+                            <Plus className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col gap-2 mt-4">
+                        {listaTurnos.map((turno) => (
+                            <div key={turno.key} className="w-full">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => abrirEditorTurno(turno)}
+                                        className="bg-[#F2F2F2] text-[#333333] font-medium px-3 py-1.5 rounded-md flex items-center gap-2 text-[15px] text-left focus:outline-none"
+                                    >
+                                        <span>{turno.label}</span>
+                                        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${turnoEditandoKey === turno.key ? "rotate-180" : ""}`} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); removerTurno(turno.key); }}
+                                        className="text-gray-500 focus:outline-none"
+                                    >
+                                        <XIcon className="h-4 w-4" />
+                                    </button>
+                                </div>
+
+                                {turnoEditandoKey === turno.key && (
+                                    <div className="mt-2 w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                                        <div className="mb-4">
+                                            <p className="text-base font-semibold text-gray-700 mb-2">Dias de operação</p>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {diasSemanaEdicao.map((dia) => (
+                                                    <label key={dia.valor} className="flex min-w-[70px] items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-2 text-sm font-medium text-gray-700">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={diasTurnoEditando.includes(dia.valor)}
+                                                            onChange={() => alternarDiaTurno(dia.valor)}
+                                                            className="h-4 w-4 shrink-0 accent-[#002C6A]"
+                                                        />
+                                                        {dia.label}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-base font-medium text-gray-700 mb-1">Início</label>
+                                                <input
+                                                    type="time"
+                                                    value={inicioTurnoEditando}
+                                                    onChange={(e) => setInicioTurnoEditando(e.target.value)}
+                                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none shadow-sm"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-base font-medium text-gray-700 mb-1">Fim</label>
+                                                <input
+                                                    type="time"
+                                                    value={fimTurnoEditando}
+                                                    onChange={(e) => setFimTurnoEditando(e.target.value)}
+                                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-700 outline-none shadow-sm"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 flex justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setTurnoEditandoKey(null)}
+                                                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => salvarEdicaoTurno(e, turno)}
+                                                disabled={salvandoTurno}
+                                                className="rounded-lg bg-[#002C6A] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                                            >
+                                                {salvandoTurno ? "Salvando..." : "Salvar"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <Separator className="bg-gray-200" />
+
                 {/* máquinas do setor — ids_maquinas (array) */}
                 <div>
-                    <h2 className="text-2xl font-semibold text-black">2. Máquinas do Setor</h2>
+                    <h2 className="text-2xl font-semibold text-black">3. Máquinas do Setor</h2>
                     <p className="text-xl text-[#545454] font-medium mb-4">Vincule os equipamentos que operarão nesse setor.</p>
 
                     <div className="flex items-center gap-3">
@@ -275,7 +620,7 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
 
                 {/* equipe e responsabilidades — id_gestor */}
                 <div>
-                    <h2 className="text-2xl font-semibold text-black">3. Equipe e Responsabilidades</h2>
+                    <h2 className="text-2xl font-semibold text-black">4. Equipe e Responsabilidades</h2>
                     <p className="text-xl text-[#545454] font-medium mb-4">Adicione os colaboradores e defina suas responsabilidades.</p>
 
                     <div className="flex items-end gap-3 max-w-4xl">
