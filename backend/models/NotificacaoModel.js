@@ -3,7 +3,8 @@ import prisma from '../config/prisma.js';
 class NotificacaoModel {
     static tipoPorStatus(status) {
         if (status === 'Setup') return 'Maquina_Setup';
-        return 'Maquina_Parada';
+        if (status === 'Parada') return 'Maquina_Parada';
+        return null;
     }
 
     static async obterAdministradores(id_empresa) {
@@ -39,7 +40,7 @@ class NotificacaoModel {
             where: {
                 id_empresa,
                 id_motivo_parada: null,
-                status_atual: { in: ['Parada', 'Setup', 'Manutencao'] },
+                status_atual: { in: ['Parada', 'Setup'] },
             },
             include: {
                 maquina: { select: { nome: true } },
@@ -57,21 +58,12 @@ class NotificacaoModel {
             if (!deveReceber) continue;
 
             const tipo = this.tipoPorStatus(evento.status_atual);
-            const statusLabel = evento.status_atual === 'Manutencao' ? 'Parada' : evento.status_atual;
+            if (!tipo) continue;
+
+            const statusLabel = evento.status_atual;
             const nomeMaquina = evento.maquina?.nome ?? `Máquina ${evento.id_maquina}`;
 
-            const existente = await prisma.notificacoes.findFirst({
-                where: {
-                    id_empresa,
-                    id_destinatario: Number(id_usuario),
-                    id_evento: evento.id_evento,
-                    tipo: { in: ['Maquina_Parada', 'Maquina_Setup'] },
-                },
-            });
-
-            if (existente) continue;
-
-            await this.criar({
+            await this.criarUnicaPorEvento({
                 id_empresa,
                 id_destinatario: id_usuario,
                 tipo,
@@ -199,6 +191,72 @@ class NotificacaoModel {
         return this.formatar(notificacao);
     }
 
+    static async criarUnicaPorEvento({
+        id_empresa,
+        id_destinatario,
+        tipo,
+        titulo,
+        mensagem,
+        id_evento,
+        id_maquina = null,
+        apenasNaoLida = false,
+    }) {
+        if (!id_evento) {
+            return this.criar({
+                id_empresa,
+                id_destinatario,
+                tipo,
+                titulo,
+                mensagem,
+                id_evento,
+                id_maquina,
+            });
+        }
+
+        return prisma.$transaction(async (tx) => {
+            const idDestinatario = Number(id_destinatario);
+            const idEvento = Number(id_evento);
+            const idMaquina = id_maquina ? Number(id_maquina) : null;
+            const lockKey = `notificacao:${id_empresa}:${idDestinatario}:${idEvento}:${tipo}`;
+
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
+
+            const existente = await tx.notificacoes.findFirst({
+                where: {
+                    id_empresa,
+                    id_destinatario: idDestinatario,
+                    id_evento: idEvento,
+                    tipo,
+                    ...(apenasNaoLida ? { lida: false } : {}),
+                },
+                include: {
+                    maquina: { select: { nome: true } },
+                    evento: { select: { status_atual: true } },
+                },
+            });
+
+            if (existente) return this.formatar(existente);
+
+            const notificacao = await tx.notificacoes.create({
+                data: {
+                    id_empresa,
+                    id_destinatario: idDestinatario,
+                    tipo,
+                    titulo,
+                    mensagem,
+                    id_evento: idEvento,
+                    id_maquina: idMaquina,
+                },
+                include: {
+                    maquina: { select: { nome: true } },
+                    evento: { select: { status_atual: true } },
+                },
+            });
+
+            return this.formatar(notificacao);
+        });
+    }
+
     static async notificarEventoMaquina(id_empresa, evento, nomeMaquina) {
         const status = evento.status_atual;
         if (!['Parada', 'Setup'].includes(status)) return;
@@ -220,7 +278,7 @@ class NotificacaoModel {
 
         const criadas = [];
         for (const id_destinatario of destinatarios) {
-            const notificacao = await this.criar({
+            const notificacao = await this.criarUnicaPorEvento({
                 id_empresa,
                 id_destinatario,
                 tipo,
@@ -247,6 +305,14 @@ class NotificacaoModel {
             throw new Error('Evento não encontrado');
         }
 
+        if (evento.id_motivo_parada) {
+            throw new Error('Evento ja justificado');
+        }
+
+        if (!['Parada', 'Setup'].includes(evento.status_atual)) {
+            throw new Error('Evento nao requer justificativa');
+        }
+
         if (solicitante.tipo === 'Gestor') {
             const setores = await prisma.setor_Gestor.findMany({
                 where: {
@@ -267,31 +333,10 @@ class NotificacaoModel {
             throw new Error('Nenhum operador vinculado à máquina deste evento');
         }
 
-        const existente = await prisma.notificacoes.findFirst({
-            where: {
-                id_empresa,
-                id_destinatario: Number(idOperador),
-                id_evento: evento.id_evento,
-                tipo: 'Solicitar_Justificativa',
-                lida: false,
-            },
-        });
-
-        if (existente) {
-            const completa = await prisma.notificacoes.findUnique({
-                where: { id_notificacao: existente.id_notificacao },
-                include: {
-                    maquina: { select: { nome: true } },
-                    evento: { select: { status_atual: true } },
-                },
-            });
-            return this.formatar(completa);
-        }
-
         const nomeMaquina = evento.maquina?.nome ?? `Máquina ${evento.id_maquina}`;
         const statusLabel = evento.status_atual === 'Setup' ? 'Setup' : 'Parada';
 
-        return this.criar({
+        return this.criarUnicaPorEvento({
             id_empresa,
             id_destinatario: idOperador,
             tipo: 'Solicitar_Justificativa',
@@ -299,6 +344,7 @@ class NotificacaoModel {
             mensagem: `${solicitante.nome ?? 'Administrador'} solicitou justificativa do evento de ${statusLabel} na máquina ${nomeMaquina}.`,
             id_evento: evento.id_evento,
             id_maquina: evento.id_maquina,
+            apenasNaoLida: true,
         });
     }
 
@@ -364,6 +410,19 @@ class NotificacaoModel {
             where: {
                 id_empresa,
                 id_destinatario: Number(id_usuario),
+                lida: false,
+            },
+            data: { lida: true, lida_em: new Date() },
+        });
+
+        return { sucesso: true };
+    }
+
+    static async marcarEventoComoResolvido(id_empresa, id_evento) {
+        await prisma.notificacoes.updateMany({
+            where: {
+                id_empresa,
+                id_evento: Number(id_evento),
                 lida: false,
             },
             data: { lida: true, lida_em: new Date() },

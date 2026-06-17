@@ -699,6 +699,8 @@ class EventoModel {
                 throw new Error('Evento nao encontrado ou nao pertence a empresa');
             }
 
+            await NotificacaoModel.marcarEventoComoResolvido(id_empresa, id_evento);
+
             return await prisma.historico_Eventos.findFirst({
                 where: {
                     id_empresa,
