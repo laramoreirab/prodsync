@@ -578,7 +578,7 @@ function montarInicioApontamentoHoje(fim, periodoHoje) {
 }
 
 async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, agora = new Date()) {
-  const stats = { apontamentos: 0, ops_criadas: 0 };
+  const stats = { apontamentos: 0, ops_criadas: 0, horas_preenchidas: 0 };
   if (maquinas.length === 0 || agora <= periodoHoje.inicio) return stats;
 
   const producoesHoje = await prisma.apontamento.findMany({
@@ -598,6 +598,7 @@ async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, 
   );
   const horarios = criarHorariosProducaoHoje(periodoHoje, agora, horasComProducao);
   const horasPreenchidas = horarios.filter((horario) => horario.getHours() !== agora.getHours()).length;
+  stats.horas_preenchidas = horasPreenchidas;
 
   for (const [index, fim] of horarios.entries()) {
     const maquina = maquinas[index % maquinas.length];
@@ -645,7 +646,7 @@ async function createDashboardApontamento(id_empresa, maquina, turno, ordem, per
 async function ensureDashboardDataEmpresa(empresa, contexto) {
   const id_empresa = empresa.id_empresa;
   if (!config.dashboardEmpresaIds.includes(id_empresa)) {
-    return { dashboard_apontamentos: 0, dashboard_eventos: 0, ops_criadas: 0 };
+    return { dashboard_apontamentos: 0, dashboard_eventos: 0, dashboard_horas_preenchidas: 0, ops_criadas: 0 };
   }
 
   const motivos = contexto?.motivos ?? await ensureMotivos(id_empresa);
@@ -653,12 +654,13 @@ async function ensureDashboardDataEmpresa(empresa, contexto) {
   const periodoDia = await getPeriodoDiaIndustrial(id_empresa);
   const periodoHoje = getPeriodoDiaCalendario();
   const turnoAtual = await getPeriodoTurnoAtual(id_empresa);
-  const stats = { dashboard_apontamentos: 0, dashboard_eventos: 0, ops_criadas: 0 };
+  const stats = { dashboard_apontamentos: 0, dashboard_eventos: 0, dashboard_horas_preenchidas: 0, ops_criadas: 0 };
 
   if (!turnoAtual?.turno || maquinas.length === 0) return stats;
 
   const producaoHojeStats = await preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje);
   stats.dashboard_apontamentos += producaoHojeStats.apontamentos;
+  stats.dashboard_horas_preenchidas += producaoHojeStats.horas_preenchidas;
   stats.ops_criadas += producaoHojeStats.ops_criadas;
 
   const apontamentosDia = await prisma.apontamento.findMany({
@@ -925,6 +927,7 @@ async function simulateEmpresa(empresa) {
     ops_criadas: dashboardStats.ops_criadas,
     dashboard_apontamentos: dashboardStats.dashboard_apontamentos,
     dashboard_eventos: dashboardStats.dashboard_eventos,
+    dashboard_horas_preenchidas: dashboardStats.dashboard_horas_preenchidas,
   };
 
   for (const maquina of selecionadas) {
@@ -981,6 +984,7 @@ async function simulateCycle() {
     ops_criadas: 0,
     dashboard_apontamentos: 0,
     dashboard_eventos: 0,
+    dashboard_horas_preenchidas: 0,
   };
 
   for (const empresa of empresas) {
@@ -991,7 +995,8 @@ async function simulateCycle() {
     `[cron-producao] ciclo empresas=${total.empresas} maquinas=${total.maquinas} ` +
     `ops_criadas=${total.ops_criadas} apontamentos=${total.apontamentos} ` +
     `eventos=${total.eventos} eventos_fechados=${total.eventos_fechados} ` +
-    `dashboard_apontamentos=${total.dashboard_apontamentos} dashboard_eventos=${total.dashboard_eventos}`,
+    `dashboard_apontamentos=${total.dashboard_apontamentos} dashboard_eventos=${total.dashboard_eventos} ` +
+    `dashboard_horas_preenchidas=${total.dashboard_horas_preenchidas}`,
   );
 
   return total;
