@@ -62,7 +62,7 @@ function obterRotaNotificacao(tipoUsuario, notificacao) {
 const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, onOpenChange }) => {
   const router = useRouter();
   const [aberto, setAberto] = useState(defaultOpen ?? false);
-  const { notificacoes, loading, marcarComoLida, marcarTodasComoLidas, excluir } =
+  const { notificacoes, contagem: contagemNaoLidas, loading, marcarComoLida, marcarTodasComoLidas, excluir } =
     useNotificacoes();
   const tipoUsuario = getUserFromToken()?.tipo;
 
@@ -85,7 +85,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, o
   };
 
   const naoLidas = notificacoes.filter((n) => !n.lida).length;
-  const badgeContagem = contagem ?? naoLidas;
+  const badgeContagem = contagem ?? contagemNaoLidas ?? naoLidas;
   const triggerClassName = isValidElement(trigger) ? trigger.props?.className ?? "" : "";
   const triggerIsFullWidth = typeof triggerClassName === "string" && triggerClassName.includes("w-full");
 
@@ -129,6 +129,10 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, o
               )}
             </DropdownMenuLabel>
 
+            <div
+              className="max-h-[min(420px,calc(100vh-14rem))] overflow-y-auto overscroll-contain pr-1"
+              onWheel={(event) => event.stopPropagation()}
+            >
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -191,6 +195,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, o
                 );
               })
             )}
+            </div>
 
             {notificacoes.length > 0 && badgeContagem > 0 && (
               <div className="mx-1.5 my-1 p-2">

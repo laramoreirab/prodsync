@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -87,20 +87,79 @@ const passos = [
   },
 ];
 
+const STORAGE_KEY = "prodsync:production-setup-tour";
+
 export function ProductionSetupTour() {
   const [aberto, setAberto] = useState(false);
   const [passoAtual, setPassoAtual] = useState(0);
+  const [maiorPassoAlcancado, setMaiorPassoAlcancado] = useState(0);
+  const [guiaConcluido, setGuiaConcluido] = useState(false);
+  const [storageCarregado, setStorageCarregado] = useState(false);
   const passo = passos[passoAtual];
   const Icon = passo.icon;
-  const progresso = Math.round(((passoAtual + 1) / passos.length) * 100);
+  const progresso = guiaConcluido
+    ? 100
+    : Math.round(((maiorPassoAlcancado + 1) / passos.length) * 100);
+
+  useEffect(() => {
+    try {
+      const salvo = window.localStorage.getItem(STORAGE_KEY);
+      if (!salvo) {
+        setStorageCarregado(true);
+        return;
+      }
+
+      const dados = JSON.parse(salvo);
+      const passoSalvo = Math.min(Math.max(Number(dados.passoAtual) || 0, 0), passos.length - 1);
+      const maiorSalvo = Math.min(Math.max(Number(dados.maiorPassoAlcancado) || passoSalvo, 0), passos.length - 1);
+
+      setPassoAtual(passoSalvo);
+      setMaiorPassoAlcancado(Math.max(passoSalvo, maiorSalvo));
+      setGuiaConcluido(Boolean(dados.guiaConcluido));
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } finally {
+      setStorageCarregado(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!storageCarregado) return;
+
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        passoAtual,
+        maiorPassoAlcancado,
+        guiaConcluido,
+      })
+    );
+  }, [passoAtual, maiorPassoAlcancado, guiaConcluido, storageCarregado]);
+
+  const selecionarPasso = (index) => {
+    setPassoAtual(index);
+    setMaiorPassoAlcancado((valor) => Math.max(valor, index));
+  };
 
   const abrir = () => {
-    setPassoAtual(0);
     setAberto(true);
   };
 
   const anterior = () => setPassoAtual((valor) => Math.max(0, valor - 1));
-  const proximo = () => setPassoAtual((valor) => Math.min(passos.length - 1, valor + 1));
+  const proximo = () => selecionarPasso(Math.min(passos.length - 1, passoAtual + 1));
+
+  const concluir = () => {
+    setPassoAtual(passos.length - 1);
+    setMaiorPassoAlcancado(passos.length - 1);
+    setGuiaConcluido(true);
+    setAberto(false);
+  };
+
+  const reiniciar = () => {
+    setPassoAtual(0);
+    setMaiorPassoAlcancado(0);
+    setGuiaConcluido(false);
+  };
 
   return (
     <>
@@ -144,18 +203,35 @@ export function ProductionSetupTour() {
               />
             </div>
 
+            {guiaConcluido ? (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 size-6 shrink-0 text-green-600" />
+                  <div>
+                    <h3 className="text-xl font-bold text-[#23304c]">Guia de implantação concluído</h3>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Todas as etapas foram percorridas. Para refazer o fluxo desde o início, reinicie o guia.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5 flex justify-end">
+                  <Button onClick={reiniciar}>Reiniciar guia</Button>
+                </div>
+              </div>
+            ) : (
+              <>
             <div className="space-y-4">
               <div className="grid gap-2 sm:grid-cols-2">
                 {passos.map((item, index) => {
                   const ItemIcon = item.icon;
                   const ativo = index === passoAtual;
-                  const concluido = index < passoAtual;
+                  const concluido = index <= maiorPassoAlcancado;
 
                   return (
                     <button
                       key={item.titulo}
                       type="button"
-                      onClick={() => setPassoAtual(index)}
+                      onClick={() => selecionarPasso(index)}
                       className={cn(
                         "flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
                         ativo
@@ -221,7 +297,7 @@ export function ProductionSetupTour() {
                 Passo {passoAtual + 1} de {passos.length}
               </p>
               {passoAtual === passos.length - 1 ? (
-                <Button onClick={() => setAberto(false)}>Concluir</Button>
+                <Button onClick={concluir}>Concluir</Button>
               ) : (
                 <Button onClick={proximo}>
                   Proximo
@@ -229,6 +305,8 @@ export function ProductionSetupTour() {
                 </Button>
               )}
             </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
