@@ -9,6 +9,10 @@
     "start": "node server.js",
     "simulate": "node scripts/db-simulator.js",
     "simulate:once": "node scripts/db-simulator.js --once",
+    "simulate:once:parallel": "node scripts/db-simulator.js --once --parallel=3",
+    "simulate:once:part1": "node scripts/db-simulator.js --once --part=1/3",
+    "simulate:once:part2": "node scripts/db-simulator.js --once --part=2/3",
+    "simulate:once:part3": "node scripts/db-simulator.js --once --part=3/3",
     "simulate:seed": "node scripts/db-simulator.js --seed-only",
     "simulate:backfill": "node scripts/db-simulator.js --backfill",
     "seed:demo": "node scripts/seed-demo-presentation.js"

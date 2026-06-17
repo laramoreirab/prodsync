@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { backfillHistory, seedSupportData, simulateCycle } from '../scripts/db-simulator.js';
+import { backfillHistory, seedSupportData, simulateCycleParallel, simulateCyclePart } from '../scripts/db-simulator.js';
 
 const router = Router();
 
@@ -24,9 +24,41 @@ function validarSegredo(req, res, next) {
   return next();
 }
 
+function obterPartes(req) {
+  const valor = Number(req.query.parts ?? req.body?.parts ?? process.env.SIMULATOR_PARALLEL_PARTS ?? 3);
+  return Math.min(3, Math.max(1, Number.isFinite(valor) ? valor : 3));
+}
+
+function obterParte(req) {
+  const valor = req.query.part ?? req.body?.part;
+  if (!valor) return null;
+
+  const match = String(valor).match(/^(\d+)\/(\d+)$/);
+  if (match) {
+    return {
+      indice: Number(match[1]),
+      partes: Math.min(3, Math.max(1, Number(match[2]))),
+    };
+  }
+
+  return {
+    indice: Number(valor),
+    partes: obterPartes(req),
+  };
+}
+
+async function executarSimulador(req) {
+  const parte = obterParte(req);
+  if (parte) {
+    return simulateCyclePart(parte.indice, parte.partes);
+  }
+
+  return simulateCycleParallel(obterPartes(req));
+}
+
 router.post('/run', validarSegredo, async (req, res, next) => {
   try {
-    const resultado = await simulateCycle();
+    const resultado = await executarSimulador(req);
     return res.json({ sucesso: true, resultado });
   } catch (error) {
     return next(error);
@@ -35,7 +67,7 @@ router.post('/run', validarSegredo, async (req, res, next) => {
 
 router.get('/run', validarSegredo, async (req, res, next) => {
   try {
-    const resultado = await simulateCycle();
+    const resultado = await executarSimulador(req);
     return res.json({ sucesso: true, resultado });
   } catch (error) {
     return next(error);

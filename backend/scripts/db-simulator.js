@@ -14,6 +14,7 @@ const config = {
   empresaIds: parseIds(process.env.SIMULATOR_EMPRESA_IDS ?? process.env.SIMULATOR_EMPRESA_ID ?? '43,44,45'),
   dashboardEmpresaIds: parseIds(process.env.SIMULATOR_DASHBOARD_EMPRESA_IDS ?? '43,44,45'),
   dashboardMinSetores: Number(process.env.SIMULATOR_DASHBOARD_MIN_SETORES ?? 5),
+  parallelParts: Math.min(3, Math.max(1, Number(process.env.SIMULATOR_PARALLEL_PARTS ?? 3))),
   intervalMs: Number(process.env.SIMULATOR_INTERVAL_MS ?? 60000),
   batchSize: Number(process.env.SIMULATOR_BATCH_SIZE ?? 4),
   historyDays: Number(process.env.SIMULATOR_HISTORY_DAYS ?? 7),
@@ -171,6 +172,13 @@ async function getEmpresasAlvo() {
   }
 
   return empresas;
+}
+
+function dividirEmpresas(empresas, totalPartes = config.parallelParts) {
+  const partes = Math.min(3, Math.max(1, Number(totalPartes) || 1));
+  return Array.from({ length: partes }, (_, indice) => (
+    empresas.filter((_, empresaIndice) => empresaIndice % partes === indice)
+  ));
 }
 
 async function ensureMotivos(id_empresa) {
@@ -1063,9 +1071,8 @@ function sumStats(total, atual) {
   return total;
 }
 
-async function simulateCycle() {
-  const empresas = await getEmpresasAlvo();
-  const total = {
+function criarStatsCiclo() {
+  return {
     empresas: 0,
     maquinas: 0,
     apontamentos: 0,
@@ -1077,21 +1084,68 @@ async function simulateCycle() {
     dashboard_horas_preenchidas: 0,
     kpi_pecas_minuto_apontamentos: 0,
   };
+}
 
-  for (const empresa of empresas) {
-    sumStats(total, await simulateEmpresa(empresa));
-  }
-
+function logStatsCiclo(total, sufixo = '') {
   console.log(
-    `[cron-producao] ciclo empresas=${total.empresas} maquinas=${total.maquinas} ` +
+    `[cron-producao] ciclo${sufixo} empresas=${total.empresas} maquinas=${total.maquinas} ` +
     `ops_criadas=${total.ops_criadas} apontamentos=${total.apontamentos} ` +
     `eventos=${total.eventos} eventos_fechados=${total.eventos_fechados} ` +
     `dashboard_apontamentos=${total.dashboard_apontamentos} dashboard_eventos=${total.dashboard_eventos} ` +
     `dashboard_horas_preenchidas=${total.dashboard_horas_preenchidas} ` +
     `kpi_pecas_minuto_apontamentos=${total.kpi_pecas_minuto_apontamentos}`,
   );
+}
+
+async function simulateEmpresas(empresas, options = {}) {
+  const total = criarStatsCiclo();
+
+  for (const empresa of empresas) {
+    sumStats(total, await simulateEmpresa(empresa));
+  }
+
+  if (options.log !== false) {
+    logStatsCiclo(total, options.sufixoLog ?? '');
+  }
 
   return total;
+}
+
+async function simulateCycle() {
+  const empresas = await getEmpresasAlvo();
+  return simulateEmpresas(empresas);
+}
+
+async function simulateCyclePart(partIndex, totalParts = config.parallelParts) {
+  const empresas = await getEmpresasAlvo();
+  const partes = dividirEmpresas(empresas, totalParts);
+  const indice = Math.min(Math.max(Number(partIndex) || 1, 1), partes.length) - 1;
+  return simulateEmpresas(partes[indice] ?? [], {
+    sufixoLog: ` parte=${indice + 1}/${partes.length}`,
+  });
+}
+
+async function simulateCycleParallel(totalParts = config.parallelParts) {
+  const empresas = await getEmpresasAlvo();
+  const partes = dividirEmpresas(empresas, totalParts);
+  const resultados = await Promise.all(
+    partes.map((empresasParte, indice) => simulateEmpresas(empresasParte, {
+      log: false,
+      sufixoLog: ` parte=${indice + 1}/${partes.length}`,
+    })),
+  );
+
+  const total = criarStatsCiclo();
+  for (const resultado of resultados) {
+    sumStats(total, resultado);
+  }
+
+  logStatsCiclo(total, ` paralelo=${partes.length}`);
+  return {
+    ...total,
+    paralelo: partes.length,
+    partes: resultados,
+  };
 }
 
 async function backfillEmpresa(empresa) {
@@ -1157,7 +1211,12 @@ async function seedSupportData() {
 }
 
 async function run() {
-  const args = new Set(process.argv.slice(2));
+  const argsList = process.argv.slice(2);
+  const args = new Set(argsList);
+  const parallelArg = argsList.find((arg) => arg.startsWith('--parallel='));
+  const partArg = argsList.find((arg) => arg.startsWith('--part='));
+  const parallelParts = parallelArg ? Number(parallelArg.split('=')[1]) : config.parallelParts;
+  const partMatch = partArg?.match(/^--part=(\d+)\/(\d+)$/);
 
   if (args.has('--seed-only')) {
     await seedSupportData();
@@ -1170,19 +1229,30 @@ async function run() {
   }
 
   if (args.has('--once')) {
-    await simulateCycle();
+    if (partMatch) {
+      await simulateCyclePart(Number(partMatch[1]), Number(partMatch[2]));
+      return;
+    }
+
+    if (parallelArg) {
+      await simulateCycleParallel(parallelParts);
+      return;
+    }
+
+    await simulateCycleParallel();
     return;
   }
 
   await seedSupportData();
   console.log(
     `[cron-producao] rodando empresas=${config.empresaIds.join(',')} ` +
-    `dashboard=${config.dashboardEmpresaIds.join(',')} intervalo=${config.intervalMs}ms.`,
+    `dashboard=${config.dashboardEmpresaIds.join(',')} paralelo=${config.parallelParts} ` +
+    `intervalo=${config.intervalMs}ms.`,
   );
-  await simulateCycle();
+  await simulateCycleParallel();
 
   const timer = setInterval(() => {
-    simulateCycle().catch((error) => {
+    simulateCycleParallel().catch((error) => {
       console.error('[cron-producao] erro no ciclo:', error);
     });
   }, config.intervalMs);
@@ -1213,4 +1283,4 @@ if (executadoDiretamente) {
     });
 }
 
-export { backfillHistory, seedSupportData, simulateCycle };
+export { backfillHistory, seedSupportData, simulateCycle, simulateCycleParallel, simulateCyclePart };
