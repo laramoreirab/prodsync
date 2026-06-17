@@ -78,6 +78,15 @@ class EventoModel {
         return `${horas}h ${resto}m`;
     }
 
+    static formatarDuracaoComSegundos(minutos) {
+        const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+        const horas = Math.floor(totalSegundos / 3600);
+        const mins = Math.floor((totalSegundos % 3600) / 60);
+        const segs = totalSegundos % 60;
+
+        return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}`;
+    }
+
     static criarMapaUltimosDias(quantidadeDias = 7) {
         const dias = [];
         const hoje = this.inicioDoDia(new Date());
@@ -97,10 +106,8 @@ class EventoModel {
                 ? this.calcularDuracao(evento.inicio, evento.termino ?? new Date())
                 : null
         );
-        const horas = duracaoMinutos != null ? Math.floor(duracaoMinutos / 60) : 0;
-        const mins = duracaoMinutos != null ? duracaoMinutos % 60 : 0;
         const duracaoTexto = duracaoMinutos != null
-            ? `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+            ? this.formatarDuracaoComSegundos(duracaoMinutos)
             : null;
 
         return {
@@ -1135,9 +1142,6 @@ class EventoModel {
                     ? this.calcularDuracao(evento.inicio, evento.termino ?? new Date())
                     : null
             );
-            const horas = duracaoMinutos != null ? Math.floor(duracaoMinutos / 60) : 0;
-            const mins = duracaoMinutos != null ? duracaoMinutos % 60 : 0;
-
             return {
                 id: evento.id_evento,
                 id_evento: evento.id_evento,
@@ -1146,7 +1150,7 @@ class EventoModel {
                 inicio: evento.inicio ? new Date(evento.inicio).toISOString() : null,
                 fim: evento.termino ? new Date(evento.termino).toISOString() : null,
                 duracao: duracaoMinutos != null
-                    ? `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+                    ? this.formatarDuracaoComSegundos(duracaoMinutos)
                     : '—',
                 motivo: evento.motivo_parada?.descricao ?? 'Aguardando justificativa',
                 observacao: evento.observacao || '—',

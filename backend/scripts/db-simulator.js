@@ -672,6 +672,52 @@ async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, 
   return stats;
 }
 
+async function garantirKpiPecasPorMinuto(id_empresa, maquinas, agora = new Date()) {
+  const stats = { apontamentos: 0, ops_criadas: 0 };
+  if (maquinas.length === 0) return stats;
+
+  const inicioJanela = addMinutes(agora, -30);
+  const apontamentoRecente = await prisma.apontamento.findFirst({
+    where: {
+      id_empresa,
+      data_hora_fim: {
+        gte: inicioJanela,
+        lte: agora,
+      },
+      OR: [
+        { qtd_boa: { gt: 0 } },
+        { qtd_refugo: { gt: 0 } },
+      ],
+    },
+    select: { id_apontamento: true },
+  });
+
+  if (apontamentoRecente) return stats;
+
+  const maquina = maquinas[0];
+  const turno = await getTurnoParaData(id_empresa, agora);
+  if (!turno) return stats;
+
+  const ordemAntes = await prisma.ordemProducao.findFirst({
+    where: { id_empresa, id_maquina: maquina.id_maquina, status_op: { in: STATUS_OP_ATIVOS } },
+    select: { id_ordem: true },
+  });
+  const ordem = await getOrCreateOrdemAtiva(id_empresa, maquina);
+  if (!ordem) return stats;
+  if (!ordemAntes) stats.ops_criadas += 1;
+
+  const duracaoMinutos = randomInt(5, 12);
+  const result = await createApontamento(id_empresa, maquina, turno, ordem, addMinutes(agora, -duracaoMinutos), {
+    dataFim: agora,
+    duracaoMinutos,
+    totalPecas: randomInt(45, 120),
+    qtd_refugo: chance(0.12) ? randomInt(1, 3) : 0,
+  });
+
+  stats.apontamentos += result.apontamentos;
+  return stats;
+}
+
 async function createDashboardApontamento(id_empresa, maquina, turno, ordem, periodo, options = {}) {
   const janela = montarJanelaApontamento(periodo);
   return createApontamento(id_empresa, maquina, turno, ordem, janela.inicio, {
@@ -685,7 +731,7 @@ async function createDashboardApontamento(id_empresa, maquina, turno, ordem, per
 async function ensureDashboardDataEmpresa(empresa, contexto) {
   const id_empresa = empresa.id_empresa;
   if (!config.dashboardEmpresaIds.includes(id_empresa)) {
-    return { dashboard_apontamentos: 0, dashboard_eventos: 0, dashboard_horas_preenchidas: 0, ops_criadas: 0 };
+    return { dashboard_apontamentos: 0, dashboard_eventos: 0, dashboard_horas_preenchidas: 0, kpi_pecas_minuto_apontamentos: 0, ops_criadas: 0 };
   }
 
   const motivos = contexto?.motivos ?? await ensureMotivos(id_empresa);
@@ -693,7 +739,7 @@ async function ensureDashboardDataEmpresa(empresa, contexto) {
   const periodoDia = await getPeriodoDiaIndustrial(id_empresa);
   const periodoHoje = getPeriodoDiaCalendario();
   const turnoAtual = await getPeriodoTurnoAtual(id_empresa);
-  const stats = { dashboard_apontamentos: 0, dashboard_eventos: 0, dashboard_horas_preenchidas: 0, ops_criadas: 0 };
+  const stats = { dashboard_apontamentos: 0, dashboard_eventos: 0, dashboard_horas_preenchidas: 0, kpi_pecas_minuto_apontamentos: 0, ops_criadas: 0 };
 
   if (!turnoAtual?.turno || maquinas.length === 0) return stats;
 
@@ -701,6 +747,10 @@ async function ensureDashboardDataEmpresa(empresa, contexto) {
   stats.dashboard_apontamentos += producaoHojeStats.apontamentos;
   stats.dashboard_horas_preenchidas += producaoHojeStats.horas_preenchidas;
   stats.ops_criadas += producaoHojeStats.ops_criadas;
+
+  const kpiPecasMinutoStats = await garantirKpiPecasPorMinuto(id_empresa, maquinas);
+  stats.kpi_pecas_minuto_apontamentos += kpiPecasMinutoStats.apontamentos;
+  stats.ops_criadas += kpiPecasMinutoStats.ops_criadas;
 
   const apontamentosDia = await prisma.apontamento.findMany({
     where: {
@@ -967,6 +1017,7 @@ async function simulateEmpresa(empresa) {
     dashboard_apontamentos: dashboardStats.dashboard_apontamentos,
     dashboard_eventos: dashboardStats.dashboard_eventos,
     dashboard_horas_preenchidas: dashboardStats.dashboard_horas_preenchidas,
+    kpi_pecas_minuto_apontamentos: dashboardStats.kpi_pecas_minuto_apontamentos,
   };
 
   for (const maquina of selecionadas) {
@@ -1024,6 +1075,7 @@ async function simulateCycle() {
     dashboard_apontamentos: 0,
     dashboard_eventos: 0,
     dashboard_horas_preenchidas: 0,
+    kpi_pecas_minuto_apontamentos: 0,
   };
 
   for (const empresa of empresas) {
@@ -1035,7 +1087,8 @@ async function simulateCycle() {
     `ops_criadas=${total.ops_criadas} apontamentos=${total.apontamentos} ` +
     `eventos=${total.eventos} eventos_fechados=${total.eventos_fechados} ` +
     `dashboard_apontamentos=${total.dashboard_apontamentos} dashboard_eventos=${total.dashboard_eventos} ` +
-    `dashboard_horas_preenchidas=${total.dashboard_horas_preenchidas}`,
+    `dashboard_horas_preenchidas=${total.dashboard_horas_preenchidas} ` +
+    `kpi_pecas_minuto_apontamentos=${total.kpi_pecas_minuto_apontamentos}`,
   );
 
   return total;

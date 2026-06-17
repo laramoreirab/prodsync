@@ -1,6 +1,15 @@
 import EventoModel from '../models/EventoModel.js';
 import prisma from '../config/prisma.js';
 
+function formatarDuracaoComSegundos(minutos) {
+    const totalSegundos = Math.max(0, Math.round((Number(minutos) || 0) * 60));
+    const horas = Math.floor(totalSegundos / 3600);
+    const mins = Math.floor((totalSegundos % 3600) / 60);
+    const segs = totalSegundos % 60;
+
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(segs).padStart(2, '0')}`;
+}
+
 class EventoController {
     static async listarTodos(req, res) {
         try {
@@ -44,7 +53,7 @@ class EventoController {
                     setor_afetado: evento.setor_afetado,
                     inicio: evento.inicio ? new Date(evento.inicio).toISOString() : null,
                     fim: evento.termino ? new Date(evento.termino).toISOString() : null,
-                    duracao: evento.duracao ? `${Math.floor(evento.duracao / 60)}:${String(evento.duracao % 60).padStart(2, '0')}` : null,
+                    duracao: evento.duracao ? formatarDuracaoComSegundos(evento.duracao) : null,
                     id_motivo_parada: evento.id_motivo_parada,
                     motivo: evento.motivo_parada?.descricao ?? null,
                     observacao: evento.observacao,
@@ -426,7 +435,7 @@ class EventoController {
                 maquinas: [evento.id_maquina],
                 inicio: evento.inicio ? evento.inicio.toISOString() : null,
                 fim: evento.termino ? evento.termino.toISOString() : null,
-                duracao: evento.duracao ? `${Math.floor(evento.duracao / 60)}:${String(evento.duracao % 60).padStart(2, '0')}` : null,
+                duracao: evento.duracao ? formatarDuracaoComSegundos(evento.duracao) : null,
                 id_motivo_parada: evento.id_motivo_parada,
                 motivo: evento.motivo_parada?.descricao ?? null,
                 observacao: evento.observacao,
@@ -492,7 +501,7 @@ class EventoController {
             }
 
             const duracao = evento.duracao
-                ? `${Math.floor(evento.duracao / 60)}h ${evento.duracao % 60}m`
+                ? formatarDuracaoComSegundos(evento.duracao)
                 : 'Em andamento';
 
             return res.status(200).json({
