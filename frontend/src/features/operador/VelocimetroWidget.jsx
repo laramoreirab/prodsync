@@ -13,9 +13,9 @@ export function VelocimetroWidget({ operadorId }) {
   const pct = Math.round((data.atual / data.ideal) * 100);
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 pb-0">
       <p className="text-sm font-semibold text-black self-start">Velocímetro</p>
-          <p className="text-[11px] text-muted-foreground font-medium mt-0.5 justify-start">Atualizado em tempo real</p>
+      <p className="text-[11px] text-muted-foreground font-medium self-start">Atualizado em tempo real</p>
       <GaugeSemicircular
         data={[{ value: pct, fill: "#00357a" }]}
         size="lg"
