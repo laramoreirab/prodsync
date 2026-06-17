@@ -1,16 +1,50 @@
 import prisma from '../config/prisma.js';
 
+const DASHBOARD_TIME_ZONE = 'America/Sao_Paulo';
+const SAO_PAULO_UTC_OFFSET_HOURS = 3;
+
+function getSaoPauloDateParts(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: DASHBOARD_TIME_ZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hourCycle: 'h23',
+    }).formatToParts(date);
+
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+    return {
+        year: Number(values.year),
+        month: Number(values.month),
+        day: Number(values.day),
+        hour: Number(values.hour) % 24,
+    };
+}
+
+function getSaoPauloStartOfDay(date = new Date()) {
+    const parts = getSaoPauloDateParts(date);
+    return new Date(Date.UTC(
+        parts.year,
+        parts.month - 1,
+        parts.day,
+        SAO_PAULO_UTC_OFFSET_HOURS,
+        0,
+        0,
+        0,
+    ));
+}
+
 class DashboardModel {
 
     // Grafico global de producao acumulada do dia
     static async buscarProducaoDiaria(id_empresa, setorId = null) {
         try {
             const idSetor = setorId ? Number(setorId) : null;
-            // Pega o inicio do dia atual
             const agora = new Date();
-            const horaAtual = agora.getHours();
-            const inicioDoDia = new Date(agora);
-            inicioDoDia.setHours(0, 0, 0, 0);
+            const horaAtual = getSaoPauloDateParts(agora).hour;
+            const inicioDoDia = getSaoPauloStartOfDay(agora);
 
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
@@ -35,7 +69,7 @@ class DashboardModel {
 
             const producaoPorHora = Array.from({ length: horaAtual + 1 }, () => 0);
             apontamentos.forEach(ap => {
-                const horaLocal = ap.data_hora_fim.getHours();
+                const horaLocal = getSaoPauloDateParts(ap.data_hora_fim).hour;
                 if (horaLocal < 0 || horaLocal > horaAtual) {
                     return;
                 }

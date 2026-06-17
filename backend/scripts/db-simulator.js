@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url';
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
 const STATUS_OP_ATIVOS = ['Em_Andamento', 'Parada', 'Setup'];
 const STATUS_PARADA = ['Parada', 'Setup', 'Manutencao'];
+const DASHBOARD_TIME_ZONE = 'America/Sao_Paulo';
+const SAO_PAULO_UTC_OFFSET_HOURS = 3;
 
 const config = {
   empresaIds: parseIds(process.env.SIMULATOR_EMPRESA_IDS ?? process.env.SIMULATOR_EMPRESA_ID ?? '43,44,45'),
@@ -94,6 +96,43 @@ function addDays(date, days) {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
   return next;
+}
+
+function getSaoPauloDateParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: DASHBOARD_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+    hour: Number(values.hour) % 24,
+  };
+}
+
+function criarDataSaoPaulo(parts, hour, minutes = 0) {
+  return new Date(Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    hour + SAO_PAULO_UTC_OFFSET_HOURS,
+    minutes,
+    0,
+    0,
+  ));
+}
+
+function getSaoPauloStartOfDay(date = new Date()) {
+  const parts = getSaoPauloDateParts(date);
+  return criarDataSaoPaulo(parts, 0);
 }
 
 function formatarDataCodigo(date = new Date()) {
@@ -529,8 +568,7 @@ function montarJanelaApontamento(periodo, duracaoMaxima = 32) {
 }
 
 function getPeriodoDiaCalendario(dataReferencia = new Date()) {
-  const inicio = new Date(dataReferencia);
-  inicio.setHours(0, 0, 0, 0);
+  const inicio = getSaoPauloStartOfDay(dataReferencia);
   return { inicio, fim: addDays(inicio, 1) };
 }
 
@@ -543,14 +581,14 @@ function intersectarPeriodos(...periodos) {
 
 function criarHorariosProducaoHoje(periodoHoje, agora, horasComProducao) {
   const horarios = [];
-  const horaInicial = periodoHoje.inicio.getHours();
-  const horaAtual = agora.getHours();
+  const hojeSaoPaulo = getSaoPauloDateParts(agora);
+  const horaInicial = getSaoPauloDateParts(periodoHoje.inicio).hour;
+  const horaAtual = hojeSaoPaulo.hour;
 
   for (let hora = horaInicial; hora < horaAtual; hora += 1) {
     if (horasComProducao.has(hora)) continue;
 
-    const fim = new Date(agora);
-    fim.setHours(hora, randomInt(8, 52), 0, 0);
+    const fim = criarDataSaoPaulo(hojeSaoPaulo, hora, randomInt(8, 52));
 
     if (fim < periodoHoje.inicio) {
       fim.setTime(addMinutes(periodoHoje.inicio, randomInt(5, 25)).getTime());
@@ -594,10 +632,11 @@ async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, 
   });
 
   const horasComProducao = new Set(
-    producoesHoje.map((producao) => producao.data_hora_fim.getHours()),
+    producoesHoje.map((producao) => getSaoPauloDateParts(producao.data_hora_fim).hour),
   );
   const horarios = criarHorariosProducaoHoje(periodoHoje, agora, horasComProducao);
-  const horasPreenchidas = horarios.filter((horario) => horario.getHours() !== agora.getHours()).length;
+  const horaAtual = getSaoPauloDateParts(agora).hour;
+  const horasPreenchidas = horarios.filter((horario) => getSaoPauloDateParts(horario).hour !== horaAtual).length;
   stats.horas_preenchidas = horasPreenchidas;
 
   for (const [index, fim] of horarios.entries()) {
