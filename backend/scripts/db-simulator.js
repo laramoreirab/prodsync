@@ -541,6 +541,93 @@ function intersectarPeriodos(...periodos) {
   return inicio < fim ? { inicio, fim } : null;
 }
 
+function criarHorariosProducaoHoje(periodoHoje, agora, devePreencherHistorico) {
+  if (!devePreencherHistorico) {
+    return [new Date(agora)];
+  }
+
+  const horarios = [];
+  const horaInicial = periodoHoje.inicio.getHours();
+  const horaAtual = agora.getHours();
+
+  for (let hora = horaInicial; hora <= horaAtual; hora += 1) {
+    const fim = new Date(agora);
+    fim.setHours(hora, randomInt(8, 52), 0, 0);
+
+    if (fim < periodoHoje.inicio) {
+      fim.setTime(addMinutes(periodoHoje.inicio, randomInt(5, 25)).getTime());
+    }
+
+    if (fim > agora) {
+      fim.setTime(agora.getTime());
+    }
+
+    horarios.push(new Date(fim));
+  }
+
+  return horarios.sort((a, b) => a - b);
+}
+
+function montarInicioApontamentoHoje(fim, periodoHoje) {
+  const minutosDisponiveis = Math.max(1, Math.floor((fim - periodoHoje.inicio) / 60000));
+  const duracaoMinutos = Math.max(1, Math.min(randomInt(12, 34), minutosDisponiveis));
+  return {
+    inicio: addMinutes(fim, -duracaoMinutos),
+    duracaoMinutos,
+  };
+}
+
+async function preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje, agora = new Date()) {
+  const stats = { apontamentos: 0, ops_criadas: 0 };
+  if (maquinas.length === 0 || agora <= periodoHoje.inicio) return stats;
+
+  const producaoAntesDeAgora = await prisma.apontamento.count({
+    where: {
+      id_empresa,
+      qtd_boa: { gt: 0 },
+      data_hora_fim: {
+        gte: periodoHoje.inicio,
+        lt: agora,
+      },
+    },
+  });
+
+  const devePreencherHistorico = producaoAntesDeAgora === 0;
+  const horarios = criarHorariosProducaoHoje(periodoHoje, agora, devePreencherHistorico);
+
+  for (const [index, fim] of horarios.entries()) {
+    const maquina = maquinas[index % maquinas.length];
+    const turno = await getTurnoParaData(id_empresa, fim);
+    if (!turno) continue;
+
+    const ordemAntes = await prisma.ordemProducao.findFirst({
+      where: { id_empresa, id_maquina: maquina.id_maquina, status_op: { in: STATUS_OP_ATIVOS } },
+      select: { id_ordem: true },
+    });
+    const ordem = await getOrCreateOrdemAtiva(id_empresa, maquina);
+    if (!ordem) continue;
+    if (!ordemAntes) stats.ops_criadas += 1;
+
+    const { inicio, duracaoMinutos } = montarInicioApontamentoHoje(fim, periodoHoje);
+    const result = await createApontamento(id_empresa, maquina, turno, ordem, inicio, {
+      dataFim: fim,
+      duracaoMinutos,
+      totalPecas: randomInt(18, 72),
+      qtd_refugo: chance(0.18) ? randomInt(1, 4) : 0,
+    });
+    stats.apontamentos += result.apontamentos;
+  }
+
+  if (devePreencherHistorico && stats.apontamentos > 0) {
+    console.log(
+      `[cron-producao] empresa=${id_empresa} producao_hoje_preenchida ate=${agora.toTimeString().slice(0, 5)} ` +
+      `apontamentos=${stats.apontamentos}`,
+    );
+  }
+
+  return stats;
+}
+
 async function createDashboardApontamento(id_empresa, maquina, turno, ordem, periodo, options = {}) {
   const janela = montarJanelaApontamento(periodo);
   return createApontamento(id_empresa, maquina, turno, ordem, janela.inicio, {
@@ -565,6 +652,10 @@ async function ensureDashboardDataEmpresa(empresa, contexto) {
   const stats = { dashboard_apontamentos: 0, dashboard_eventos: 0, ops_criadas: 0 };
 
   if (!turnoAtual?.turno || maquinas.length === 0) return stats;
+
+  const producaoHojeStats = await preencherProducaoHojeAteAgora(id_empresa, maquinas, periodoHoje);
+  stats.dashboard_apontamentos += producaoHojeStats.apontamentos;
+  stats.ops_criadas += producaoHojeStats.ops_criadas;
 
   const apontamentosDia = await prisma.apontamento.findMany({
     where: {

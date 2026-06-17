@@ -2,18 +2,23 @@ import prisma from '../config/prisma.js';
 
 class DashboardModel {
 
-    // Gráfico global de produção ao longo do dia (Agrupado por hora)
+    // Grafico global de producao acumulada do dia
     static async buscarProducaoDiaria(id_empresa, setorId = null) {
         try {
             const idSetor = setorId ? Number(setorId) : null;
-            // Pega o início do dia atual
-            const inicioDoDia = new Date();
+            // Pega o inicio do dia atual
+            const agora = new Date();
+            const horaAtual = agora.getHours();
+            const inicioDoDia = new Date(agora);
             inicioDoDia.setHours(0, 0, 0, 0);
 
             const apontamentos = await prisma.apontamento.findMany({
                 where: {
                     id_empresa: Number(id_empresa),
-                    data_hora_fim: { gte: inicioDoDia },
+                    data_hora_fim: {
+                        gte: inicioDoDia,
+                        lte: agora
+                    },
                     ...(idSetor ? { maquina: { id_setor: idSetor } } : {})
                 },
                 select: {
@@ -23,23 +28,30 @@ class DashboardModel {
                 orderBy: { data_hora_fim: 'asc' }
             });
 
-            // Agrupa as quantidades por hora (ex: '07h', '08h')
-            const producaoPorHora = {};
-            apontamentos.forEach(ap => {
-                // Formata para ter sempre dois dígitos (ex: "09h" em vez de "9h")
-                const horaLocal = ap.data_hora_fim.getHours();
-                const horaFormatada = String(horaLocal).padStart(2, '0') + 'h';
+            // Agrupa por hora e transforma em total acumulado do dia
+            if (apontamentos.length === 0) {
+                return [];
+            }
 
-                if (!producaoPorHora[horaFormatada]) {
-                    producaoPorHora[horaFormatada] = 0;
+            const producaoPorHora = Array.from({ length: horaAtual + 1 }, () => 0);
+            apontamentos.forEach(ap => {
+                const horaLocal = ap.data_hora_fim.getHours();
+                if (horaLocal < 0 || horaLocal > horaAtual) {
+                    return;
                 }
-                producaoPorHora[horaFormatada] += ap.qtd_boa || 0;
+
+                producaoPorHora[horaLocal] += ap.qtd_boa || 0;
             });
 
-            return Object.entries(producaoPorHora).map(([hora, pcs]) => ({
-                hora,
-                pcs
-            }));
+            let producaoAcumulada = 0;
+            return producaoPorHora.map((pcsHora, hora) => {
+                producaoAcumulada += pcsHora;
+
+                return {
+                    hora: String(hora).padStart(2, '0') + 'h',
+                    pcs: producaoAcumulada
+                };
+            });
         }
         catch (error) {
             console.error('Erro ao buscar produção diária:', error);
