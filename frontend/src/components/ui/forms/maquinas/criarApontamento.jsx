@@ -81,19 +81,33 @@ export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onS
         setLoading(true);
 
         try {
+            const normalizarNumero = (valor) => {
+                if (valor === '' || valor === null || valor === undefined) return null;
+                return Number(valor);
+            };
+
+            const normalizarData = (valor) => {
+                if (!valor) return null;
+                const data = new Date(valor);
+                return Number.isNaN(data.getTime()) ? null : data.toISOString();
+            };
+
             const payload = {
                 ...form,
-                id_maquina: Number(form.id_maquina),
-                id_ordemProducao: Number(form.id_ordemProducao),
-                id_turno: Number(form.id_turno),
-                qtd_boa: form.qtd_boa === '' ? '' : Number(form.qtd_boa),
-                qtd_refugo: form.qtd_refugo === '' ? '' : Number(form.qtd_refugo),
-                inicio: form.inicio ? new Date(form.inicio).toISOString() : '',
-                fim: form.fim ? new Date(form.fim).toISOString() : '',
+                id_maquina: normalizarNumero(form.id_maquina),
+                id_ordemProducao: normalizarNumero(form.id_ordemProducao),
+                id_turno: normalizarNumero(form.id_turno),
+                qtd_boa: normalizarNumero(form.qtd_boa),
+                qtd_refugo: normalizarNumero(form.qtd_refugo),
+                inicio: normalizarData(form.inicio),
+                fim: normalizarData(form.fim),
             };
 
             const data = await apiFetch('/api/apontamentos', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(payload),
             });
 
@@ -116,8 +130,9 @@ export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onS
                 observacao: '',
             });
 
-        } catch {
-            toast.error('Erro de conexão com o servidor');
+        } catch (error) {
+            console.error('Erro ao criar apontamento:', error);
+            toast.error(error?.mensagem || error?.message || 'Erro ao criar apontamento');
         } finally {
             setLoading(false);
         }
