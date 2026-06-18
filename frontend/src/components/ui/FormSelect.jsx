@@ -11,8 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Componente de Select customizado para uso em formulários,
- * com estilização similar ao OrdenarDropdown.
+ * Componente de Select customizado para uso em formulários.
  *
  * @param {Object} props
  * @param {Array} props.options - Array de objetos { value, label } ou { id, nome } etc.
@@ -33,6 +32,8 @@ const FormSelect = ({
     className,
     triggerClassName,
     disabled = false,
+    valueKey, // Prop opcional para forçar uma chave de valor
+    labelKey, // Prop opcional para forçar uma chave de rótulo
     ...props
 }) => {
     return (
@@ -44,13 +45,13 @@ const FormSelect = ({
             )}
 
             <Select
-                value={value ? String(value) : undefined}
+                value={(value !== undefined && value !== null) ? String(value) : undefined}
                 onValueChange={onValueChange}
                 disabled={disabled}
                 {...props}
             >
                 <SelectTrigger className={cn(
-                    "w-full h-10 min-h-10 cursor-pointer rounded-md bg-white border border-gray-200 py-2 px-4 text-sm font-semibold text-[#23304c] shadow-sm hover:bg-white dark:bg-[#f8f8f8] dark:text-[#23304c] outline-none focus:ring-0",
+                    "w-full h-10 min-h-10 cursor-pointer rounded-md bg-white border border-neutral-200! py-3 px-4 text-sm font-semibold text-[#23304c] shadow-md hover:bg-white dark:bg-[#f8f8f8] dark:text-[#23304c] outline-none focus:ring-0",
                     triggerClassName
                 )}>
                     <SelectValue placeholder={placeholder} />
@@ -59,17 +60,51 @@ const FormSelect = ({
                 <SelectContent
                     position="popper"
                     align="start"
-                    className="bg-white text-[#23304c] border border-gray-200"
+                    className="bg-white text-[#23304c] p-2 border border-gray-700"
                 >
-                    {options.map((option) => {
-                        const val = option.value ?? option.id ?? option.id_setor ?? option.id_operador;
-                        const labelText = option.label ?? option.nome ?? option.nome_setor;
+                    {options.map((option, index) => {
+                        const isObject = typeof option === 'object' && option !== null;
+
+                        const val = isObject
+                            ? ((valueKey && option[valueKey] !== undefined) ? option[valueKey] : (
+                                (props.id && option[props.id] !== undefined) ? option[props.id] : (
+                                    option.value ??
+                                    option.id_usuario ??
+                                    option.id_turno ??
+                                    option.id_maquina ??
+                                    option.id_ordem ??
+                                    option.id_ordemProducao ??
+                                    option.id_motivo_parada ??
+                                    option.id_motivo ??
+                                    option.id ??
+                                    option.id_setor ??
+                                    option.id_operador
+                                )
+                            ))
+                            : option;
+
+                        const labelText = isObject
+                            ? ((labelKey && option[labelKey] !== undefined) ? option[labelKey] : (
+                                option.label ??
+                                option.nome_turno ??
+                                option.nome_setor ??
+                                option.nome_maquina ??
+                                option.nome ??
+                                option.descricao ??
+                                option.codigo_lote ??
+                                option.setor ??
+                                `Opção ${val}`
+                            ))
+                            : option;
+
+                        const finalValue = (val !== undefined && val !== null && val !== "") ? String(val) : `opt-${index}`;
+                        const itemKey = `fs-item-${finalValue}-${index}`;
 
                         return (
                             <SelectItem
-                                key={val}
-                                value={String(val)}
-                                className="cursor-pointer rounded-sm px-3 py-2 text-sm font-medium text-[#23304c] focus:bg-[#eef4ff] focus:text-[#23304c] data-[state=checked]:bg-[#eef4ff] data-[state=checked]:text-[#23304c]"
+                                key={itemKey}
+                                value={finalValue}
+                                className="cursor-pointer rounded-sm px-3 py-2 text-sm font-medium text-black focus:bg-[#eef4ff] data-[state=checked]:bg-[#eef4ff] data-[state=checked]:text-[#23304c]"
                             >
                                 {labelText}
                             </SelectItem>

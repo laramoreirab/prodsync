@@ -4,8 +4,8 @@ const API_URL = "/api/maquinas";
 
 export const maquinaCrudService = {
   getAll: async () => {
-    const options = { method: "GET" };
-    return await apiFetch(`${API_URL}/`);
+    // Busca um limite alto para contornar a paginação do backend na listagem do dashboard
+    return await apiFetch(`${API_URL}/?limite=500`);
   },
 
   getById: async (id) => {

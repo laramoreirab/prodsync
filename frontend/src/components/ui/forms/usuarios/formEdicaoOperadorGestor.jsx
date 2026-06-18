@@ -10,6 +10,7 @@ import { mascaraCPF } from '@/utils/mascaras';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
+import FormSelect from "@/components/ui/FormSelect";
 
 
 const resolverImagemPerfil = (imagem) => {
@@ -283,76 +284,35 @@ export default function FormEdicaoOperadorGestor({ operadorId, onEdicaoSucesso }
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
-                    <div className="relative">
-                        <label htmlFor="id_setor" className={labelStyle}>Setor</label>
-                        <select
-                            id="id_setor"
-                            value={formData.id_setor}
-                            onChange={handleInputChange}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            required
-                        >
-                            <option value="">Selecione...</option>
-                            {setores.map((setor) => (
-
-                                <option
-                                    key={setor.id_setor}
-                                    value={setor.id_setor}
-                                >
-                                    {setor.nome_setor}
-                                </option>
-
-                            ))}
-                        </select>
-                    </div>
-                    <div className="relative">
-                        <label htmlFor="id_turno" className={labelStyle}>Turno</label>
-                        <select
-                            id="id_turno"
-                            value={formData.id_turno}
-                            onChange={handleInputChange}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            required
-                            disabled={!formData.id_setor}
-                        >
-                            <option value="">Selecione...</option>
-                            {listaTurnos.map((turno) => (
-
-                                <option
-                                    key={turno.id_turno}
-                                    value={turno.id_turno}
-                                >
-                                    {turno.nome_turno}
-                                </option>
-
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="relative pt-1">
-                    <label htmlFor="id_maquina" className={labelStyle}>Máquina a Gerenciar</label>
-                    <select
-                        id="id_maquina"
-                        value={formData.id_maquina}
-                        onChange={handleInputChange}
-                        className={`${inputStyle} appearance-none pr-10 bg-white`}
-                        disabled={!formData.id_setor}
+                    <FormSelect
+                        id="id_setor"
+                        label="Setor"
+                        options={setores}
+                        value={formData.id_setor}
+                        onValueChange={(val) => handleInputChange({ target: { id: "id_setor", value: val } })}
                         required
-                    >
-                        <option value="">Selecione...</option>
-                        {listaMaquinas.map((maquina) => (
+                    />
 
-                            <option
-                                key={maquina.id_maquina}
-                                value={maquina.id_maquina}
-                            >
-                                {maquina.nome}
-                            </option>
-
-                        ))}
-                    </select>
+                    <FormSelect
+                        id="id_turno"
+                        label="Turno"
+                        options={listaTurnos}
+                        value={formData.id_turno}
+                        onValueChange={(val) => handleInputChange({ target: { id: "id_turno", value: val } })}
+                        required
+                        disabled={!formData.id_setor}
+                    />
                 </div>
+
+                <FormSelect
+                    id="id_maquina"
+                    label="Máquina a Gerenciar"
+                    options={listaMaquinas}
+                    value={formData.id_maquina}
+                    onValueChange={(val) => handleInputChange({ target: { id: "id_maquina", value: val } })}
+                    disabled={!formData.id_setor}
+                    required
+                />
 
                 <div className="flex justify-center mt-4">
                     <button type="submit" className="cursor-pointer bg-[#002866] hover:bg-[#003891] hover:scale-105 transition-all text-xl text-white font-semibold py-3 px-8 rounded-lg">

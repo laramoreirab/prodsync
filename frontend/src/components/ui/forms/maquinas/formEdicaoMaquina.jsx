@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { maquinaCrudService } from '@/services/maquinaCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
+import FormSelect from "@/components/ui/FormSelect";
+import { deduplicarPorCampo, deduplicarUsuarios } from '@/lib/filterUtils';
 
 const resolverImagemMaquina = (imagem) => {
     if (!imagem) return null;
@@ -44,8 +46,9 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
     useEffect(() => {
         async function carregarSetores() {
             try {
-                const dados = await setorCrudService.getAll();
-                setSetores(dados.dados);
+                const response = await setorCrudService.getAll();
+                const lista = Array.isArray(response) ? response : (response.dados || []);
+                setSetores(deduplicarPorCampo(lista, 'id_setor'));
             } catch (error) {
                 console.log(error)
                 toast.error("Erro ao carregar setores.");
@@ -67,8 +70,9 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                 }
 
                 const options = { method: "GET" };
-                const dados = await apiFetch(`/api/usuarios/operadores/${idSetor}`, options)
-                setOperadores(dados.dados);
+                const response = await apiFetch(`/api/usuarios/operadores/${idSetor}`, options)
+                const lista = Array.isArray(response) ? response : (response.dados || []);
+                setOperadores(deduplicarUsuarios(lista));
             } catch (error) {
                 console.log(error)
                 toast.error("Erro ao carregar operadores atrelados ao Setor");
@@ -278,27 +282,16 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                         />
                     </div>
 
-                    {/* campos pendentes pro backend adicionar */}
-                    <div className="flex flex-col gap-1">
-                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Setor</label>
-                        <select
-                                id="id_setor"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
-                                value={idSetor}
-                                onChange={(e) => {setIdSetor(e.target.value);  setOperador('');}}
-                            >
-                                <option value="">Selecione...</option>
-                                 {setores.map((setor) => (
-
-                                    <option
-                                        key={setor.id_setor}
-                                        value={setor.id_setor}
-                                    >
-                                        {setor.nome_setor}
-                                    </option>
-                                ))}
-                            </select>
-                    </div>
+                    <FormSelect
+                        key={`select-setor`}
+                        id="id_setor"
+                        label="Setor"
+                        options={setores}
+                        valueKey="id_setor"
+                        labelKey="nome_setor"
+                        value={idSetor}
+                        onValueChange={(val) => { setIdSetor(val); setOperador(''); }}
+                    />
 
                     <div className="flex flex-col gap-1">
                         <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Tipo de Máquina</label>
@@ -323,41 +316,30 @@ export default function FormEdicaoMaquina({ maquinaId, onEdicaoSucesso }) {
                         />
                     </div>
 
-                    <div className="flex flex-col gap-1">
-                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Status de Máquina</label>
-                        <select
-                            id="status"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="Produzindo">Produzindo</option>
-                            <option value="Parada">Parada</option>
-                            <option value="Setup">Setup</option>
-                        </select>
-                    </div>
+                    <FormSelect
+                        id="status"
+                        label="Status de Máquina"
+                        options={[
+                            { value: "Produzindo", label: "Produzindo" },
+                            { value: "Parada", label: "Parada" },
+                            { value: "Setup", label: "Setup" }
+                        ]}
+                        value={status}
+                        onValueChange={(val) => setStatus(val)}
+                    />
 
-                    <div className="flex flex-col gap-1 col-span-2">
-                        <label className="block text-lg text-gray-700 font-medium dark:text-slate-300">Operador</label>
-                        <select
-                                id="operador"
-                                className="border shadow-md mt-1 border-gray-200 rounded-md p-3 outline-none bg-white"
-                                value={operador}
-                                onChange={(e) => setOperador(e.target.value)}
-                                 disabled={!idSetor}
-                            >
-                                <option value="">Selecione...</option>
-                                {operadores.map((operador) => (
-                                    <option
-                                        key={operador.id_operador}
-                                        value={operador.id_operador}
-                                    >
-                                        {operador.nome}
-                                    </option>
-                                ))}
-                            </select>
-                    </div>
+                    <FormSelect
+                        key={`select-operador-${idSetor}`}
+                        id="operador"
+                        label="Operador"
+                        className="col-span-2"
+                        options={operadores}
+                        valueKey="id_operador"
+                        labelKey="nome"
+                        value={operador}
+                        onValueChange={(val) => setOperador(val)}
+                        disabled={!idSetor}
+                    />
                 </div>
 
                 <div className="flex justify-center mt-4">

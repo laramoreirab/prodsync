@@ -3,10 +3,9 @@ import { apiFetch } from "@/lib/api";
 const API_URL = "/api/usuarios";
 
 export const usuariosCrudService = {
-  //buscar todos os usuários
   getAll: async () => {
-    const options = { method: "GET"}
-    return await apiFetch(`${API_URL}/`, options);
+    // Busca um limite alto para contornar a paginação do backend na listagem administrativa
+    return await apiFetch(`${API_URL}/?limite=100`);
   },
 
   // Buscar detalhes de um usuário por id

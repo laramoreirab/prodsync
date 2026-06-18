@@ -262,7 +262,7 @@ export default function UsuariosGestor() {
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <FormExclusaoUsuario operadorId={user.id} onExclusaoSucesso={refresh} />
+                    <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
                   </DialogContent>
                 </Dialog>
               </>

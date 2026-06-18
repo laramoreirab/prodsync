@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -13,6 +13,7 @@ import { useSetores } from '@/hooks/useSetores';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import { useOps } from '@/hooks/useOps';
 import FormCriarMotivo from './formCriarMotivo';
+import FormSelect from "@/components/ui/FormSelect";
 
 
 export default function FormCadastroEventoGestor({ onCadastroSucesso }) {
@@ -45,6 +46,12 @@ export default function FormCadastroEventoGestor({ onCadastroSucesso }) {
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
 
     const [setoresSelecionados, setSetoresSelecionados] = useState([]); // setor_afetado — backend: setor_afetado
+
+    const maquinasFiltradas = useMemo(() => {
+        if (setoresSelecionados.length === 0) return maquinas;
+        return maquinas.filter(m => setoresSelecionados.includes(Number(m.id_setor)));
+    }, [maquinas, setoresSelecionados]);
+
     const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]); // maquinas (array de ids) — backend: maquinas
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
     const [idMotivoPrincipal, setIdMotivoPrincipal] = useState(""); // id_motivo_parada — backend: id_motivo_parada
@@ -230,7 +237,7 @@ export default function FormCadastroEventoGestor({ onCadastroSucesso }) {
                     {/* dropdown */}
                     {menusAbertos.maquina && (
                         <div className="w-full mt-1 bg-gray-50/50 border border-gray-200 rounded-md p-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                            {maquinas.map((maquina) => {
+                            {maquinasFiltradas.map((maquina) => {
                                 const maquinaId = Number(maquina.id_maquina ?? maquina.id ?? maquina.id_maquina);
                                 const maquinaLabel = maquina.nome || maquina.serie || maquina.codigo || `Máquina ${maquinaId}`;
                                 return (
@@ -374,21 +381,13 @@ export default function FormCadastroEventoGestor({ onCadastroSucesso }) {
 
                     <div className="space-y-3">
 
-                        <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
-                        <div className="relative">
-                            <select
-                                value={idMotivoPrincipal}
-                                onChange={(e) => setIdMotivoPrincipal(e.target.value)}
-                                className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
-                            >
-                                <option value="" disabled>Selecione o motivo</option>
-                                {/* mapeando do estado */}
-                                {opcoesMotivo.map((motivo) => (
-                                    <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        </div>
+                        <FormSelect
+                            label="Motivo Principal:"
+                            options={opcoesMotivo}
+                            value={idMotivoPrincipal}
+                            onValueChange={(val) => setIdMotivoPrincipal(val)}
+                            placeholder="Selecione o motivo"
+                        />
 
                     </div>
                     <div>

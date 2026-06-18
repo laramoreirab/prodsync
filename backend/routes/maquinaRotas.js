@@ -49,7 +49,7 @@ router.post('/:id/parar-sincronizacao', gestorOuAdminMiddleware, autorizarMaquin
 router.post('/:id/desconectar-placa', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), MaquinaController.desconectarPlacaMaquina);
 
 router.get('/:id', autorizarMaquinaParam('id'), MaquinaController.buscarMaquinaPorId);
-router.put('/:id', adminMiddleware, uploadImagensCloudinary.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
+router.put('/:id', gestorOuAdminMiddleware, autorizarMaquinaParam('id'), uploadImagensCloudinary.single('imagem'), handleUploadError, MaquinaController.atualizarMaquina);
 router.put('/:id/status', autorizarMaquinaParam('id'), MaquinaController.atualizarStatus);
 router.delete('/:id', adminMiddleware, MaquinaController.deletarMaquina);
 
