@@ -15,6 +15,7 @@ export function CustomPieChart({
   showOuterLabels = Boolean(showLegend),
   startAngle = 90,
   endAngle = -270,
+  maxSlices = 6,
 }) {
   if (!data?.length) return null;
 
@@ -25,9 +26,10 @@ export function CustomPieChart({
     typeof value === "number" ? value.toLocaleString("pt-BR") : value;
 
   const positiveData = data.filter((entry) => Number(entry[dataKey]) > 0);
+  const chartData = maxSlices ? positiveData.slice(0, maxSlices) : positiveData;
 
   const legendItems = (showLegend || showOuterLabels)
-    ? positiveData
+    ? chartData
         .map((entry, index) => {
           const entryKey = entry[nameKey];
 
@@ -85,7 +87,7 @@ export function CustomPieChart({
               }
             />
             <Pie
-              data={data}
+              data={chartData}
               dataKey={dataKey}
               nameKey={nameKey}
               cx="50%"
@@ -99,7 +101,7 @@ export function CustomPieChart({
               labelLine={false}
               label={false}
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={config?.[entry[nameKey]]?.color || entry.fill || "#ccc"} 

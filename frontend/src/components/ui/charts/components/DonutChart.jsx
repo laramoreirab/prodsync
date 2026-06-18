@@ -26,6 +26,7 @@ export function DonutChart({
   showLegend = showOuterLabels,
   innerRadius = 45,
   outerRadius = 70,
+  maxSlices = 6,
 }) {
   if (!data?.length) return null;
 
@@ -36,8 +37,9 @@ export function DonutChart({
     String(config?.[key]?.label ?? key).replace(/:\s*$/, "");
 
   const positiveData = data.filter((entry) => Number(entry[dataKey]) > 0);
+  const chartData = maxSlices ? positiveData.slice(0, maxSlices) : positiveData;
   const legendItems = showLegend
-    ? positiveData.map((entry, index) => {
+    ? chartData.map((entry, index) => {
         const entryKey = entry[nameKey];
 
         return {
@@ -108,7 +110,7 @@ export function DonutChart({
                 }
               />
               <Pie
-                data={data}
+                data={chartData}
                 dataKey={dataKey}
                 nameKey={nameKey}
                 cx="50%"
@@ -118,7 +120,7 @@ export function DonutChart({
                 labelLine={false}
                 label={false}
               >
-                {data.map((entry) => {
+                {chartData.map((entry) => {
                   const entryKey = entry[nameKey];
                   const fillColor =
                     config?.[entryKey]?.color ?? `var(--color-${entryKey})`;

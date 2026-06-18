@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { EyeIcon, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
-
 import TableListagens from "@/components/table";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -55,7 +54,6 @@ const usuariosFilter = [
 const colunasUsuarios = [
   { id: "nome", key: "nome", label: "Nome", className: "w-1/5" },
   { id: "id", key: "id", label: "ID", className: "w-40" },
-  { id: "oee_medio", key: "oee_medio", label: "OEE Médio", className: "w-45" },
   { id: "maquina", key: "maquina", label: "Maquina", className: "pl-16" },
   {
     id: "turno",

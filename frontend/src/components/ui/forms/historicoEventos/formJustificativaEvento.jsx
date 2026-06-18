@@ -40,12 +40,13 @@ export default function FormJustificativaEvento({ onFechar }) {
 
     async function handleSubmit(e) {
         e.preventDefault();
+        if (!evento?.id_evento && !evento?.id) return toast.error('Evento pendente inválido.');
         if (!motivo) return toast.error('Selecione um motivo principal.');
 
         setLoadingSubmit(true);
         try {
             await eventosCrudService.justificar({
-                id_evento: evento.id_evento,
+                id_evento: evento.id_evento ?? evento.id,
                 id_maquina: evento.id_maquina,
                 id_motivo_parada: Number(motivo),
                 observacao
@@ -58,6 +59,11 @@ export default function FormJustificativaEvento({ onFechar }) {
             setLoadingSubmit(false);
         }
     }
+
+    const tipoEvento = evento?.tipo ?? evento?.status_atual;
+    const maquinaEvento = evento?.maquina_nome
+        ?? (typeof evento?.maquina === 'object' ? evento.maquina?.nome : evento?.maquina);
+    const dataEvento = evento?.inicio_formatado ?? evento?.data;
 
     return (
         <>
@@ -86,17 +92,17 @@ export default function FormJustificativaEvento({ onFechar }) {
                         <div className="flex flex-col w-full gap-2 mt-2 mb-6 cursor-not-allowed">
                             <div className="flex items-center">
                                 <p className="text-xl font-semibold text-black mr-2">Evento:</p>
-                                <Badge className={BADGE[evento.status_atual] ?? "rounded-xl px-3 font-semibold bg-gray-100"}>
-                                    {evento.status_atual}
+                                <Badge className={BADGE[tipoEvento] ?? "rounded-xl px-3 font-semibold bg-gray-100"}>
+                                    {tipoEvento ?? '—'}
                                 </Badge>
                             </div>
                             <div className="flex items-center">
                                 <p className="text-xl font-semibold text-black mr-2">Máquina:</p>
-                                <p className="text-xl font-medium text-[#7c7c81]">{evento.maquina?.nome ?? '—'}</p>
+                                <p className="text-xl font-medium text-[#7c7c81]">{maquinaEvento ?? '-'}</p>
                             </div>
                             <div className="flex items-center">
                                 <p className="text-xl font-semibold text-black mr-2">Data:</p>
-                                <p className="text-xl font-medium text-[#7c7c81]">{evento.inicio_formatado ?? '—'}</p>
+                                <p className="text-xl font-medium text-[#7c7c81]">{dataEvento ?? '-'}</p>
                             </div>
                             <div className="flex items-center">
                                 <p className="text-xl font-semibold text-black mr-2">Duração:</p>

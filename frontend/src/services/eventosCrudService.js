@@ -2,7 +2,13 @@ import { apiFetch } from "@/lib/api";
 
 const API_URL = "/api/eventos";
 
-const extrairDados = (resposta) => resposta?.dados ?? resposta ?? [];
+const extrairDados = (resposta) => {
+  if (resposta && Object.prototype.hasOwnProperty.call(resposta, "dados")) {
+    return resposta.dados;
+  }
+
+  return resposta ?? [];
+};
 
 const formatarSegundos = (totalSegundos) => {
   const segundosValidos = Math.max(0, Math.floor(Number(totalSegundos) || 0));
@@ -58,7 +64,7 @@ const normalizarEvento = (evento) => {
     typeof evento.maquina === "object"
       ? evento.maquina?.nome ?? evento.maquina?.serie
       : evento.maquina;
-  const statusBase = evento.status_maquina ?? evento.status_atual;
+  const statusBase = evento.status_maquina ?? evento.status_atual ?? evento.tipo;
   const tipo = normalizarTipoEvento(evento.tipo ?? statusBase);
   const statusMaquina = normalizarStatusMaquinaEvento(statusBase ?? tipo);
 
@@ -70,6 +76,7 @@ const normalizarEvento = (evento) => {
     numero_evento_maquina: evento.numero_evento_maquina ?? evento.numero_evento,
     tipo,
     status: normalizarStatusMaquinaEvento(evento.status ?? tipo),
+    status_atual: statusBase ?? tipo,
     status_maquina: statusMaquina,
     maquina: evento.maquina ?? maquinaNome ?? "-",
     maquina_nome: maquinaNome ?? "-",

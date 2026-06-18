@@ -10,6 +10,7 @@ import SuccessCard from "@/components/ui/modalCadastro";
 import { setAuthToken } from "@/lib/auth";
 
 const REMEMBER_ID_KEY = "rememberedLoginId";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function LoginForm() {
     const router = useRouter()
@@ -37,7 +38,7 @@ export default function LoginForm() {
 
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+            const res = await fetch(`${API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id, senha, lembrarDeMim })

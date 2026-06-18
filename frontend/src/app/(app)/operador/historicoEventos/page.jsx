@@ -59,7 +59,7 @@ import {
   duracaoEmMinutos,
 } from "@/lib/filterUtils";
 
-import DetalhaeEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";
+import DetalhesEvento from "@/components/ui/forms/historicoEventos/modalDetalhesEventoOperador";
 
 import {
   PageLayout,
@@ -292,7 +292,7 @@ export default function HistoricoEventos() {
           className="mt-4"
             data={dadosExibidos}
             columns={colunasEventos}
-            acoesDropdown={(maquina) => (
+            acoesDropdown={(evento) => (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -308,7 +308,7 @@ export default function HistoricoEventos() {
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <DetalhaeEvento />
+                    <DetalhesEvento eventoId={evento.id} />
                   </DialogContent>
                 </Dialog>
               </>

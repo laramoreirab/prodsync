@@ -5,9 +5,9 @@ import {
 import { Pencil, ChevronDown, Calendar, Clock, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'sonner';
+import { apiFetch } from '@/lib/api';
 import { opCrudService } from '@/services/opCrudService'; // Importar o serviço
 import { useSetores } from '@/hooks/useSetores';
-import { useMaquinas } from '@/hooks/useMaquinas';
 import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
@@ -26,13 +26,34 @@ export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
     const [fimData, setFimData] = useState('');                  // backend: data_fim
     const [fimHora, setFimHora] = useState('');
     const [observacaoOp, setObservacaoOp] = useState('');        // backend: observacao_op
+    const [listaMaquinas, setListaMaquinas] = useState([]);
+    const [carregandoMaquinas, setCarregandoMaquinas] = useState(false);
 
     const { setores } = useSetores();
-    const { maquinas } = useMaquinas();
 
-    const maquinasFiltradas = idSetor
-        ? maquinas.filter((maquina) => String(maquina.id_setor) === String(idSetor))
-        : maquinas;
+    useEffect(() => {
+        async function carregarMaquinasDoSetor() {
+            if (!idSetor) {
+                setListaMaquinas([]);
+                return;
+            }
+
+            try {
+                setCarregandoMaquinas(true);
+                setListaMaquinas([]);
+                const resposta = await apiFetch(`/api/maquinas/setor/${idSetor}`, { method: "GET" });
+                setListaMaquinas(resposta.dados || []);
+            } catch (error) {
+                console.error("Erro ao carregar maquinas do setor:", error);
+                toast.error("Erro ao carregar máquinas do setor.");
+                setListaMaquinas([]);
+            } finally {
+                setCarregandoMaquinas(false);
+            }
+        }
+
+        carregarMaquinasDoSetor();
+    }, [idSetor]);
 
     const handleSetorChange = (value) => {
         setIdSetor(value);
@@ -162,15 +183,29 @@ export default function FormEdicaoOp({ opId, onEdicaoSucesso }) {
                             className="w-1/2"
                             options={setores}
                             value={idSetor}
+                            valueKey="id_setor"
+                            labelKey="nome_setor"
                             onValueChange={handleSetorChange}
                         />
 
                         <FormSelect
                             label="Máquina"
                             className="w-1/2"
-                            options={maquinasFiltradas}
+                            options={listaMaquinas}
                             value={idMaquina}
+                            valueKey="id_maquina"
+                            labelKey="nome"
                             onValueChange={(val) => setIdMaquina(val)}
+                            placeholder={
+                                !idSetor
+                                    ? "Selecione um setor..."
+                                    : carregandoMaquinas
+                                        ? "Carregando..."
+                                        : listaMaquinas.length === 0
+                                            ? "Nenhuma máquina no setor"
+                                            : "Selecione..."
+                            }
+                            disabled={!idSetor || carregandoMaquinas || listaMaquinas.length === 0}
                         />
                     </div>
                 </div>
