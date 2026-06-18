@@ -21,11 +21,15 @@ export function ProducaoDefeitosWidget({ setorId }) {
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
 
-      <div className="mt-2">
+      <div className="mt-4">
         <BarStackedHorizontal
           data={data}
           config={producaoDefeitosConfig}
           xKey="maquina"
+          limit={5}
+          heightClassName="h-[330px]"
+          yAxisWidth={185}
+          barSize={24}
         />
       </div>
     </div>
