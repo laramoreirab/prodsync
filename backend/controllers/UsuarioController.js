@@ -340,9 +340,13 @@ class UsuarioController {
             }
             }
 
-            res.status(201).json({
+            const usuarioCriado = await UsuarioModel.buscarPorId(usuarioId, id_empresa);
+            const { senha: _senha, ...usuarioCriadoSemSenha } = usuarioCriado ?? {};
+
+            return res.status(201).json({
                 sucesso: true,
                 mensagem: 'Usuário criado com sucesso!',
+                dados: usuarioCriadoSemSenha
             })
         } catch (error) {
             console.error('Erro ao criar usuário:', error);

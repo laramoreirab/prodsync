@@ -24,6 +24,11 @@ import {
 
 const USE_MOCK = false;
 
+const labelOrFallback = (value, fallback) => {
+  const label = String(value ?? "").trim();
+  return label || fallback;
+};
+
 function withSetorId(url, setorId = null) {
   if (!setorId) return url;
   const separator = url.includes("?") ? "&" : "?";
@@ -108,7 +113,7 @@ export const opTopRefugoService = {
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/top-refugo", setorId));
       const dados = (response.dados || []).map((item) => ({
-        op: item.label,
+        op: labelOrFallback(item.label, "Sem OP"),
         refugo: item.qtd_refugo,
       }));
       return OPRefugoArraySchema.parse(dados);
@@ -127,7 +132,7 @@ export const opCargaSetorService = {
         const carga = item.carga_restante ?? item.qtd_ops ?? 0;
 
         return {
-          setor: item.setor,
+          setor: labelOrFallback(item.setor, "Sem setor"),
           carga,
         };
       });
@@ -144,7 +149,7 @@ export const opStatusService = {
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/status", setorId));
       const dados = (response.dados || []).map((item) => ({
-        name: item.status,
+        name: labelOrFallback(item.status, "Sem status"),
         value: item.quantidade,
       }));
       return OPStatusArraySchema.parse(dados);
@@ -160,7 +165,7 @@ export const opConcluidasDiaService = {
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/concluidas-dia", setorId));
       const dados = (response.dados || []).map((item) => ({
-        dia: item.dia,
+        dia: labelOrFallback(item.dia, "Sem data"),
         total: item.ops_concluidas,
       }));
       return OPConcluidasDiaArraySchema.parse(dados);

@@ -40,7 +40,7 @@ export function useSetores() {
   const criarSetor = async (dados) => {
     try {
       const novo = await setorCrudService.create(dados);
-      setSetores(prev => [...prev, novo]);
+      await fetchSetores();
       return novo;
     } catch (err) {
       throw err;
@@ -51,7 +51,7 @@ export function useSetores() {
   const editarSetor = async (id, dados) => {
     try {
       const atualizado = await setorCrudService.update(id, dados);
-      setSetores(prev => prev.map(s => String(s.id) === String(id) ? atualizado : s));
+      await fetchSetores();
       return atualizado;
     } catch (err) {
       throw err;
