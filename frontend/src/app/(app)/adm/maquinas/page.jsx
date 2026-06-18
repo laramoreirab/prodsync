@@ -54,7 +54,7 @@ const maquinasFilterBase = [
 ];
 
 const colunasMaquinas = [
-  { id: 'id_maquina', key: 'id_maquina', label: 'ID', className: 'w-20 text-center justify-center' }, /* id da máquina */
+  { id: 'id_exibicao_empresa', key: 'id_exibicao_empresa', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'nome', key: 'nome', label: 'Nome' },
   { id: 'setor', key: 'setor', label: 'Setor', icone: (valor, row) => obterNomeSetor(row) || "-" },
   {
@@ -117,8 +117,8 @@ export default function Maquinas() {
 
     dadosCopiados.sort((a, b) => {
       if (criterio === 'nome') return a.nome.localeCompare(b.nome);
-      if (criterio === 'id_asc') return a.id_maquina - b.id_maquina;
-      if (criterio === 'id_desc') return b.id_maquina - a.id_maquina;
+      if (criterio === 'id_asc') return Number(a.id_exibicao_empresa ?? a.id_maquina) - Number(b.id_exibicao_empresa ?? b.id_maquina);
+      if (criterio === 'id_desc') return Number(b.id_exibicao_empresa ?? b.id_maquina) - Number(a.id_exibicao_empresa ?? a.id_maquina);
       if (criterio === 'setor') return obterNomeSetor(a).localeCompare(obterNomeSetor(b));
       return 0;
     });
@@ -171,7 +171,7 @@ export default function Maquinas() {
     const termo = busca.toLowerCase();
     return (
       maq.nome.toLowerCase().includes(termo) ||
-      maq.id_maquina.toString().includes(termo)
+      String(maq.id_exibicao_empresa ?? maq.id_maquina).includes(termo)
     );
   });
 

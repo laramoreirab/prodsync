@@ -121,7 +121,7 @@ const statusBadge = (status) => {
 };
 
 const colunasEventos = [
-  { id: "id", key: "id", label: "ID", className: "w-20 text-center justify-center" },
+  { id: "id_exibicao_op", key: "id_exibicao_op", label: "ID", className: "w-20 text-center justify-center" },
   {
     id: "tipo",
     key: "tipo",
@@ -222,6 +222,7 @@ export default function OPDetalheGestor({ params }) {
 
       const eventos = eventosRaw.map((item) => ({
         ...item,
+        id_exibicao_op: item.id_exibicao_op ?? item.numero_evento_op ?? item.id,
         data: formatarPeriodo(item.inicio, item.fim),
         duracao: formatarDuracao(item.duracao_minutos),
       }));
@@ -250,8 +251,8 @@ export default function OPDetalheGestor({ params }) {
   const handleSortEventos = (criterio) => {
     const copia = [...dadosEventos];
     copia.sort((a, b) => {
-      if (criterio === "id_asc") return a.id - b.id;
-      if (criterio === "id_desc") return b.id - a.id;
+      if (criterio === "id_asc") return Number(a.id_exibicao_op ?? a.id) - Number(b.id_exibicao_op ?? b.id);
+      if (criterio === "id_desc") return Number(b.id_exibicao_op ?? b.id) - Number(a.id_exibicao_op ?? a.id);
       if (criterio === "data_asc") return new Date(a.inicio) - new Date(b.inicio);
       if (criterio === "data_desc") return new Date(b.inicio) - new Date(a.inicio);
       if (criterio === "duracao_asc") {
@@ -291,7 +292,7 @@ export default function OPDetalheGestor({ params }) {
     return (
       evento.tipo?.toLowerCase().includes(termo) ||
       evento.motivo?.toLowerCase().includes(termo) ||
-      String(evento.id).includes(termo)
+      String(evento.id_exibicao_op ?? evento.id).includes(termo)
     );
   });
 

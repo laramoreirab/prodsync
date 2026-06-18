@@ -398,6 +398,32 @@ class MaquinaModel {
         return dias;
     }
 
+    static async adicionarIdsExibicaoEmpresa(id_empresa, maquinas) {
+        if (!Array.isArray(maquinas) || maquinas.length === 0) return maquinas;
+
+        const idsOrdenados = await prisma.maquinas.findMany({
+            where: {
+                id_empresa: Number(id_empresa),
+                ativo: true
+            },
+            orderBy: {
+                id_maquina: 'asc'
+            },
+            select: {
+                id_maquina: true
+            }
+        });
+
+        const numeroPorId = new Map(
+            idsOrdenados.map((maquina, index) => [maquina.id_maquina, index + 1])
+        );
+
+        return maquinas.map((maquina) => ({
+            ...maquina,
+            id_exibicao_empresa: numeroPorId.get(maquina.id_maquina) ?? maquina.id_maquina
+        }));
+    }
+
     //Lista as máquinas de uma empresa com paginação
     static async listarMaquinasPaginadas(id_empresa, paginacao, setorId = null) {
         try {
@@ -423,6 +449,8 @@ class MaquinaModel {
                 regrasDaBusca,   // Manda as regras
                 paginacao        // Manda a página e o limite
             );
+
+            resultadoPaginado.dados = await this.adicionarIdsExibicaoEmpresa(id_empresa, resultadoPaginado.dados);
 
             return resultadoPaginado;
         } catch (error) {

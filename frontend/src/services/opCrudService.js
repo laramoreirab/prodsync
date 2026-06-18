@@ -66,6 +66,7 @@ const normalizarOp = (op) => {
   return {
     ...op,
     id: op.id ?? op.id_ordem,
+    id_exibicao_empresa: op.id_exibicao_empresa ?? op.id ?? op.id_ordem,
     id_maquina: op.id_maquina ?? op.maquina?.id_maquina ?? null,
     nome: op.nome ?? op.codigo_lote ?? op.produto,
     setor: typeof setor === "string" ? setor : setor?.nome_setor ?? op.id_setor,

@@ -11,6 +11,31 @@ class OrdemProducaoModel {
         return Math.min(100, Math.round((boas / planejado) * 100));
     }
 
+    static async adicionarIdsExibicaoEmpresa(id_empresa, ordens) {
+        if (!Array.isArray(ordens) || ordens.length === 0) return ordens;
+
+        const idsOrdenados = await prisma.ordemProducao.findMany({
+            where: {
+                id_empresa: Number(id_empresa)
+            },
+            orderBy: {
+                id_ordem: 'asc'
+            },
+            select: {
+                id_ordem: true
+            }
+        });
+
+        const numeroPorId = new Map(
+            idsOrdenados.map((ordem, index) => [ordem.id_ordem, index + 1])
+        );
+
+        return ordens.map((ordem) => ({
+            ...ordem,
+            id_exibicao_empresa: numeroPorId.get(ordem.id_ordem) ?? ordem.id_ordem
+        }));
+    }
+
     static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
             const regrasDaBusca = {
@@ -38,6 +63,8 @@ class OrdemProducaoModel {
                 regrasDaBusca,
                 paginacao
             );
+
+            resultadoPaginado.dados = await this.adicionarIdsExibicaoEmpresa(id_empresa, resultadoPaginado.dados);
 
             const ids = resultadoPaginado.dados.map((ordem) => ordem.id_ordem);
             if (ids.length === 0) return resultadoPaginado;
@@ -151,21 +178,36 @@ class OrdemProducaoModel {
     }
 
     static async listarEventosOrdem(id_ordem, id_empresa, limite = 50) {
-        const eventos = await prisma.historico_Eventos.findMany({
-            where: {
-                id_ordemProducao: Number(id_ordem),
-                id_empresa: Number(id_empresa)
-            },
-            include: {
-                motivo_parada: { select: { descricao: true } }
-            },
-            orderBy: { inicio: 'desc' },
-            take: limite
-        });
+        const where = {
+            id_ordemProducao: Number(id_ordem),
+            id_empresa: Number(id_empresa)
+        };
+
+        const [eventos, idsEventosOrdem] = await Promise.all([
+            prisma.historico_Eventos.findMany({
+                where,
+                include: {
+                    motivo_parada: { select: { descricao: true } }
+                },
+                orderBy: { inicio: 'desc' },
+                take: limite
+            }),
+            prisma.historico_Eventos.findMany({
+                where,
+                select: { id_evento: true },
+                orderBy: { id_evento: 'asc' }
+            })
+        ]);
+
+        const numeroEventoOrdem = new Map(
+            idsEventosOrdem.map((evento, index) => [evento.id_evento, index + 1])
+        );
 
         return eventos.map((evento) => ({
             id: evento.id_evento,
             id_evento: evento.id_evento,
+            id_exibicao_op: numeroEventoOrdem.get(evento.id_evento) ?? evento.id_evento,
+            numero_evento_op: numeroEventoOrdem.get(evento.id_evento) ?? evento.id_evento,
             tipo: evento.status_atual,
             evento: evento.status_atual,
             inicio: evento.inicio,
