@@ -12,6 +12,7 @@ import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
+import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -364,108 +365,67 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             placeholder="usuario@email.com"
                             required />
                     </div>
-                    <div className="relative">
-                        <label htmlFor="id_setor" className={labelStyle}>Setor</label>
-                        <select
-                            id="id_setor"
-                            onChange={handleInputChange}
-                            value={formData.id_setor}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            disabled={listaSetores.length === 0}
-                            required
-                        >
-                            <option value="">
-                                {listaSetores.length === 0 ? "Nenhum setor criado" : "Selecione..."}
-                            </option>
-                            {listaSetores.map((setor) => (
-
-                                <option
-                                    key={setor.id_setor}
-                                    value={setor.id_setor}
-                                >
-                                    {setor.nome_setor}
-                                </option>
-
-                            ))}
-                        </select>
-                    </div>
+                    <FormSelect
+                        id="id_setor"
+                        label="Setor"
+                        options={listaSetores}
+                        value={formData.id_setor}
+                        onValueChange={(val) => handleInputChange({ target: { id: "id_setor", value: val } })}
+                        placeholder={listaSetores.length === 0 ? "Nenhum setor criado" : "Selecione..."}
+                        disabled={listaSetores.length === 0}
+                        required
+                    />
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
-                    <div className="relative">
-                        <label htmlFor="funcao" className={labelStyle}>Função</label>
-                        <select
-                            id="funcao"
-                            value={formData.funcao}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            onChange={handleInputChange}
-                            required
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="Operador">Operador</option>
-                            <option value="Gestor">Gestor</option>
-                        </select>
-                    </div>
-                    <div className="relative">
-                        <label htmlFor="id_turno" className={labelStyle}>Turno</label>
-                        <select
-                            id="id_turno"
-                            onChange={handleInputChange}
-                            value={formData.id_turno}
-                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
-                            disabled={!formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
-                            required
-                        >
-                            <option value="">
-                                {!formData.id_setor
-                                    ? "Selecione..."
-                                    : carregandoTurnos
-                                        ? "Sincronizando turnos..."
-                                    : listaTurnos.length === 0
-                                        ? "Nenhum turno criado"
-                                        : "Selecione..."}
-                            </option>
-                            {listaTurnos.map((turno) => (
+                    <FormSelect
+                        id="funcao"
+                        label="Função"
+                        options={[
+                            { value: "Operador", label: "Operador" },
+                            { value: "Gestor", label: "Gestor" }
+                        ]}
+                        value={formData.funcao}
+                        onValueChange={(val) => handleInputChange({ target: { id: "funcao", value: val } })}
+                        required
+                    />
 
-                                <option
-                                    key={turno.id_turno}
-                                    value={turno.id_turno}
-                                >
-                                    {turno.nome_turno}
-                                </option>
-
-                            ))}
-                        </select>
-                    </div>
+                    <FormSelect
+                        id="id_turno"
+                        label="Turno"
+                        options={listaTurnos}
+                        value={formData.id_turno}
+                        valueKey="id_turno"
+                        labelKey="nome_turno"
+                        onValueChange={(val) => handleInputChange({ target: { id: "id_turno", value: val } })}
+                        placeholder={
+                            !formData.id_setor
+                                ? "Selecione um setor..."
+                                : carregandoTurnos
+                                    ? "Sincronizando turnos..."
+                                : listaTurnos.length === 0
+                                    ? "Nenhum turno criado"
+                                    : "Selecione..."
+                        }
+                        disabled={!formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
+                        required
+                    />
                 </div>
 
                 {/* máquina a gerenciar só aparece se função = operador */}
                 {formData.funcao === "Operador" && (
-                    <div className="relative pt-1">
-                        <label htmlFor="id_maquina" className={labelStyle}>Máquina a Gerenciar</label>
-                        <select
-                            id="id_maquina"
-                            onChange={handleInputChange}
-                            value={formData.id_maquina}
-                            className={`${inputStyle} appearance-none pr-10 bg-white`}
-                            disabled={!formData.id_setor || !formData.id_turno}
-                            required
-                        >
-                            <option value="">
-                                {formData.id_turno ? "Selecione..." : "Selecione um turno primeiro"}
-                            </option>
-                            {listaMaquinas.map((maquina) => (
-
-                                <option
-                                    key={maquina.id_maquina}
-                                    value={maquina.id_maquina}
-                                >
-                                    {maquina.nome}
-                                </option>
-
-                            ))}
-                        </select>
-                    </div>
+                    <FormSelect
+                        id="id_maquina"
+                        label="Máquina a Gerenciar"
+                        options={listaMaquinas}
+                        value={formData.id_maquina}
+                        valueKey="id_maquina"
+                        labelKey="nome"
+                        onValueChange={(val) => handleInputChange({ target: { id: "id_maquina", value: val } })}
+                        placeholder={formData.id_turno ? "Selecione..." : "Selecione um turno primeiro"}
+                        disabled={!formData.id_setor || !formData.id_turno}
+                        required
+                    />
                 )}
 
                 <div className="flex justify-center mt-4">

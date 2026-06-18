@@ -4,6 +4,7 @@ import { DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
+import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormCriarMotivo({ onCriadoSucesso }) {
     const [descricao, setDescricao] = useState("");
@@ -68,17 +69,16 @@ export default function FormCriarMotivo({ onCriadoSucesso }) {
                         />
                     </div>
 
-                    <div className="flex flex-col mt-3 gap-1">
-                        <label className="text-lg font-semibold text-black dark:text-white">Tipo</label>
-                        <select
-                            value={tipo}
-                            onChange={(e) => setTipo(e.target.value)}
-                            className="w-full outline-none shadow-md border border-gray-200 rounded-md p-3 text-xl text-gray-700 bg-white"
-                        >
-                            <option value="Programada">Programada</option>
-                            <option value="Nao_Programada">Não Programada</option>
-                        </select>
-                    </div>
+                    <FormSelect
+                        label="Tipo"
+                        className="mt-3"
+                        options={[
+                            { value: "Programada", label: "Programada" },
+                            { value: "Nao_Programada", label: "Não Programada" }
+                        ]}
+                        value={tipo}
+                        onValueChange={(val) => setTipo(val)}
+                    />
 
                     <div className="flex justify-center mb-4 mt-8">
                         <button

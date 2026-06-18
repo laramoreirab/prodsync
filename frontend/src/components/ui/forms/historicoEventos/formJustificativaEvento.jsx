@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Badge } from '../../badge';
 import { eventosCrudService } from '@/services/eventosCrudService';
+import FormSelect from "@/components/ui/FormSelect";
 
 const BADGE = {
     Setup: "rounded-xl px-3 text-amarelo font-semibold bg-[var(--amarelo-setup)]",
@@ -106,22 +107,13 @@ export default function FormJustificativaEvento({ onFechar }) {
                         <h1 className="text-2xl font-bold text-black">Justificativa</h1>
 
                         <div className="space-y-3">
-                            <div>
-                                <span className="block text-xl font-semibold mb-1 mt-2">Motivo Principal:</span>
-                                <div className="relative">
-                                    <select
-                                        value={motivo}
-                                        onChange={(e) => setMotivo(e.target.value)}
-                                        className="w-full border shadow-sm border-gray-200 rounded-md p-2.5 pr-10 text-xl text-gray-500 outline-none bg-white appearance-none font-medium"
-                                    >
-                                        <option value="">Selecione o motivo</option>
-                                        {motivos.map((m) => (
-                                            <option key={m.id_motivo} value={m.id_motivo}>{m.descricao}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                </div>
-                            </div>
+                            <FormSelect
+                                label="Motivo Principal:"
+                                options={motivos}
+                                value={motivo}
+                                onValueChange={(val) => setMotivo(val)}
+                                placeholder="Selecione o motivo"
+                            />
                             <div>
                                 <span className="block text-xl font-semibold mb-1 mt-2">Observação:</span>
                                 <textarea
