@@ -70,7 +70,7 @@ export function RelatorioView({ variant, setorId = null, setorNome = null, dashb
   const nenhumaSecao = ativos === 0;
 
   return (
-    <PageLayout className="pb-12 relatorio-pagina">
+    <PageLayout className="py-8 relatorio-pagina">
       <div data-print-hide className="space-y-4">
       <DetailBackLink href={dashboardHref} label="Voltar para Dashboard" />
       <PageHeader
@@ -81,7 +81,7 @@ export function RelatorioView({ variant, setorId = null, setorNome = null, dashb
           <Button
             type="button"
             size="lg"
-            className="h-auto gap-2.5 bg-secondary-foreground px-6 py-3 text-lg font-semibold text-white hover:bg-secondary-foreground/90"
+            className="cursor-pointer h-auto gap-2.5 bg-secondary-foreground px-6 py-3 text-lg font-semibold text-white hover:bg-secondary-foreground/90"
             disabled={nenhumaSecao}
             onClick={exportRelatorioPdf}
           >

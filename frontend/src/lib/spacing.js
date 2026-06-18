@@ -1,4 +1,3 @@
-// src/lib/spacing.js
 export const SPACING = {
     // Distância do título ao topo da área de conteúdo
     pageTop:     "pt-8 sm:pt-10",

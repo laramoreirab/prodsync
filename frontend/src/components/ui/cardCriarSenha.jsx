@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import InputSenha from "./inputSenha";
 import { useState } from "react";
-import { CheckCircle2, Info, Eye, EyeOff, Key } from "lucide-react";
+import { CircleCheck, CircleX, Eye, EyeOff, Key} from "lucide-react";
 import { apiFetch } from "@/lib/api"
 import { setAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
@@ -233,9 +233,9 @@ export default function CriarSenha() {
                                                         }`}
                                                     key={index}>
                                                     {validation.valid ? (
-                                                        <CheckCircle2 className="h-3.5 w-3.5" />
+                                                        <CircleCheck className="h-3.5 w-3.5" />
                                                     ) : (
-                                                        <Info className="h-3.5 w-3.5" />
+                                                        <CircleX className="h-3.5 w-3.5" />
                                                     )}
                                                     <span className="text-[13px]">{validation.text}</span>
                                                 </div>

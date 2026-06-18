@@ -255,7 +255,7 @@ export default function UsuarioDetalheGestor({ params }) {
           actions={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
+                <DialogTrigger className="text-(--pencil) cursor-pointer">
                   <Pencil size={36} className="mr-1" />
                 </DialogTrigger>
                 <DialogContent>
@@ -267,7 +267,7 @@ export default function UsuarioDetalheGestor({ params }) {
               </Dialog>
 
               <Dialog>
-                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
+                <DialogTrigger className="text-(--trash) cursor-pointer">
                   <Trash2 className="w-9 h-9" />
                 </DialogTrigger>
                 <DialogContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -23,143 +23,66 @@ import { cn } from "@/lib/utils";
 
 const passos = [
   {
-    titulo: "1. Dados da empresa",
-    menu: "Minha conta > Configurações",
-    href: "/adm/configuracoes",
-    icon: Settings,
-    objetivo: "Confirme os dados da empresa antes de liberar o ambiente para operação.",
-    configurar: "Nome, e-mail da empresa, aparência e políticas básicas da conta.",
-    motivo: "Essas informações aparecem em relatórios, usuários e rotinas administrativas.",
-  },
-  {
-    titulo: "2. Setores e turnos",
-    menu: "Setores",
-    href: "/adm/setores",
-    icon: MapPinned,
-    objetivo: "Crie a estrutura produtiva antes de cadastrar máquinas e gestores.",
-    configurar: "Setores da fábrica, turnos de trabalho e gestores responsáveis.",
-    motivo: "Máquinas, operadores, filtros de dashboard e permissões de gestor dependem do setor.",
-  },
-  {
-    titulo: "3. Usuários",
+    titulo: "1. Usuários",
     menu: "Usuários",
-    href: "/adm/usuarios",
+    href: "/gestor/usuarios",
     icon: Users,
-    objetivo: "Cadastre quem vai operar, gerir e administrar o ambiente.",
-    configurar: "Administradores, gestores e operadores com seus vínculos corretos.",
-    motivo: "Operadores recebem solicitações de justificativa e gestores enxergam apenas seus setores.",
+    objetivo: "Cadastre quem vai operar no seu setor.",
+    configurar: "Operadores com seus vínculos corretos.",
+    motivo: "Operadores recebem solicitações de justificativa.",
   },
   {
-    titulo: "4. Máquinas",
+    titulo: "2. Máquinas",
     menu: "Máquinas",
-    href: "/adm/maquinas",
+    href: "/gestor/maquinas",
     icon: Wrench,
-    objetivo: "Cadastre as máquinas depois que setores e usuários já existem.",
-    configurar: "Setor, operador responsável, metas, capacidade e dados técnicos.",
+    objetivo: "Cadastre as máquinas.",
+    configurar: "Operador responsável, capacidade e dados técnicos.",
     motivo: "Eventos, produção, OEE, Andon e notificações dependem da máquina estar vinculada corretamente.",
   },
   {
-    titulo: "5. Motivos e Histórico de Eventos",
+    titulo: "3. Motivos e Histórico de Eventos",
     menu: "Histórico de Eventos",
-    href: "/adm/historicoEventos",
+    href: "/gestor/historicoEventos",
     icon: ClipboardList,
     objetivo: "Prepare os motivos de parada/setup e valide os primeiros eventos.",
     configurar: "Motivos de parada, eventos manuais e justificativas pendentes.",
     motivo: "Paradas e setups exigem justificativa para manter indicadores e relatórios confiáveis.",
   },
   {
-    titulo: "6. Ordens de Produção",
+    titulo: "4. Ordens de Produção",
     menu: "Ordem de Produção",
-    href: "/adm/ordensDeProducao",
+    href: "/gestor/ordensDeProducao",
     icon: ListBulletsIcon,
-    objetivo: "Cadastre as OPs quando o chão de fábrica já estiver estruturado.",
+    objetivo: "Cadastre as OPs.",
     configurar: "Lotes, metas, máquinas, operadores e acompanhamento da produção.",
     motivo: "As OPs usam máquinas e operadores existentes para consolidar produção e refugos.",
   },
   {
-    titulo: "7. Andon e acompanhamento",
+    titulo: "5. Andon e acompanhamento",
     menu: "Andon",
-    href: "/adm/andon",
+    href: "/gestor/andon",
     icon: Factory,
-    objetivo: "Use por último para monitorar o ambiente já configurado.",
+    objetivo: "Use para monitorar o ambiente.",
     configurar: "Painéis de acompanhamento, status das máquinas e indicadores em tempo real.",
     motivo: "O Andon fica útil depois que máquinas, operadores, eventos e OPs estão alimentando dados.",
   },
 ];
 
-const STORAGE_KEY = "prodsync:production-setup-tour";
-
 export function ProductionSetupTour() {
   const [aberto, setAberto] = useState(false);
   const [passoAtual, setPassoAtual] = useState(0);
-  const [maiorPassoAlcancado, setMaiorPassoAlcancado] = useState(0);
-  const [guiaConcluido, setGuiaConcluido] = useState(false);
-  const [storageCarregado, setStorageCarregado] = useState(false);
   const passo = passos[passoAtual];
   const Icon = passo.icon;
-  const progresso = guiaConcluido
-    ? 100
-    : Math.round(((maiorPassoAlcancado + 1) / passos.length) * 100);
-
-  useEffect(() => {
-    try {
-      const salvo = window.localStorage.getItem(STORAGE_KEY);
-      if (!salvo) {
-        setStorageCarregado(true);
-        return;
-      }
-
-      const dados = JSON.parse(salvo);
-      const passoSalvo = Math.min(Math.max(Number(dados.passoAtual) || 0, 0), passos.length - 1);
-      const maiorSalvo = Math.min(Math.max(Number(dados.maiorPassoAlcancado) || passoSalvo, 0), passos.length - 1);
-
-      setPassoAtual(passoSalvo);
-      setMaiorPassoAlcancado(Math.max(passoSalvo, maiorSalvo));
-      setGuiaConcluido(Boolean(dados.guiaConcluido));
-    } catch {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } finally {
-      setStorageCarregado(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!storageCarregado) return;
-
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        passoAtual,
-        maiorPassoAlcancado,
-        guiaConcluido,
-      })
-    );
-  }, [passoAtual, maiorPassoAlcancado, guiaConcluido, storageCarregado]);
-
-  const selecionarPasso = (index) => {
-    setPassoAtual(index);
-    setMaiorPassoAlcancado((valor) => Math.max(valor, index));
-  };
+  const progresso = Math.round(((passoAtual + 1) / passos.length) * 100);
 
   const abrir = () => {
+    setPassoAtual(0);
     setAberto(true);
   };
 
   const anterior = () => setPassoAtual((valor) => Math.max(0, valor - 1));
-  const proximo = () => selecionarPasso(Math.min(passos.length - 1, passoAtual + 1));
-
-  const concluir = () => {
-    setPassoAtual(passos.length - 1);
-    setMaiorPassoAlcancado(passos.length - 1);
-    setGuiaConcluido(true);
-    setAberto(false);
-  };
-
-  const reiniciar = () => {
-    setPassoAtual(0);
-    setMaiorPassoAlcancado(0);
-    setGuiaConcluido(false);
-  };
+  const proximo = () => setPassoAtual((valor) => Math.min(passos.length - 1, valor + 1));
 
   return (
     <>
@@ -203,35 +126,18 @@ export function ProductionSetupTour() {
               />
             </div>
 
-            {guiaConcluido ? (
-              <div className="rounded-lg border border-green-200 bg-green-50 p-5">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 size-6 shrink-0 text-green-600" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[#23304c]">Guia de implantação concluído</h3>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Todas as etapas foram percorridas. Para refazer o fluxo desde o início, reinicie o guia.
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-5 flex justify-end">
-                  <Button onClick={reiniciar}>Reiniciar guia</Button>
-                </div>
-              </div>
-            ) : (
-              <>
             <div className="space-y-4">
               <div className="grid gap-2 sm:grid-cols-2">
                 {passos.map((item, index) => {
                   const ItemIcon = item.icon;
                   const ativo = index === passoAtual;
-                  const concluido = index <= maiorPassoAlcancado;
+                  const concluido = index < passoAtual;
 
                   return (
                     <button
                       key={item.titulo}
                       type="button"
-                      onClick={() => selecionarPasso(index)}
+                      onClick={() => setPassoAtual(index)}
                       className={cn(
                         "flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
                         ativo
@@ -297,7 +203,7 @@ export function ProductionSetupTour() {
                 Passo {passoAtual + 1} de {passos.length}
               </p>
               {passoAtual === passos.length - 1 ? (
-                <Button onClick={concluir}>Concluir</Button>
+                <Button onClick={() => setAberto(false)}>Concluir</Button>
               ) : (
                 <Button onClick={proximo}>
                   Próximo
@@ -305,8 +211,6 @@ export function ProductionSetupTour() {
                 </Button>
               )}
             </div>
-              </>
-            )}
           </div>
         </DialogContent>
       </Dialog>

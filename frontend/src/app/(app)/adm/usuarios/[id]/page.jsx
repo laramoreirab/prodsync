@@ -367,7 +367,7 @@ export default function UsuarioDetalhePage({ params }) {
           actions={
             <DetailActions>
               <Dialog>
-                <DialogTrigger className="text-[var(--pencil)] cursor-pointer">
+                <DialogTrigger className="text-(--pencil) cursor-pointer">
                   <Pencil size={32} />
                 </DialogTrigger>
                 <DialogContent>
@@ -375,7 +375,7 @@ export default function UsuarioDetalhePage({ params }) {
                 </DialogContent>
               </Dialog>
               <Dialog>
-                <DialogTrigger className="text-[var(--trash)] cursor-pointer">
+                <DialogTrigger className="text-(--trash) cursor-pointer">
                   <Trash2 size={32} />
                 </DialogTrigger>
                 <DialogContent>

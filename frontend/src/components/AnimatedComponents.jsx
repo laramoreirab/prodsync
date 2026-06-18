@@ -204,7 +204,7 @@ export function PageHeader({
       <div className="flex flex-col gap-1 min-w-0 flex-1">
         {/* Criamos um wrapper 'w-fit' para que a linha tenha exatamente o tamanho do texto */}
         <div className="relative w-fit pb-2">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#17233b] dark:text-[#f4f8ff]">
+          <h1 className="mb-1 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#17233b] dark:text-[#f4f8ff]">
             {title}
           </h1>
           
