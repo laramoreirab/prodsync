@@ -2,8 +2,10 @@
 
 import { cn } from "@/lib/utils";
 
-export function DonutLegend({ items, className }) {
+export function DonutLegend({ items, className, maxItems = 6 }) {
   if (!items?.length) return null;
+
+  const visibleItems = maxItems ? items.slice(0, maxItems) : items;
 
   return (
     <div
@@ -12,7 +14,7 @@ export function DonutLegend({ items, className }) {
         className
       )}
     >
-      {items.map((item, index) => (
+      {visibleItems.map((item, index) => (
         <div
           key={item.key ?? `${item.label}-${index}`}
           className="flex min-w-0 max-w-full items-center gap-2"

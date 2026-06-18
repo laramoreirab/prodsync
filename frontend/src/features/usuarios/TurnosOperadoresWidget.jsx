@@ -21,6 +21,8 @@ const tonsAzuis = [
   "#1e3a8a",
 ];
 
+const MAX_CHART_ITEMS = 6;
+
 export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = false, cy = "50%" }) {
   const { data, loading, error } = useTurnosOperadores(setorId);
 
@@ -38,11 +40,12 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
   const formatValue = (value) => (valueFormatter ? valueFormatter(value) : value);
   const getColor = (entry, index) =>
     turnosOperadoresConfig?.[entry[nameKey]]?.color ?? tonsAzuis[index % tonsAzuis.length];
+  const chartData = data
+    .filter((entry) => Number(entry[dataKey]) > 0)
+    .slice(0, MAX_CHART_ITEMS);
   const legendItems = compact
     ? []
-    : data
-        .filter((entry) => Number(entry[dataKey]) > 0)
-        .map((entry, index) => ({
+    : chartData.map((entry, index) => ({
           key: `${entry[nameKey]}-${index}`,
           color: getColor(entry, index),
           label: turnosOperadoresConfig?.[entry[nameKey]]?.label ?? entry[nameKey],
@@ -99,7 +102,7 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
                 }
               />
               <Pie
-                data={data}
+                data={chartData}
                 dataKey={dataKey}
                 nameKey={nameKey}
                 cx="50%"
@@ -109,7 +112,7 @@ export function TurnosOperadoresWidget({ setorId, valueFormatter, compact = fals
                 labelLine={false}
                 label={false}
               >
-                {data.map((entry, index) => {
+                {chartData.map((entry, index) => {
                   const entryKey = entry[nameKey];
                   const fillColor = getColor(entry, index);
                   

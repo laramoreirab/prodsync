@@ -628,6 +628,7 @@ class EventoModel {
                 where: { id_empresa, id_evento },
                 include: {
                     maquina: { select: { id_maquina: true, nome: true, serie: true } },
+                    ordem_producao: { select: { id_ordem: true, codigo_lote: true, produto: true } },
                     motivo_parada: { select: { id_motivo: true, descricao: true, tipo: true } },
                     turno: { select: { id_turno: true, nome_turno: true } }
                 }
