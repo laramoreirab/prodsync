@@ -146,10 +146,12 @@ export default function HistoricoEventosGestor() {
     [dadosExibidos]
   );
 
+  // Aqui passamos apenas o CONTEÚDO, pois o DialogContent já deve estar no TableListagens
   const modalJustificativa = (
-    <DialogContent>
-      <SolicitarJustificativaConteudo idsEventos={selecionados.map((row) => row.id)} onSucesso={refresh} />
-    </DialogContent>
+    <SolicitarJustificativaConteudo 
+      idsEventos={selecionados.map((row) => row.id)} 
+      onSucesso={refresh} 
+    />
   );
 
   const acoesDropdown = (row) => (

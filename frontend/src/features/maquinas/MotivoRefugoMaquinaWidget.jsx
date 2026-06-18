@@ -3,7 +3,6 @@
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useMotivoRefugoMaquina } from "./hooks/useMotivoRefugoMaquina";
 import { motivoRefugoConfig } from "./config/maquinaDetalheConfig";
-import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 
 const tonsAzuis = [
   "#1d4ed8",
