@@ -435,7 +435,7 @@ class EventoModel {
             }
 
             const { resultado, criado } = await prisma.$transaction(async (tx) => {
-                await tx.$queryRaw`SELECT pg_advisory_xact_lock(${empresaId}::int, ${maquinaId}::int)`;
+                await tx.$executeRaw`SELECT pg_advisory_xact_lock(${empresaId}::int, ${maquinaId}::int)`;
 
                 const eventoAtual = await this.obterUltimoEventoMaquina(empresaId, maquinaId, tx);
                 if (eventoAtual?.status_atual === statusNormalizado) {
