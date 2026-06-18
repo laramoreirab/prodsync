@@ -60,8 +60,8 @@ const opsFilter = [
 
 const colunasOrdemProd = [
   {
-    id: "id",
-    key: "id",
+    id: "id_exibicao_empresa",
+    key: "id_exibicao_empresa",
     label: "ID",
     className: "w-1/7"
   },
@@ -182,8 +182,8 @@ export default function OrdensDeProducao() {
 
 
     dadosCopiados.sort((a, b) => {
-      if (criterio === 'id_asc') return a.id - b.id;
-      if (criterio === 'id_desc') return b.id - a.id;
+      if (criterio === 'id_asc') return Number(a.id_exibicao_empresa ?? a.id) - Number(b.id_exibicao_empresa ?? b.id);
+      if (criterio === 'id_desc') return Number(b.id_exibicao_empresa ?? b.id) - Number(a.id_exibicao_empresa ?? a.id);
       if (criterio === 'progresso_asc') return a.progresso - b.progresso;
       if (criterio === 'progresso_desc') return b.progresso - a.progresso;
       return 0;
@@ -247,7 +247,7 @@ export default function OrdensDeProducao() {
     const termo = (busca || "").toLowerCase();
 
     const nome = op?.nome?.toLowerCase() || "";
-    const id = op?.id?.toString() || "";
+    const id = String(op?.id_exibicao_empresa ?? op?.id ?? "");
 
     return (
       nome.includes(termo) ||

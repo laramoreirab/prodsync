@@ -17,6 +17,7 @@ export function useMaquinas() {
 
       const maquinasNormalizadas = (data.dados || []).map((maquina) => ({
         ...maquina,
+        id_exibicao_empresa: maquina.id_exibicao_empresa ?? maquina.id_maquina,
         status: normalizarStatusMaquina(maquina.status_atual || maquina.status || ''),
         status_atual: normalizarStatusMaquina(maquina.status_atual),
       }));

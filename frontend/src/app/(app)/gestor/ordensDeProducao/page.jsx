@@ -56,7 +56,7 @@ import {
 } from "@/components/DetailComponents";
 
 const colunasOrdemProd = [
-  { id: "id", key: "id", label: "ID", className: "w-1/7" },
+  { id: "id_exibicao_empresa", key: "id_exibicao_empresa", label: "ID", className: "w-1/7" },
   { id: "codigo_lote", key: "codigo_lote", label: "Lote", className: "w-1/7" },
   { id: "produto", key: "produto", label: "Produto", className: "w-1/5" },
   {
@@ -174,8 +174,8 @@ export default function OrdensDeProducaoGestor() {
 
   const handleSort = (criterio) => {
     const ordenado = [...dados].sort((a, b) => {
-      if (criterio === "id_asc") return Number(a.id) - Number(b.id);
-      if (criterio === "id_desc") return Number(b.id) - Number(a.id);
+      if (criterio === "id_asc") return Number(a.id_exibicao_empresa ?? a.id) - Number(b.id_exibicao_empresa ?? b.id);
+      if (criterio === "id_desc") return Number(b.id_exibicao_empresa ?? b.id) - Number(a.id_exibicao_empresa ?? a.id);
       if (criterio === "prioridade") return String(a.prioridade).localeCompare(String(b.prioridade));
       if (criterio === "status") return String(a.status_op).localeCompare(String(b.status_op));
       return 0;
@@ -196,7 +196,7 @@ export default function OrdensDeProducaoGestor() {
 
   const dadosExibidos = dados.filter((op) => {
     const termo = busca.toLowerCase();
-    return String(op.id).includes(termo) || op.codigo_lote?.toLowerCase().includes(termo) || op.produto?.toLowerCase().includes(termo);
+    return String(op.id_exibicao_empresa ?? op.id).includes(termo) || op.codigo_lote?.toLowerCase().includes(termo) || op.produto?.toLowerCase().includes(termo);
   });
 
   if (loading) {

@@ -31,8 +31,8 @@ const colunasMaquinas = [
   // Ajuste nas classes do Tailwind: w-1/8 -> w-[12.5%], w-30 -> w-32, w-45 -> w-48, w-1/7 -> w-[14%]
   { id: "nome", key: "nome", label: "Nome", className: "w-[12.5%]" },
   {
-    id: "id_maquina",
-    key: "id_maquina",
+    id: "id_exibicao_empresa",
+    key: "id_exibicao_empresa",
     label: "ID",
     className: "w-32 text-center justify-center",
   },
@@ -83,6 +83,7 @@ const opcoesOrdenacao = [
 function normalizarMaquina(maquina) {
   return {
     ...maquina,
+    id_exibicao_empresa: maquina.id_exibicao_empresa ?? maquina.id_maquina,
     status: maquina.status_atual || maquina.status || "",
     operador: maquina.operador?.nome || maquina.operador || "Sem operador",
     oee_atual: maquina.oee_atual || "0%",
@@ -128,7 +129,7 @@ export default function MaquinasGestor() {
       const termo = busca.toLowerCase();
       resultado = resultado.filter((maquina) =>
         maquina.nome?.toLowerCase().includes(termo) ||
-        String(maquina.id_maquina).includes(termo)
+        String(maquina.id_exibicao_empresa ?? maquina.id_maquina).includes(termo)
       );
     }
 
@@ -144,9 +145,9 @@ export default function MaquinasGestor() {
       resultado.sort((a, b) => {
         if (ordenacao === "nome") return a.nome.localeCompare(b.nome);
         if (ordenacao === "id_asc")
-          return Number(a.id_maquina) - Number(b.id_maquina);
+          return Number(a.id_exibicao_empresa ?? a.id_maquina) - Number(b.id_exibicao_empresa ?? b.id_maquina);
         if (ordenacao === "id_desc")
-          return Number(b.id_maquina) - Number(a.id_maquina);
+          return Number(b.id_exibicao_empresa ?? b.id_maquina) - Number(a.id_exibicao_empresa ?? a.id_maquina);
         if (ordenacao === "status")
           return String(a.status).localeCompare(String(b.status));
         return 0;
