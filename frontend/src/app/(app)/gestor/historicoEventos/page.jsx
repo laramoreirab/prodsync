@@ -72,7 +72,7 @@ const colunasEventos = [
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
   { id: "motivo", key: "motivo", label: "Motivo", className: "truncate max-w-[245px]" },
-  { id: "observacao", key: "observacao", label: "Observacao",className: "truncate max-w-[200px]" },
+  { id: "observacao", key: "observacao", label: "Observacao", className: "truncate max-w-[200px]" },
 ];
 
 const historicoEventosFilter = [

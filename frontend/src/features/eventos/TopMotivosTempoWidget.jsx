@@ -19,16 +19,17 @@ export function TopMotivosTempoWidget({ setorId = null }) {
     .map((item) => ({ ...item, setor: item.motivo }));
 
   return (
-    <div className="p-5 h-full">
-      <header>
+<div className="flex h-full w-full flex-col">
+      <div className="shrink-0">
         <p className="text-sm font-semibold text-black">
           Top 3 Motivos de Parada (Tempo)
         </p>
         <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
-      </header>
+      </div>
 
-      <div className="mt-2">
+<div className="min-h-0 flex-1 flex flex-col justify-center items-center w-full">
+        <div className="w-full flex justify-center flex-col">
         <BarHorizontal
           data={formattedData}
           config={topMotivosTempoConfig}
@@ -37,6 +38,7 @@ export function TopMotivosTempoWidget({ setorId = null }) {
           paddingTopClassName="pt-4"
           barSize={42}
         />
+        </div>
       </div>
     </div>
   );

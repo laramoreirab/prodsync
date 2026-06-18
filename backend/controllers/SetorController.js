@@ -120,6 +120,84 @@ class SetorController {
         }
     }
 
+    static async listarTurnosDoSetor(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const id_empresa = req.user.id_empresa;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor invÃ¡lido' });
+
+            const turnos = await SetorModel.listarTurnosDoSetor(id_setor, id_empresa);
+            res.status(200).json({ sucesso: true, dados: turnos });
+        } catch (error) {
+            console.error('Erro ao listar turnos do setor:', error);
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async sincronizarTurnos(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const id_empresa = req.user.id_empresa;
+            const { ids_turnos } = req.body;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor invÃ¡lido' });
+            if (!Array.isArray(ids_turnos)) {
+                return res.status(400).json({ sucesso: false, erro: 'ForneÃ§a um array com os IDs dos turnos' });
+            }
+
+            const turnos = await SetorModel.sincronizarTurnos(id_setor, id_empresa, ids_turnos);
+            res.status(200).json({ sucesso: true, dados: turnos, mensagem: 'Turnos do setor atualizados com sucesso' });
+        } catch (error) {
+            console.error('Erro ao sincronizar turnos do setor:', error);
+            if (
+                error.message?.includes('invalidos') ||
+                error.message?.includes('nao pertence') ||
+                error.message?.includes('nao encontrado')
+            ) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
+    static async atualizarGrupoTurno(req, res) {
+        try {
+            const id_setor = Number(req.params.id_setor);
+            const id_empresa = req.user.id_empresa;
+            const { ids_turnos, dias_semana, hora_inicio, hora_fim } = req.body;
+
+            if (isNaN(id_setor)) return res.status(400).json({ sucesso: false, erro: 'ID de setor invÃ¡lido' });
+            if (!Array.isArray(ids_turnos) || ids_turnos.length === 0) {
+                return res.status(400).json({ sucesso: false, erro: 'ForneÃ§a os IDs do grupo de turnos' });
+            }
+            if (!Array.isArray(dias_semana) || dias_semana.length === 0 || !hora_inicio || !hora_fim) {
+                return res.status(400).json({ sucesso: false, erro: 'Informe dias da semana e horarios do turno' });
+            }
+
+            const turnos = await SetorModel.atualizarGrupoTurno(id_setor, id_empresa, {
+                ids_turnos,
+                dias_semana,
+                hora_inicio,
+                hora_fim
+            });
+
+            res.status(200).json({ sucesso: true, dados: turnos, mensagem: 'Turno atualizado com sucesso' });
+        } catch (error) {
+            console.error('Erro ao atualizar grupo de turnos do setor:', error);
+            if (
+                error.message?.includes('invalid') ||
+                error.message?.includes('invalido') ||
+                error.message?.includes('Selecione') ||
+                error.message?.includes('nao encontrado') ||
+                error.message?.includes('nao pertence')
+            ) {
+                return res.status(400).json({ sucesso: false, erro: error.message });
+            }
+            res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });
+        }
+    }
+
     // Atualizar setor
     static async atualizarSetor(req, res) {
         try {

@@ -29,7 +29,7 @@ export default function DashboardGeralOperador() {
       title="Dashboard Geral"
     />
 
-    <ContentGrid cols={3} className="mt-2">
+    <ContentGrid cols={3} className="mt-4">
       <WidgetCard>
         <OEEMaquinaWidget operadorId={operadorId} />
       </WidgetCard>
@@ -41,7 +41,7 @@ export default function DashboardGeralOperador() {
       </WidgetCard>
     </ContentGrid>
 
-    <ContentGrid cols={3} className="mt-2">
+    <ContentGrid cols={3} className="mt-6">
       <WidgetCard>
         <ProducaoPorHoraOperadorWidget operadorId={operadorId} />
       </WidgetCard>

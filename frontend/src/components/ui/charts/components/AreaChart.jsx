@@ -25,6 +25,7 @@ function useChart(config, key) {
 // Mapeamento de tamanhos para classes do Tailwind
 const sizeVariants = {
   pequeno: "h-[180px]",
+  AA: "h-[256px]",
   medio: "h-[300px]",
   grande: "h-[450px]",
 };

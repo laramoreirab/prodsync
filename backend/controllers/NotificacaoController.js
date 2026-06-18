@@ -175,6 +175,17 @@ class NotificacaoController {
                 });
             }
 
+            if (
+                error.message === 'Evento ja justificado' ||
+                error.message === 'Evento nao requer justificativa'
+            ) {
+                return res.status(400).json({
+                    sucesso: false,
+                    erro: 'OperaÃ§Ã£o invÃ¡lida',
+                    mensagem: error.message,
+                });
+            }
+
             console.error('Erro ao solicitar justificativa:', error);
             return res.status(500).json({
                 sucesso: false,

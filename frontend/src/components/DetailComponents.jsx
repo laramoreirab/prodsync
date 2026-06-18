@@ -290,10 +290,10 @@ export function DetailListingSection({ id, title, action, search, filterRow, chi
   return (
     <motion.section
       id={id}
+      key={id}
       variants={DV.fadeUp}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
+      animate="visible"
       className={cn("flex flex-col gap-4 sm:gap-5", className)}
     >
       {/* Cabeçalho: título + botão */}

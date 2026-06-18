@@ -31,7 +31,7 @@ export function QtdUsuariosAdmWidget() {
   return (
     <div className="h-full">
         <p className="text-sm font-semibold text-black">
-       Quantidade de usuarios
+       Quantidade de usuários
       </p>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 

@@ -34,7 +34,7 @@ export function MaquinaStatusDonutWidget({ setorId }) {
         </p>
       </div>
 
-      <div className="mt-4 min-h-0 flex-1">
+      <div className="mt-4 min-h-0 flex-1 flex flex-col justify-center">
         <CustomPieChart
           data={chartData}
           config={maquinaStatusConfig}

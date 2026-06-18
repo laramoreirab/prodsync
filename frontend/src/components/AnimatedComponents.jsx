@@ -496,7 +496,7 @@ export function SearchBar({
   className,
 }) {
   return (
-    <FadeUpItem
+    <div
       className={cn(
         "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 dark:border-[#243754] dark:bg-[#07101f] dark:shadow-[0_12px_34px_rgba(0,0,0,0.24)]",
         className,
@@ -512,7 +512,7 @@ export function SearchBar({
       <span className="m-2 text-muted-foreground">
         <Search className="w-4 h-4" />
       </span>
-    </FadeUpItem>
+    </div>
   );
 }
 
