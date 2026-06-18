@@ -16,6 +16,11 @@ import {
   SetorProducaoDiariaArraySchema,
 } from "@features/setores/schemas/setorSchema";
 
+const labelOrFallback = (value, fallback) => {
+  const label = String(value ?? "").trim();
+  return label || fallback;
+};
+
 export const setorService = {
   async getSetores() {
     const data = await apiFetch("/api/setores/empresa");
@@ -41,7 +46,11 @@ export const operadoresMediaKPIService = {
 export const oeeSetorService = {
   async getOEEPorSetor() {
     const data = await apiFetch("/api/oee/setores/media");
-    return OEEPorSetorArraySchema.parse(data.dados);
+    const normalized = (data.dados || []).map((item) => ({
+      ...item,
+      setor: labelOrFallback(item.setor, "Sem setor"),
+    }));
+    return OEEPorSetorArraySchema.parse(normalized);
   },
 };
 
@@ -50,7 +59,7 @@ export const refugoSetorService = {
     const listaDados = await apiFetch("/api/setores/obterProducaoDefeitosPorSetor");
     const dadosOriginais = listaDados.dados || [];
     const data = dadosOriginais.map((item) => ({
-      setor: item.setor,
+      setor: labelOrFallback(item.setor, "Sem setor"),
       refugo: item.defeito,
     }));
     return RefugoPorSetorArraySchema.parse(data);
@@ -80,7 +89,10 @@ export const setorMaquinaStatusService = {
 export const setorOEEMedioService = {
   async getOEE(setorId) {
     const data = await apiFetch(`/api/oee/setores/${setorId}`);
-    return SetorOEEMedioSchema.parse(data.dados);
+    return SetorOEEMedioSchema.parse({
+      ...data.dados,
+      setor: labelOrFallback(data.dados?.setor, "Sem setor"),
+    });
   },
 };
 
@@ -94,14 +106,22 @@ export const setorOEEEvolucaoService = {
 export const setorTopOperadoresService = {
   async getTopOperadores(setorId) {
     const data = await apiFetch(`/api/setores/top5operadoresPorSetor/${setorId}`);
-    return SetorTopOperadoresArraySchema.parse(data.dados);
+    const normalized = (data.dados || []).map((item) => ({
+      ...item,
+      operador: labelOrFallback(item.operador, "Sem nome"),
+    }));
+    return SetorTopOperadoresArraySchema.parse(normalized);
   },
 };
 
 export const setorMotivosParadaService = {
   async getMotivos(setorId) {
     const data = await apiFetch(`/api/setores/motivosParada/${setorId}`);
-    return SetorMotivosParadaArraySchema.parse(data.dados);
+    const normalized = (data.dados || []).map((item) => ({
+      ...item,
+      motivo: labelOrFallback(item.motivo, "Sem motivo"),
+    }));
+    return SetorMotivosParadaArraySchema.parse(normalized);
   },
 };
 
@@ -115,7 +135,11 @@ export const setorProducaoSemanalService = {
 export const setorProducaoMaquinaService = {
   async getProducaoPorMaquina(setorId) {
     const data = await apiFetch(`/api/maquinas/producaoMaquinas/${setorId}`);
-    return SetorProducaoMaquinaArraySchema.parse(data.dados);
+    const normalized = (data.dados || []).map((item) => ({
+      ...item,
+      maquina: labelOrFallback(item.maquina, "Sem máquina"),
+    }));
+    return SetorProducaoMaquinaArraySchema.parse(normalized);
   },
 };
 

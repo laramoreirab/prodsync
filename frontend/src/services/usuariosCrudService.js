@@ -23,7 +23,8 @@ export const usuariosCrudService = {
     } else {
       options.body = JSON.stringify(dados);
     }
-    return await apiFetch(`${API_URL}/criar`, options);
+    const response = await apiFetch(`${API_URL}/criar`, options);
+    return response?.dados ?? response;
   },
 
   // Atualizar usuário (aceita FormData para upload de foto)

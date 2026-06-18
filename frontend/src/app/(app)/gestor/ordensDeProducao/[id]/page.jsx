@@ -153,7 +153,7 @@ const colunasEventos = [
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
   { id: "motivo", key: "motivo", label: "Motivo" },
-  { id: "observacao", key: "observacao", label: "Observação" },
+  { id: "observacao", key: "observacao", label: "Observação",  className: "truncate max-w-[200px]"},
 ];
 
 const colunasApontamento = [
@@ -186,7 +186,7 @@ const colunasApontamento = [
       </Badge>
     ),
   },
-  { id: "observacao", key: "observacao", label: "Observação" },
+  { id: "observacao", key: "observacao", label: "Observação",  className: "truncate max-w-[200px]"},
 ];
 
 // ─── Componente Principal ────────────────────────────────────────────────────
