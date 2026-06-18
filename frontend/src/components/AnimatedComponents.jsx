@@ -450,7 +450,7 @@ export function WidgetCard({ children, className, colSpan, centered }) {
   return (
     <FadeUpItem
       className={cn(
-        "group bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90 dark:bg-[#0b1324] dark:border-[#1d2d49] dark:shadow-[0_18px_50px_rgba(0,0,0,0.28)] dark:hover:border-[#2f4770]",
+        "group bg-white/95 backdrop-blur border border-gray-200/80 rounded-2xl p-2 sm:p-4 lg:p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300/90 dark:bg-[#0b1324] dark:border-[#1d2d49] dark:shadow-[0_18px_50px_rgba(0,0,0,0.28)] dark:hover:border-[#2f4770]",
         centered && "flex flex-col items-center justify-center",
         colSpan,
         className,

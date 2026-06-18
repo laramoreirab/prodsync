@@ -15,10 +15,10 @@ export function TempoMedioParadaWidget({ setorId = null }) {
 
   return (
     <div>
-      <p className="text-sm font-semibold text-black">
+      <p className="text-lg font-semibold text-black">
         Tempo médio de parada das máquinas 
       </p>
-          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+          <p className="text-md text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
 
       <div className="mt-2">

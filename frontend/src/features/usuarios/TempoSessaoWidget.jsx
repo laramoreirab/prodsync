@@ -22,8 +22,8 @@ export function TempoSessaoWidget({ setorId }) {
 
   return (
     <div>
-      <p className="text-sm font-semibold text-black dark:text-f8fafc">Tempo médio de sessão por perfil</p>
-          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+      <p className="text-lg font-semibold text-black dark:text-f8fafc">Tempo médio de sessão por perfil</p>
+          <p className="text-md text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
       <div className="flex flex-col gap-5 pt-4">
         {perfisData.map(({ perfil, minutos, label }) => {

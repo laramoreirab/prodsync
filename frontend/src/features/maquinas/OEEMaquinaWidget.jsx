@@ -20,10 +20,10 @@ export function OEEMaquinaWidget({ maquinaId }) {
     <div className="flex flex-col gap-6 w-full p-4 h-full justify-between">
       {/* Cabeçalho */}
       <div className="text-left w-full">
-        <h2 className="text-sm font-semibold tracking-tight text-foreground">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">
           Resumo OEE Geral da Máquina
         </h2>
-          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+          <p className="text-md text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
       </div>
 
       {/* Container do Conteúdo - Alterado para flex-row com Split 50% / 50% */}

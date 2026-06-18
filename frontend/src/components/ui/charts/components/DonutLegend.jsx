@@ -8,7 +8,7 @@ export function DonutLegend({ items, className }) {
   return (
     <div
       className={cn(
-        "flex w-full shrink-0 flex-wrap items-center justify-center gap-x-5 gap-y-1 px-2 text-xs font-medium leading-tight text-foreground",
+        "flex w-full shrink-0 flex-wrap items-center justify-center gap-x-5 gap-y-1 px-2 text-sm font-medium leading-tight text-foreground",
         className
       )}
     >

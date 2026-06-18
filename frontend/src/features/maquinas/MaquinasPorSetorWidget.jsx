@@ -23,9 +23,7 @@ export function MaquinasPorSetorWidget({ setorId }) {
       error={error}
       yKey="setor"
       yAxisWidth={160}
-      paddingTopClassName="pt-10"
-      heightClassName="h-[260px]"
-
+      paddingTopClassName="pt-17"
       chartSize="small"
     />
   );

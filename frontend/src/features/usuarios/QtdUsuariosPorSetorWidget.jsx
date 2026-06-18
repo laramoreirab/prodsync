@@ -25,10 +25,10 @@ export function QtdUsuariosPorSetorWidget() {
 
   return (
     <div>
-      <p className="text-sm font-semibold text-black">
+      <p className="text-lg font-semibold text-black">
         Top 5 Setores Com Mais Usuários
       </p>
-      <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+      <p className="text-md text-muted-foreground font-medium mt-0.5">
         Atualizado em tempo real
       </p>
 

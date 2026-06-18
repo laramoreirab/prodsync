@@ -17,13 +17,13 @@ export function OEEWidget() {
   const metricasSecundarias = oeeMetricasConfig.filter((m) => m.key !== "oee");
 
   return (
-    <div className="flex flex-col gap-6 w-full p-4 h-full justify-between">
+    <div className="flex flex-col gap-6 w-full p-2 h-full justify-between">
       {/* Título do Card */}
       <div className="text-left w-full">
-        <h2 className="text-sm font-semibold tracking-tight text-foreground">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">
           Resumo OEE geral da Fábrica
         </h2>
-        <p className="text-[10px] text-muted-foreground">Atualizando em tempo real</p>
+        <p className="text-md text-muted-foreground">Atualizando em tempo real</p>
       </div>
 
       {/* Container do Conteúdo */}
@@ -54,7 +54,7 @@ export function OEEWidget() {
             return (
               <div key={key} className="space-y-1">
                 {/* Rótulo e Percentual lado a lado */}
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between text-md">
                   <span className="text-muted-foreground font-medium">{label}</span>
                   <span className="font-bold text-foreground">{normalizedValue}%</span>
                 </div>

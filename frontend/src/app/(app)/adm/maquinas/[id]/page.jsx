@@ -444,7 +444,6 @@ export default function MaquinaDetalhePage({ params }) {
           <SectionHighlight className="h-full flex">
             <OEEMaquinaWidget maquinaId={maquinaId} />
           </SectionHighlight>
-
         </AsymmetricGrid>
 
         <DetailWidgetGrid cols={3}>

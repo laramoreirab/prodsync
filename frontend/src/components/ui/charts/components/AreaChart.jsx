@@ -53,9 +53,9 @@ export function AreaChartBase({
   return (
     <div className="relative">
       {title && (
-        <div className="absolute top-0 left-0 z-10 text-left">
-          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-          <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
+        <div className="absolute top-0 left-0 z-10 text-left p-2">
+          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          <p className="text-md text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
           {description && (
             <p className="text-xs text-muted-foreground mt-1">
               {description}

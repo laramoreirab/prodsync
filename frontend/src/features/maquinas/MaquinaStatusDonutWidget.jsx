@@ -26,10 +26,10 @@ export function MaquinaStatusDonutWidget({ setorId }) {
   return (
     <div className="flex h-full w-full flex-col">
       <div className="shrink-0">
-        <p className="text-sm font-semibold text-foreground">
+        <p className="text-lg font-semibold text-foreground">
           Status Operacional das Máquinas
         </p>
-        <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+        <p className="mt-0.5 text-md font-medium text-muted-foreground">
           Atualizado em tempo real
         </p>
       </div>

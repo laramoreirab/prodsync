@@ -63,7 +63,7 @@ export function KPIHorizontal({ title, value, type = "number", subtitle = "Atual
                 <p className="text-base font-semibold text-foreground tracking-tight leading-snug uppercase">
                     {title}
                 </p>
-                <p className="text-[11px] text-muted-foreground font-medium mt-0.5 self-start">
+                <p className="text-md text-muted-foreground font-medium mt-0.5 self-start">
                     {subtitle}
                 </p>
             </div>

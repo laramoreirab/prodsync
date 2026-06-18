@@ -154,23 +154,23 @@ export default function Usuarios() {
 
   return (
     <PageLayout>
-        {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
-        <PageHeader title="Usuários" action={
-          <Dialog>
-            <DialogTrigger
-              className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
-            >
-              <Plus className="mr-2" />
-              Cadastrar
-            </DialogTrigger>
+      {/* Título da tela e do botão que leva ao modal de cadastro do usuário */}
+      <PageHeader title="Usuários" action={
+        <Dialog>
+          <DialogTrigger
+            className="bg-secondary-foreground px-4 py-1 rounded-md flex items-center text-white text-xl font-semibold cursor-pointer"
+          >
+            <Plus className="mr-2" />
+            Cadastrar
+          </DialogTrigger>
 
-            <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
-              <FormCadastroUsuario onCadastroSucesso={refresh} />
-            </DialogContent>
-          </Dialog>
-        } />
+          <DialogContent className="top-0 left-0 right-0 translate-x-0 translate-y-0 w-full max-w-none rounded-b-lg max-h-screen overflow-y-auto">
+            <FormCadastroUsuario onCadastroSucesso={refresh} />
+          </DialogContent>
+        </Dialog>
+      } />
 
-        {/* Gráficos */}
+      {/* Gráficos */}
 
 
       <ContentGrid cols={2} className="mt-6">
@@ -206,7 +206,7 @@ export default function Usuarios() {
         <WidgetCard>
           <RotatividadeWidget />
         </WidgetCard>
-                <WidgetCard>
+        <WidgetCard>
           <TempoSessaoWidget />
         </WidgetCard>
       </ContentGrid>
