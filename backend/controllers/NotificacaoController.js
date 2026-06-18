@@ -176,12 +176,12 @@ class NotificacaoController {
             }
 
             if (
-                error.message === 'Evento ja justificado' ||
-                error.message === 'Evento nao requer justificativa'
+                error.message === 'Evento já justificado' ||
+                error.message === 'Evento não requer justificativa'
             ) {
                 return res.status(400).json({
                     sucesso: false,
-                    erro: 'OperaÃ§Ã£o invÃ¡lida',
+                    erro: 'Operação inválida',
                     mensagem: error.message,
                 });
             }
