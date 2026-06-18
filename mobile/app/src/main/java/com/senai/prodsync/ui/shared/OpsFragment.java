@@ -118,16 +118,16 @@ public class OpsFragment extends Fragment {
                         for (OrdemProducao item : ordens) {
                             listaUI.add(new Op(
                                     item.getId(),
-                                    item.getMaquina() != null ? item.getMaquina().getNome() : (item.getNomeMaquina() != null ? item.getNomeMaquina() : "Máquina N/A"),
-                                    item.getPrioridade() != null ? item.getPrioridade() : "Normal",
-                                    item.getDataFinal() != null ? item.getDataFinal() : "S/D",
-                                    item.getSetor() != null ? item.getSetor() : "Geral",
+                                    item.getNomeMaquina(),
+                                    item.getPrioridade(),
+                                    item.getDataFinal(),
+                                    item.getSetor(),
                                     item.getProduto() != null ? item.getProduto() : "Produto N/A",
                                     item.getQuantidade(),
                                     item.getStatus(),
                                     item.getNomeOperador(),
                                     item.getDataInicio(),
-                                    item.getMaquina() != null ? item.getMaquina().getFotoUrl() : null
+                                    item.getFotoMaquinaUrl()
                             ));
                         }
                     }

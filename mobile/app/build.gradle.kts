@@ -57,4 +57,9 @@ dependencies {
     
     // WorkManager
     implementation("androidx.work:work-runtime:2.9.0")
+
+    // Test dependencies
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }
