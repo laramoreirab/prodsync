@@ -6,7 +6,10 @@ import { andonSectionsService } from "@services/andonService";
 
 export function useAndonSections(scope = "factory", idSetor = null) {
   const fetchSections = useCallback(
-    () => andonSectionsService.getSections(scope, idSetor),
+    () => {
+      if (scope === "sector" && !idSetor) return Promise.resolve([]);
+      return andonSectionsService.getSections(scope, idSetor);
+    },
     [scope, idSetor]
   );
 

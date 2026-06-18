@@ -277,6 +277,12 @@ export default function OPDetalhePage({ params }) {
   }
 
   const maquina = op?.maquina;
+  const maquinaIdOEE =
+    op?.id_maquina ??
+    maquina?.id_maquina ??
+    maquina?.id ??
+    op?.maquina_id ??
+    null;
   const tituloOp = op?.codigo_lote || op?.nome || `OP #${opId}`;
 
   const imagemMaquina = (() => {
@@ -351,7 +357,7 @@ export default function OPDetalhePage({ params }) {
             <OPProgressoWidget opId={opId} />
           </DetailWidgetCard>
           <DetailWidgetCard>
-            <OPOEEDetalheWidget opId={opId} maquinaId={op?.id_maquina ?? maquina?.id_maquina} />
+            <OPOEEDetalheWidget opId={opId} maquinaId={maquinaIdOEE} />
           </DetailWidgetCard>
         </AsymmetricGrid>
 

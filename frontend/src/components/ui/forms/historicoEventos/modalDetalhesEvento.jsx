@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, ReceiptText } from "lucide-react";
+import { ReceiptText } from "lucide-react";
 import {
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -17,7 +17,6 @@ export default function DetalhesEvento({ eventoId }) {
     const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]);
     const [setoresSelecionados, setSetoresSelecionados] = useState([]);
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
-    const [idMotivoPrincipal, setIdMotivoPrincipal] = useState([]);
     const [nomeMotivo, setNomeMotivo] = useState('')
     const [observacao, setObservacao] = useState('');
     const [inicioData, setInicioData] = useState('');
@@ -34,8 +33,12 @@ export default function DetalhesEvento({ eventoId }) {
                 setMaquinasSelecionadas(dados.maquina ? [dados.maquina] : []);
                 setSetoresSelecionados(dados.setor_afetado ? [dados.setor_afetado] : []);
                 setOpsSelecionadas(dados.op_afetada ? [dados.op_afetada] : []);
-                setIdMotivoPrincipal(dados.id_motivo_parada || '');
-                setNomeMotivo(dados.motivo || '')
+                setNomeMotivo(
+                    dados.motivo ||
+                    dados.motivo_parada?.descricao ||
+                    dados.motivo_parada?.nome ||
+                    ''
+                )
                 setObservacao(dados.observacao || '');
                 setDadosEvento(dados);
 

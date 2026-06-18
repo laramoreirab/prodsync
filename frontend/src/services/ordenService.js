@@ -202,7 +202,11 @@ export const opOEEDetalheService = {
 
     if (!id_maquina) {
       const op = await opCrudService.getById(opId);
-      id_maquina = op?.id_maquina;
+      id_maquina =
+        op?.id_maquina ??
+        op?.maquina?.id_maquina ??
+        op?.maquina?.id ??
+        op?.maquina_id;
     }
 
     if (!id_maquina) {

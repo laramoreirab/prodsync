@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, ReceiptText } from "lucide-react";
+import { ReceiptText } from "lucide-react";
 import {
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -8,45 +8,53 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { eventosCrudService } from '@/services/eventosCrudService';
 
-const OPCOES_MOTIVO = [
-    { label: "Falta de Energia", value: 1 },
-    { label: "Manutenção Preventiva", value: 2 },
-    { label: "Manutenção Corretiva", value: 3 },
-    { label: "Falta de Material", value: 4 },
-    { label: "Outros", value: 5 },
-];
+const normalizarLista = (...valores) => {
+    const valor = valores.find((item) => item !== undefined && item !== null && item !== "");
+    if (!valor) return [];
+    if (Array.isArray(valor)) return valor.filter(Boolean);
+    return [valor];
+};
+
+const extrairLabelOP = (op) => {
+    if (typeof op === "string" || typeof op === "number") return op;
+    return op?.codigo_lote ?? op?.id_ordem ?? op?.id ?? op?.nome ?? "-";
+};
 
 export default function DetalhesEvento({ eventoId }) {
-    const [dadosEvento, setDadosEvento] = useState(null)
-
     const [tipoEvento, setTipoEvento] = useState('');
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
-    const [idMotivoPrincipal, setIdMotivoPrincipal] = useState([]);
+    const [nomeMotivo, setNomeMotivo] = useState('');
     const [observacao, setObservacao] = useState('');
     const [inicioData, setInicioData] = useState('');
     const [inicioHora, setInicioHora] = useState('');
     const [fimData, setFimData] = useState('');
     const [fimHora, setFimHora] = useState('');
 
-    // — mesmo useEffect do formEdicao —
     useEffect(() => {
         const buscarDados = async () => {
             try {
                 const dados = await eventosCrudService.getById(eventoId);
-                setTipoEvento(dados.status_maquina || '');
-                setOpsSelecionadas(dados.op_afetada ? [dados.op_afetada] : []);
-                setIdMotivoPrincipal(dados.id_motivo_parada || '');
+                setTipoEvento(dados.status_maquina || dados.tipo || dados.ultimo_evento || '');
+                setOpsSelecionadas(normalizarLista(
+                    dados.ops_afetadas,
+                    dados.op_afetada,
+                    dados.ordens_afetadas,
+                    dados.ordem_producao,
+                    dados.op,
+                ).map(extrairLabelOP));
+                setNomeMotivo(
+                    dados.motivo ||
+                    dados.motivo_parada?.descricao ||
+                    dados.motivo_parada?.nome ||
+                    ''
+                );
                 setObservacao(dados.observacao || '');
-                setDadosEvento(dados);
-               // Nova função interna blindada
+
                 const extrairEFormatar = (dataOriginal) => {
                     if (!dataOriginal) return { data: '', hora: '' };
-                    
-                    // Separa a data da hora (aceita 'T' do padrão ISO ou espaço de SQL)
                     const [dataParte, horaParte] = String(dataOriginal).trim().split(/[T ]/);
-                    
+
                     let dataCerta = dataParte;
-                    // Se a data tem traço e começa com o ano (YYYY-MM-DD), inverte para DD/MM/YYYY
                     if (dataParte && dataParte.includes('-')) {
                         const [ano, mes, dia] = dataParte.split('-');
                         if (ano.length === 4) {
@@ -56,11 +64,10 @@ export default function DetalhesEvento({ eventoId }) {
 
                     return {
                         data: dataCerta,
-                        hora: horaParte ? horaParte.slice(0, 5) : '' // Pega apenas HH:MM
+                        hora: horaParte ? horaParte.slice(0, 5) : ''
                     };
                 };
 
-                // Aplica a formatação ANTES de salvar no estado
                 if (dados.inicio) {
                     const formatado = extrairEFormatar(dados.inicio);
                     setInicioData(formatado.data);
@@ -79,9 +86,6 @@ export default function DetalhesEvento({ eventoId }) {
         if (eventoId) buscarDados();
     }, [eventoId]);
 
-    // helpers de exibição
-    const nomeMotivo = OPCOES_MOTIVO.find(m => m.value === Number(idMotivoPrincipal))?.label;
-
     return (
         <>
             <div className="flex items-center">
@@ -96,14 +100,8 @@ export default function DetalhesEvento({ eventoId }) {
             <Separator className="my-2" />
 
             <div className=" flex flex-col cursor-text">
-                {/* Informações do Evento */}
-
                 <div className="flex flex-col">
-
-
                     <div className="flex flex-col w-full gap-4 px-2 pb-8 pt-4 cursor-text">
-
-                        {/* Status */}
                         <div className="flex items-center">
                             <p className="text-xl font-semibold text-black mr-1">Evento:</p>
                             <Badge variant={tipoEvento === 'Parada' ? 'parada' : tipoEvento === 'Setup' ? 'setup' : 'outline'}
@@ -112,19 +110,21 @@ export default function DetalhesEvento({ eventoId }) {
                             </Badge>
                         </div>
 
-                        {/* Ordens de Produção */}
                         <div className="flex flex-col gap-1.5">
                             <span className="text-xl font-semibold text-black">OP(s) Afetada(s):</span>
                             <ul className="flex flex-col">
-                                {opsSelecionadas.map((op, index) => (
+                                {opsSelecionadas.length > 0 ? opsSelecionadas.map((op, index) => (
                                     <li key={index} className="text-[#333333] font-medium text-xl">
                                         - {op}
                                     </li>
-                                ))}
+                                )) : (
+                                    <li className="text-[#333333] font-medium text-xl">
+                                        - Nenhuma OP vinculada
+                                    </li>
+                                )}
                             </ul>
                         </div>
 
-                        {/* Início */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Data Início: </span>
                             <div className="flex">
@@ -134,7 +134,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </div>
                         </div>
 
-                        {/* Fim */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Data Fim:</span>
                             <span className="text-xl text-[#333333]">
@@ -145,7 +144,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </span>
                         </div>
 
-                        {/* Motivo */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Motivo: </span>
                             <span className="text-xl font-medium text-[#333333]">
@@ -153,7 +151,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </span>
                         </div>
 
-                        {/* Observação */}
                         <div className="flex flex-col gap-1">
                             <span className="text-xl font-semibold text-black">Observação:</span>
                             {observacao ? (
@@ -164,12 +161,8 @@ export default function DetalhesEvento({ eventoId }) {
                                 <span className="text-xl font-medium text-[#333333]">Sem observação</span>
                             )}
                         </div>
-
                     </div>
-
                 </div>
-
-
             </div>
         </>
     );
