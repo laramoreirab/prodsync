@@ -125,8 +125,10 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
-        payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
-        payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
+        if (formData.funcao === "Operador") {
+            payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
+            payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
+        }
 
         if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
@@ -155,12 +157,15 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         payloadLote.append("file", arquivoLote.raw);
 
         try {
-            const resposta = await apiFetch('/api/usuario/cadastro-lote', {
+            const resposta = await apiFetch('/api/usuarios/cadastro-lote', {
                 method: "POST",
                 body: payloadLote
             })
             if (resposta && resposta.sucesso !== false) {
                 toast.success("Usuários importados com sucesso!");
+            } else {
+                toast.error(resposta?.mensagem || "Erro ao processar o arquivo CSV.");
+                return;
             }
             setArquivoLote(null);
             if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
@@ -168,9 +173,6 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
             setIsLoteModalOpen(false);
 
             if (onCadastroSucesso) onCadastroSucesso();
-            else {
-                toast.error(response.mensagem || "Erro ao processar o arquivo CSV.");
-            }
         } catch (error) {
             console.error("Erro no upload em lote:", error);
             toast.error("Erro interno ao enviar o arquivo para o servidor.");
@@ -413,11 +415,13 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             onChange={handleInputChange}
                             value={formData.id_turno}
                             className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
-                            disabled={!formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
-                            required
+                            disabled={formData.funcao !== "Operador" || !formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
+                            required={formData.funcao === "Operador"}
                         >
                             <option value="">
-                                {!formData.id_setor
+                                {formData.funcao !== "Operador"
+                                    ? "Não se aplica"
+                                    : !formData.id_setor
                                     ? "Selecione..."
                                     : carregandoTurnos
                                         ? "Sincronizando turnos..."

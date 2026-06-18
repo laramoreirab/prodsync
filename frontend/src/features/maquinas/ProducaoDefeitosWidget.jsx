@@ -33,11 +33,15 @@ export function ProducaoDefeitosWidget({ setorId }) {
         </p>
       </div>
 
-      <div className="mt-2 min-h-0 flex-1 flex flex-col justify-center">
+      <div className="mt-4 min-h-0 flex-1 flex flex-col justify-center">
         <BarStackedHorizontal
           data={data}
           config={producaoDefeitosConfig}
           xKey="maquina"
+          limit={5}
+          heightClassName="h-[330px]"
+          yAxisWidth={185}
+          barSize={24}
         />
       </div>
     </div>
