@@ -204,7 +204,7 @@ export function PageHeader({
       <div className="flex flex-col gap-1 min-w-0 flex-1">
         {/* Criamos um wrapper 'w-fit' para que a linha tenha exatamente o tamanho do texto */}
         <div className="relative w-fit pb-2">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#17233b] dark:text-[#f4f8ff]">
+          <h1 className="mb-1 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#17233b] dark:text-[#f4f8ff]">
             {title}
           </h1>
           
@@ -496,7 +496,7 @@ export function SearchBar({
   className,
 }) {
   return (
-    <FadeUpItem
+    <div
       className={cn(
         "flex items-center w-full p-1.5 justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 dark:border-[#243754] dark:bg-[#07101f] dark:shadow-[0_12px_34px_rgba(0,0,0,0.24)]",
         className,
@@ -512,7 +512,7 @@ export function SearchBar({
       <span className="m-2 text-muted-foreground">
         <Search className="w-4 h-4" />
       </span>
-    </FadeUpItem>
+    </div>
   );
 }
 

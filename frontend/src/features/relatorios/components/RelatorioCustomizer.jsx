@@ -38,17 +38,17 @@ export function RelatorioCustomizer({
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={onSelecionarTodos}>
+        <Button type="button" variant="outline" size="sm" className="cursor-pointer" onClick={onSelecionarTodos}>
           <CheckCheck className="mr-1.5 size-4" />
           Marcar tudo
         </Button>
-        <Button type="button" variant="outline" size="sm" onClick={onLimparTodos}>
+        <Button type="button" variant="outline" size="sm" className="cursor-pointer" onClick={onLimparTodos}>
           <Eraser className="mr-1.5 size-4" />
           Limpar
         </Button>
       </div>
 
-      <div className="max-h-[calc(100vh-14rem)] space-y-5 overflow-y-auto pr-1 scrollbar-hide">
+      <div data-lenis-prevent className="max-h-[calc(100vh-14rem)] space-y-5 overflow-y-auto pr-1 scrollbar-hide">
         {areas.map((area) => {
           const idsArea = area.secoes.map((s) => s.id);
           const marcados = idsArea.filter((id) => selecao[id]).length;
@@ -127,7 +127,7 @@ export function RelatorioCustomizer({
           <Button
             type="button"
             size="md"
-            className="h-auto gap-2.5 bg-secondary-foreground px-6 py-2 text-lg font-semibold cursor-pointer text-white hover:bg-secondary-foreground/90"
+            className="cursor-pointer h-auto gap-2.5 bg-secondary-foreground px-6 py-2 text-lg font-semibold text-white hover:bg-secondary-foreground/90"
             disabled={nenhumaSecao}
             onClick={exportRelatorioPdf}
           >

@@ -34,6 +34,6 @@ export const opStatusConfig = {
 export const opConcluidasConfig = {
   total: {
     label: "OPs Concluídas:",
-    color: "var(--chart3)",
+    color: "var(--chart2)",
   },
 };

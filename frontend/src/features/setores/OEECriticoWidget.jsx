@@ -14,15 +14,14 @@ export function OEECriticoWidget() {
 
 
   return (
-    <div className=" flex flex-col gap-2">
-      <div>
+    <div className="flex h-full w-full flex-col">
+      <div className="shrink-0">
         <h2 className="text-sm font-semibold text-black">Setor com OEE mais crítico</h2>
           <p className="text-[11px] text-muted-foreground font-medium mt-0.5">Atualizado em tempo real</p>
 
       </div>
 
-      <div className="flex items-center justify-center py-4">
-        <div className="flex flex-col items-center">
+      <div className="min-h-0 flex-1 flex flex-col justify-center items-center w-full">
           <GaugeSemicircular
             title={data.setor}
             data={[{ value: data.oee, fill: "var(--color-grafico-area)" }]}
@@ -31,8 +30,6 @@ export function OEECriticoWidget() {
               value: { label: data.setor },
             }}
           />
-
-        </div>
       </div>
     </div>
   );
