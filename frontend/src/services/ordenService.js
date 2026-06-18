@@ -24,11 +24,6 @@ import {
 
 const USE_MOCK = false;
 
-const labelOrFallback = (value, fallback) => {
-  const label = String(value ?? "").trim();
-  return label || fallback;
-};
-
 function withSetorId(url, setorId = null) {
   if (!setorId) return url;
   const separator = url.includes("?") ? "&" : "?";
@@ -113,7 +108,7 @@ export const opTopRefugoService = {
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/top-refugo", setorId));
       const dados = (response.dados || []).map((item) => ({
-        op: labelOrFallback(item.label, "Sem OP"),
+        op: item.label,
         refugo: item.qtd_refugo,
       }));
       return OPRefugoArraySchema.parse(dados);
@@ -132,7 +127,7 @@ export const opCargaSetorService = {
         const carga = item.carga_restante ?? item.qtd_ops ?? 0;
 
         return {
-          setor: labelOrFallback(item.setor, "Sem setor"),
+          setor: item.setor,
           carga,
         };
       });
@@ -149,7 +144,7 @@ export const opStatusService = {
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/status", setorId));
       const dados = (response.dados || []).map((item) => ({
-        name: labelOrFallback(item.status, "Sem status"),
+        name: item.status,
         value: item.quantidade,
       }));
       return OPStatusArraySchema.parse(dados);
@@ -165,7 +160,7 @@ export const opConcluidasDiaService = {
     try {
       const response = await apiFetch(withSetorId("/api/ordens/dashboard/concluidas-dia", setorId));
       const dados = (response.dados || []).map((item) => ({
-        dia: labelOrFallback(item.dia, "Sem data"),
+        dia: item.dia,
         total: item.ops_concluidas,
       }));
       return OPConcluidasDiaArraySchema.parse(dados);
@@ -207,7 +202,11 @@ export const opOEEDetalheService = {
 
     if (!id_maquina) {
       const op = await opCrudService.getById(opId);
-      id_maquina = op?.id_maquina;
+      id_maquina =
+        op?.id_maquina ??
+        op?.maquina?.id_maquina ??
+        op?.maquina?.id ??
+        op?.maquina_id;
     }
 
     if (!id_maquina) {

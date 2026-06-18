@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, CloudBackup, Info } from "lucide-react";
+import { CheckCircle2, CloudBackup, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
@@ -163,51 +163,34 @@ export default function SyncPlacaDialog({ maquinaId, iconSize = 32 }) {
         className={conectado ? "text-[#2d6645] cursor-pointer" : "text-[#2d6645] cursor-pointer"}
         aria-label={conectado ? "Desconectar placa" : "Sincronizar placa"}
       >
-        {conectado ? <CloudBackup size={iconSize} /> : <CloudBackup size={iconSize} />}
+        {conectado ? <X size={iconSize} /> : <CloudBackup size={iconSize} />}
       </DialogTrigger>
 
       <DialogContent>
         {conectado ? (
           <div className="flex flex-col gap-4">
-            <div className="flex text-3xl font-semibold text-blue-900">
-              <CloudBackup size={34} className="mr-2" />
-              <p className="text-4xl font-semibold text-blue-900">Desconectar placa</p>
-            </div>
+            <div className="text-4xl font-semibold text-blue-900">Desconectar placa</div>
 
-            <div className="px-8 py-2 mb-6">
-              <div className="flex items-center justify-center gap-2 rounded-md border border-emerald-200 mt-8 bg-emerald-50 px-3 py-2 text-emerald-900">
-
-                <div className="flex flex-col">
-                  <div className="flex gap-1">
-                    <CheckCircle2 size={18} className="shrink-0 mt-1.25" />
-                    <div className="text-xl font-semibold">Placa Sincronizada nesta máquina</div>
-                  </div>
-
-                  <div className="text-lg text-center font-medium text-emerald-800">UID: {placaUid}</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center mt-4">
-                <div className="flex items-start gap-2">
-                  <Info size={18} className="shrink-0 mt-1.25 text-gray-500" />
-                  <div className="text-lg font-medium text-gray-700">
-                    Ao desconectar, esta placa deixa de registrar eventos nesta máquina até ser sincronizada novamente.
-                  </div>
-                </div>
-              </div>
-
-
-
-              <div className="flex justify-end mt-8 gap-2">
-                <Button variant="outline" disabled={desconectando} onClick={() => setOpen(false)} className="cursor-pointer border border-zinc-200 shadow-sm text-lg font-semibold py-2 px-5 h-auto">
-                  Cancelar
-                </Button>
-                <Button variant="destructive" disabled={desconectando} onClick={desconectar} className="cursor-pointer text-lg font-semibold py-2 px-5 h-auto">
-                  {desconectando ? "Desconectando..." : "Desconectar"}
-                </Button>
+            <div className="flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-900">
+              <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+              <div className="flex flex-col">
+                <div className="text-sm font-semibold">Placa sincronizada nesta maquina</div>
+                <div className="text-xs text-emerald-800">UID: {placaUid}</div>
               </div>
             </div>
 
+            <div className="text-sm text-gray-700">
+              Ao desconectar, esta placa deixa de registrar eventos nesta maquina até ser sincronizada novamente.
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" disabled={desconectando} onClick={() => setOpen(false)}>
+                Cancelar
+              </Button>
+              <Button variant="destructive" disabled={desconectando} onClick={desconectar}>
+                {desconectando ? "Desconectando..." : "Desconectar"}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-4">

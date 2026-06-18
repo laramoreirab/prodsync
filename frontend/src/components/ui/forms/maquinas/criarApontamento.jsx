@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { deduplicarTurnosParaSelect } from "@/lib/filterUtils";
-import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onSuccess }) {
     const [loading, setLoading] = useState(false);
@@ -137,23 +136,55 @@ export default function FormCriarApontamento({ id_maquina, id_ordemProducao, onS
 
             <form onSubmit={handleSubmit} className="space-y-6 p-4">
 
-                <FormSelect
-                    label="Ordem de Produção"
-                    options={ordens}
-                    value={form.id_ordemProducao}
-                    onValueChange={(val) => handleChange({ target: { name: "id_ordemProducao", value: val } })}
-                    disabled={loadingOrdens || !!id_ordemProducao}
-                    placeholder={loadingOrdens ? 'Sincronizando...' : 'Selecione a Ordem'}
-                />
+                <div className="w-full">
+                    <label className="block text-lg font-semibold mb-1">
+                        Ordem de Produção
+                    </label>
+                    <div className="relative">
+                        <select
+                            name="id_ordemProducao"
+                            value={form.id_ordemProducao}
+                            onChange={handleChange}
+                            disabled={loadingOrdens || !!id_ordemProducao}
+                            className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none pr-10 text-gray-700 font-medium disabled:opacity-50"
+                        >
+                            <option value="" disabled>
+                                {loadingOrdens ? 'Sincronizando...' : 'Selecione a Ordem'}
+                            </option>
+                            {ordens.map(op => (
+                                <option key={op.id ?? op.id_ordem} value={op.id ?? op.id_ordem}>
+                                    {op.codigo_lote || op.nome || `Ordem #${op.id ?? op.id_ordem}`}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    </div>
+                </div>
 
-                <FormSelect
-                    label="Turno"
-                    options={turnos}
-                    value={form.id_turno}
-                    onValueChange={(val) => handleChange({ target: { name: "id_turno", value: val } })}
-                    disabled={loadingTurnos}
-                    placeholder={loadingTurnos ? 'Sincronizando...' : 'Selecione o Turno'}
-                />
+                <div className="w-full">
+                    <label className="block text-lg font-semibold mb-1">
+                        Turno
+                    </label>
+                    <div className="relative">
+                        <select
+                            name="id_turno"
+                            value={form.id_turno}
+                            onChange={handleChange}
+                            disabled={loadingTurnos}
+                            className="w-full h-11 border outline-none border-neutral-200 shadow-sm rounded-lg bg-white p-2.5 text-lg appearance-none text-gray-700 pr-10 font-medium disabled:opacity-50"
+                        >
+                            <option value="" disabled>
+                                {loadingTurnos ? 'Sincronizando...' : 'Selecione o Turno'}
+                            </option>
+                            {turnos.map(t => (
+                                <option key={t.id_turno} value={t.id_turno}>
+                                    {t.nome_turno || `Turno #${t.id_turno}`}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="w-full">

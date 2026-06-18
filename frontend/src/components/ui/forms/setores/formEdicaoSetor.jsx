@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { setorCrudService } from "@/services/setorCrudService"; 
 import { apiFetch } from "@/lib/api";
-import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
     const [carregando, setSincronizando] = useState(true);
@@ -451,16 +450,27 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                     <p className="text-xl text-[#545454] font-medium mb-4">Vincule os turnos que operarão nesse setor.</p>
 
                     <div className="flex items-center gap-3">
-                        <FormSelect
-                            className="max-w-md"
-                            options={turnosDisponiveisAgrupados.filter((turno) => !listaTurnos.some((item) => item.key === turno.key))}
-                            value={turnoSelecionado}
-                            onValueChange={(val) => setTurnoSelecionado(val)}
-                            valueKey="key"
-                        />
+                        <div className="relative w-full max-w-md">
+                            <select
+                                value={turnoSelecionado}
+                                onChange={(e) => setTurnoSelecionado(e.target.value)}
+                                className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
+                            >
+                                <option value="" disabled>Selecione</option>
+                                {turnosDisponiveisAgrupados
+                                    .filter((turno) => !listaTurnos.some((item) => item.key === turno.key))
+                                    .map((turno) => (
+                                        <option key={turno.key} value={turno.key}>
+                                            {turno.label}
+                                        </option>
+                                    ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                <ChevronDown className="h-4 w-4" />
+                            </div>
+                        </div>
 
                         <button
-                            type="button"
                             onClick={adicionarTurno}
                             className="bg-[#002C6A] hover:bg-[#001f4d] text-white rounded-full w-9 h-9 flex items-center justify-center focus:outline-none transition-colors shrink-0"
                         >
@@ -561,17 +571,28 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                     <p className="text-xl text-[#545454] font-medium mb-4">Vincule os equipamentos que operarão nesse setor.</p>
 
                     <div className="flex items-center gap-3">
-                        <FormSelect
-                            className="max-w-md"
-                            options={maquinasDisponiveis
-                                .filter((maquina) => !maquina.id_setor || String(maquina.id_setor) === String(setorId))
-                                .filter((maquina) => !listaMaquinas.some((item) => String(item.value) === String(maquina.id_maquina)))}
-                            value={maquinaSelecionada}
-                            onValueChange={(val) => setMaquinaSelecionada(val)}
-                        />
+                        <div className="relative w-full max-w-md">
+                            <select
+                                value={maquinaSelecionada}
+                                onChange={(e) => setMaquinaSelecionada(e.target.value)}
+                                className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-gray-400 bg-white shadow-sm text-lg outline-none"
+                            >
+                                <option value="" disabled>Selecione</option>
+                                {maquinasDisponiveis
+                                    .filter((maquina) => !maquina.id_setor || String(maquina.id_setor) === String(setorId))
+                                    .filter((maquina) => !listaMaquinas.some((item) => String(item.value) === String(maquina.id_maquina)))
+                                    .map((maquina) => (
+                                        <option key={maquina.id_maquina} value={maquina.id_maquina}>
+                                            {maquina.nome}
+                                        </option>
+                                    ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                <ChevronDown className="h-4 w-4" />
+                            </div>
+                        </div>
 
                         <button
-                            type="button"
                             onClick={adicionarMaquina}
                             className="bg-[#002C6A] hover:bg-[#001f4d] text-white rounded-full w-9 h-9 flex items-center justify-center focus:outline-none transition-colors shrink-0"
                         >
@@ -603,25 +624,46 @@ export default function FormEdicaoSetor({ setorId, onEdicaoSucesso }) {
                     <p className="text-xl text-[#545454] font-medium mb-4">Adicione os colaboradores e defina suas responsabilidades.</p>
 
                     <div className="flex items-end gap-3 max-w-4xl">
-                        <FormSelect
-                            label="Selecione o Usuário"
-                            options={usuariosFiltrados}
-                            value={usuarioSelecionado}
-                            onValueChange={(val) => setUsuarioSelecionado(val)}
-                        />
+                        <div className="flex-1">
+                            <label className="block text-xl font-medium text-gray-700 mb-1">Selecione o Usuário</label>
+                            <div className="relative">
+                                <select
+                                    value={usuarioSelecionado}
+                                    onChange={(e) => setUsuarioSelecionado(e.target.value)}
+                                    className="w-full appearance-none border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 bg-white focus:outline-none shadow-sm text-gray-400 text-lg"
+                                >
+                                    <option value="" disabled>Selecione...</option>
+                                    {usuariosFiltrados.map((usuario) => (
+                                        <option key={usuario.id_usuario} value={usuario.id_usuario}>
+                                            {usuario.nome} ({tipoUsuario(usuario)})
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                    <ChevronDown className="h-4 w-4" />
+                                </div>
+                            </div>
+                        </div>
 
-                        <FormSelect
-                            label="Definir Função"
-                            options={[
-                                { value: "Operador", label: "Operador" },
-                                { value: "Gestor", label: "Gestor" }
-                            ]}
-                            value={funcaoSelecionada}
-                            onValueChange={(val) => setFuncaoSelecionada(val)}
-                        />
+                        <div className="flex-1">
+                            <label className="block text-xl font-medium text-gray-700 mb-1">Definir Função</label>
+                            <div className="relative">
+                                <select
+                                    value={funcaoSelecionada}
+                                    onChange={(e) => setFuncaoSelecionada(e.target.value)}
+                                    className="w-full appearance-none border text-gray-400 border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-lg bg-white focus:outline-none shadow-sm"
+                                >
+                                    <option value="" disabled>Selecione....</option>
+                                    <option value="Operador">Operador</option>
+                                    <option value="Gestor">Gestor</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                                    <ChevronDown className="h-4 w-4" />
+                                </div>
+                            </div>
+                        </div>
 
                         <button
-                            type="button"
                             onClick={adicionarColaborador}
                             className="bg-[#002C6A] hover:bg-[#001f4d] text-white rounded-full w-9 h-9 flex items-center justify-center focus:outline-none transition-colors shrink-0 mb-0.5"
                         >

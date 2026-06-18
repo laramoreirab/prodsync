@@ -3,9 +3,10 @@ import { apiFetch } from "@/lib/api";
 const API_URL = "/api/setores";
 
 export const setorCrudService = {
+  // buscar todos os setores
   getAll: async () => {
-    // Busca um limite alto para contornar a paginação do backend
-    return await apiFetch(`${API_URL}/empresa?limite=100`);
+    const options = { method: "GET" };
+    return await apiFetch(`${API_URL}/empresa`, options);
   },
 
   // buscar setor por ID — id vai na URL

@@ -108,12 +108,17 @@ const colunasEventos = [
     label: "Duração",
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
-  { id: "motivo", key: "motivo", label: "Motivo" },
+  { id: "motivo", key: "motivo", label: "Motivo", className: "w-[190px]" },
   {
     id: "observacao",
     key: "observacao",
     label: "Observação",
-    className: "pl-5",
+    className: 'max-w-[200px]',
+    icone: (valor) => (
+      <span className="block truncate" title={valor}>
+        {valor || "-"}
+      </span>
+    )
   },
 ];
 
@@ -289,10 +294,10 @@ export default function HistoricoEventos() {
 
         {dadosExibidos.length > 0 ? (
           <TableListagens
-          className="mt-4"
+            className="mt-4"
             data={dadosExibidos}
             columns={colunasEventos}
-            acoesDropdown={(maquina) => (
+            acoesDropdown={(evento) => (
               <>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -308,7 +313,7 @@ export default function HistoricoEventos() {
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <DetalhaeEvento />
+                    <DetalhaeEvento eventoId={evento.id} />
                   </DialogContent>
                 </Dialog>
               </>

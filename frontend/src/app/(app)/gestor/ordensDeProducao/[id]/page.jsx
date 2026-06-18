@@ -153,7 +153,7 @@ const colunasEventos = [
     icone: (valor, row) => <DuracaoEvento inicio={row.inicio} fim={row.fim} />,
   },
   { id: "motivo", key: "motivo", label: "Motivo" },
-  { id: "observacao", key: "observacao", label: "Observação",  className: "truncate max-w-[200px]"},
+  { id: "observacao", key: "observacao", label: "Observação" },
 ];
 
 const colunasApontamento = [
@@ -186,7 +186,7 @@ const colunasApontamento = [
       </Badge>
     ),
   },
-  { id: "observacao", key: "observacao", label: "Observação",  className: "truncate max-w-[200px]"},
+  { id: "observacao", key: "observacao", label: "Observação" },
 ];
 
 // ─── Componente Principal ────────────────────────────────────────────────────
@@ -369,7 +369,7 @@ export default function OPDetalheGestor({ params }) {
         <DetailBackLink href="/gestor/ordensDeProducao" label="Voltar para Ordens de Produção" />
 
         <EntityProfileCard
-          name={`Ordem de Produção #${tituloOp}`}
+          name={`Ordem de Produção — ${tituloOp}`}
           imageSrc={imagemMaquina}
           imageAlt={maquina?.nome || "Máquina"}
           imageShape="square"

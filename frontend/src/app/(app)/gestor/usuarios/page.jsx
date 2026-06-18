@@ -42,14 +42,14 @@ const turnoLabel = { 1: "Manhã", 2: "Tarde", 3: "Noite" }
 
 const opcoesOrdenacao = [
   { value: "nome", label: "Ordem Alfabética" },
-  { value: "id_asc", label: "ID Crescente" },
-  { value: "id_desc", label: "ID Decrescente" },
+  { value: "id_asc", label: "ID (Crescente)" },
+  { value: "id_desc", label: "ID (Decrescente)" },
   { value: "turno", label: "Turno" },
 ];
 
 const usuariosFilter = [
   { id: "id_turno", label: "Turno", type: "checkbox", options: Object.values(turnoLabel) },
-  { id: "oee_medio", label: "OEE Médio", type: "number-range" },
+  { id: "oee_medio", label: "OEE Médio", type: "range" },
 ];
 
 const colunasUsuarios = [
@@ -262,7 +262,7 @@ export default function UsuariosGestor() {
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <DialogContent>
-                    <FormExclusaoUsuario usuarioId={user.id} onExclusaoSucesso={refresh} />
+                    <FormExclusaoUsuario operadorId={user.id} onExclusaoSucesso={refresh} />
                   </DialogContent>
                 </Dialog>
               </>

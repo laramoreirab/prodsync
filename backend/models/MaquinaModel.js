@@ -440,24 +440,7 @@ class MaquinaModel {
                 // Se no futuro quiser incluir o Setor na resposta, é só descomentar a linha abaixo:
                 include: {
                     setor: { select: { id_setor: true, nome_setor: true } },
-                    operador: { select: { id_usuario: true, nome: true } },
-                    historico_eventos: {
-                        where: {
-                            status_atual: { in: ['Parada', 'Setup'] },
-                            termino: { not: null }
-                        },
-                        orderBy: [
-                            { termino: 'desc' },
-                            { id_evento: 'desc' }
-                        ],
-                        take: 1,
-                        select: {
-                            id_evento: true,
-                            status_atual: true,
-                            inicio: true,
-                            termino: true
-                        }
-                    }
+                    operador: { select: { id_usuario: true, nome: true } }
                 }
             };
 

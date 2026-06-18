@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, ReceiptText } from "lucide-react";
+import { ReceiptText } from "lucide-react";
 import {
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -8,21 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { eventosCrudService } from '@/services/eventosCrudService';
 
-const OPCOES_MOTIVO = [
-    { label: "Falta de Energia", value: 1 },
-    { label: "Manutenção Preventiva", value: 2 },
-    { label: "Manutenção Corretiva", value: 3 },
-    { label: "Falta de Material", value: 4 },
-    { label: "Outros", value: 5 },
-];
-
 export default function DetalhesEvento({ eventoId }) {
     const [dadosEvento, setDadosEvento] = useState(null)
 
     const [tipoEvento, setTipoEvento] = useState('');
     const [maquinasSelecionadas, setMaquinasSelecionadas] = useState([]);
     const [opsSelecionadas, setOpsSelecionadas] = useState([]);
-    const [idMotivoPrincipal, setIdMotivoPrincipal] = useState([]);
     const [observacao, setObservacao] = useState('');
     const [inicioData, setInicioData] = useState('');
     const [inicioHora, setInicioHora] = useState('');
@@ -30,7 +21,6 @@ export default function DetalhesEvento({ eventoId }) {
     const [fimData, setFimData] = useState('');
     const [fimHora, setFimHora] = useState('');
 
-    // — mesmo useEffect do formEdicao —
     useEffect(() => {
         const buscarDados = async () => {
             try {
@@ -38,19 +28,20 @@ export default function DetalhesEvento({ eventoId }) {
                 setTipoEvento(dados.status_maquina || '');
                 setMaquinasSelecionadas(dados.maquina ? [dados.maquina] : []);
                 setOpsSelecionadas(dados.op_afetada ? [dados.op_afetada] : []);
-                setIdMotivoPrincipal(dados.id_motivo_parada || '');
-                setNomeMotivo(dados.motivo || '');
+                setNomeMotivo(
+                    dados.motivo ||
+                    dados.motivo_parada?.descricao ||
+                    dados.motivo_parada?.nome ||
+                    ''
+                );
                 setObservacao(dados.observacao || '');
                 setDadosEvento(dados);
-                // Nova função interna blindada
+
                 const extrairEFormatar = (dataOriginal) => {
                     if (!dataOriginal) return { data: '', hora: '' };
-                    
-                    // Separa a data da hora (aceita 'T' do padrão ISO ou espaço de SQL)
                     const [dataParte, horaParte] = String(dataOriginal).trim().split(/[T ]/);
-                    
+
                     let dataCerta = dataParte;
-                    // Se a data tem traço e começa com o ano (YYYY-MM-DD), inverte para DD/MM/YYYY
                     if (dataParte && dataParte.includes('-')) {
                         const [ano, mes, dia] = dataParte.split('-');
                         if (ano.length === 4) {
@@ -60,11 +51,10 @@ export default function DetalhesEvento({ eventoId }) {
 
                     return {
                         data: dataCerta,
-                        hora: horaParte ? horaParte.slice(0, 5) : '' // Pega apenas HH:MM
+                        hora: horaParte ? horaParte.slice(0, 5) : ''
                     };
                 };
 
-                // Aplica a formatação ANTES de salvar no estado
                 if (dados.inicio) {
                     const formatado = extrairEFormatar(dados.inicio);
                     setInicioData(formatado.data);
@@ -83,7 +73,6 @@ export default function DetalhesEvento({ eventoId }) {
         if (eventoId) buscarDados();
     }, [eventoId]);
 
-
     return (
         <>
             <div className="flex items-center">
@@ -98,14 +87,8 @@ export default function DetalhesEvento({ eventoId }) {
             <Separator className="my-2" />
 
             <div className=" flex flex-col cursor-text">
-                {/* Informações do Evento */}
-
                 <div className="flex flex-col">
-
-
                     <div className="flex flex-col w-full gap-4 px-2 pb-8 pt-4 cursor-text">
-
-                        {/* Status */}
                         <div className="flex items-center">
                             <p className="text-xl font-semibold text-black mr-1">Evento:</p>
                             <Badge variant={tipoEvento === 'Parada' ? 'parada' : tipoEvento === 'Setup' ? 'setup' : 'outline'}
@@ -114,7 +97,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </Badge>
                         </div>
 
-                        {/* Máquinas */}
                         <div className="flex flex-col gap-1.5">
                             <span className="text-xl font-semibold text-black">Máquina(s) Afetada(s): </span>
 
@@ -127,7 +109,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </div>
                         </div>
 
-                        {/* Ordens de Produção */}
                         <div className="flex flex-col gap-1.5">
                             <span className="text-xl font-semibold text-black">OP(s) Afetada(s):</span>
                             <div className="flex flex-wrap gap-2">
@@ -139,7 +120,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </div>
                         </div>
 
-                        {/* Início */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Data Início: </span>
                             <div className="flex">
@@ -149,7 +129,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </div>
                         </div>
 
-                        {/* Fim */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Data Fim:</span>
                             <span className="text-xl text-[#333333]">
@@ -160,7 +139,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </span>
                         </div>
 
-                        {/* Motivo */}
                         <div className="flex items-center gap-1">
                             <span className="text-xl font-semibold text-black">Motivo: </span>
                             <span className="text-xl font-medium text-[#333333]">
@@ -168,7 +146,6 @@ export default function DetalhesEvento({ eventoId }) {
                             </span>
                         </div>
 
-                        {/* Observação */}
                         <div className="flex flex-col gap-1">
                             <span className="text-xl font-semibold text-black">Observação:</span>
                             {observacao ? (
@@ -179,12 +156,8 @@ export default function DetalhesEvento({ eventoId }) {
                                 <span className="text-xl font-medium text-[#333333]">Sem observação</span>
                             )}
                         </div>
-
                     </div>
-
                 </div>
-
-
             </div>
         </>
     );

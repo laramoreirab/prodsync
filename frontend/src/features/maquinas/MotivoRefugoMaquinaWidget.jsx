@@ -1,5 +1,6 @@
 "use client";
 
+import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useMotivoRefugoMaquina } from "./hooks/useMotivoRefugoMaquina";
 import { motivoRefugoConfig } from "./config/maquinaDetalheConfig";
 
@@ -17,7 +18,7 @@ const tonsAzuis = [
   "#38bdf8",
   "#7dd3fc",
 ];
- 
+
 export function MotivoRefugoMaquinaWidget({ maquinaId }) {
   const { data, loading, error } = useMotivoRefugoMaquina(maquinaId);
 
@@ -28,17 +29,19 @@ export function MotivoRefugoMaquinaWidget({ maquinaId }) {
     return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
   }
 
+  const top5 = data.slice(0, 5);
+
   return (
     <div>
       <p className="text-sm font-semibold text-foreground">
-        Principais Motivos de Refugo
+        Peças com Maior Refugo
       </p>
       <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">
         Atualizado em tempo real
       </p>
       <div className="mt-2">
         <CustomPieChart
-          data={data.map((item, index) => ({
+          data={top5.map((item, index) => ({
             ...item,
             fill: item.fill || tonsAzuis[index % tonsAzuis.length],
           }))}

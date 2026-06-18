@@ -306,11 +306,11 @@ class NotificacaoModel {
         }
 
         if (evento.id_motivo_parada) {
-            throw new Error('Evento já justificado');
+            throw new Error('Evento ja justificado');
         }
 
         if (!['Parada', 'Setup'].includes(evento.status_atual)) {
-            throw new Error('Evento não requer justificativa');
+            throw new Error('Evento nao requer justificativa');
         }
 
         if (solicitante.tipo === 'Gestor') {

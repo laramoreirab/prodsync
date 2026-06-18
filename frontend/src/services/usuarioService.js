@@ -32,11 +32,6 @@ const filterBySetorId = (items, setorId) => {
   );
 };
 
-const labelOrFallback = (value, fallback) => {
-  const label = String(value ?? "").trim();
-  return label || fallback;
-};
-
 const USE_MOCK = false;
 
 export const qtdUsuariosPerfilService = {
@@ -44,11 +39,7 @@ export const qtdUsuariosPerfilService = {
     if (USE_MOCK) return QtdUsuariosPorPerfilArraySchema.parse(mockQtdUsuariosPorPerfil);
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/usuarios/dashboard/qtdUsuariosPorTipo${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      name: labelOrFallback(item.name, "Sem perfil"),
-    }));
-    return QtdUsuariosPorPerfilArraySchema.parse(normalized);
+    return QtdUsuariosPorPerfilArraySchema.parse(data.dados);
   },
 };
 
@@ -56,11 +47,7 @@ export const qtdUsuariosSetorService = {
   async getQtdPorSetor() {
     if (USE_MOCK) return QtdUsuariosPorSetorArraySchema.parse(mockQtdUsuariosPorSetor);
     const data = await apiFetch("/api/usuarios/dashboard/qtdUsuariosPorSetor");
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      setor: labelOrFallback(item.setor, "Sem setor"),
-    }));
-    return QtdUsuariosPorSetorArraySchema.parse(normalized);
+    return QtdUsuariosPorSetorArraySchema.parse(data.dados);
   },
 };
 
@@ -70,7 +57,7 @@ export const topOperadoresService = {
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/usuarios/dashboard/top5Operadores${query}`);
     const normalized = (data.dados || []).map((item) => ({
-      operador: labelOrFallback(item.operador ?? item.nome, "Sem nome"),
+      operador: item.operador ?? item.nome ?? "Sem nome",
       media: item.media ?? item.pecas_boas ?? item.qtd ?? 0,
       setorId: item.setorId ?? (setorId ? Number(setorId) : undefined),
     }));
@@ -83,11 +70,7 @@ export const tempoSessaoService = {
     if (USE_MOCK) return TempoSessaoPerfilArraySchema.parse(mockTempoSessaoPerfil);
     const query = setorId ? `?setorId=${setorId}` : "";
     const data = await apiFetch(`/api/usuarios/dashboard/tempo-medio-sessao-perfil${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      perfil: labelOrFallback(item.perfil, "Sem perfil"),
-    }));
-    return TempoSessaoPerfilArraySchema.parse(filterBySetorId(normalized, setorId));
+    return TempoSessaoPerfilArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
 
@@ -104,11 +87,7 @@ export const CumprimentoMetaSetorService = {
   async getCumprimentoMetaSetor() {
     if (USE_MOCK) return CumprimentoMetaSetorArraySchema.parse(mockCumprimentoMetaSetor);
     const data = await apiFetch("/api/usuarios/dashboard/metaProducaoPorSetor");
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      setor: labelOrFallback(item.setor, "Sem setor"),
-    }));
-    return CumprimentoMetaSetorArraySchema.parse(normalized);
+    return CumprimentoMetaSetorArraySchema.parse(data.dados);
   },
 };
 
@@ -116,11 +95,7 @@ export const producaoMediaSetorService = {
   async getProducaoMedia() {
     if (USE_MOCK) return ProducaoMediaSetorArraySchema.parse(mockProducaoMediaSetor);
     const data = await apiFetch("/api/usuarios/dashboard/producaoMediaPorSetor");
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      setor: labelOrFallback(item.setor, "Sem setor"),
-    }));
-    return ProducaoMediaSetorArraySchema.parse(normalized);
+    return ProducaoMediaSetorArraySchema.parse(data.dados);
   },
 };
 
@@ -131,11 +106,7 @@ export const turnosOperadoresService = {
     }
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/usuarios/turnos${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      turno: labelOrFallback(item.turno, "Sem turno"),
-    }));
-    return UsuariosPorTurnoArraySchema.parse(filterBySetorId(normalized, setorId));
+    return UsuariosPorTurnoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };
 
@@ -149,7 +120,7 @@ export const producaoMediaUsuarioSetorService = {
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/usuarios/producao_media_por_usuario${query}`);
     const normalized = (data.dados || []).map((item) => ({
-      usuario: labelOrFallback(item.usuario ?? item.nome, "Sem nome"),
+      usuario: item.usuario ?? item.nome ?? "Sem nome",
       media: item.media ?? item.qtd ?? 0,
       setorId: item.setorId ?? (setorId ? Number(setorId) : undefined),
     }));
@@ -164,10 +135,6 @@ export const usuarioTaxaRefugoService = {
     }
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/usuarios/taxa_refugo${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      operador: labelOrFallback(item.operador, "Sem nome"),
-    }));
-    return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(normalized, setorId));
+    return UsuarioTaxaRefugoArraySchema.parse(filterBySetorId(data.dados || [], setorId));
   },
 };

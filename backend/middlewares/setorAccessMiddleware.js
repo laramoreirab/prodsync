@@ -172,39 +172,21 @@ function autorizarUsuarioParam(nomeParam = 'id') {
 
             if (idUsuario === Number(req.user.id_usuario)) return next();
 
-            if (!Number.isInteger(idUsuario)) return negarSetor(res);
+            const operador = Number.isInteger(idUsuario)
+                ? await prisma.escalaTrabalho.findFirst({
+                    where: {
+                        id_empresa: Number(req.user.id_empresa),
+                        id_operador: idUsuario,
+                        id_setor: { in: setores }
+                    },
+                    select: { id_setor: true }
+                })
+                : null;
 
-            // Verificamos se o usuário é um operador em um dos setores do gestor
-            const escala = await prisma.escalaTrabalho.findFirst({
-                where: {
-                    id_empresa: Number(req.user.id_empresa),
-                    id_operador: idUsuario,
-                    id_setor: { in: setores }
-                },
-                select: { id_setor: true }
-            });
+            if (!operador) return negarSetor(res);
 
-            if (escala) {
-                req.query.setorId = String(escala.id_setor);
-                return next();
-            }
-
-            // Se não for operador, verificamos se é um gestor em um dos setores do gestor
-            const gestorNoSetor = await prisma.setor_Gestor.findFirst({
-                where: {
-                    id_empresa: Number(req.user.id_empresa),
-                    id_gestor: idUsuario,
-                    id_setor: { in: setores }
-                },
-                select: { id_setor: true }
-            });
-
-            if (gestorNoSetor) {
-                req.query.setorId = String(gestorNoSetor.id_setor);
-                return next();
-            }
-
-            return negarSetor(res);
+            req.query.setorId = String(operador.id_setor);
+            return next();
         } catch (error) {
             console.error('Erro ao validar usuario do gestor:', error);
             return res.status(500).json({ sucesso: false, erro: 'Erro interno do servidor' });

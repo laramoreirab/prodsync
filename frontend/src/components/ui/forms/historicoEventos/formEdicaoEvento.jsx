@@ -9,7 +9,6 @@ import { eventosCrudService } from '@/services/eventosCrudService'; // Importar 
 import { useSetores } from '@/hooks/useSetores';
 import { useMaquinas } from '@/hooks/useMaquinas';
 import { useOps } from '@/hooks/useOps';
-import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
     const [tipoEvento, setTipoEvento] = useState('Parada'); // status_maquina — backend: status_maquina
@@ -369,13 +368,23 @@ export default function FormEdicaoEvento({ eventoId, onEdicaoSucesso }) {
                     <label className="text-2xl font-semibold text-black">6. Justificativa</label>
 
                     <div className="space-y-3">
-                        <FormSelect
-                            label="Motivo Principal:"
-                            options={opcoesMotivo}
-                            value={idMotivoPrincipal}
-                            onValueChange={(val) => setIdMotivoPrincipal(val)}
-                            placeholder="Selecione o motivo"
-                        />
+                        <div>
+                            <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Motivo Principal:</span>
+                            <div className="relative">
+                                <select
+                                    value={idMotivoPrincipal}
+                                    onChange={(e) => setIdMotivoPrincipal(e.target.value)}
+                                    className="w-full border shadow-md border-gray-200 rounded-md p-2.5 pr-10 text-xl outline-none bg-white appearance-none text-gray-600"
+                                >
+                                    <option value="" disabled>Selecione o motivo</option>
+                                    {opcoesMotivo.map((motivo) => (
+                                        // id_motivo_parada — número — backend: id_motivo_parada
+                                        <option key={motivo.value} value={motivo.value}>{motivo.label}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
+                        </div>
                         <div>
                             <span className="block text-xl text-gray-700 font-medium mb-1 mt-2">Observação (Opcional):</span>
                             <textarea

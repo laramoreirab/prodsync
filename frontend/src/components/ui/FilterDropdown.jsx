@@ -1,22 +1,3 @@
-//como funciona para deixar os parametros dentro do filtrar:
-//1. definir uma constante dentro da pagina desejada para configurar os filtros, como uma
-//   array fora e antes do "export default function" 
-//2. oq colocar dentro dessa constante? definir as infos de cada objeto (bloco de seleção) --> {id: "comoVaiPuxarEssaInfoParaFiltrar",
-//   label: "nomeDoParametro", type:"tipoDeSeleção"} 
-// obs: se type = checkbox, tem que adicionar mais um par de chaves (options: ["opçao1", "opcao2", "opcao3"]) 
-// obs 2: blocos como turnos e setores, vai puxar do back --> essa parte é com eles para enviar essas informações pra gente
-//sobre o type de cada bloco de seleção:
-// se oq tiver dentro for checkbox, type="checkbox"; se for intervalo de data e horario, type = "date-range"
-// se for a duração máxima de tempo: "time-max"; se for um intervalo de valor minimo e maximo, type = "number-range"
-//ex na prática:
-//   const maquinasFilters = [
-//    { id: "status", label: "Status", type: "checkbox", options: ["Parada", "Produzindo", "Setup"] },
-//    { id: "data", label: "Data", type: "date-range" },
-//    { id: "duracao", label: "Duração", type: "time-max" },
-//    { id: "produzido", label: "Produzido", type: "number-range" },
-//    { id: "refugo", label: "Refugo", type: "number-range" },
-// ];
-//para utilizar: criar constante com tudo dentro e dentro do export, puxar o <FilterDropdown filtersConfig={nomeDaConstante} onApply={suaFuncaoDeFiltrar} /> 
 "use client";
 
 import { useState } from "react";

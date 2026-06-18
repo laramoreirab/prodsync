@@ -18,21 +18,12 @@ import {
 
 const USE_MOCK = false;
 
-const labelOrFallback = (value, fallback) => {
-  const label = String(value ?? "").trim();
-  return label || fallback;
-};
-
 export const maquinaStatusService = {
   async getStatus(setorId = null) {
     if (USE_MOCK) return MaquinaStatusArraySchema.parse(mockMaquinaStatus);
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/maquinas/dashboard/status-geral${query}`);
-    const normalized = (data.dados || data || []).map((item) => ({
-      ...item,
-      name: labelOrFallback(item.name, "Sem status"),
-    }));
-    return MaquinaStatusArraySchema.parse(normalized);
+    return MaquinaStatusArraySchema.parse(data.dados || data);
   },
 };
 
@@ -50,11 +41,7 @@ export const qtdMaquinasPorSetorService = {
     if (USE_MOCK) return QtdMaquinaPorSetorArraySchema.parse(mockQtdMaquinasPorSetor);
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/setores/obterQuantidadeMaquinasPorSetor${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      setor: labelOrFallback(item.setor, "Sem setor"),
-    }));
-    return QtdMaquinaPorSetorArraySchema.parse(normalized);
+    return QtdMaquinaPorSetorArraySchema.parse(data.dados);
   },
 };
 
@@ -63,11 +50,7 @@ export const tempoMedioParadaService = {
     if (USE_MOCK) return TempoMedioParadaArraySchema.parse(mockTempoMedioParada);
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/setores/obterTempoMedioParadaPorSetor${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      maquina: labelOrFallback(item.maquina, "Sem máquina"),
-    }));
-    return TempoMedioParadaArraySchema.parse(normalized);
+    return TempoMedioParadaArraySchema.parse(data.dados);
   },
 };
 
@@ -76,11 +59,7 @@ export const producaoDefeitosService = {
     if (USE_MOCK) return ProducaoDefeitoPorSetorArraySchema.parse(mockProducaoDefeitos);
     const query = setorId ? `?setorId=${setorId}` : "";
     const data = await apiFetch(`/api/setores/obterProducaoDefeitosPorSetor${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      maquina: labelOrFallback(item.maquina ?? item.setor, "Sem setor"),
-    }));
-    return ProducaoDefeitoPorSetorArraySchema.parse(normalized);
+    return ProducaoDefeitoPorSetorArraySchema.parse(data.dados);
   },
 };
 
@@ -89,10 +68,6 @@ export const maquinasPorTurnoService = {
     if (USE_MOCK) return MaquinaPorTurnoArraySchema.parse(mockMaquinasPorTurno);
     const query = setorId ? `?setorId=${encodeURIComponent(setorId)}` : "";
     const data = await apiFetch(`/api/turnos/status-maquinas-por-turno${query}`);
-    const normalized = (data.dados || []).map((item) => ({
-      ...item,
-      turno: labelOrFallback(item.turno, "Sem turno"),
-    }));
-    return MaquinaPorTurnoArraySchema.parse(normalized);
+    return MaquinaPorTurnoArraySchema.parse(data.dados);
   },
 };

@@ -17,6 +17,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.senai.prodsync.ApiResponse;
 import com.senai.prodsync.DashboardService;
 import com.senai.prodsync.OeeResponse;
@@ -38,8 +40,8 @@ public class OpDetalheFragment extends Fragment {
     private static final String ARG_OPERADOR = "operador";
     private static final String ARG_DATA_INICIO = "data_inicio";
     private static final String ARG_DATA_FINAL = "data_final";
-    private static final String ARG_FOTO_MAQUINA = "foto_maquina";
-
+    private static final String ARG_FOTO_MAQUINA_URL = "foto_maquina_url";
+    
     private String opId;
     private String maquinaId;
     private String prioridade;
@@ -68,7 +70,7 @@ public class OpDetalheFragment extends Fragment {
         args.putString(ARG_OPERADOR, operador);
         args.putString(ARG_DATA_INICIO, dataInicio);
         args.putString(ARG_DATA_FINAL, dataFinal);
-        args.putString(ARG_FOTO_MAQUINA, fotoMaquinaUrl);
+        args.putString(ARG_FOTO_MAQUINA_URL, fotoMaquinaUrl);
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,7 +89,7 @@ public class OpDetalheFragment extends Fragment {
             operador = getArguments().getString(ARG_OPERADOR);
             dataInicio = getArguments().getString(ARG_DATA_INICIO);
             dataFinal = getArguments().getString(ARG_DATA_FINAL);
-            fotoMaquinaUrl = getArguments().getString(ARG_FOTO_MAQUINA);
+            fotoMaquinaUrl = getArguments().getString(ARG_FOTO_MAQUINA_URL);
         }
     }
 
@@ -103,13 +105,13 @@ public class OpDetalheFragment extends Fragment {
         TextView tvTitulo = view.findViewById(R.id.tv_titulo_op_detalhe);
         TextView tvStatus = view.findViewById(R.id.tv_status_op_val);
         TextView tvMaquina = view.findViewById(R.id.tv_nome_maquina_op);
-        ImageView ivMaquina = view.findViewById(R.id.iv_maquina_op);
         TextView tvSetor = view.findViewById(R.id.tv_setor_op);
         TextView tvPrioridade = view.findViewById(R.id.tv_prioridade_op_val);
         TextView tvMeta = view.findViewById(R.id.tv_meta_op);
         TextView tvOperador = view.findViewById(R.id.tv_operador_op_val);
         TextView tvDataInicio = view.findViewById(R.id.tv_data_inicio_op);
         TextView tvPrazoFinal = view.findViewById(R.id.tv_prazo_final_op);
+        ImageView ivMaquinaOp = view.findViewById(R.id.iv_maquina_op);
 
         layoutLoading = view.findViewById(R.id.layout_loading_op);
         groupConteudo = view.findViewById(R.id.group_conteudo_op);
@@ -122,15 +124,6 @@ public class OpDetalheFragment extends Fragment {
             tvMeta.setText("Meta: " + quantidade + " peças");
             tvOperador.setText(operador != null ? operador : "Nenhum");
             
-            if (fotoMaquinaUrl != null && !fotoMaquinaUrl.isEmpty()) {
-                Glide.with(this)
-                        .load(fotoMaquinaUrl)
-                        .placeholder(R.drawable.ic_ferramenta)
-                        .error(R.drawable.ic_ferramenta)
-                        .centerInside()
-                        .into(ivMaquina);
-            }
-
             if (dataInicio != null && !dataInicio.isEmpty()) {
                 tvDataInicio.setText(formatarData(dataInicio));
             } else {
@@ -141,6 +134,20 @@ public class OpDetalheFragment extends Fragment {
                  tvPrazoFinal.setText(formatarData(dataFinal));
             } else {
                  tvPrazoFinal.setText("S/D");
+            }
+
+            int radius = 32; // Bordas arredondadas
+            if (ivMaquinaOp != null) {
+                if (fotoMaquinaUrl != null && !fotoMaquinaUrl.isEmpty()) {
+                    Glide.with(this)
+                            .load(fotoMaquinaUrl)
+                            .transform(new CenterCrop(), new RoundedCorners(radius))
+                            .placeholder(R.drawable.ic_ferramenta)
+                            .error(R.drawable.ic_ferramenta)
+                            .into(ivMaquinaOp);
+                } else {
+                    ivMaquinaOp.setImageResource(R.drawable.ic_ferramenta);
+                }
             }
             
             setupStatusBadge(tvStatus, status);
@@ -231,6 +238,7 @@ public class OpDetalheFragment extends Fragment {
     private String formatarData(String dataIso) {
         if (dataIso == null || dataIso.isEmpty()) return "S/D";
         try {
+            // Ex: 2008-11-11T06:09:00.000Z
             String datePart = dataIso.substring(0, 10); // yyyy-MM-dd
             String timePart = dataIso.substring(11, 16); // HH:mm
 

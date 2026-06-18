@@ -8,28 +8,17 @@ class UsuarioModel {
     //Listar todos os usuários com paginacção
     static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
-            const where = {
-                id_empresa,
-                tipo: { in: ['Gestor', 'Operador'] },
-            };
-
-            if (setorId) {
-                // Busca os IDs dos gestores do setor para o filtro
-                const gestoresDoSetor = await prisma.setor_Gestor.findMany({
-                    where: { id_setor: Number(setorId) },
-                    select: { id_gestor: true }
-                });
-                const idsGestores = gestoresDoSetor.map(g => g.id_gestor);
-
-                where.OR = [
-                    { escalas: { some: { id_setor: Number(setorId) } } },
-                    { setores_geridos: { some: { id_setor: Number(setorId) } } },
-                    { id_usuario: { in: idsGestores } }
-                ];
-            }
-
             const regrasDaBusca = {
-                where,
+                where: {
+                    id_empresa,
+                    tipo: { in: ['Gestor', 'Operador'] },
+                    ...(setorId ? {
+                        OR: [
+                            { escalas: { some: { id_setor: Number(setorId) } } },
+                            { setores_geridos: { some: { id_setor: Number(setorId) } } }
+                        ]
+                    } : {}) // exclui Adm da listagem
+                },
                 select: {
                     id_usuario: true,
                     nome: true,

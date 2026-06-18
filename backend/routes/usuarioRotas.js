@@ -11,7 +11,7 @@ const router = Router()
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Rotas de Dashboard do Operador
-router.get('/', authMiddleware, aplicarEscopoGestor, paginacaoMiddleware, UsuarioController.listarUsuarios)
+router.get('/', authMiddleware, aplicarEscopoGestor, UsuarioController.listarUsuarios)
 router.get('/listarSemAdms', authMiddleware, UsuarioController.listarSemAdms)
 router.get('/dashboard/qtdUsuariosPorTipo', authMiddleware, aplicarEscopoGestor, UsuarioController.qtdDeUsuariosTipo)
 router.get('/dashboard/qtdUsuariosPorSetor', authMiddleware, aplicarEscopoGestor, UsuarioController.qtdUsuariosPorSetor)

@@ -5,8 +5,8 @@ export const paginacaoMiddleware = (req, res, next) => {
     const pagina = parseInt(req.query.pagina) || 1;
     const limite = parseInt(req.query.limite) || 10;
     
-    // Busca o limite máximo no .env. Se não existir, usa 500 como segurança padrão.
-    const limiteMaximo = parseInt(process.env.PAGINACAO_LIMITE_MAXIMO) || 500;
+    // Busca o limite máximo no .env. Se não existir, usa 100 como segurança padrão.
+    const limiteMaximo = parseInt(process.env.PAGINACAO_LIMITE_MAXIMO) || 100;
 
     // 1ª Validação: Números negativos ou zero
     if (pagina <= 0 || limite <= 0) {

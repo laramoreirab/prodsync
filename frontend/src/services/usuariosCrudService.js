@@ -3,9 +3,10 @@ import { apiFetch } from "@/lib/api";
 const API_URL = "/api/usuarios";
 
 export const usuariosCrudService = {
+  //buscar todos os usuários
   getAll: async () => {
-    // Busca um limite alto para contornar a paginação do backend na listagem administrativa
-    return await apiFetch(`${API_URL}/?limite=100`);
+    const options = { method: "GET"}
+    return await apiFetch(`${API_URL}/`, options);
   },
 
   // Buscar detalhes de um usuário por id
@@ -23,8 +24,7 @@ export const usuariosCrudService = {
     } else {
       options.body = JSON.stringify(dados);
     }
-    const response = await apiFetch(`${API_URL}/criar`, options);
-    return response?.dados ?? response;
+    return await apiFetch(`${API_URL}/criar`, options);
   },
 
   // Atualizar usuário (aceita FormData para upload de foto)

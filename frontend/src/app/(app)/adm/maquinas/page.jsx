@@ -56,7 +56,7 @@ const maquinasFilterBase = [
 const colunasMaquinas = [
   { id: 'id_exibicao_empresa', key: 'id_exibicao_empresa', label: 'ID', className: 'w-20 text-center justify-center' },
   { id: 'nome', key: 'nome', label: 'Nome' },
-  { id: 'setor', key: 'setor', label: 'Setor', icone: (valor, row) => obterNomeSetor(row) || "Sem setor" },
+  { id: 'setor', key: 'setor', label: 'Setor', icone: (valor, row) => obterNomeSetor(row) || "-" },
   {
     id: 'status',
     key: 'status',

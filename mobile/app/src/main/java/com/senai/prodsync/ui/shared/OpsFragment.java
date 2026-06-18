@@ -72,9 +72,7 @@ public class OpsFragment extends Fragment {
 
         adapter = new OpAdapter(new ArrayList<>(), userRole, op -> {
             OpDetalheFragment fragment = OpDetalheFragment.newInstance(
-                    op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(),
-                    op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(),
-                    op.getDataFinal(), op.getFotoMaquinaUrl());
+                    op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(), op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(), op.getDataFinal(), op.getFotoMaquinaUrl());
             getParentFragmentManager().beginTransaction()
                     .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
                     .replace(R.id.fragmentContainer, fragment)
@@ -121,9 +119,9 @@ public class OpsFragment extends Fragment {
                             listaUI.add(new Op(
                                     item.getId(),
                                     item.getNomeMaquina(),
-                                    item.getPrioridade() != null ? item.getPrioridade() : "Normal",
-                                    item.getDataFinal() != null ? item.getDataFinal() : "S/D",
-                                    item.getSetor() != null ? item.getSetor() : "Geral",
+                                    item.getPrioridade(),
+                                    item.getDataFinal(),
+                                    item.getSetor(),
                                     item.getProduto() != null ? item.getProduto() : "Produto N/A",
                                     item.getQuantidade(),
                                     item.getStatus(),

@@ -5,6 +5,9 @@ import { AndonSectionMarquee } from "./AndonSectionMarquee";
 import { AndonStatusWidget } from "./AndonStatusWidget";
 import { useAndonSections } from "./hooks/useAndonSections";
 import { usePerfil } from "@/hooks/usePerfil";
+import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
+import { getUserFromToken } from "@/lib/auth";
 
 import {
   PageLayout,
@@ -32,12 +35,75 @@ const scopeContent = {
 
 export function AndonBoardPage({ scope = "factory" }) {
   const { loading: loadingPerfil, setorId } = usePerfil();
-  const idSetor = scope === "sector" ? setorId : null;
+  const [setorOperadorId, setSetorOperadorId] = useState(null);
+  const [loadingSetorOperador, setLoadingSetorOperador] = useState(false);
+  const [tentouResolverSetorOperador, setTentouResolverSetorOperador] = useState(false);
+  const idSetor = scope === "sector" ? setorId ?? setorOperadorId : null;
   const content = scopeContent[scope] ?? scopeContent.factory;
+  const aguardandoSetorOperador =
+    scope === "sector" &&
+    !loadingPerfil &&
+    !setorId &&
+    !setorOperadorId &&
+    !tentouResolverSetorOperador;
 
   const { data: sections, loading, error } = useAndonSections(scope, idSetor);
 
-  if (scope === "sector" && loadingPerfil) {
+  useEffect(() => {
+    if (scope !== "sector" || loadingPerfil || setorId) return;
+
+    let ativo = true;
+
+    async function resolverSetorPelaMaquina() {
+      const usuario = getUserFromToken();
+      if (!usuario?.id_usuario) {
+        if (ativo) setTentouResolverSetorOperador(true);
+        return;
+      }
+
+      setLoadingSetorOperador(true);
+      try {
+        const resposta = await apiFetch(
+          `/api/maquinas/obter-maquina-operador/${usuario.id_usuario}`,
+        );
+        const maquinaOperador = resposta?.dados ?? resposta;
+        let idSetorMaquina =
+          maquinaOperador?.id_setor ??
+          maquinaOperador?.setor?.id_setor ??
+          null;
+
+        const idMaquina =
+          maquinaOperador?.id_maquina ??
+          maquinaOperador?.maquina?.id_maquina ??
+          maquinaOperador?.id ??
+          null;
+
+        if (!idSetorMaquina && idMaquina) {
+          const maquinaDetalhe = await apiFetch(`/api/maquinas/${idMaquina}`);
+          const maquina = maquinaDetalhe?.dados ?? maquinaDetalhe;
+          idSetorMaquina =
+            maquina?.id_setor ??
+            maquina?.setor?.id_setor ??
+            null;
+        }
+
+        if (ativo) setSetorOperadorId(idSetorMaquina ? Number(idSetorMaquina) : null);
+      } catch (error) {
+        console.error("Erro ao resolver setor do operador para o Andon:", error);
+      } finally {
+        if (ativo) setTentouResolverSetorOperador(true);
+        if (ativo) setLoadingSetorOperador(false);
+      }
+    }
+
+    resolverSetorPelaMaquina();
+
+    return () => {
+      ativo = false;
+    };
+  }, [scope, loadingPerfil, setorId]);
+
+  if (scope === "sector" && (loadingPerfil || loadingSetorOperador || aguardandoSetorOperador)) {
     return (
       <PageLayout>
         <PageHeader title={content.pageTitle} action={<AndonRelogioWidget />} />
@@ -48,7 +114,7 @@ export function AndonBoardPage({ scope = "factory" }) {
     );
   }
 
-  if (scope === "sector" && !idSetor) {
+  if (scope === "sector" && !idSetor && !loadingSetorOperador) {
     return (
       <PageLayout>
         <PageHeader title={content.pageTitle} action={<AndonRelogioWidget />} />

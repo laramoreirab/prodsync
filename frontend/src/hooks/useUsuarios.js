@@ -29,7 +29,7 @@ export function useUsuarios() {
   const cadastrarUsuario = async (dados) => {
     try {
       const novo = await usuariosCrudService.create(dados);
-      await fetchUsuarios();
+      setUsuarios(prev => [...prev, novo]);
       return novo;
     } catch (err) {
       throw err;
@@ -40,7 +40,7 @@ export function useUsuarios() {
   const editarUsuario = async (id, dados) => {
     try {
       const atualizado = await usuariosCrudService.update(id, dados);
-      await fetchUsuarios();
+      setUsuarios(prev => prev.map(u => String(u.id) === String(id) ? atualizado : u));
       return atualizado;
     } catch (err) {
       throw err;

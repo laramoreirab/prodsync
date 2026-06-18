@@ -12,7 +12,6 @@ import { usuariosCrudService } from '@/services/usuariosCrudService';
 import { setorCrudService } from '@/services/setorCrudService';
 import { apiFetch } from '@/lib/api';
 import { deduplicarTurnosParaSelect } from '@/lib/filterUtils';
-import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormCadastroUsuario({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -126,10 +125,8 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         payload.append('email', formData.email);
         payload.append('id_setor', formData.id_setor);     // número — backend: id_setor
         payload.append('funcao', formData.funcao);
-        if (formData.funcao === "Operador") {
-            payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
-            payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
-        }
+        payload.append('id_turno', formData.id_turno);     // número — backend: id_turno
+        payload.append('id_maquina', formData.id_maquina); // número — backend: id_maquina
 
         if (fotoPerfil?.raw) payload.append("imagem_perfil", fotoPerfil.raw);
 
@@ -158,15 +155,12 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
         payloadLote.append("file", arquivoLote.raw);
 
         try {
-            const resposta = await apiFetch('/api/usuarios/cadastro-lote', {
+            const resposta = await apiFetch('/api/usuario/cadastro-lote', {
                 method: "POST",
                 body: payloadLote
             })
             if (resposta && resposta.sucesso !== false) {
                 toast.success("Usuários importados com sucesso!");
-            } else {
-                toast.error(resposta?.mensagem || "Erro ao processar o arquivo CSV.");
-                return;
             }
             setArquivoLote(null);
             if (fileInputLoteRef.current) fileInputLoteRef.current.value = "";
@@ -174,6 +168,9 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
             setIsLoteModalOpen(false);
 
             if (onCadastroSucesso) onCadastroSucesso();
+            else {
+                toast.error(response.mensagem || "Erro ao processar o arquivo CSV.");
+            }
         } catch (error) {
             console.error("Erro no upload em lote:", error);
             toast.error("Erro interno ao enviar o arquivo para o servidor.");
@@ -367,67 +364,108 @@ export default function FormCadastroUsuario({ onCadastroSucesso }) {
                             placeholder="usuario@email.com"
                             required />
                     </div>
-                    <FormSelect
-                        id="id_setor"
-                        label="Setor"
-                        options={listaSetores}
-                        value={formData.id_setor}
-                        onValueChange={(val) => handleInputChange({ target: { id: "id_setor", value: val } })}
-                        placeholder={listaSetores.length === 0 ? "Nenhum setor criado" : "Selecione..."}
-                        disabled={listaSetores.length === 0}
-                        required
-                    />
+                    <div className="relative">
+                        <label htmlFor="id_setor" className={labelStyle}>Setor</label>
+                        <select
+                            id="id_setor"
+                            onChange={handleInputChange}
+                            value={formData.id_setor}
+                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disabled={listaSetores.length === 0}
+                            required
+                        >
+                            <option value="">
+                                {listaSetores.length === 0 ? "Nenhum setor criado" : "Selecione..."}
+                            </option>
+                            {listaSetores.map((setor) => (
+
+                                <option
+                                    key={setor.id_setor}
+                                    value={setor.id_setor}
+                                >
+                                    {setor.nome_setor}
+                                </option>
+
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
-                    <FormSelect
-                        id="funcao"
-                        label="Função"
-                        options={[
-                            { value: "Operador", label: "Operador" },
-                            { value: "Gestor", label: "Gestor" }
-                        ]}
-                        value={formData.funcao}
-                        onValueChange={(val) => handleInputChange({ target: { id: "funcao", value: val } })}
-                        required
-                    />
+                    <div className="relative">
+                        <label htmlFor="funcao" className={labelStyle}>Função</label>
+                        <select
+                            id="funcao"
+                            value={formData.funcao}
+                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            onChange={handleInputChange}
+                            required
+                        >
+                            <option value="">Selecione...</option>
+                            <option value="Operador">Operador</option>
+                            <option value="Gestor">Gestor</option>
+                        </select>
+                    </div>
+                    <div className="relative">
+                        <label htmlFor="id_turno" className={labelStyle}>Turno</label>
+                        <select
+                            id="id_turno"
+                            onChange={handleInputChange}
+                            value={formData.id_turno}
+                            className={`${inputStyle} appearance-none pr-10 bg-white text-gray-400`}
+                            disabled={!formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
+                            required
+                        >
+                            <option value="">
+                                {!formData.id_setor
+                                    ? "Selecione..."
+                                    : carregandoTurnos
+                                        ? "Sincronizando turnos..."
+                                    : listaTurnos.length === 0
+                                        ? "Nenhum turno criado"
+                                        : "Selecione..."}
+                            </option>
+                            {listaTurnos.map((turno) => (
 
-                    <FormSelect
-                        id="id_turno"
-                        label="Turno"
-                        options={listaTurnos}
-                        value={formData.id_turno}
-                        valueKey="id_turno"
-                        labelKey="nome_turno"
-                        onValueChange={(val) => handleInputChange({ target: { id: "id_turno", value: val } })}
-                        placeholder={
-                            !formData.id_setor
-                                ? "Selecione um setor..."
-                                : carregandoTurnos
-                                    ? "Sincronizando turnos..."
-                                : listaTurnos.length === 0
-                                    ? "Nenhum turno criado"
-                                    : "Selecione..."
-                        }
-                        disabled={!formData.id_setor || carregandoTurnos || listaTurnos.length === 0}
-                        required
-                    />
+                                <option
+                                    key={turno.id_turno}
+                                    value={turno.id_turno}
+                                >
+                                    {turno.nome_turno}
+                                </option>
+
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 {/* máquina a gerenciar só aparece se função = operador */}
                 {formData.funcao === "Operador" && (
-                    <FormSelect
-                        id="id_maquina"
-                        label="Máquina a Gerenciar"
-                        options={listaMaquinas}
-                        value={formData.id_maquina}
-                        valueKey="id_maquina"
-                        labelKey="nome"
-                        onValueChange={(val) => handleInputChange({ target: { id: "id_maquina", value: val } })}
-                        placeholder={formData.id_turno ? "Selecione..." : "Selecione um turno primeiro"}
-                        disabled={!formData.id_setor || !formData.id_turno}
-                        required
-                    />
+                    <div className="relative pt-1">
+                        <label htmlFor="id_maquina" className={labelStyle}>Máquina a Gerenciar</label>
+                        <select
+                            id="id_maquina"
+                            onChange={handleInputChange}
+                            value={formData.id_maquina}
+                            className={`${inputStyle} appearance-none pr-10 bg-white`}
+                            disabled={!formData.id_setor || !formData.id_turno}
+                            required
+                        >
+                            <option value="">
+                                {formData.id_turno ? "Selecione..." : "Selecione um turno primeiro"}
+                            </option>
+                            {listaMaquinas.map((maquina) => (
+
+                                <option
+                                    key={maquina.id_maquina}
+                                    value={maquina.id_maquina}
+                                >
+                                    {maquina.nome}
+                                </option>
+
+                            ))}
+                        </select>
+                    </div>
                 )}
 
                 <div className="flex justify-center mt-4">
