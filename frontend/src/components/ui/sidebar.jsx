@@ -190,10 +190,15 @@ function Sidebar({
             data-sidebar="sidebar"
             data-slot="sidebar"
             data-mobile="true"
-            className="w-(--sidebar-width) border-r border-sidebar-border bg-sidebar p-0 text-sidebar-foreground shadow-[0_18px_40px_rgba(15,23,42,0.25)] [&>button]:hidden"
+            className="w-(--sidebar-width) border-r border-white/10 bg-[#0f3d84] p-0 text-white shadow-[0_18px_40px_rgba(15,23,42,0.25)] [&>button]:hidden"
             style={
               {
-                "--sidebar-width": SIDEBAR_WIDTH_MOBILE
+                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+                "--sidebar-background": "217 80% 29%",
+                "--sidebar-foreground": "0 0% 100%",
+                "--sidebar-accent": "217 80% 35%",
+                "--sidebar-accent-foreground": "0 0% 100%",
+                "--sidebar-border": "217 80% 35%",
               }
             }
             side={side}>

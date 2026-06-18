@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { KeyRound, LockKeyhole, Palette, Save, Trash2, Upload, UserRound, EyeOff, Eye, CircleX, CircleCheck } from "lucide-react"
+import { KeyRound, LockKeyhole, Palette, Save, Pencil, Trash2, Upload, UserRound, EyeOff, Eye, CircleX, CircleCheck, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/api"
 import { toast } from "sonner"
-import { PageLayout, PageHeader } from "@/components/AnimatedComponents"
+import { PageLayout } from "@/components/AnimatedComponents"
 import { usuariosCrudService } from "@/services/usuariosCrudService"
 
 const adminTabs = [
@@ -26,10 +26,10 @@ const userTabs = [
 
 const adminAccountFields = [
   { id: "id", label: "ID", readOnly: true },
-  { id: "emailEmpresa", label: "Email da Empresa", type: "email" },
   { id: "telefoneEmpresa", label: "Telefone da Empresa" },
-  { id: "enderecoEmpresa", label: "Endereço da Empresa" },
+  { id: "emailEmpresa", label: "Email da Empresa", type: "email" },
   { id: "cpfRepresentante", label: "CPF do Representante" },
+  { id: "enderecoEmpresa", label: "Endereço da Empresa" },
 ]
 
 const userAccountFields = [
@@ -62,7 +62,7 @@ function getInitialDarkMode() {
   return document.documentElement.classList.contains("dark")
 }
 
-const defaultAvatarSrc = "/userdefault.svg"
+const defaultAvatarSrc = "/userdefault.png"
 
 function resolverImagemPerfil(imagem) {
   if (!imagem || imagem === "null") return defaultAvatarSrc
@@ -76,10 +76,25 @@ function resolverImagemPerfil(imagem) {
   return `${baseUrl}/uploads/imagens/${imagem}`
 }
 
+function LoadingOverlay({ message = "Sincronizando Dados..." }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/60 backdrop-blur-[2px] dark:bg-zinc-950/60">
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative flex items-center justify-center">
+          <Loader2 className="size-12 animate-spin text-[#154ecb]" />
+        </div>
+        <p className="animate-pulse text-base font-bold text-zinc-700 dark:text-zinc-200">
+          {message}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function SettingsSidebar({ activeTab, onTabChange, tabs }) {
   return (
-    <aside className="w-full border-b border-zinc-100 p-4 dark:border-zinc-800 sm:w-44 sm:border-b-0 sm:border-r">
-      <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:overflow-visible">
+    <aside className="w-full border-b border-zinc-100 py-2 px-4 dark:border-zinc-800 sm:w-60 sm:py-4 sm:border-b-0 sm:border-r">
+      <nav className="flex gap-1 overflow-x-auto pb-2 sm:flex-col sm:gap-2 sm:overflow-visible sm:pb-0 hide-scrollbar">
         {tabs.map(({ id, label, icon: Icon }) => {
           const isActive = activeTab === id
           return (
@@ -88,13 +103,15 @@ function SettingsSidebar({ activeTab, onTabChange, tabs }) {
               type="button"
               onClick={() => onTabChange(id)}
               className={cn(
-                "flex h-7 shrink-0 items-center gap-2 rounded-md px-3 text-left text-sm font-semibold text-zinc-950 transition-colors dark:text-zinc-100",
-                "hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:hover:bg-zinc-800",
-                isActive && "bg-zinc-100 dark:bg-zinc-800"
+                "cursor-pointer flex h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-sm font-bold transition-all",
+                "hover:bg-zinc-100/80 focus-visible:outline-none dark:hover:bg-zinc-800",
+                isActive
+                  ? "bg-zinc-100 text-black dark:bg-zinc-800 dark:text-blue-400"
+                  : "text-zinc-500 dark:text-zinc-400"
               )}
             >
-              <Icon className="size-4 text-zinc-800 dark:text-zinc-200" />
-              <span>{label}</span>
+              <Icon className={cn("size-5 shrink-0", isActive ? "text-black dark:text-blue-400" : "text-zinc-400")} />
+              <span className="whitespace-nowrap">{label}</span>
             </button>
           )
         })}
@@ -117,59 +134,97 @@ function SettingsInput(props) {
     <Input
       {...props}
       className={cn(
-        "h-8 rounded-md border-zinc-100 shadow-sm bg-white text-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100",
+        "h-9 rounded-md border-zinc-100 shadow-sm bg-white text-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100",
         props.className
       )}
     />
   )
 }
 
-function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect }) {
+function ProfilePhotoSelector({ fotoPerfil, inputRef, onSelect, defaultPreview, canEdit }) {
   const hasPreview = Boolean(fotoPerfil?.preview)
+  const previewUrl = hasPreview ? fotoPerfil.preview : defaultPreview || defaultAvatarSrc
 
   return (
-    <div className="flex w-full flex-col sm:min-h-64 lg:min-h-full lg:flex-1 lg:py-0">
-      <input
-        type="file"
-        ref={inputRef}
-        onChange={onSelect}
-        accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
-        className="hidden"
-      />
+    <div className="flex flex-col items-center sm:items-start lg:flex-1 lg:py-0">
+      {canEdit && (
+        <input
+          type="file"
+          ref={inputRef}
+          onChange={onSelect}
+          accept=".jpg, .jpeg, .png, .webp, image/jpeg, image/png, image/webp"
+          className="hidden"
+        />
+      )}
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        aria-label="Selecionar foto de perfil"
-        className={cn(
-          "group relative flex size-35 mb-2 cursor-pointer items-center justify-center bg-transparent text-zinc-500 transition-colors",
-          "hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:text-zinc-400 dark:hover:text-zinc-100"
-        )}
-      >
-        {hasPreview ? (
-          <img
-            src={fotoPerfil.preview}
-            alt="Foto de perfil"
-            className="size-35 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-700"
-            onError={(event) => {
-              event.currentTarget.src = defaultAvatarSrc
-            }}
-          />
-        ) : (
-          <img src="/userdefault.svg" alt="Foto de perfil padrão" className="size-30 rounded-full object-cover" />
-        )}
-      </button>
+      <div className="relative mb-2 w-fit">
+        <button
+          type="button"
+          onClick={() => canEdit && inputRef.current?.click()}
+          aria-label="Selecionar foto de perfil"
+          className={cn(
+            "group relative flex size-35 items-center justify-center bg-transparent text-zinc-500 transition-colors",
+            canEdit ? "hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 cursor-pointer" : "cursor-default",
+            "dark:text-zinc-400 dark:hover:text-zinc-100"
+          )}
+        >
+          {hasPreview ? (
+            <img
+              src={previewUrl}
+              alt="Foto de perfil"
+              className="size-35 rounded-full object-cover block ring-2 ring-zinc-200 dark:ring-zinc-700 shadow-sm"
+              onError={(event) => {
+                event.currentTarget.src = defaultPreview || defaultAvatarSrc
+              }}
+            />
+          ) : (
+            <div
+              role="img"
+              aria-label="Foto de perfil padrão"
+              className="size-35 rounded-full bg-center block ring-2 ring-zinc-200 dark:ring-zinc-700 shadow-sm"
+              style={{
+                backgroundImage: `url(${previewUrl})`,
+                backgroundSize: '100%',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+              }}
+            />
+          )}
+        </button>
 
+        {/* botão que ativa o dropdwon  */}
+        {canEdit && (
+          <div className="absolute right-0 bottom-0">
+            <button
+              type="button"
+              aria-label="Abrir opções de foto"
+              className="bg-[#154ecb] hover:bg-[#0f3fb8] text-white p-2 rounded-full shadow-lg border-4 border-white dark:border-zinc-900 focus:outline-none transition-all cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation()
+                const ev = new CustomEvent('toggle-photo-dropdown', { bubbles: true })
+                window.dispatchEvent(ev)
+              }}
+            >
+              <Pencil />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
-
 function AccountSettings({ role }) {
   const isAdmin = role === "admin"
+  const canEditPhoto = role === "admin" || role === "gestor"
   const [salvando, setSalvando] = useState(false)
+  const [loading, setLoading] = useState(false)
+
   const [fotoPerfil, setFotoPerfil] = useState(null)
+  const [defaultProcessedPreview, setDefaultProcessedPreview] = useState(null)
   const fileInputFotoRef = useRef(null)
   const previewObjectUrlRef = useRef(null)
+  const dropdownRef = useRef(null)
+  const [photoDropdownOpen, setPhotoDropdownOpen] = useState(false)
 
   const [formData, setFormData] = useState({
     id: "",
@@ -196,36 +251,87 @@ function AccountSettings({ role }) {
   }, [])
 
   useEffect(() => {
+    let mounted = true
+    let url = null
+      ; (async () => {
+        try {
+          const res = await fetch('/userdefault.png')
+          if (!res.ok) return
+          const blob = await res.blob()
+          const file = new File([blob], 'userdefault.png', { type: blob.type || 'image/png' })
+          const processed = await processImageFile(file, 1024)
+          url = URL.createObjectURL(processed)
+          if (mounted) setDefaultProcessedPreview(url)
+        } catch (err) {
+          console.warn('Não foi possível processar avatar padrão:', err)
+        }
+      })()
+    return () => {
+      mounted = false
+      if (url) {
+        try { URL.revokeObjectURL(url) } catch (e) { }
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    function onToggle() {
+      setPhotoDropdownOpen((v) => !v)
+    }
+
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setPhotoDropdownOpen(false)
+      }
+    }
+
+    window.addEventListener('toggle-photo-dropdown', onToggle)
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      window.removeEventListener('toggle-photo-dropdown', onToggle)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  useEffect(() => {
     async function buscarDados() {
-      const dadosUsuario = await apiFetch("/api/auth/perfil")
-      const dadosPerfil = dadosUsuario.dados || {}
-      const usuarioAdm = dadosPerfil.usuarios?.[0]
-      const idUsuario = usuarioAdm?.id_usuario || dadosPerfil.id_usuario || ""
-      const idSetor = dadosPerfil.id_setor ?? dadosPerfil.setor?.id_setor ?? ""
-      const imagemPerfil = dadosPerfil.imagem_perfil || usuarioAdm?.imagem_perfil
+      setLoading(true)
+      try {
+        const dadosUsuario = await apiFetch("/api/auth/perfil")
+        const dadosPerfil = dadosUsuario.dados || {}
+        const usuarioAdm = dadosPerfil.usuarios?.[0]
+        const idUsuario = usuarioAdm?.id_usuario || dadosPerfil.id_usuario || ""
+        const idSetor = dadosPerfil.id_setor ?? dadosPerfil.setor?.id_setor ?? ""
+        const imagemPerfil = dadosPerfil.imagem_perfil || usuarioAdm?.imagem_perfil
 
-      setFormData({
-        id: idUsuario,
-        id_setor: idSetor ? String(idSetor) : "",
-        nome: dadosPerfil.nome || "",
-        cpf: aplicarMascaraCPF(dadosPerfil.cpf) || "",
-        cargo: dadosPerfil.tipo || "",
-        email: dadosPerfil.email || "",
-        emailEmpresa: dadosPerfil.email || "",
-        telefoneEmpresa: aplicarMascaraTelefone(dadosPerfil.telefone) || "",
-        enderecoEmpresa: dadosPerfil.endereco || "",
-        cpfRepresentante: aplicarMascaraCPF(dadosPerfil.cpf_representante) || ""
-      })
+        setFormData({
+          id: idUsuario,
+          id_setor: idSetor ? String(idSetor) : "",
+          nome: dadosPerfil.nome || "",
+          cpf: aplicarMascaraCPF(dadosPerfil.cpf) || "",
+          cargo: dadosPerfil.tipo || "",
+          email: dadosPerfil.email || "",
+          emailEmpresa: dadosPerfil.email || "",
+          telefoneEmpresa: aplicarMascaraTelefone(dadosPerfil.telefone) || "",
+          enderecoEmpresa: dadosPerfil.endereco || "",
+          cpfRepresentante: aplicarMascaraCPF(dadosPerfil.cpf_representante) || ""
+        })
 
-      setFotoPerfil(
-        imagemPerfil
-          ? {
-            raw: null,
-            preview: resolverImagemPerfil(imagemPerfil),
-            nome: "Imagem atual"
-          }
-          : null
-      )
+        setFotoPerfil(
+          imagemPerfil
+            ? {
+              raw: null,
+              preview: resolverImagemPerfil(imagemPerfil),
+              nome: "Imagem atual"
+            }
+            : null
+        )
+      } catch (err) {
+        console.error("Erro ao buscar dados do perfil:", err)
+      } finally {
+        setLoading(false)
+      }
     }
     buscarDados()
   }, [])
@@ -235,19 +341,66 @@ function AccountSettings({ role }) {
     if (!file) return
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Selecione uma imagem valida.")
+      toast.error("Selecione uma imagem válida!")
       e.target.value = ""
       return
     }
 
-    limparPreviewTemporario()
-    const preview = URL.createObjectURL(file)
-    previewObjectUrlRef.current = preview
+    ; (async () => {
+      try {
+        limparPreviewTemporario()
+        const processed = await processImageFile(file, 1024)
+        const preview = URL.createObjectURL(processed)
+        previewObjectUrlRef.current = preview
 
-    setFotoPerfil({
-      raw: file,
-      preview,
-      nome: file.name
+        // garantir que se envia um arquivo com nome
+        const processedFile = new File([processed], file.name.replace(/\.[^.]+$/, ".png"), { type: "image/png" })
+
+        setFotoPerfil({ raw: processedFile, preview, nome: processedFile.name })
+      } catch (err) {
+        console.error('Erro ao processar imagem:', err)
+        toast.error('Não foi possível processar a imagem. Tente outro arquivo.')
+        if (e.target) e.target.value = ""
+      }
+    })()
+  }
+
+  // processa a imagem no client para garantir crop/cover e remover espaços transparentes
+  function processImageFile(file, outputSize = 1024) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onerror = () => reject(new Error('Erro ao ler arquivo'))
+      reader.onload = () => {
+        const img = new Image()
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas')
+            canvas.width = outputSize
+            canvas.height = outputSize
+            const ctx = canvas.getContext('2d')
+            ctx.fillStyle = '#ffffff'
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+            const scale = Math.max(canvas.width / img.width, canvas.height / img.height)
+            const sw = canvas.width / scale
+            const sh = canvas.height / scale
+            const sx = Math.max(0, (img.width - sw) / 2)
+            const sy = Math.max(0, (img.height - sh) / 2)
+
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
+
+            canvas.toBlob((blob) => {
+              if (!blob) return reject(new Error('Falha ao gerar imagem'))
+              resolve(blob)
+            }, 'image/png', 0.92)
+          } catch (err) {
+            reject(err)
+          }
+        }
+        img.onerror = () => reject(new Error('Formato de imagem inválido'))
+        img.src = String(reader.result)
+      }
+      reader.readAsDataURL(file)
     })
   }
 
@@ -283,6 +436,43 @@ function AccountSettings({ role }) {
     }
 
     if (fileInputFotoRef.current) fileInputFotoRef.current.value = ""
+  }
+
+  async function handleRemoveFoto() {
+    // upload do userdefault.png como se fosse uma nova imagem
+    if (!formData.id) return
+    setSalvando(true)
+    setPhotoDropdownOpen(false)
+    try {
+      const res = await fetch('/userdefault.png')
+      if (!res.ok) throw new Error('Não foi possível obter imagem padrão')
+      const blob = await res.blob()
+      const file = new File([blob], 'userdefault.png', { type: blob.type || 'image/png' })
+
+      const processed = await processImageFile(file, 1024)
+      const processedFile = new File([processed], 'userdefault.png', { type: 'image/png' })
+
+      const payload = new FormData()
+      payload.append('imagem_perfil', processedFile)
+      if (formData.id_setor) payload.append('id_setor', formData.id_setor)
+
+      const response = await usuariosCrudService.update(formData.id, payload)
+      const imagemAtualizada = response?.dados?.imagem_perfil
+
+      if (imagemAtualizada) {
+        limparPreviewTemporario()
+        setFotoPerfil({ raw: null, preview: resolverImagemPerfil(imagemAtualizada), nome: 'Imagem atual' })
+        toast.success('Foto substituída pela padrão')
+      } else {
+        setFotoPerfil((fotoAtual) => fotoAtual ? { ...fotoAtual, raw: null, preview: defaultProcessedPreview || defaultAvatarSrc, nome: 'Imagem atual' } : { raw: null, preview: defaultProcessedPreview || defaultAvatarSrc, nome: 'Imagem atual' })
+        toast.success('Foto substituída pela padrão')
+      }
+    } catch (error) {
+      console.error('Erro ao substituir foto pelo padrão:', error)
+      toast.error('Erro ao remover foto. Tente novamente.')
+    } finally {
+      setSalvando(false)
+    }
   }
 
   const fields = isAdmin ? adminAccountFields : userAccountFields
@@ -355,57 +545,97 @@ function AccountSettings({ role }) {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-10 space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-[#0f3d84]" />
+        <p className="text-lg text-zinc-600 font-medium">Sincronizando dados do perfil...</p>
+      </div>
+    );
+  }
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6 lg:flex-row lg:items-stretch lg:justify-between">
-      <div className="w-full max-w-sm space-y-4">
+    <div className="flex w-full max-w-4xl flex-col gap-8 lg:flex-row lg:items-start">
+      <div className="w-full space-y-6">
         <SectionTitle
           title="Informações da Conta"
           description={isAdmin ? "Atualize suas informações pessoais" : "Visualize os dados do seu perfil"}
         />
 
         <form className="space-y-3" onSubmit={handleSubmitPerfil}>
-          <div className="flex flex-col justify-start">
-            <div>
+          <div className="flex flex-col items-center gap-10 sm:flex-row sm:items-start">
+            <div className="relative" ref={dropdownRef}>
               <ProfilePhotoSelector
                 fotoPerfil={fotoPerfil}
                 inputRef={fileInputFotoRef}
                 onSelect={handleFotoChange}
+                defaultPreview={defaultProcessedPreview}
+                canEdit={canEditPhoto}
               />
-            </div>
-            <div>
-              {fields.map(({ id, label, type = "text", readOnly }) => {
-                const isDisabled = !isAdmin || readOnly
-                const valorDoInput = formData[id] || ""
-                return (
-                  <div key={id} className="space-y-1">
-                    <label htmlFor={id} className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                      {label}
-                    </label>
-                    <SettingsInput
-                      id={id}
-                      type={type}
-                      disabled={isDisabled}
-                      value={valorDoInput}
-                      onChange={isDisabled ? undefined : handleInputChange}
-                      className={cn(isDisabled && "bg-zinc-100 text-black-400 cursor-not-allowed select-none dark:bg-zinc-900 dark:text-zinc-500")}
-                    />
+
+              {canEditPhoto && photoDropdownOpen && (
+                <div className="absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-md border bg-white shadow-lg animate-in fade-in zoom-in-95 duration-100">
+                  <div className="flex flex-col py-2">
+                    <div className="px-1">
+                      <button
+                        type="button"
+                        onClick={() => { fileInputFotoRef.current?.click(); setPhotoDropdownOpen(false) }}
+                        className="cursor-pointer flex w-full items-center gap-3 px-3 py-2 text-sm font-semibold text-zinc-700 rounded-lg transition-all duration-100 hover:bg-zinc-100"
+                      >
+                        <Upload className="size-4" />
+                        Carregar Foto
+                      </button>
+                    </div>
+                    <div className="px-1">
+                      <button
+                        type="button"
+                        onClick={handleRemoveFoto}
+                        className="cursor-pointer flex w-full items-center gap-3 px-3 py-2 text-sm font-semibold text-red-600 rounded-lg transition-all duration-100 hover:bg-red-50"
+                      >
+                        <Trash2 className="size-4" />
+                        Remover foto
+                      </button>
+                    </div>
                   </div>
-                )
-              })}
-              {(isAdmin || fotoPerfil?.raw) && (
-                <Button type="submit" disabled={salvando} className="cursor-pointer mt-4 h-10 rounded-lg bg-[#23304c] px-5 text-lg font-bold transition-all hover:scale-[1.02] shadow-md">
-                  <Save className="size-5" />
-                  {salvando ? "Salvando..." : "Salvar Alterações"}
-                </Button>
+
+
+                </div>
               )}
             </div>
+
+            <div className="flex flex-col">
+              <div className="grid w-full flex-1 gap-4 sm:grid-cols-2">
+                {fields.map(({ id, label, type = "text", readOnly }) => {
+                  const isDisabled = !isAdmin || readOnly
+                  const valorDoInput = formData[id] || ""
+                  return (
+                    <div key={id} className={cn("space-y-1.5", (id === "enderecoEmpresa" || id === "nome") && "sm:col-span-2")}>
+                      <label htmlFor={id} className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                        {label}
+                      </label>
+                      <SettingsInput
+                        id={id}
+                        type={type}
+                        disabled={isDisabled}
+                        value={valorDoInput}
+                        onChange={isDisabled ? undefined : handleInputChange}
+                        className={cn(isDisabled && "bg-zinc-100 text-zinc-500 cursor-not-allowed dark:bg-zinc-900/50")}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="flex justify-start pt-8 dark:border-zinc-800">
+                {(isAdmin || fotoPerfil?.raw) && (
+                  <Button type="submit" disabled={salvando} className="flex items-center cursor-pointer w-full sm:w-auto h-10 rounded-lg bg-[#23304c] px-5 text-md font-bold transition-all hover:scale-[1.01] shadow-md">
+                    <Save className="mr-1 size-5" />
+                    {salvando ? "Salvando..." : "Salvar Alterações"}
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-
-
         </form>
       </div>
-
-
     </div>
   )
 }
@@ -469,6 +699,7 @@ function SecuritySettings({ role }) {
   const [showCurrent, setShowCurrent] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [carregando, setSincronizando] = useState(false)
+
   const [deletando, setDeletando] = useState(false)
   const [confirmCNPJ, setConfirmCNPJ] = useState("")
   const [confirmPasswordDelete, setConfirmPasswordDelete] = useState("")
@@ -495,8 +726,6 @@ function SecuritySettings({ role }) {
     } catch (error) {
       console.error("Erro ao trocar senha:", error)
       toast("Ocorreu um erro ao tentar alterar a senha.")
-    } finally {
-      setSincronizando(false)
     }
   }
 
@@ -658,17 +887,23 @@ export default function SettingsPage({ role = "operator" }) {
 
   return (
     <PageLayout>
-      <div className="flex w-full flex-col gap-7 pb-10">
+      <div className="flex w-full flex-col gap-7 py-10">
+        <div className="flex flex-col gap-1 min-w-0 flex-1 pb-6">
+          <div className="relative w-fit pb-1">
+            <h1 className="mb-1 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-black dark:text-[#f4f8ff]">
+              Configurações
+            </h1>
+          </div>
 
-        <PageHeader
-          title="Configurações"
-          subtitle="Gerencie suas informações da conta e preferências."
-        />
+          <p className="text-base text-muted-foreground font-medium">
+            Gerencie suas informações da conta e preferências.
+          </p>
+        </div>
 
 
-        <section className="flex min-h-87.5 overflow-hidden rounded-xl border border-zinc-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+        <section className="flex flex-col sm:flex-row min-h-125 overflow-hidden rounded-xl border border-zinc-100 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
           <SettingsSidebar activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
-          <div className="flex-1 p-4 sm:p-6">
+          <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
             {activeTab === "conta" && <AccountSettings role={role} />}
             {activeTab === "aparencia" && <AppearanceSettings darkMode={darkMode} onDarkModeChange={setDarkMode} />}
             {activeTab === "seguranca" && <SecuritySettings role={role} />}

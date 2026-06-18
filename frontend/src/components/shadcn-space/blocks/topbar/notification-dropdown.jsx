@@ -1,6 +1,6 @@
 "use client";
 
-import { isValidElement, useState } from "react";
+import { isValidElement, useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useNotificacoes } from "@/hooks/useNotificacoes";
 import { getUserFromToken } from "@/lib/auth";
 import { AlertTriangle, BellRing, Loader2, Settings2, X } from "lucide-react";
+
 
 const ICONES_POR_TIPO = {
   Maquina_Parada: {
@@ -65,6 +66,7 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, o
   const { notificacoes, loading, marcarComoLida, marcarTodasComoLidas, excluir } =
     useNotificacoes();
   const tipoUsuario = getUserFromToken()?.tipo;
+  const scrollRef = useRef(null);
 
   const handleClickNotificacao = async (notificacao) => {
     if (!notificacao.lida) {
@@ -77,6 +79,12 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, o
       router.push(rota);
     }
   };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [notificacoes, aberto]);
 
   const handleExcluir = async (e, id) => {
     e.preventDefault();
@@ -116,14 +124,15 @@ const NotificationDropdown = ({ trigger, defaultOpen, align = "end", contagem, o
 
         <DropdownMenuContent
           align={align}
+          ref={scrollRef} data-lenis-prevent
           className="p-0 ml-3  w-sm rounded-2xl data-open:slide-in-from-top-20! data-closed:slide-out-to-top-20 data-open:fade-in-0 data-closed:fade-out-0 data-closed:zoom-out-100 duration-400"
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <DropdownMenuGroup>
             <DropdownMenuLabel className="flex items-center justify-between p-4">
-              <p className="text-base font-medium text-popover-foreground">Notificações</p>
+              <p className="text-base font-bold text-popover-foreground">Notificações</p>
               {badgeContagem > 0 && (
-                <Badge className="h-5 bg-blue-600 font-normal leading-0 hover:bg-blue-600">
+                <Badge className="h-5 bg-blue-900 font-normal leading-0 hover:bg-blue-600">
                   {badgeContagem} {badgeContagem === 1 ? "nova" : "novas"}
                 </Badge>
               )}

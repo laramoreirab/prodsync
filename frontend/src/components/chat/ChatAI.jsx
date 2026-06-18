@@ -178,7 +178,7 @@ const ChatAI = () => {
                   </button>
               </div>
 
-              <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 scrollbar-hide pt-12 relative z-10 bg-transparent">
+              <div ref={scrollRef} data-lenis-prevent className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 scrollbar-hide pt-12 relative z-10 bg-transparent">
                 {historico.length === 0 ? (
                   <div className="flex-1 flex flex-col justify-center items-center text-center px-4">
                     <motion.div layout className="mb-8">
@@ -367,8 +367,8 @@ const ChatAI = () => {
       </div>
 
       {!isOpen && (
-        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-slate-100 overflow-hidden z-[9999]">
-            <div className="relative w-full h-full flex items-center justify-center">
+        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-slate-100 overflow-hidden z-9999">
+            <div className="cursor-pointer relative w-full h-full flex items-center justify-center">
                 <img src="/ia_trigger.svg" alt="Sy AI" className="w-[75%] h-[75%] object-contain" />
             </div>
         </button>
