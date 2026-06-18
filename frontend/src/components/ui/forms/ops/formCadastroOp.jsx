@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { opCrudService } from '@/services/opCrudService';
 import { useSetores } from '@/hooks/useSetores';
 import { useMaquinas } from '@/hooks/useMaquinas';
+import FormSelect from "@/components/ui/FormSelect";
 
 export default function FormCadastroOp({ onCadastroSucesso }) {
     const [isLoteModalOpen, setIsLoteModalOpen] = useState(false);
@@ -220,22 +221,18 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                                 className="border text-lg border-gray-100 shadow-md rounded-lg p-2 focus:outline-none"
                             />
                         </div>
-                        <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Prioridade</label>
-                            <div className="relative">
-                                <select
-                                    value={prioridade}
-                                    onChange={(e) => setPrioridade(e.target.value)}
-                                    className="w-full border text-lg shadow-md border-gray-100 rounded-lg p-2 appearance-none text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-200 bg-white"
-                                >
-                                    <option value="Crítica">Crítica</option>
-                                    <option value="Alta">Alta</option>
-                                    <option value="Média">Média</option>
-                                    <option value="Baixa">Baixa</option>
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
-                            </div>
-                        </div>
+                        <FormSelect
+                            label="Prioridade"
+                            className="w-1/2"
+                            options={[
+                                { value: "Crítica", label: "Crítica" },
+                                { value: "Alta", label: "Alta" },
+                                { value: "Média", label: "Média" },
+                                { value: "Baixa", label: "Baixa" }
+                            ]}
+                            value={prioridade}
+                            onValueChange={(val) => setPrioridade(val)}
+                        />
                     </div>
                 </div>
 
@@ -243,43 +240,21 @@ export default function FormCadastroOp({ onCadastroSucesso }) {
                 <div className="flex flex-col gap-3">
                     <h3 className="text-2xl font-semibold text-black dark:text-white">2. Roteiro de Produção</h3>
                     <div className="flex gap-4">
-                        <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Setor</label>
-                            <div className="relative">
-                                <select
-                                    value={idSetor}
-                                    onChange={(e) => handleSetorChange(e.target.value)}
-                                    className="w-full border text-lg shadow-md border-gray-100 rounded-lg p-2 appearance-none text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-200 bg-white"
-                                >
-                                    <option value="">Selecione...</option>
-                                    {setores.map((setor) => (
-                                        <option key={setor.id} value={setor.id}>
-                                            {setor.nome_setor ?? setor.setor ?? setor.nome ?? `Setor ${setor.id}`}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
-                            </div>
-                        </div>
+                        <FormSelect
+                            label="Setor"
+                            className="w-1/2"
+                            options={setores}
+                            value={idSetor}
+                            onValueChange={handleSetorChange}
+                        />
 
-                        <div className="flex flex-col w-1/2">
-                            <label className="block text-lg text-gray-700 font-medium mb-1 dark:text-slate-300">Máquina</label>
-                            <div className="relative">
-                                <select
-                                    value={idMaquina}
-                                    onChange={(e) => setIdMaquina(e.target.value)}
-                                    className="w-full border text-lg shadow-md border-gray-100 rounded-lg p-2 appearance-none text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-200 bg-white"
-                                >
-                                    <option value="">Selecione...</option>
-                                    {maquinasFiltradas.map((maquina) => (
-                                        <option key={maquina.id_maquina} value={maquina.id_maquina}>
-                                            {maquina.nome ?? maquina.nome_maquina ?? `Máquina ${maquina.id_maquina}`}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
-                            </div>
-                        </div>
+                        <FormSelect
+                            label="Máquina"
+                            className="w-1/2"
+                            options={maquinasFiltradas}
+                            value={idMaquina}
+                            onValueChange={(val) => setIdMaquina(val)}
+                        />
                     </div>
                 </div>
 
