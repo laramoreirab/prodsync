@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.senai.prodsync.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,13 +54,15 @@ public class OpAdapter extends RecyclerView.Adapter<OpAdapter.OpViewHolder> {
         holder.tvPrioridade.setText("Prioridade: " + op.getPrioridade());
         holder.tvDataFinal.setText("Data Final: " + formatarData(op.getDataFinal()));
 
+        int radius = 24; // Padronizando bordas arredondadas
+
         // Carrega a imagem da máquina relacionada à OP
         if (op.getFotoMaquinaUrl() != null && !op.getFotoMaquinaUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(op.getFotoMaquinaUrl())
+                    .transform(new CenterCrop(), new RoundedCorners(radius))
                     .placeholder(R.drawable.ic_ferramenta)
                     .error(R.drawable.ic_ferramenta)
-                    .centerCrop()
                     .into(holder.ivMaquina);
         } else {
             holder.ivMaquina.setImageResource(R.drawable.ic_ferramenta);

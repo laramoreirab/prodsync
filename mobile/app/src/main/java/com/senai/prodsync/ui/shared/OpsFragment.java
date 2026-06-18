@@ -72,9 +72,7 @@ public class OpsFragment extends Fragment {
 
         adapter = new OpAdapter(new ArrayList<>(), userRole, op -> {
             OpDetalheFragment fragment = OpDetalheFragment.newInstance(
-                    op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(),
-                    op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(),
-                    op.getDataFinal(), op.getFotoMaquinaUrl());
+                    op.getId(), op.getMaquina(), op.getPrioridade(), op.getSetor(), op.getProduto(), op.getQuantidade(), op.getStatus(), op.getOperador(), op.getDataInicio(), op.getDataFinal(), op.getFotoMaquinaUrl());
             getParentFragmentManager().beginTransaction()
                     .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
                     .replace(R.id.fragmentContainer, fragment)
@@ -120,7 +118,7 @@ public class OpsFragment extends Fragment {
                         for (OrdemProducao item : ordens) {
                             listaUI.add(new Op(
                                     item.getId(),
-                                    item.getNomeMaquina(),
+                                    item.getMaquina() != null ? item.getMaquina().getNome() : (item.getNomeMaquina() != null ? item.getNomeMaquina() : "Máquina N/A"),
                                     item.getPrioridade() != null ? item.getPrioridade() : "Normal",
                                     item.getDataFinal() != null ? item.getDataFinal() : "S/D",
                                     item.getSetor() != null ? item.getSetor() : "Geral",
@@ -129,7 +127,7 @@ public class OpsFragment extends Fragment {
                                     item.getStatus(),
                                     item.getNomeOperador(),
                                     item.getDataInicio(),
-                                    item.getFotoMaquinaUrl()
+                                    item.getMaquina() != null ? item.getMaquina().getFotoUrl() : null
                             ));
                         }
                     }
