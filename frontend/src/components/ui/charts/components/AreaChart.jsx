@@ -41,6 +41,7 @@ export function AreaChartBase({
   xKey,
   yKey,
   config,
+  tooltipFormatter,
   size = "medio", // Tamanho padrão caso nenhum seja informado
 }) {
   const { color } = useChart(config, yKey);
@@ -83,7 +84,7 @@ export function AreaChartBase({
           />
           <YAxis hide />
 
-          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartTooltip content={<ChartTooltipContent formatter={tooltipFormatter} />} />
 
           <Area
             type="monotone"

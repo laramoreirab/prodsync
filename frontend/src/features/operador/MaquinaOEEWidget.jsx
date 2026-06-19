@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useOEEMaquinaDetalhes } from "./hooks/useOEEMaquinaDetalhes";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +21,8 @@ export function MaquinaOEEWidget() {
 
   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (!data) return <EmptyChartState title={"OEE da Máquina"} message={"Nenhum dado encontrado."} />;
+  if (Array.isArray(data) && data.length === 0) return <EmptyChartState title={"OEE da Máquina"} message={"Nenhum registro de OEE disponível."} />;
 
 
   return (

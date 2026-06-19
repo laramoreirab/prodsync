@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useVelocimetro } from "./hooks/useVelocimetro";
 
@@ -6,8 +7,8 @@ export function VelocimetroWidget({ operadorId }) {
   const { data, loading, error } = useVelocimetro(operadorId);
   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (!data) return <EmptyChartState title={"Velocímetro"} message={"Nenhum dado encontrado."} />;
+  if (Array.isArray(data) && data.length === 0) return <EmptyChartState title={"Velocímetro"} message={"Nenhum registro de velocidade disponível."} />;
 
 
   const pct = Math.round((data.atual / data.ideal) * 100);
