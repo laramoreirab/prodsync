@@ -12,6 +12,14 @@ export default function OperadorMaquinasRedirectPage() {
 
   useEffect(() => {
     let active = true;
+    const semMaquina = new URLSearchParams(window.location.search).get("semMaquina") === "1";
+
+    if (semMaquina) {
+      setMessage("Nenhuma máquina vinculada a este operador.");
+      return () => {
+        active = false;
+      };
+    }
 
     async function redirectToAssignedMachine() {
       const usuario = getUserFromToken();

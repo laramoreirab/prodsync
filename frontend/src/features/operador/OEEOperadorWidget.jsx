@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 
 import { GaugeSemicircular } from "@/components/ui/charts/components/GaugeSemicircular";
 import { useOEEOperador } from "./hooks/useOEEOperador";
@@ -9,8 +10,8 @@ export function OEEOperadorWidget({ operadorId }) {
 
   if (loading) return <p className="text-sm text-muted-foreground p-4">Sincronizando OEE...</p>;
   if (error) return <p className="text-sm text-destructive p-4">Erro ao carregar OEE.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground p-4">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground p-4">Nenhum registro disponível.</p>;
+  if (!data) return <EmptyChartState title={"OEE Médio da Máquina do Operador"} message={"Nenhum dado encontrado."} />;
+  if (Array.isArray(data) && data.length === 0) return <EmptyChartState title={"OEE Médio da Máquina do Operador"} message={"Nenhum registro de OEE disponível."} />;
 
   const metricaOeeGeral = metricas.find((m) => m.key === "oee");
   const metricasSecundarias = metricas.filter((m) => m.key !== "oee");

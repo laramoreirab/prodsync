@@ -1,5 +1,5 @@
 export const eficienciaConfig = {
-  eficiencia: { label: "Eficiência %:", color: "var(--chart1)" },
+  eficiencia: { label: "Eficiência:", color: "var(--chart1)" },
 };
 
 export const metaConfig = {

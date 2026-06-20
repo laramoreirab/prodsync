@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 
 import { useMetaProducao } from "./hooks/useMetaProducao";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
@@ -10,8 +11,8 @@ export function MetaProducaoWidget({ operadorId }) {
 
   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar meta.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (!data) return <EmptyChartState title={"Meta da Produção"} message={"Nenhum dado encontrado."} />;
+  if (Array.isArray(data) && data.length === 0) return <EmptyChartState title={"Meta da Produção"} message={"Nenhum registro de meta disponível."} />;
 
 
   const chartData = [

@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 import { CustomPieChart } from "@/components/ui/charts/components/PieChart";
 import { useQualidade } from "./hooks/useQualidade";
 
@@ -11,8 +12,8 @@ export function QualidadeWidget({ operadorId }) {
   const { data, loading, error } = useQualidade(operadorId);
   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (!data) return <EmptyChartState title={"Média de Qualidade"} message={"Nenhum dado encontrado."} />;
+  if (Array.isArray(data) && data.length === 0) return <EmptyChartState title={"Média de Qualidade"} message={"Nenhum registro de qualidade disponível."} />;
   const chartData = [
     { name: "pecasBoas", value: data.pecasBoas },
     { name: "refugo", value: data.refugo },

@@ -492,7 +492,7 @@ class EventoController {
                     id_empresa,
                     id_maquina: escala.id_maquina,
                     id_motivo_parada: null,
-                    status_atual: { in: ['Parada', 'Manutencao', 'Setup'] }
+                    status_atual: { in: ['Parada', 'Setup'] }
                 },
                 include: {
                     maquina: { select: { id_maquina: true, nome: true } }

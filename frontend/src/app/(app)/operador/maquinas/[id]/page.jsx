@@ -57,7 +57,7 @@ export default function MaquinaDetalhePage({ params }) {
       setLoading(true);
 
       if (!Number.isInteger(maquinaId) || maquinaId <= 0) {
-        router.replace("/operador/maquinas");
+        router.replace("/operador/maquinas?semMaquina=1");
         return;
       }
 
@@ -73,7 +73,7 @@ export default function MaquinaDetalhePage({ params }) {
           );
 
           if (!idMaquinaAutorizada) {
-            router.replace("/operador/maquinas");
+            router.replace("/operador/maquinas?semMaquina=1");
             return;
           }
 
@@ -87,7 +87,7 @@ export default function MaquinaDetalhePage({ params }) {
         if (ativo) setMaquina(resp?.dados || resp);
       } catch (error) {
         console.error(error);
-        router.replace("/operador/maquinas");
+        router.replace("/operador/maquinas?semMaquina=1");
         return;
       }
 

@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 import { BarHorizontal } from "@/components/ui/charts/components/BarHorizontal";
 import { useOEEMaquina } from "./hooks/useOEEMaquina";
 
@@ -12,11 +13,11 @@ export function OEEMaquinaWidget({ operadorId }) {
 
   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando...</p>;
   if (error) return <p className="text-sm text-destructive">Erro.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
+  if (!data) return <EmptyChartState title={"OEE Médio da Máquina"} message={"Nenhum dado encontrado."} />;
   
   // Considerando que 'data' seja o array "dados" da sua API [ { oee: 100, ... } ]
   const listaDados = Array.isArray(data) ? data : [];
-  if (listaDados.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (listaDados.length === 0) return <EmptyChartState title={"OEE Médio da Máquina"} message={"Nenhum registro de OEE disponível."} />;
 
   // Pegamos o primeiro item do array de dados da API
   const metricasOriginais = listaDados[0];

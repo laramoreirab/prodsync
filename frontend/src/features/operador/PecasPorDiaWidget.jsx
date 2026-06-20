@@ -1,4 +1,5 @@
 "use client";
+import { EmptyChartState } from "@/components/ui/empty-chart-state";
 
 import { BarVerticalBase } from "@/components/ui/charts/components/BarVertical";
 import { usePecasPorDia } from "./hooks/usePecasPorDia";
@@ -9,8 +10,8 @@ export function PecasPorDiaWidget({ operadorId }) {
   
   if (loading) return <p className="text-sm text-muted-foreground">Sincronizando peças...</p>;
   if (error) return <p className="text-sm text-destructive">Erro ao carregar peças por dia.</p>;
-  if (!data) return <p className="text-xs text-muted-foreground">Nenhum dado encontrado.</p>;
-  if (Array.isArray(data) && data.length === 0) return <p className="text-xs text-muted-foreground">Nenhum registro disponível.</p>;
+  if (!data) return <EmptyChartState title={"Peças Produzidas"} message={"Nenhum dado encontrado."} />;
+  if (Array.isArray(data) && data.length === 0) return <EmptyChartState title={"Peças Produzidas"} message={"Nenhum registro de peças produzidas disponível."} />;
 
 
   return (
