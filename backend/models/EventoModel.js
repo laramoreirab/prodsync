@@ -230,7 +230,7 @@ class EventoModel {
                     ...(id_maquina ? { id_maquina } : {}),
                     id_motivo_parada: null,
                     status_atual: {
-                        in: ['Parada', 'Setup', 'Manutencao']
+                        in: ['Parada', 'Setup']
                     }
                 },
                 include: {
@@ -296,7 +296,7 @@ class EventoModel {
     }
 
     static requerJustificativa(status) {
-        return ['Parada', 'Setup', 'Manutencao'].includes(status);
+        return ['Parada', 'Setup'].includes(status);
     }
 
     static async obterUltimoEventoMaquina(id_empresa, id_maquina, db = prisma) {
@@ -310,23 +310,25 @@ class EventoModel {
     }
 
     static async validarPodeRegistrarEvento(id_empresa, id_maquina, db = prisma) {
-        const ultimoEvento = await this.obterUltimoEventoMaquina(id_empresa, id_maquina, db);
+        const eventoPendente = await db.historico_Eventos.findFirst({
+            where: {
+                id_empresa: Number(id_empresa),
+                id_maquina: Number(id_maquina),
+                id_motivo_parada: null,
+                status_atual: { in: ['Parada', 'Setup'] }
+            },
+            orderBy: [{ inicio: 'desc' }, { id_evento: 'desc' }]
+        });
 
-        if (
-            ultimoEvento &&
-            this.requerJustificativa(ultimoEvento.status_atual) &&
-            !ultimoEvento.id_motivo_parada &&
-            !ultimoEvento.termino
-        ) {
+        if (eventoPendente) {
             const erro = new Error(
-                `A máquina ${id_maquina} possui o evento #${ultimoEvento.id_evento} (${ultimoEvento.status_atual}) sem justificativa. Justifique-o antes de registrar um novo evento.`
+                `A maquina ${id_maquina} possui o evento #${eventoPendente.id_evento} (${eventoPendente.status_atual}) sem justificativa. Justifique-o antes de registrar um novo evento.`
             );
             erro.code = 'EVENTO_PENDENTE';
-            erro.id_evento = ultimoEvento.id_evento;
+            erro.id_evento = eventoPendente.id_evento;
             throw erro;
         }
     }
-
     static async fecharEventosAbertosMaquina(db, id_empresa, id_maquina, termino, idEventoMantido = null) {
         const eventosAbertos = await db.historico_Eventos.findMany({
             where: {
@@ -362,11 +364,13 @@ class EventoModel {
             if (!statusNormalizado) {
                 throw new Error(`Status de maquina invalido: ${status_maquina}`);
             }
+
             const empresaId = Number(id_empresa);
             const maquinaId = Number(id_maquina);
             const inicio = this.converterTimestamp(datastamp);
-            let status_op = null
-            let prioridade = null
+            let status_op = null;
+            let prioridade = null;
+
             const maquina = await prisma.maquinas.findFirst({
                 where: {
                     id_empresa: empresaId,
@@ -383,55 +387,81 @@ class EventoModel {
                 throw new Error('Maquina nao encontrada ou inativa');
             }
 
+            switch (statusNormalizado) {
+                case 'Produzindo':
+                    status_op = 'Em_Andamento';
+                    prioridade = 'Media';
+                    break;
+                case 'Setup':
+                    status_op = 'Setup';
+                    prioridade = 'Alta';
+                    break;
+                case 'Parada':
+                    status_op = 'Parada';
+                    prioridade = 'Critica';
+                    break;
+                default:
+                    console.warn(`[AVISO] Status de maquina desconhecido recebido: ${status_maquina}`);
+                    break;
+            }
+
+            const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(maquinaId);
+
+            const atualizarOrdemAtiva = async (tx) => {
+                if (ordemProducaoId && status_op) {
+                    await tx.ordemProducao.update({
+                        where: { id_ordem: ordemProducaoId },
+                        data: {
+                            status_op,
+                            prioridade
+                        }
+                    });
+                } else if (statusNormalizado === 'Produzindo' && !ordemProducaoId) {
+                    console.warn(`[ALERTA] Maquina ${maquinaId} esta PRODUZINDO, mas nenhuma OP ativa foi encontrada no sistema!`);
+                }
+            };
+
+            if (statusNormalizado === 'Produzindo') {
+                const resultado = await prisma.$transaction(async (tx) => {
+                    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${empresaId}::int, ${maquinaId}::int)`;
+
+                    const atualizada = await tx.maquinas.updateMany({
+                        where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
+                        data: { status_atual: statusNormalizado }
+                    });
+                    if (atualizada.count === 0) {
+                        throw new Error('Erro ao atualizar status da maquina');
+                    }
+
+                    await atualizarOrdemAtiva(tx);
+
+                    const ultimoEventoAberto = await tx.historico_Eventos.findFirst({
+                        where: {
+                            id_empresa: empresaId,
+                            id_maquina: maquinaId,
+                            termino: null
+                        },
+                        orderBy: [{ inicio: 'desc' }, { id_evento: 'desc' }]
+                    });
+
+                    await this.fecharEventosAbertosMaquina(tx, empresaId, maquinaId, inicio);
+
+                    return ultimoEventoAberto ?? {
+                        id_empresa: empresaId,
+                        id_maquina: maquinaId,
+                        status_atual: statusNormalizado,
+                        inicio,
+                        termino: inicio,
+                        duracao: 0
+                    };
+                });
+
+                return this.formatarEvento(resultado);
+            }
+
             const turno = await TurnoModel.obterTurnoAtual(empresaId, inicio);
             if (!turno) {
                 throw new Error('Nenhum turno ativo encontrado para o horario informado');
-            }
-
-            // Validacao feita dentro da transacao abaixo, apos adquirir a trava da maquina.
-
-            const atualizarMaquina = await prisma.maquinas.updateMany({
-                where:{ id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
-                data:{ status_atual: statusNormalizado }
-            })
-            if(atualizarMaquina.count === 0){
-                throw new Error('Erro ao atualizar status da máquina'); 
-            }
-
-            //fazer um if se o status for produzindo mudar status da op vinculada a máquina para em_andamento, se vier setup ou parada buscar a op ativa e setar status
-            switch (statusNormalizado) {
-                case 'Produzindo':
-                    status_op = 'Em_Andamento'
-                    prioridade = 'Media'
-                    break;
-
-                case 'Setup':
-                    status_op = 'Setup'
-                    prioridade = 'Alta'
-
-                    break;
-                case 'Parada':
-                    status_op = 'Parada'
-                    prioridade = 'Critica'
-                    break;
-                default:
-                    console.warn(`[AVISO] Status de máquina desconhecido recebido: ${status_maquina}`);
-                    break;
-            }
-
-            // busca a ordem de produção ativa da máquina
-            const ordemProducaoId = await OrdemProducaoModel.buscarOrdemAtiva(maquinaId);
-
-            if (ordemProducaoId && status_op) {
-                await prisma.ordemProducao.update({
-                    where: { id_ordem: ordemProducaoId },
-                    data: {
-                        status_op: status_op,
-                        prioridade: prioridade
-                    }
-                });
-            } else if (statusNormalizado === 'Produzindo' && !ordemProducaoId) {
-                console.warn(`[ALERTA] Maquina ${maquinaId} esta PRODUZINDO, mas nenhuma OP ativa foi encontrada no sistema!`);
             }
 
             const { resultado, criado } = await prisma.$transaction(async (tx) => {
@@ -443,6 +473,7 @@ class EventoModel {
                         where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
                         data: { status_atual: statusNormalizado }
                     });
+                    await atualizarOrdemAtiva(tx);
                     await this.fecharEventosAbertosMaquina(tx, empresaId, maquinaId, eventoAtual.inicio, eventoAtual.id_evento);
                     console.warn(`[AVISO] Ultimo evento da maquina ${maquinaId} ja e ${statusNormalizado}. Evento duplicado ignorado.`);
                     return { resultado: eventoAtual, criado: false };
@@ -467,13 +498,24 @@ class EventoModel {
                         where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
                         data: { status_atual: statusNormalizado }
                     });
+                    await atualizarOrdemAtiva(tx);
                     await this.fecharEventosAbertosMaquina(tx, empresaId, maquinaId, eventoDuplicadoRecente.inicio, eventoDuplicadoRecente.id_evento);
                     console.warn(`[AVISO] Evento ${statusNormalizado} duplicado em janela curta ignorado para a maquina ${maquinaId}.`);
                     return { resultado: eventoDuplicadoRecente, criado: false };
                 }
 
-                await this.fecharEventosAbertosMaquina(tx, empresaId, maquinaId, inicio);
                 await this.validarPodeRegistrarEvento(empresaId, maquinaId, tx);
+
+                const atualizada = await tx.maquinas.updateMany({
+                    where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
+                    data: { status_atual: statusNormalizado }
+                });
+                if (atualizada.count === 0) {
+                    throw new Error('Erro ao atualizar status da maquina');
+                }
+
+                await atualizarOrdemAtiva(tx);
+                await this.fecharEventosAbertosMaquina(tx, empresaId, maquinaId, inicio);
 
                 const eventoCriado = await tx.historico_Eventos.create({
                     data: {
@@ -501,7 +543,7 @@ class EventoModel {
                     resultado,
                     maquinaInfo?.nome ?? `Maquina ${maquinaId}`
                 ).catch((err) => {
-                    console.error('Erro ao criar notificações do evento:', err);
+                    console.error('Erro ao criar notificacoes do evento:', err);
                 });
             }
 
@@ -511,7 +553,6 @@ class EventoModel {
             throw error;
         }
     }
-
     static async registrarEventoSistema(id_empresa, status_maquina, setor_afetado, maquinas, inicio, fim, id_motivo_parada, observacao = null) {
         try {
             function capitalizar(texto) {
@@ -773,7 +814,7 @@ class EventoModel {
                 where: {
                     id_empresa,
                     ...(setorId ? { setor_afetado: Number(setorId) } : {}),
-                    status_atual: { in: ['Parada', 'Manutencao', 'Setup'] },
+                    status_atual: { in: ['Parada', 'Setup'] },
                     inicio: { gte: inicio, lte: fim },
                     duracao: { not: null }
                 },
@@ -842,7 +883,7 @@ class EventoModel {
                         not: null
                     },
                     status_atual: {
-                        in: ['Parada', 'Manutencao']
+                        in: ['Parada']
                     }
                 },
                 _count: {
@@ -1079,7 +1120,7 @@ class EventoModel {
                         not: null
                     },
                     status_atual: {
-                        in: ['Parada', 'Manutencao']
+                        in: ['Parada']
                     }
                 },
                 _sum: {
