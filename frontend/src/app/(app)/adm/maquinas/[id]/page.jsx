@@ -197,13 +197,22 @@ export default function MaquinaDetalhePage({ params }) {
   })();
 
   useEffect(() => {
-    async function carregarMaquina() {
-      setLoadingMaquina(true);
+    let cancelado = false;
+    let carregando = false;
+
+    async function carregarMaquina({ silent = false } = {}) {
+      if (carregando) return;
+      carregando = true;
+      if (!silent) setLoadingMaquina(true);
+
       try {
         const [respostaMaquina, respostaHistorico] = await Promise.all([
           maquinaCrudService.getById(maquinaId),
           apiFetch(`/api/maquinas/${maquinaId}/historico-eventos`),
         ]);
+
+        if (cancelado) return;
+
         setMaquina(respostaMaquina.dados || respostaMaquina);
         const historico = respostaHistorico.dados || [];
         const eventos = historico
@@ -232,10 +241,24 @@ export default function MaquinaDetalhePage({ params }) {
         setTodosApontamentos(apontamentos);
         setDadosApontamentoState(apontamentos);
       } finally {
-        setLoadingMaquina(false);
+        carregando = false;
+        if (!cancelado && !silent) setLoadingMaquina(false);
       }
     }
-    if (maquinaId) carregarMaquina();
+
+    if (!maquinaId) return undefined;
+
+    carregarMaquina();
+    const intervalo = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        carregarMaquina({ silent: true });
+      }
+    }, 5000);
+
+    return () => {
+      cancelado = true;
+      clearInterval(intervalo);
+    };
   }, [maquinaId]);
 
   useEffect(() => {

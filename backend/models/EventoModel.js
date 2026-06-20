@@ -416,7 +416,8 @@ class EventoModel {
                 },
                 select: {
                     id_maquina: true,
-                    id_setor: true
+                    id_setor: true,
+                    status_atual: true
                 }
             });
 
@@ -506,7 +507,11 @@ class EventoModel {
                 await tx.$executeRaw`SELECT pg_advisory_xact_lock(${empresaId}::int, ${maquinaId}::int)`;
 
                 const eventoAtual = await this.obterUltimoEventoMaquina(empresaId, maquinaId, tx);
-                if (eventoAtual?.status_atual === statusNormalizado) {
+                const statusAtualMaquina = this.normalizarStatusMaquina(maquina.status_atual);
+                const eventoIgualAberto = eventoAtual?.status_atual === statusNormalizado && eventoAtual?.termino === null;
+                const maquinaJaEstaNoStatus = statusAtualMaquina === statusNormalizado;
+
+                if (eventoAtual?.status_atual === statusNormalizado && (eventoIgualAberto || maquinaJaEstaNoStatus)) {
                     await tx.maquinas.updateMany({
                         where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
                         data: { status_atual: statusNormalizado }

@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { eventosCrudService } from '@/services/eventosCrudService';
 
+const EVENTOS_POLLING_INTERVAL_MS = 5000;
+
 export function useEventos() {
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   //carregar todos os eventos
-  const fetchEventos = useCallback(async () => {
-    setLoading(true);
+  const fetchEventos = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const lista = await eventosCrudService.getAllPages();
       setEventos(Array.isArray(lista) ? lista : []);
@@ -17,12 +19,20 @@ export function useEventos() {
       setError('Falha ao carregar eventos');
       console.error(err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchEventos();
+
+    const intervalo = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchEventos({ silent: true });
+      }
+    }, EVENTOS_POLLING_INTERVAL_MS);
+
+    return () => clearInterval(intervalo);
   }, [fetchEventos]);
 
   //registrar novo evento
