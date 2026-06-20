@@ -1,105 +1,44 @@
 "use client";
 
-import { CheckCircle2, EyeClosed, X, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-export const title = "Password Validation";
-
-const InputSenha = ({ value, onChange }) => {
+const InputSenha = ({ value, onChange, errorId }) => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const validations = [
-    { text: "At least 8 characters", valid: value.length >= 8 },
-    { text: "Contains a number", valid: /\d/.test(value) },
-    { text: "Contains uppercase letter", valid: /[A-Z]/.test(value) },
-    { text: "Contains special character", valid: /[!@#$%^&*]/.test(value) },
-  ];
-
-/*   const strength = validations.filter((v) => v.valid).length;
-
-  const getStrengthColor = (score) => {
-    if (score === 0) return "bg-muted";
-    if (score <= 1) return "bg-red-600";
-    if (score <= 2) return "bg-orange-500";
-    if (score <= 3) return "bg-teal-400";
-    return "bg-teal-500";
-  };
-
-  const getStrengthText = (score) => {
-    if (score === 0) return "";
-    if (score <= 1) return "Weak";
-    if (score <= 2) return "Moderate";
-    if (score <= 3) return "Strong";
-    return "Very Strong";
-  };
-
-  const getStrengthTextColor = (score) => {
-    if (score === 0) return "text-muted-foreground";
-    if (score <= 1) return "text-red-500";
-    if (score <= 2) return "text-orange-500";
-    if (score <= 3) return "text-teal-400";
-    return "text-teal-500";
-  }; */
-
   return (
-
-
-      
-      <div className="space-y-2">
-        <Label htmlFor="password-realtime">Confirmar Senha</Label>
-        <div className="relative">
-          <Input
-            className="bg-transparent [&::-ms-reveal]:hidden h-10"
-            id="confirm-password"
-            onChange={onChange}
-            type={showPassword ? "text" : "password"}
-            value={value} />
-          <Button
-            className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
-            onClick={() => setShowPassword(!showPassword)}
-            size="icon"
-            type="button"
-            variant="ghost">
-            {showPassword ? (
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <EyeOff className="h-4 w-4 text-muted-foreground" />
-            )}
-          </Button>
-        </div>
-
-         
-{/*  <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs font-medium">
-          <span className={getStrengthTextColor(strength)}>
-            {getStrengthText(strength)}
-          </span>
-        </div>
+    <div className="space-y-2">
+      <Label htmlFor="confirm-password">Confirmar Senha</Label>
+      <div className="relative">
+        <Input
+          id="confirm-password"
+          name="confirmPassword"
+          className="bg-transparent [&::-ms-reveal]:hidden h-10 pr-10"
+          onChange={onChange}
+          type={showPassword ? "text" : "password"}
+          value={value}
+          autoComplete="new-password"
+          required
+          aria-describedby={errorId}
+        />
+        <Button
+          className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
+          size="icon"
+          type="button"
+          variant="ghost"
+          aria-label={showPassword ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
+        >
+          {showPassword ? (
+            <Eye aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <EyeOff aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
       </div>
-      <div className="space-y-1.5 pt-1">
-        {validations.map((validation, index) => (
-          <div
-            className={`flex items-center gap-2 text-sm transition-colors duration-200 ${
-              validation.valid
-                ? "text-green-500"
-                : "text-muted-foreground"
-            }`}
-            key={index}>
-            {validation.valid ? (
-              <CheckCircle2 className="h-3.5 w-3.5" />
-            ) : (
-              <X className="h-3.5 w-3.5" />
-            )}
-            <span className="text-[13px]">{validation.text}</span>
-          </div>
-        ))}
-      </div> */}
-
-
-
     </div>
   );
 };

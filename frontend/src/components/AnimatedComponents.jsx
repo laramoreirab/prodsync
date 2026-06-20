@@ -123,12 +123,13 @@ function getViewportMotionProps(shouldReduce, once = true) {
 export function PageLayout({
   children,
   className,
+  id = "conteudo-principal",
   padded = true,
   bg,
   center = false,
 }) {
   return (
-    <main className={cn("relative min-h-screen flex flex-col bg-transparent dark:bg-zinc-950", className)}>
+    <main id={id} className={cn("relative min-h-screen flex flex-col bg-transparent dark:bg-zinc-950", className)}>
       {/* Light mode: SVG aparece normalmente */}
       <div
         className="fixed inset-0 -z-10 bg-no-repeat dark:hidden"

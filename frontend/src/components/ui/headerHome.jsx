@@ -20,16 +20,16 @@ const CollaborateButton = ({ className, href = "/cadastro" }) => (
       "cursor-pointer",
     )}
   >
-    <Link href={href}>
+    <Link href={href} aria-label="Cadastre-se no ProdSync">
       <span className="relative z-10 transition-all duration-500">Cadastre-se</span>
-      <span className="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
-        <ArrowUpRight size={16} />
+      <span aria-hidden="true" className="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground transition-all duration-500 group-hover:right-[calc(100%-36px)] group-hover:rotate-45">
+        <ArrowUpRight aria-hidden="true" size={16} />
       </span>
     </Link>
   </Button>
 );
 
-const Header = ({ navigationData, className }) => {
+const Header = ({ navigationData, className, showCadastroButton = true }) => {
   const [sticky, setSticky] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -74,7 +74,7 @@ const Header = ({ navigationData, className }) => {
         )}
       >
         <div>
-          <a href="/">
+          <a href="/" aria-label="Ir para a página inicial do ProdSync">
             <Logo className="gap-3" />
           </a>
         </div>
@@ -100,25 +100,25 @@ const Header = ({ navigationData, className }) => {
         </div>
 
         <div className="flex gap-4">
-          <CollaborateButton className="hidden lg:flex" />
+          {showCadastroButton && <CollaborateButton className="hidden lg:flex" />}
 
           <div className="lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger id="mobile-menu-trigger">
+              <SheetTrigger id="mobile-menu-trigger" type="button" aria-label="Abrir menu de navegação">
                 <span className="block rounded-full border border-border p-2">
-                  <Menu width={20} height={20} />
+                  <Menu aria-hidden="true" width={20} height={20} />
                   <span className="sr-only">Menu</span>
                 </span>
               </SheetTrigger>
 
               <SheetContent showCloseButton={false} side="right" className="w-full border-l-0 p-0 sm:w-96">
                 <div className="flex items-center justify-between p-6">
-                  <a href="#">
+                  <a href="/" aria-label="Ir para a página inicial do ProdSync">
                     <Logo className="gap-2" />
                   </a>
-                  <SheetClose id="mobile-menu-close">
+                  <SheetClose id="mobile-menu-close" type="button" aria-label="Fechar menu de navegação">
                     <span className="block rounded-full border border-border p-2.5">
-                      <X width={16} height={16} />
+                      <X aria-hidden="true" width={16} height={16} />
                     </span>
                   </SheetClose>
                 </div>
@@ -154,9 +154,11 @@ const Header = ({ navigationData, className }) => {
                       </NavigationMenuList>
                     </NavigationMenu>
 
-                    <div className="w-fit">
-                      <CollaborateButton />
-                    </div>
+                    {showCadastroButton && (
+                      <div className="w-fit">
+                        <CollaborateButton />
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-auto flex flex-col gap-4">

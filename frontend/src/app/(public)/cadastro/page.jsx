@@ -1,3 +1,11 @@
+export const metadata = {
+  title: "Cadastro",
+  description:
+    "Crie sua conta no ProdSync para acompanhar máquinas, paradas, operadores e indicadores de produção em tempo real.",
+  alternates: {
+    canonical: "/cadastro",
+  },
+};
 import RegisterForm from "@/components/ui/formCadastro";
 import LeftCards from "@/components/ui/leftCadastro";
 import Header from "@/components/ui/headerHome";
@@ -11,22 +19,22 @@ export default function RegisterPage() {
     },
     {
       title: "Sobre nós",
-      href: "#about-us",
+      href: "/#sobre-nos",
     },
     {
       title: "Serviços",
-      href: "#servicos",
+      href: "/#servicos",
     },
     {
       title: "FAQs",
-      href: "#faqs",
+      href: "/#faqs",
     },
   ];
 
   return (
     <>
-      <Header navigationData={navigationData} />
-      <main className="h-[calc(100vh-80px)] min-h-0 grid grid-cols-1 md:grid-cols-[55%_45%] bg-gray-100 overflow-hidden">
+      <Header navigationData={navigationData} showCadastroButton={false} />
+      <main id="conteudo-principal" className="h-[calc(100vh-80px)] min-h-0 grid grid-cols-1 md:grid-cols-[55%_45%] bg-gray-100 overflow-hidden">
         <div className="hidden min-h-0 md:flex items-center justify-end pr-4 lg:pr-8 relative overflow-hidden">
           <LeftCards />
         </div>

@@ -1,6 +1,10 @@
-const Logo = (props) => {
+const Logo = ({ className = "", title = "ProdSync", decorative = false, ...props }) => {
   return (
-    <div className="flex items-center gap-2.5">
+    <div
+      className={["flex items-center gap-2.5", className].filter(Boolean).join(" ")}
+      {...props}
+      {...(decorative ? { "aria-hidden": "true" } : { role: "img", "aria-label": title })}
+    >
       {/* <svg
         width="147"
         height="40"
@@ -19,7 +23,7 @@ const Logo = (props) => {
           className="dark:fill-[#FFFFFF]" />
       </svg> */}
 
-      <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+      <svg version="1.0" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
         width="170"
         height="120"
         viewBox="0 0 1366.000000 768.000000"

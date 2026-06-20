@@ -33,14 +33,14 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-16 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-5">
-            <a href="/" className="inline-block">
+            <a href="/" aria-label="Ir para a página inicial do ProdSync" className="inline-block">
               <img
                 src="/logo.png"
                 alt="ProdSync"
                 className="h-9 w-auto sm:h-10"
               />
             </a>
-            <p className="mt-4 max-w-sm text-base leading-relaxed text-muted-foreground">
+            <p className="mt-4 max-w-sm text-base leading-relaxed text-slate-700">
               Sua fábrica sincronizada em tempo real e sob controle.
             </p>
           </div>
@@ -49,12 +49,12 @@ const Footer = () => {
             <p className="text-xs font-semibold uppercase tracking-widest text-[#23304c]/70">
               Navegação
             </p>
-            <nav className="mt-4 flex flex-col gap-2.5">
+            <nav aria-label="Navegação do rodapé" className="mt-4 flex flex-col gap-2.5">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-[#23304c]"
+                  className="text-sm text-slate-700 transition-colors hover:text-[#23304c]"
                 >
                   {link.title}
                 </a>
@@ -72,7 +72,7 @@ const Footer = () => {
                 const content = (
                   <>
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#23304c]/6 text-[#23304c]">
-                      <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+                      <Icon aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
                     </span>
                     <span className="text-sm leading-snug">{item.label}</span>
                   </>
@@ -83,12 +83,12 @@ const Footer = () => {
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="group flex items-center gap-3 text-muted-foreground transition-colors hover:text-[#23304c]"
+                        className="group flex items-center gap-3 text-slate-700 transition-colors hover:text-[#23304c]"
                       >
                         {content}
                       </a>
                     ) : (
-                      <div className="flex items-center gap-3 text-muted-foreground">
+                      <div className="flex items-center gap-3 text-slate-700">
                         {content}
                       </div>
                     )}
@@ -101,7 +101,7 @@ const Footer = () => {
 
         <Separator className="my-8 bg-[#23304c]/10" />
 
-        <p className="text-center text-xs text-muted-foreground sm:text-sm">
+        <p className="text-center text-xs text-slate-700 sm:text-sm">
           © 2026 ProdSync. Todos os direitos reservados.
         </p>
       </div>

@@ -158,7 +158,7 @@ export default function RegisterForm() {
         </div>
 
         {erros.geral && (
-          <p className="text-sm text-destructive text-center">{erros.geral}</p>
+          <p id="cadastro-error" role="alert" className="text-sm text-destructive text-center">{erros.geral}</p>
         )}
 
         <Button
@@ -171,9 +171,7 @@ export default function RegisterForm() {
 
         <p className="text-sm text-center text-muted-foreground">
           Já tem uma conta?{" "}
-          <span className="font-medium text-foreground cursor-pointer hover:underline">
-            Entrar
-          </span>
+          <button type="button" onClick={handleIrLogin} className="font-medium text-foreground cursor-pointer hover:underline">Entrar</button>
         </p>
       </div>
 
@@ -187,6 +185,20 @@ export default function RegisterForm() {
 }
 
 // ← mascara é opcional: se não passar, comportamento normal
+function getAutoComplete(campo) {
+  const mapa = {
+    nome_empresa: "organization",
+    cnpj: "off",
+    telefone: "tel",
+    endereco: "street-address",
+    email: "email",
+    nome_representante: "name",
+    cpf: "off",
+  };
+
+  return mapa[campo] ?? "off";
+}
+
 function FormField({
   label,
   campo,
@@ -204,19 +216,25 @@ function FormField({
 
   return (
     <div className="space-y-1">
-      <Label className="text-xs font-medium text-slate-900">{label}</Label>
+      <Label htmlFor={campo} className="text-xs font-medium text-slate-900">{label}</Label>
       <Input
+        id={campo}
+        name={campo}
         type={type}
         className="h-9"
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
+        autoComplete={getAutoComplete(campo)}
         aria-invalid={!!erro}
+        aria-describedby={erro ? `${campo}-erro` : undefined}
+        required
       />
-      {erro && <p className="text-xs text-destructive">{erro}</p>}
+      {erro && <p id={`${campo}-erro`} role="alert" className="text-xs text-destructive">{erro}</p>}
     </div>
   );
 }
+
 function SenhaField({ value, erro, onChange }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -229,16 +247,20 @@ function SenhaField({ value, erro, onChange }) {
 
   return (
     <div className="space-y-1">
-      <Label className="text-xs font-medium text-slate-900">Senha</Label>
+      <Label htmlFor="senha" className="text-xs font-medium text-slate-900">Senha</Label>
       <div className="relative">
         <Input
           className="h-9 pr-10 [&::-ms-reveal]:hidden"
           id="senha"
+          name="senha"
           placeholder="••••••••"
           type={showPassword ? "text" : "password"}
           value={value}
           onChange={(e) => onChange("senha", e.target.value)}
           aria-invalid={!!erro}
+          aria-describedby={erro ? "senha-erro" : undefined}
+          autoComplete="new-password"
+          required
         />
         <Button
           className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
@@ -246,58 +268,59 @@ function SenhaField({ value, erro, onChange }) {
           size="icon"
           type="button"
           variant="ghost"
+          aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
         >
           {showPassword ? (
-            <Eye className="h-4 w-4 text-muted-foreground" />
+            <Eye aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <EyeOff className="h-4 w-4 text-muted-foreground" />
+            <EyeOff aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
           )}
         </Button>
       </div>
-        <AnimatePresence>
-  {value.length > 0 && (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className="overflow-hidden"
-    >
-      <motion.div
-        className="space-y-1 pt-1"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: {},
-          visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-        }}
-      >
-        {validacoes.map((v, i) => (
+
+      <AnimatePresence>
+        {value.length > 0 && (
           <motion.div
-            key={i}
-            variants={{
-              hidden: { opacity: 0, x: -8 },
-              visible: { opacity: 1, x: 0, transition: { duration: 0.2, ease: "easeOut" } },
-            }}
-            className={`flex items-center gap-2 transition-colors duration-300 ${
-              v.valido ? "text-green-500" : "text-muted-foreground"
-            }`}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="overflow-hidden"
           >
-            {v.valido ? (
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            ) : (
-              <X className="h-3.5 w-3.5 shrink-0" />
-            )}
-            <span className="text-[13px]">{v.texto}</span>
+            <motion.div
+              className="space-y-1 pt-1"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
+              }}
+            >
+              {validacoes.map((v, i) => (
+                <motion.div
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, x: -8 },
+                    visible: { opacity: 1, x: 0, transition: { duration: 0.2, ease: "easeOut" } },
+                  }}
+                  className={`flex items-center gap-2 transition-colors duration-300 ${
+                    v.valido ? "text-green-500" : "text-muted-foreground"
+                  }`}
+                >
+                  {v.valido ? (
+                    <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                  ) : (
+                    <X aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                  )}
+                  <span className="text-[13px]">{v.texto}</span>
+                </motion.div>
+              ))}
+            </motion.div>
           </motion.div>
-        ))}
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+        )}
+      </AnimatePresence>
 
-
-      {erro && <p className="text-xs text-destructive">{erro}</p>}
+      {erro && <p id="senha-erro" role="alert" className="text-xs text-destructive">{erro}</p>}
     </div>
   );
 }

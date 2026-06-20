@@ -1,3 +1,11 @@
+export const metadata = {
+  title: "Primeiro acesso",
+  description:
+    "Configure sua primeira senha e acesse sua conta ProdSync com segurança.",
+  alternates: {
+    canonical: "/primeiro-acesso",
+  },
+};
 import CriarSenha from "@/components/ui/cardCriarSenha";
 import Header from "@/components/ui/headerHome";
 
@@ -11,22 +19,24 @@ export default function Home() {
     },
     {
       title: "Sobre nós",
-      href: "#about-us",
+      href: "/#sobre-nos",
     },
     {
       title: "Serviços",
-      href: "#servicos",
+      href: "/#servicos",
     },    
     {
       title: "FAQs",
-      href: "#faqs",
+      href: "/#faqs",
     }
   ];
 
   return (
     <>
     <Header navigationData={navigationData} />
-      <CriarSenha />
+      <main id="conteudo-principal">
+        <CriarSenha />
+      </main>
     </>
   );
 }

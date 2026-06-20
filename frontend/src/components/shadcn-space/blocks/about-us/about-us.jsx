@@ -94,7 +94,7 @@ const AboutUs = ({
                     <Plus strokeWidth={3.5} className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12" />
                     <AnimatedCounter value={value.count} isInView={isInView} />
                   </div>
-                  <p className="text-base font-normal text-muted-foreground text-center">
+                  <p className="text-base font-normal text-slate-700 text-center">
                     {value.title}
                   </p>
                 </div>

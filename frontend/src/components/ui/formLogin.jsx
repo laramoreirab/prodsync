@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import SuccessCard from "@/components/ui/modalCadastro";
 import { setAuthToken } from "@/lib/auth";
 
@@ -13,16 +13,15 @@ const REMEMBER_ID_KEY = "rememberedLoginId";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function LoginForm() {
-    const router = useRouter()
+    const router = useRouter();
 
     const [open, setOpen] = useState(false);
     const [id, setId] = useState("");
     const [senha, setSenha] = useState("");
     const [lembrarDeMim, setLembrarDeMim] = useState(false);
-    const [carregando, setSincronizando] = useState(false)
-    const [erro, setErro] = useState("")
+    const [carregando, setSincronizando] = useState(false);
+    const [erro, setErro] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-
 
     useEffect(() => {
         const rememberedId = localStorage.getItem(REMEMBER_ID_KEY);
@@ -33,26 +32,22 @@ export default function LoginForm() {
     }, []);
 
     async function handleLogin() {
-        setSincronizando(true)
-        setErro("")
-
+        setSincronizando(true);
+        setErro("");
 
         try {
             const res = await fetch(`${API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id, senha, lembrarDeMim })
-            })
+            });
 
-            const data = await res.json()
-
-            console.log(data)
+            const data = await res.json();
 
             if (!res.ok) {
-                setErro(data.mensagem)
-                return
+                setErro(data.mensagem);
+                return;
             }
-
 
             setAuthToken(data.dados.token, lembrarDeMim);
 
@@ -62,55 +57,67 @@ export default function LoginForm() {
                 localStorage.removeItem(REMEMBER_ID_KEY);
             }
 
-
-            //redireciona pelo tipo que vem no token
-            if (data.dados.tipo === "Adm") router.push("/adm")
-            if (data.dados.tipo === "Gestor") router.push("/gestor")
-            if (data.dados.tipo === "Operador") router.push("/operador")
-
+            if (data.dados.tipo === "Adm") router.push("/adm");
+            if (data.dados.tipo === "Gestor") router.push("/gestor");
+            if (data.dados.tipo === "Operador") router.push("/operador");
         } catch (error) {
-            setErro("Erro de conexão com o servidor")
+            setErro("Erro de conexão com o servidor");
         } finally {
-            setSincronizando(false)
+            setSincronizando(false);
         }
     }
 
     return (
         <>
             <div className="login-card-shell w-95 gap-0 space-y-4 rounded-[36px] bg-white px-8 pb-8 pt-10 lg:min-w-120 lg:px-10 lg:pb-10 lg:pt-15">
-
-                {/* TITULO */}
                 <div className="space-y-1">
                     <h1 className="text:2x1 sm:text-3xl font-semibold tracking-tight">
                         Bem-vindo de volta!
                     </h1>
-                    <p className="text-md text-muted-foreground font-medium">
+                    <p className="text-md text-slate-700 font-medium">
                         Faça seu login.
                     </p>
                 </div>
 
-                {/* FORM */}
                 <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
                     <div className="flex flex-col gap-8 mt-5">
                         <div className="grid gap-3">
-                            <Label className="text-[#545454] font-medium mt-5">Identificador</Label>
-                            <Input className="h-9" placeholder="Ex: 11111111"
-                                value={id} onChange={(e) => setId(e.target.value)} />
+                            <Label htmlFor="login-id" className="text-[#545454] font-medium mt-5">
+                                Identificador
+                            </Label>
+                            <Input
+                                id="login-id"
+                                name="id"
+                                className="h-9"
+                                placeholder="Ex: 11111111"
+                                value={id}
+                                onChange={(e) => setId(e.target.value)}
+                                autoComplete="username"
+                                inputMode="numeric"
+                                required
+                                aria-describedby={erro ? "login-error" : undefined}
+                            />
                         </div>
 
                         <div className="grid gap-3">
                             <div className="flex items-center">
-                                <Label className="font-medium text-[#545454]">Senha</Label>
+                                <Label htmlFor="login-senha" className="font-medium text-[#545454]">
+                                    Senha
+                                </Label>
                             </div>
 
-                            {/* Container relativo para prender o botão absoluto */}
                             <div className="relative flex items-center">
                                 <Input
+                                    id="login-senha"
+                                    name="senha"
                                     className="h-9 w-full pr-10"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
                                     value={senha}
                                     onChange={(e) => setSenha(e.target.value)}
+                                    autoComplete="current-password"
+                                    required
+                                    aria-describedby={erro ? "login-error" : undefined}
                                 />
                                 <button
                                     type="button"
@@ -119,13 +126,14 @@ export default function LoginForm() {
                                     aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-4 w-4" />
+                                        <EyeOff aria-hidden="true" className="h-4 w-4" />
                                     ) : (
-                                        <Eye className="h-4 w-4" />
+                                        <Eye aria-hidden="true" className="h-4 w-4" />
                                     )}
                                 </button>
                             </div>
                         </div>
+
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mt-2">
                             <label className="flex items-center gap-2 cursor-pointer group">
                                 <input
@@ -139,7 +147,7 @@ export default function LoginForm() {
                                 </span>
                             </label>
                             <a
-                                href="#"
+                                href="mailto:prodsync@gmail.com?subject=Recuperação%20de%20senha"
                                 className="hover:underline font-semibold text-sm transition-all"
                             >
                                 Esqueceu sua senha?
@@ -147,25 +155,22 @@ export default function LoginForm() {
                         </div>
                     </div>
 
-                    {/* erro vindo do backend */}
-                    {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
+                    {erro && <p id="login-error" role="alert" className="text-red-500 text-sm mt-3">{erro}</p>}
 
-                    {/* BUTTON LOGIN */}
-                    <Button id="btn_login"
+                    <Button
+                        id="btn_login"
                         type="submit"
                         disabled={carregando}
-                        className="mt-5 h-9 w-full cursor-pointer rounded-lg bg-primary py-3 text-sm font-semibold text-white shadow-md lg:mt-8">
+                        className="mt-5 h-9 w-full cursor-pointer rounded-lg bg-primary py-3 text-sm font-semibold text-white shadow-md lg:mt-8"
+                    >
                         {carregando ? "Entrando..." : "Entrar"}
                     </Button>
                 </form>
 
-                {/* AINDA NÃO TEM UMA CONTA */}
                 <p className="text-sm text-center font-medium text-[#545454]">
                     Não tem uma conta?{" "}
-                    <a href="/cadastro">
-                        <span className="cursor-pointer font-semibold text-foreground hover:underline">
-                            Cadastre-se
-                        </span>
+                    <a href="/cadastro" className="font-semibold text-foreground hover:underline">
+                        Cadastre-se
                     </a>
                 </p>
 
@@ -176,8 +181,6 @@ export default function LoginForm() {
                 </div>
             </div>
 
-
-            {/* MODAL*/}
             {open && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <SuccessCard
@@ -186,20 +189,6 @@ export default function LoginForm() {
                     />
                 </div>
             )}
-
-
         </>
-    );
-}
-
-/* FORM */
-function FormField({ label, placeholder }) {
-    return (
-        <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">
-                {label}
-            </Label>
-            <Input className="h-9" placeholder={placeholder} />
-        </div>
     );
 }

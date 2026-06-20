@@ -12,12 +12,13 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import InputSenha from "./inputSenha";
 import { useState } from "react";
-import { CircleCheck, CircleX, Eye, EyeOff, Key} from "lucide-react";
+import { CircleCheck, CircleX, Eye, EyeOff } from "lucide-react";
 import { apiFetch } from "@/lib/api"
 import { setAuthToken } from "@/lib/auth";
 import { toast } from "sonner";
 
 export default function CriarSenha() {
+    const router = useRouter();
 
     // Controle de Etapas
     const [step, setStep] = useState(1)
@@ -113,7 +114,7 @@ export default function CriarSenha() {
                     <Card className="px-6 py-8 sm:p-12 relative gap-6 animate-in fade-in zoom-in-95 duration-300">
                         <CardHeader className="text-center gap-6 p-0 mb-2">
                             <div className="mx-auto">
-                                <img src="/logo.svg" alt="shadcnspace" className="h-20 w-20" />
+                                <img src="/logo.svg" alt="ProdSync" className="h-20 w-20" />
                             </div>
 
                             <div className="flex flex-col gap-1">
@@ -134,7 +135,11 @@ export default function CriarSenha() {
                                             value={userId}
                                             onChange={(e) => setUserId(e.target.value)}
                                             className="bg-transparent h-10 mb-2"
+                                            name="id"
+                                            autoComplete="username"
+                                            inputMode="numeric"
                                             required
+                                            aria-describedby={erro ? "primeiro-acesso-error" : undefined}
                                         />
                                     </Field>
 
@@ -159,7 +164,7 @@ export default function CriarSenha() {
                     </Card>
 
                     {/* erro vindo do backend */}
-                    {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
+                    {erro && <p id="primeiro-acesso-error" role="alert" className="text-red-500 text-sm mt-3">{erro}</p>}
                 </div>
             )}
 
@@ -176,10 +181,10 @@ export default function CriarSenha() {
                     <Card className="px-6 py-8 sm:p-12 relative gap-6">
                         <CardHeader className="text-center gap-6 p-0">
                             <div className="mx-auto">
-                                <a href="">
+                                <a href="/" aria-label="Ir para a pagina inicial">
                                     <img
                                         src="/logo.svg"
-                                        alt="shadcnspace"
+                                        alt="ProdSync"
                                         className="h-20 w-20" />
                                 </a>
                             </div>
@@ -205,17 +210,23 @@ export default function CriarSenha() {
                                                     id="password-realtime"
                                                     onChange={(e) => setPassword(e.target.value)}
                                                     type={showPassword ? "text" : "password"}
-                                                    value={password} />
+                                                    value={password}
+                                                    name="password"
+                                                    autoComplete="new-password"
+                                                    required
+                                                    aria-describedby={erro ? "criar-senha-error" : undefined}
+                                                />
                                                 <Button
                                                     className="absolute top-0 right-0 h-full px-3 hover:bg-transparent cursor-pointer"
                                                     onClick={(e) => { e.preventDefault(); setShowPassword(!showPassword); }}
                                                     size="icon"
                                                     type="button"
-                                                    variant="ghost">
+                                                    variant="ghost"
+                                                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}>
                                                     {showPassword ? (
-                                                        <Eye className="h-4 w-4 text-muted-foreground" />
+                                                        <Eye aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
                                                     ) : (
-                                                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                                        <EyeOff aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
                                                     )}
                                                 </Button>
 
@@ -233,9 +244,9 @@ export default function CriarSenha() {
                                                         }`}
                                                     key={index}>
                                                     {validation.valid ? (
-                                                        <CircleCheck className="h-3.5 w-3.5" />
+                                                        <CircleCheck aria-hidden="true" className="h-3.5 w-3.5" />
                                                     ) : (
-                                                        <CircleX className="h-3.5 w-3.5" />
+                                                        <CircleX aria-hidden="true" className="h-3.5 w-3.5" />
                                                     )}
                                                     <span className="text-[13px]">{validation.text}</span>
                                                 </div>
@@ -249,11 +260,12 @@ export default function CriarSenha() {
                                             <InputSenha
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                                            errorId={erro ? "criar-senha-error" : undefined}
                                             />
 
                                         </Field>
                                         {/* erro vindo do backend */}
-                                        {erro && <p className="text-red-500 text-sm mt-3">{erro}</p>}
+                                        {erro && <p id="criar-senha-error" role="alert" className="text-red-500 text-sm mt-3">{erro}</p>}
                                     </div>
 
 

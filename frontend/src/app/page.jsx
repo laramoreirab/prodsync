@@ -1,3 +1,11 @@
+export const metadata = {
+  title: "ProdSync | Gestão industrial em tempo real",
+  description:
+    "Sincronize sua fábrica em tempo real com dashboards de máquinas, paradas, operadores, apontamentos e indicadores industriais.",
+  alternates: {
+    canonical: "/",
+  },
+};
 import AgencyHeroSection from "@/components/shadcn-space/blocks/hero";
 import AboutAndStats01 from "@/components/shadcn-space/blocks/about-us";
 import Pricing from "@/components/shadcn-space/blocks/pricing/pricing";
@@ -33,18 +41,21 @@ export default function Home() {
     <>
       <HomeAuthRedirect />
 
-      <div className="home-plexus-region relative min-h-[100svh] bg-white">
-        <HomeMeshBackground />
-        <div className="relative z-10">
-          <Header navigationData={navigationData} />
-          <AgencyHeroSection />
-        </div>
-      </div>
+      <main id="conteudo-principal">
+        <section className="home-plexus-region relative min-h-[100svh] bg-white">
+          <HomeMeshBackground />
+          <div className="relative z-10">
+            <Header navigationData={navigationData} />
+            <AgencyHeroSection />
+          </div>
+        </section>
 
-      <AboutAndStats01 />
-      <Pricing />
-      <Testimonial01 />
-      <Faq />
+        <AboutAndStats01 />
+        <Pricing />
+        <Testimonial01 />
+        <Faq />
+      </main>
+
       <Footer />
     </>
   );

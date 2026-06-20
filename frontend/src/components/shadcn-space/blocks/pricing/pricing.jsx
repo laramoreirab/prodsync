@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Check, Flame } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 const pricingData = [
   {
@@ -139,16 +140,18 @@ const Pricing = () => {
                           <li
                             key={idx}
                             className="flex items-center gap-3 text-base font-normal text-muted-foreground">
-                            <Check className="size-4 text-primary shrink-0" />
+                            <Check aria-hidden="true" className="size-4 text-primary shrink-0" />
                             {feature}
                           </li>
                         ))}
                       </ul>
 
                       <Button
+                        asChild
                         className="w-full h-12 cursor-pointer"
-                        variant={isFeatured ? "default" : "outline"}>
-                        Comece já
+                        variant={isFeatured ? "default" : "outline"}
+                      >
+                        <Link href="/cadastro">Comece já</Link>
                       </Button>
 
                     </CardContent>

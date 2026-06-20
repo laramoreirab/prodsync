@@ -160,7 +160,7 @@ const TableListagens = ({
       )}
 
       <div className="overflow-x-auto rounded-lg border border-slate-200/40 bg-transparent w-full dark:border-[#1d2d49]/40">
-        <Table className="overflow-auto bg-transparent">
+        <Table className="overflow-auto bg-transparent" aria-label="Tabela de dados">
           <TableHeader className="bg-transparent">
             <TableRow className="font-semibold h-14 text-[#17233b] bg-transparent border-slate-200/40 hover:bg-transparent dark:border-[#1d2d49]/40 dark:text-[#e7eefc] dark:hover:bg-transparent">
               {enableSelection && (
@@ -205,7 +205,7 @@ const TableListagens = ({
                     <Checkbox
                       checked={row.getIsSelected()}
                       onCheckedChange={(value) => row.toggleSelected(!!value)}
-                      aria-label="Selecionar linha"
+                      aria-label={`Selecionar linha ${row.index + 1}`}
                       className="cursor-pointer"
                     />
                   </TableCell>
@@ -230,8 +230,10 @@ const TableListagens = ({
                           <Button
                             variant="outline"
                             className="border-none bg-transparent cursor-pointer text-slate-600 hover:bg-slate-100/20 dark:text-[#aebbd1] dark:hover:bg-[#17253f]/30"
+
+                            aria-label="Abrir ações da linha"
                           >
-                            <EllipsisVertical />
+                            <EllipsisVertical aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
 
@@ -284,6 +286,9 @@ const TableListagens = ({
                       variant="ghost"
                       className={`h-7 min-w-7 rounded-full px-2 text-[11px] sm:text-xs cursor-pointer border ${page === currentPage ? "border-primary/20 bg-primary/10 text-primary dark:border-[#6f9bff]/30 dark:bg-[#17345f]/40 dark:text-[#dbe8ff]" : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100/10 dark:text-[#aebbd1] dark:hover:bg-[#17253f]/20"}`}
                       onClick={() => table.setPageIndex(page - 1)}
+
+                      aria-label={`Ir para a página ${page}`}
+                      aria-current={page === currentPage ? "page" : undefined}
                     >
                       {page}
                     </Button>
