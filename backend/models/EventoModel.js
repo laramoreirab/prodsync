@@ -146,8 +146,43 @@ class EventoModel {
         return maquina?.id_maquina ?? null;
     }
 
+    static async encerrarEventosJustificadosAbertos(id_empresa, id_maquina = null, db = prisma) {
+        const maquinaId = Number(id_maquina);
+        const filtroMaquina = Number.isInteger(maquinaId) && maquinaId > 0
+            ? { id_maquina: maquinaId }
+            : {};
+        const termino = new Date();
+        const eventos = await db.historico_Eventos.findMany({
+            where: {
+                id_empresa: Number(id_empresa),
+                ...filtroMaquina,
+                id_motivo_parada: { not: null },
+                termino: null,
+                status_atual: { in: ['Parada', 'Setup'] }
+            },
+            select: {
+                id_evento: true,
+                inicio: true
+            }
+        });
+
+        for (const evento of eventos) {
+            await db.historico_Eventos.updateMany({
+                where: {
+                    id_empresa: Number(id_empresa),
+                    id_evento: evento.id_evento
+                },
+                data: {
+                    termino,
+                    duracao: this.calcularDuracao(evento.inicio, termino)
+                }
+            });
+        }
+    }
     static async listarTodos(id_empresa, paginacao, setorId = null) {
         try {
+            await this.encerrarEventosJustificadosAbertos(id_empresa);
+
             const regrasDaBusca = {
                 where: {
                     id_empresa,
@@ -192,6 +227,8 @@ class EventoModel {
                     }
                 };
             }
+
+            await this.encerrarEventosJustificadosAbertos(id_empresa, id_maquina);
 
             const regrasDaBusca = {
                 where: { id_empresa, id_maquina },
@@ -424,6 +461,7 @@ class EventoModel {
             if (statusNormalizado === 'Produzindo') {
                 const resultado = await prisma.$transaction(async (tx) => {
                     await tx.$executeRaw`SELECT pg_advisory_xact_lock(${empresaId}::int, ${maquinaId}::int)`;
+                    await this.validarPodeRegistrarEvento(empresaId, maquinaId, tx);
 
                     const atualizada = await tx.maquinas.updateMany({
                         where: { id_empresa: empresaId, id_maquina: maquinaId, ativo: true },
@@ -725,6 +763,23 @@ class EventoModel {
                 });
             }
 
+            const eventoAtual = await prisma.historico_Eventos.findFirst({
+                where: {
+                    id_empresa,
+                    id_evento,
+                    id_maquina
+                },
+                select: {
+                    inicio: true,
+                    termino: true
+                }
+            });
+
+            if (!eventoAtual) {
+                throw new Error('Evento nao encontrado ou nao pertence a empresa');
+            }
+
+            const termino = eventoAtual.termino ?? new Date();
             const resultado = await prisma.historico_Eventos.updateMany({
                 where: {
                     id_empresa,
@@ -733,10 +788,11 @@ class EventoModel {
                 },
                 data: {
                     id_motivo_parada,
-                    observacao: observacao ?? ''
+                    observacao: observacao ?? '',
+                    termino,
+                    duracao: this.calcularDuracao(eventoAtual.inicio, termino)
                 }
             });
-
             if (resultado.count === 0) {
                 throw new Error('Evento nao encontrado ou nao pertence a empresa');
             }

@@ -1,6 +1,7 @@
 import prisma from '../config/prisma.js';
 import { paginarPrisma } from '../dev-utils/paginacaoUtil.js';
 import OEEModel from './OEEModel.js';
+import EventoModel from './EventoModel.js';
 import { EventEmitter } from 'events';
 
 class MaquinaModel {
@@ -1612,6 +1613,8 @@ class MaquinaModel {
 
     static async obterHistoricoEventosTabela(id_maquina, id_empresa, limite = 50) {
         try {
+            await EventoModel.encerrarEventosJustificadosAbertos(id_empresa, id_maquina);
+
             const [eventos, idsEventosMaquina, apontamentos] = await Promise.all([
                 prisma.historico_Eventos.findMany({
                     where: {
