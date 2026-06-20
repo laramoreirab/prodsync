@@ -675,6 +675,26 @@ async function criarEventos(id_empresa, maquinas, turnos, motivos, ordens, gesto
     });
     eventosCriados.push(evento);
 
+    await prisma.maquinas.updateMany({
+      where: {
+        id_empresa,
+        id_maquina: maquina.id_maquina,
+      },
+      data: {
+        status_atual,
+        status: status_atual,
+        board_ultimo_contato_em: inicio,
+      },
+    });
+
+    await prisma.ordemProducao.update({
+      where: { id_ordem: ordem.id_ordem },
+      data: {
+        status_op: status_atual,
+        prioridade: status_atual === 'Parada' ? 'Critica' : 'Alta',
+      },
+    });
+
     const gestor = gestoresCriados[index % gestoresCriados.length];
     await prisma.notificacoes.create({
       data: {
