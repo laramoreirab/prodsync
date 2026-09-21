@@ -5,10 +5,10 @@
 
 ## 🎯 O problema:
 Muitas indústrias ainda sofrem com processos manuais no chão de fábrica. O ProdSync resolve gargalos críticos como:
-Informação "Zumbi": O dado chega ao gestor "morto". Como o registro é manual e demorado, não se resolve o problema no momento em que ele acontece; apenas lamenta-se o prejuízo no dia seguinte.
-Subjetividade (O fator humano): Papel aceita tudo. Sem automação, os números de produção e tempos de parada são baseados em estimativas ou "arredondamentos" dos operadores, o que mascara a realidade.
-Custo Fantasma: Sem saber o motivo exato das paradas (quebra, falta de material, setup lento), a empresa perde dinheiro sem conseguir identificar o ralo por onde ele está escoando.
-Incapacidade de Melhoria: Não se gerencia o que não se mede. Sem indicadores por turno (KPIs), é impossível criar metas, bonificar bons desempenhos ou identificar gargalos operacionais.
+* Informação "Zumbi": O dado chega ao gestor "morto". Como o registro é manual e demorado, não se resolve o problema no momento em que ele acontece; apenas lamenta-se o prejuízo no dia seguinte.
+* Subjetividade (O fator humano): Papel aceita tudo. Sem automação, os números de produção e tempos de parada são baseados em estimativas ou "arredondamentos" dos operadores, o que mascara a realidade.
+* Custo Fantasma: Sem saber o motivo exato das paradas (quebra, falta de material, setup lento), a empresa perde dinheiro sem conseguir identificar o ralo por onde ele está escoando.
+* Incapacidade de Melhoria: Não se gerencia o que não se mede. Sem indicadores por turno (KPIs), é impossível criar metas, bonificar bons desempenhos ou identificar gargalos operacionais.
 
 ## 💡 A Solução
 O **ProdSync** permite o registro digital das peças produzidas em tempo real, envia alertas automáticos de paradas de máquina para a manutenção e gera dashboards com indicadores de produtividade (KPIs) por turno, eliminando o uso de papel e a comunicação verbal tardia.
@@ -17,10 +17,15 @@ O **ProdSync** permite o registro digital das peças produzidas em tempo real, e
 
 ## 🛠️ Tecnologias Usadas
 | **Linguagem web** | HTML, CSS, JavaScript |
+
 | **Framework** | ShadCN, Next.js, Express, Tailwind |
+
 | **Linguagem Mobile** | Java, Android Studio |
+
 | **Banco de dados** | PostgreSQL |
+
 | **IOT** | JavaScript, Espruino |
+
 | **Protocolo de comunicação** | MQTT |
 
 ---
