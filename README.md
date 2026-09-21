@@ -50,12 +50,15 @@ O **ProdSync** permite o registro digital das peças produzidas em tempo real, e
 ## 👥 Tipos de Usuários
 
 Persona 1 - Operador de Máquina
+
 Objetivo: Registrar sua produção de forma rápida e objetiva(assim evitando que informações sobre a produção deixem de ser registradas).
 
 Persona 2 - Gestor de Produção
+
 Objetivo: Ter visibilidade total do chão de fábrica pela plataforma(indentificando quais máquinas estão produzindo, quais estão paradas, por quais motivos elas estão paradas), para que a tomada de decisões seja mais precisa. Além da apresentação dos números de produção em tempo real(os problemas podem ser resolvidos mais rápidamente).
 
 Persona 3 - Administrador
+
 Objetivo: Maior controle sobre as informações dentro do site e visão geral do chão de fábrica.
 
 ---
@@ -69,7 +72,9 @@ Acesse a aplicação web em produção através do link: https://prodsync-six.ve
 ## 👨‍💻 Equipe & Agradecimentos
 
 Curso Técnico em Desenvolvimento de Sistemas - **SENAI**
+
 **Professores Orientadores**: Estevão Ferreira Lourenço, William Reis da Silva e Gustavo Paiva
+
 **Desenvolvedores**: Beatriz Gonçalves, Enzo Penido, Giovana Frade, Lara Moreira, Larissa Klarosk, Phietro Alves
 
 
